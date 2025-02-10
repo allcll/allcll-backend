@@ -35,6 +35,13 @@ app:
   scheduling:
     enabled: true
 
+external:
+  host: http://localhost:9090
+  connection-path: /api/connect
+  non-major-path: /api/non-major
+  pin-path: /api/pin
+
+
 management:
   endpoints:
     web:

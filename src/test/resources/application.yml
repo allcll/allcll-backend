@@ -22,3 +22,10 @@ spring:
   mvc:
     async:
       request-timeout: 500 # 500 millis
+
+external:
+  host: http://localhost:9090
+  connection-path: /api/connect
+  non-major-path: /api/non-major
+  pin-path: /api/pin
+
