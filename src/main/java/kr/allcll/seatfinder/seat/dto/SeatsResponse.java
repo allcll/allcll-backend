@@ -1,14 +1,13 @@
 package kr.allcll.seatfinder.seat.dto;
 
 import java.util.List;
-import kr.allcll.seatfinder.seat.Seat;
 
 public record SeatsResponse(
     List<SeatResponse> seatResponses
 ) {
 
-    public static SeatsResponse from(List<Seat> seats) {
-        return new SeatsResponse(seats.stream()
+    public static SeatsResponse from(List<SeatDto> seatDtos) {
+        return new SeatsResponse(seatDtos.stream()
             .map(SeatResponse::from)
             .toList());
     }
