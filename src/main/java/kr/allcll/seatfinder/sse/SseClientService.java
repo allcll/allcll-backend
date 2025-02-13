@@ -11,7 +11,7 @@ import kr.allcll.seatfinder.exception.AllcllErrorCode;
 import kr.allcll.seatfinder.exception.AllcllException;
 import kr.allcll.seatfinder.external.ExternalProperties;
 import kr.allcll.seatfinder.seat.PinRemainSeat;
-import kr.allcll.seatfinder.seat.Seat;
+import kr.allcll.seatfinder.seat.dto.SeatDto;
 import kr.allcll.seatfinder.seat.SeatStorage;
 import kr.allcll.seatfinder.subject.Subject;
 import kr.allcll.seatfinder.subject.SubjectRepository;
@@ -50,7 +50,7 @@ public class SseClientService {
                         }
                         Subject subject = subjectRepository.findById(pinRemainSeat.subjectId())
                             .orElseThrow(() -> new AllcllException(AllcllErrorCode.SUBJECT_NOT_FOUND));
-                        seatStorage.add(new Seat(subject, pinRemainSeat.remainSeat(), LocalDateTime.now()));
+                        seatStorage.add(new SeatDto(subject, pinRemainSeat.remainSeat(), LocalDateTime.now()));
                     } else {
                         log.debug("JSON 형식이 아닌 data 값: {}", dataPart);
                     }

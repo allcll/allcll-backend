@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.time.LocalDateTime;
 import java.util.List;
+import kr.allcll.seatfinder.seat.dto.SeatDto;
 import kr.allcll.seatfinder.subject.Subject;
 import kr.allcll.seatfinder.support.fixture.SubjectFixture;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,9 +27,9 @@ import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = "app.scheduling.enabled=true") // 테스트에서 스케줄러 활성화
-class SeatServiceTest {
+class SeatDtoServiceTest {
 
-    private static final Logger log = LoggerFactory.getLogger(SeatServiceTest.class);
+    private static final Logger log = LoggerFactory.getLogger(SeatDtoServiceTest.class);
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @LocalServerPort
@@ -121,21 +122,21 @@ class SeatServiceTest {
         LocalDateTime localDateTime = LocalDateTime.of(2025, 1, 28, 23, 55, 23, 434294000);
 
         seatStorage.addAll(List.of(
-            new Seat(majorSubject1, 20, localDateTime),
-            new Seat(majorSubject2, 19, localDateTime),
-            new Seat(majorSubject3, 18, localDateTime),
-            new Seat(majorSubject4, 17, localDateTime),
-            new Seat(majorSubject5, 16, localDateTime),
-            new Seat(nonMajorSubject1, 10, localDateTime),
-            new Seat(nonMajorSubject2, 9, localDateTime),
-            new Seat(nonMajorSubject3, 8, localDateTime),
-            new Seat(nonMajorSubject4, 7, localDateTime),
-            new Seat(nonMajorSubject5, 6, localDateTime),
-            new Seat(nonMajorSubject6, 5, localDateTime),
-            new Seat(nonMajorSubject7, 4, localDateTime),
-            new Seat(nonMajorSubject8, 3, localDateTime),
-            new Seat(nonMajorSubject9, 2, localDateTime),
-            new Seat(nonMajorSubject10, 1, localDateTime)
+            new SeatDto(majorSubject1, 20, localDateTime),
+            new SeatDto(majorSubject2, 19, localDateTime),
+            new SeatDto(majorSubject3, 18, localDateTime),
+            new SeatDto(majorSubject4, 17, localDateTime),
+            new SeatDto(majorSubject5, 16, localDateTime),
+            new SeatDto(nonMajorSubject1, 10, localDateTime),
+            new SeatDto(nonMajorSubject2, 9, localDateTime),
+            new SeatDto(nonMajorSubject3, 8, localDateTime),
+            new SeatDto(nonMajorSubject4, 7, localDateTime),
+            new SeatDto(nonMajorSubject5, 6, localDateTime),
+            new SeatDto(nonMajorSubject6, 5, localDateTime),
+            new SeatDto(nonMajorSubject7, 4, localDateTime),
+            new SeatDto(nonMajorSubject8, 3, localDateTime),
+            new SeatDto(nonMajorSubject9, 2, localDateTime),
+            new SeatDto(nonMajorSubject10, 1, localDateTime)
         ));
 
         // when
