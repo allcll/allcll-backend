@@ -1,7 +1,6 @@
 package kr.allcll.seatfinder.seat.dto;
 
 import java.time.LocalDateTime;
-import kr.allcll.seatfinder.seat.Seat;
 
 public record SeatResponse(
     Long subjectId,
@@ -9,11 +8,11 @@ public record SeatResponse(
     LocalDateTime queryTime
 ) {
 
-    public static SeatResponse from(Seat seat) {
+    public static SeatResponse from(SeatDto seatDto) {
         return new SeatResponse(
-            seat.getSubject().getId(),
-            seat.getSeatCount(),
-            seat.getQueryTime()
+            seatDto.getSubject().getId(),
+            seatDto.getSeatCount(),
+            seatDto.getQueryTime()
         );
     }
 }

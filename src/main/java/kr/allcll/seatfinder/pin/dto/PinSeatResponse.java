@@ -1,7 +1,7 @@
 package kr.allcll.seatfinder.pin.dto;
 
 import java.time.LocalDateTime;
-import kr.allcll.seatfinder.seat.Seat;
+import kr.allcll.seatfinder.seat.dto.SeatDto;
 
 public record PinSeatResponse(
     Long subjectId,
@@ -9,11 +9,11 @@ public record PinSeatResponse(
     LocalDateTime queryTime
 ) {
 
-    public static PinSeatResponse from(Seat seat) {
+    public static PinSeatResponse from(SeatDto seatDto) {
         return new PinSeatResponse(
-            seat.getSubject().getId(),
-            seat.getSeatCount(),
-            seat.getQueryTime()
+            seatDto.getSubject().getId(),
+            seatDto.getSeatCount(),
+            seatDto.getQueryTime()
         );
     }
 }
