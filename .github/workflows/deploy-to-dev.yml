@@ -2,7 +2,7 @@ name: Deploy to Develop Server
 
 on:
   push:
-    branches: [ "main", "fix/70-sse-transfer" ]
+    branches: [ "main" ]
 
 jobs:
   deploy:
