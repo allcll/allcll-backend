@@ -27,9 +27,9 @@ import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = "app.scheduling.enabled=true") // 테스트에서 스케줄러 활성화
-class SeatDtoServiceTest {
+class SeatServiceTest {
 
-    private static final Logger log = LoggerFactory.getLogger(SeatDtoServiceTest.class);
+    private static final Logger log = LoggerFactory.getLogger(SeatServiceTest.class);
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @LocalServerPort
