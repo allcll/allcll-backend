@@ -1,7 +1,6 @@
 package kr.allcll.seatfinder.seat;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +9,6 @@ import java.util.concurrent.ScheduledFuture;
 import kr.allcll.seatfinder.pin.Pin;
 import kr.allcll.seatfinder.pin.PinRepository;
 import kr.allcll.seatfinder.pin.dto.PinSeatsResponse;
-import kr.allcll.seatfinder.seat.dto.PreSeatsResponse;
 import kr.allcll.seatfinder.seat.dto.SeatDto;
 import kr.allcll.seatfinder.seat.dto.SeatsResponse;
 import kr.allcll.seatfinder.sse.SseService;
@@ -69,10 +67,5 @@ public class SeatService {
                 scheduledTasks.remove(token);
             },
             new Date(System.currentTimeMillis() + TASK_PERIOD));
-    }
-
-    public PreSeatsResponse getAllPreSeats() {
-        List<Seat> allByCreatedDate = seatRepository.findAllByCreatedDate((LocalDate.of(2025, 2, 14)));
-        return PreSeatsResponse.from(allByCreatedDate);
     }
 }
