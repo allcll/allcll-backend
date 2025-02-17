@@ -2,6 +2,7 @@ package kr.allcll.seatfinder.sse;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -41,5 +42,14 @@ public class SseEmitterStorage {
      */
     public List<SseEmitter> getEmitters() {
         return emitters.values().stream().toList();
+    }
+
+    public Optional<SseEmitter> getEmitter(String token) {
+        SseEmitter emitter = emitters.get(token);
+        return Optional.ofNullable(emitter);
+    }
+
+    public List<String> getUserTokens() {
+        return emitters.keySet().stream().toList();
     }
 }

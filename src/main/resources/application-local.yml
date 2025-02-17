@@ -34,6 +34,15 @@ logging:
 app:
   scheduling:
     enabled: true
+  runner:
+    enabled: true
+
+external:
+  host: http://localhost:9090
+  connection-path: /api/connect
+  non-major-path: /api/non-major
+  pin-path: /api/pin
+
 
 management:
   endpoints:

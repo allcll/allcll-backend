@@ -15,7 +15,7 @@ public class ScheduleConfig {
     public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setThreadNamePrefix("pin-subjects-sent-scheduler");
-        scheduler.setPoolSize(4);
+        scheduler.setPoolSize(20);
         scheduler.setAwaitTerminationSeconds(15);
         scheduler.setRemoveOnCancelPolicy(true);
         scheduler.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);

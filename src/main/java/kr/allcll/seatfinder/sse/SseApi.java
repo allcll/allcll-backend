@@ -19,7 +19,10 @@ public class SseApi {
     @GetMapping(value = "/api/connect", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> getServerSentEventConnection() {
         String token = ThreadLocalHolder.SHARED_TOKEN.get();
+        SseEmitter emitter = sseService.connect(token);
         seatService.sendPinSeatsInformation(token);
-        return ResponseEntity.ok(sseService.connect(token));
+        return ResponseEntity.ok()
+            .header("X-Accel-Buffering", "no")
+            .body(emitter);
     }
 }
