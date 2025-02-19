@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
+import kr.allcll.seatfinder.pin.PinRepository;
 import kr.allcll.seatfinder.star.StarRepository;
 import kr.allcll.seatfinder.subject.dto.SubjectResponse;
 import kr.allcll.seatfinder.subject.dto.SubjectsResponse;
@@ -27,8 +28,12 @@ class SubjectServiceTest {
     @Autowired
     private StarRepository starRepository;
 
+    @Autowired
+    private PinRepository pinRepository;
+
     @BeforeEach
     void setUp() {
+        pinRepository.deleteAllInBatch();
         starRepository.deleteAllInBatch();
         subjectRepository.deleteAllInBatch();
         initializeSubjects();
