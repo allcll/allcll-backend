@@ -33,6 +33,13 @@ public class SseService {
         });
     }
 
+    public void propagate(String token, String eventName, Object data) {
+        sseEmitterStorage.getEmitter(token).ifPresent(emitter -> {
+            SseEventBuilder eventBuilder = SseEventBuilderFactory.create(eventName, data);
+            sendEvent(emitter, eventBuilder);
+        });
+    }
+
     private void sendEvent(SseEmitter sseEmitter, SseEventBuilder eventBuilder) {
         try {
             sseEmitter.send(eventBuilder);

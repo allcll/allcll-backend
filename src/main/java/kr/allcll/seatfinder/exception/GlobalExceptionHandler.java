@@ -1,5 +1,6 @@
 package kr.allcll.seatfinder.exception;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,8 +33,14 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleServletException(HttpServletRequest request, ServletException e) {
+        log.warn(LOG_FORMAT, request.getMethod(), request.getRequestURI(), getRequestBody(request), e.getMessage());
+        return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleException(HttpServletRequest request, Exception e) {
-        log.error(LOG_FORMAT, request.getMethod(), request.getRequestURI(), getRequestBody(request), e.getMessage());
+        log.error(LOG_FORMAT, request.getMethod(), request.getRequestURI(), getRequestBody(request), e.getMessage(), e);
         return ResponseEntity.internalServerError()
             .body(new ErrorResponse("SERVER_ERROR",
                 "서버 에러가 발생하였습니다.",

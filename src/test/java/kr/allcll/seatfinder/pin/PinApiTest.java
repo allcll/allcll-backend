@@ -11,6 +11,7 @@ import jakarta.servlet.http.Cookie;
 import java.util.List;
 import kr.allcll.seatfinder.pin.dto.SubjectIdResponse;
 import kr.allcll.seatfinder.pin.dto.SubjectIdsResponse;
+import kr.allcll.seatfinder.sse.SseService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ class PinApiTest {
 
     @MockitoBean
     private PinService pinService;
+
+    @MockitoBean
+    private SseService sseService;
 
     private static final String BASE_URL = "/api/pin";
 

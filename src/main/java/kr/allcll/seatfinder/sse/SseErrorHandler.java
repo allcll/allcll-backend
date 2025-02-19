@@ -9,10 +9,9 @@ public class SseErrorHandler {
     public static void handle(IOException e) {
         if (isClientAbortException(e)) {
             log.info("클라이언트가 연결을 종료했습니다.");
-        } else {
-            log.error("SSE 연결 중 오류 발생: {}", e.getMessage());
-            throw new RuntimeException(e);
+            return;
         }
+        throw new RuntimeException(e);
     }
 
     private static boolean isClientAbortException(Throwable throwable) {

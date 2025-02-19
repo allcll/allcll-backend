@@ -9,12 +9,14 @@ import jakarta.persistence.Table;
 import kr.allcll.seatfinder.BaseEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Table(name = "subjects")
 @Entity
 @Getter
+@EqualsAndHashCode(of = "id", callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 public class Subject extends BaseEntity {

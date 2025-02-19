@@ -3,6 +3,7 @@ package kr.allcll.seatfinder.sse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import kr.allcll.seatfinder.seat.SeatService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,9 @@ class SseApiTest {
 
     @MockitoBean
     private SseService sseService;
+
+    @MockitoBean
+    private SeatService seatService;
 
     @DisplayName("Server Sent Event를 연결한다.")
     @Test
