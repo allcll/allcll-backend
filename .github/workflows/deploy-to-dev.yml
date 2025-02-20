@@ -27,6 +27,7 @@ jobs:
 
       - name: Copy application-dev.yml to Local
         run: |
+          mkdir -p /home/ubuntu/app
           cp config/application-dev.yml /home/ubuntu/app/application-dev.yml
 
       - name: CheckOut
