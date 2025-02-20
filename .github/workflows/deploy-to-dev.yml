@@ -2,7 +2,7 @@ name: Deploy to Develop Server
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "refactor/*" ]
 
 jobs:
   deploy:
@@ -18,7 +18,7 @@ jobs:
       - name: Fetch application-dev.yml to config path
         uses: actions/checkout@v4
         with:
-          repository: '${{ github.config-repository }}'
+          repository: '${{ secrets.CONFIG_REPOSITORY }}'
           token: '${{ github.token }}'
           path: config
           sparse-checkout: |
