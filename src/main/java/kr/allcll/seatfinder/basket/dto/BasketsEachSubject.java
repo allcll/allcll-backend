@@ -15,6 +15,7 @@ public record BasketsEachSubject(
     Integer totalCount //총 인원
 ) {
 
+
     public static BasketsEachSubject from(Subject subject, List<Basket> baskets) {
         if (baskets.isEmpty()) {
             return new BasketsEachSubject(
