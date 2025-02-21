@@ -27,7 +27,7 @@ jobs:
 
       - name: Copy application-prod.yml to Local
         run: |
-          mkdir -p /home/ubuntu/app
+          mkdir -p ${{ secrets.APP_DIR }}
           cp config/application-prod.yml ${{ secrets.APP_DIR }}/application-prod.yml
 
       - name: CheckOut
