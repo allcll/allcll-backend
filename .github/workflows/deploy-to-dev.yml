@@ -1,4 +1,4 @@
-name: Deploy to Develop Server
+name: 개발 배포
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
         shell: bash
 
     steps:
-      - name: Fetch application-dev.yml to config path
+      - name: Checkout application-dev.yml to config path
         uses: actions/checkout@v4
         with:
           repository: '${{ secrets.CONFIG_REPOSITORY }}'
