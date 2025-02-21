@@ -24,10 +24,11 @@ jobs:
         run: |
           if git diff --quiet HEAD^ HEAD -- src/; then
             echo "changed=false" >> $GITHUB_OUTPUT
+            echo "Server code changed? false"
           else
             echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Server code changed? true"
           fi
-          echo "Server code changed? ${{ steps.check.outputs.changed }}"
 
   build-and-test:
     needs: check-app-changes
