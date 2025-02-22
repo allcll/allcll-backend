@@ -1,4 +1,4 @@
-name: Deploy to Develop Server
+name: 개발 배포
 
 on:
   push:
@@ -8,12 +8,28 @@ jobs:
   deploy:
     runs-on: [ self-hosted, "dev" ]
     environment: develop
+    timeout-minutes: 10
 
     defaults:
       run:
         shell: bash
 
     steps:
+      - name: Checkout application-dev.yml to config path
+        uses: actions/checkout@v4
+        with:
+          repository: '${{ secrets.CONFIG_REPOSITORY }}'
+          token: '${{ secrets.TOKEN }}'
+          path: config
+          sparse-checkout: |
+            application-dev.yml
+          sparse-checkout-cone-mode: false
+
+      - name: Copy application-dev.yml to Local
+        run: |
+          mkdir -p /home/ubuntu/app
+          cp config/application-dev.yml /home/ubuntu/app/application-dev.yml
+
       - name: CheckOut
         uses: actions/checkout@v4
 
@@ -36,10 +52,6 @@ jobs:
         run: |
           mkdir -p /home/ubuntu/app
           cp build/libs/*-SNAPSHOT.jar /home/ubuntu/app/server.jar
-
-      - name: Copy application-dev.yml to Local
-        run: |
-          echo "${{ secrets.APPLICATION_YML }}" > /home/ubuntu/app/application-dev.yml
 
       - name: Stop Existing Application
         run: |
