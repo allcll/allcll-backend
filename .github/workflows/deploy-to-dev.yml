@@ -2,7 +2,7 @@ name: 개발 배포
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "*" ]
 
 jobs:
   deploy:
