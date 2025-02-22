@@ -99,7 +99,7 @@
       <appender-ref ref="ERROR-ROLLING"/>
       <appender-ref ref="WARN-ROLLING"/>
       <appender-ref ref="INFO-ROLLING"/>
-      <!--            <appender-ref ref="DEBUG-ROLLING"/>-->
+      <appender-ref ref="DEBUG-ROLLING"/>
     </root>
   </springProfile>
 
