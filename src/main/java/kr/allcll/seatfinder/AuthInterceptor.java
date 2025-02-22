@@ -52,7 +52,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         Cookie cookie = new Cookie(TOKEN_KEY, token);
         cookie.setPath(cookieProperties.path());
         cookie.setDomain(cookieProperties.domain());
-        cookie.setSecure(cookie.getSecure());
+        cookie.setSecure(cookieProperties.secure());
         cookie.setHttpOnly(cookieProperties.httpOnly());
         cookie.setMaxAge((int) cookieProperties.maxAge().getSeconds());
         return cookie;
