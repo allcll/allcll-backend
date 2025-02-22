@@ -49,3 +49,11 @@ management:
     web:
       exposure:
         include: prometheus, health
+
+cookie:
+  max-age: 2190D
+  secure: true
+  http-only: true
+  same-site: strict
+  domain: localhost
+  path: /

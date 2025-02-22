@@ -6,20 +6,26 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import kr.allcll.seatfinder.exception.AllcllErrorCode;
 import kr.allcll.seatfinder.exception.AllcllException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
+@RequiredArgsConstructor
+@EnableConfigurationProperties(CookieProperties.class)
 public class AuthInterceptor implements HandlerInterceptor {
 
     private static final String TOKEN_KEY = "token";
+
+    private final CookieProperties cookieProperties;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         if (hasNoToken(request)) {
             String token = TokenProvider.create();
             ThreadLocalHolder.SHARED_TOKEN.set(token);
-            response.addCookie(new Cookie(TOKEN_KEY, token));
+            response.addCookie(createCookie(token));
             return true;
         }
         ThreadLocalHolder.SHARED_TOKEN.set(findTokenFromCookie(request));
@@ -40,5 +46,15 @@ public class AuthInterceptor implements HandlerInterceptor {
             .findAny()
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.TOKEN_NOT_FOUND))
             .getValue();
+    }
+
+    private Cookie createCookie(String token) {
+        Cookie cookie = new Cookie(TOKEN_KEY, token);
+        cookie.setPath(cookieProperties.path());
+        cookie.setDomain(cookieProperties.domain());
+        cookie.setSecure(cookieProperties.secure());
+        cookie.setHttpOnly(cookieProperties.httpOnly());
+        cookie.setMaxAge((int) cookieProperties.maxAge().getSeconds());
+        return cookie;
     }
 }

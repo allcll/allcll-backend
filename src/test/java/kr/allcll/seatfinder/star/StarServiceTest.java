@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.List;
 import kr.allcll.seatfinder.exception.AllcllErrorCode;
 import kr.allcll.seatfinder.exception.AllcllException;
+import kr.allcll.seatfinder.pin.PinRepository;
 import kr.allcll.seatfinder.star.dto.StarredSubjectIdsResponse;
 import kr.allcll.seatfinder.subject.Subject;
 import kr.allcll.seatfinder.subject.SubjectRepository;
@@ -32,8 +33,12 @@ class StarServiceTest {
     @Autowired
     private StarRepository starRepository;
 
+    @Autowired
+    private PinRepository pinRepository;
+
     @BeforeEach
     void setUp() {
+        pinRepository.deleteAllInBatch();
         starRepository.deleteAllInBatch();
         subjectRepository.deleteAllInBatch();
     }

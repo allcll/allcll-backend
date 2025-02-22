@@ -33,3 +33,10 @@ external:
   non-major-path: /api/non-major
   pin-path: /api/pin
 
+cookie:
+  max-age: 2190D
+  secure: true
+  http-only: true
+  same-site: strict
+  domain: localhost
+  path: /
