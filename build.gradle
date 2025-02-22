@@ -27,9 +27,13 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+<<<<<<< HEAD
     implementation 'io.micrometer:micrometer-registry-prometheus'
     implementation 'org.springframework.retry:spring-retry'
     implementation 'org.springframework:spring-aspects'
+=======
+    implementation 'io.micrometer:micrometer-registry-datadog'
+>>>>>>> b39cdcb (chore: datadog 설정 추가)
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
