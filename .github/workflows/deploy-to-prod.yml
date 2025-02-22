@@ -1,4 +1,4 @@
-name: Deploy to Production Server
+name: 운영 배포
 
 on:
   push:
@@ -8,12 +8,28 @@ jobs:
   deploy:
     runs-on: [ self-hosted, "prod" ]
     environment: production
+    timeout-minutes: 10
 
     defaults:
       run:
         shell: bash
 
     steps:
+      - name: Checkout application-prod.yml to config path
+        uses: actions/checkout@v4
+        with:
+          repository: '${{ secrets.CONFIG_REPOSITORY }}'
+          token: '${{ secrets.TOKEN }}'
+          path: config
+          sparse-checkout: |
+            application-prod.yml
+          sparse-checkout-cone-mode: false
+
+      - name: Copy application-prod.yml to Local
+        run: |
+          mkdir -p ${{ secrets.APP_DIR }}
+          cp config/application-prod.yml ${{ secrets.APP_DIR }}/application-prod.yml
+
       - name: CheckOut
         uses: actions/checkout@v4
 
@@ -36,10 +52,6 @@ jobs:
         run: |
           mkdir -p ${{ secrets.APP_DIR }}
           cp build/libs/*-SNAPSHOT.jar ${{ secrets.APP_DIR }}/server.jar
-
-      - name: Copy application-prod.yml to Local
-        run: |
-          echo "${{ secrets.APPLICATION_YML }}" > ${{ secrets.APP_DIR }}/application-prod.yml
 
       - name: Stop Existing Application
         run: |
