@@ -1,43 +1,44 @@
-name: pull request
+name: 올클 CI
 
 on:
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'src/**'
 
 permissions:
   checks: write
   pull-requests: write
 
 jobs:
-  test:
-    runs-on: [ ubuntu-latest ]
-
+  build-and-test:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: 코드 체크아웃
         uses: actions/checkout@v4
 
-      - name: Set up JDK 21
+      - name: JDK 21 세팅
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+      - name: Gradle 세팅
+        uses: gradle/actions/setup-gradle@v3
 
-      - name: Grant execute permission for gradlew
+      - name: Gradlew 실행 권한 부여
         run: chmod +x gradlew
 
-      - name: Test with Gradle Wrapper
+      - name: Gradle 빌드와 테스트
         run: ./gradlew clean build
 
-      - name: Publish unit test results
+      - name: 테스트 결과를 빌드 디렉토리에 생성
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
           files: build/test-results/test/TEST-*.xml
 
-      - name: Add comments to a pull request
+      - name: 테스트 결과를 PR에 코멘트로 작성
         uses: mikepenz/action-junit-report@v3
         if: always()
         with:
