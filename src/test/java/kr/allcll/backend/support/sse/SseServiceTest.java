@@ -67,11 +67,10 @@ class SseServiceTest {
 
         // when && then
         RestAssured.given()
-            .accept("text/event-stream")
             .when()
             .get("/api/connect")
             .then()
-            .statusCode(500);
+            .statusCode(400);
     }
 
     @DisplayName("SSE를 연결하고, 최초 메시지를 받는다.")
