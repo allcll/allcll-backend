@@ -29,6 +29,9 @@ class SseServiceTest {
     @Autowired
     private SseService sseService;
 
+    @Autowired
+    private SseAccessStorage sseAccessStorage;
+
     @MockitoBean
     private SeatService seatService;
 
@@ -43,6 +46,9 @@ class SseServiceTest {
     @DisplayName("SSE를 연결하고, 최초 메시지를 받는다.")
     @Test
     void sseConnectionTest() {
+        // given
+        sseAccessStorage.connectionOpen();
+
         // when
         Response response = RestAssured.given()
             .accept("text/event-stream")
@@ -61,6 +67,7 @@ class SseServiceTest {
     @Test
     void ssePropagationTest() {
         // given
+        sseAccessStorage.connectionOpen();
         Response response1 = RestAssured.given()
             .accept("text/event-stream")
             .when()

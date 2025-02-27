@@ -14,6 +14,7 @@ import java.util.List;
 import kr.allcll.backend.domain.seat.dto.SeatDto;
 import kr.allcll.backend.domain.subject.Subject;
 import kr.allcll.backend.fixture.SubjectFixture;
+import kr.allcll.backend.support.sse.SseAccessStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,9 @@ class SeatServiceTest {
     @Autowired
     private SeatStorage seatStorage;
 
+    @Autowired
+    private SseAccessStorage sseAccessStorage;
+
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
@@ -46,6 +50,7 @@ class SeatServiceTest {
     @DisplayName("1초에 한 번씩 비전공 과목의 좌석 정보 10개를 전송한다.")
     @Test
     void sendNonMajorSeatInfoTest() throws JsonProcessingException {
+        sseAccessStorage.connectionOpen();
         // given
         String expected = """
             {
