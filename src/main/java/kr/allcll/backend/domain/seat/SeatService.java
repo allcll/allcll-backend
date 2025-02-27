@@ -33,7 +33,6 @@ public class SeatService {
     private final SseService sseService;
     private final SeatStorage seatStorage;
     private final PinRepository pinRepository;
-    private final SeatRepository seatRepository;
     private final ThreadPoolTaskScheduler scheduler;
     private final Map<String, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
 
