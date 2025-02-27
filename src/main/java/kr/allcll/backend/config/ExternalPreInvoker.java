@@ -1,7 +1,7 @@
 package kr.allcll.backend.config;
 
-import kr.allcll.backend.external.ExternalService;
-import kr.allcll.backend.sse.SseClientService;
+import kr.allcll.backend.client.ExternalService;
+import kr.allcll.backend.support.sse.SseClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Backoff;

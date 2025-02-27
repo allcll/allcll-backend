@@ -1,6 +1,6 @@
 package kr.allcll.backend.config;
 
-import kr.allcll.backend.AuthInterceptor;
+import kr.allcll.backend.support.web.AuthInterceptor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
