@@ -32,6 +32,7 @@ public class SeatService {
 
     private final SseService sseService;
     private final SeatStorage seatStorage;
+    private final SeatRepository seatRepository;
     private final PinRepository pinRepository;
     private final ThreadPoolTaskScheduler scheduler;
     private final ScheduleStorage scheduleStorage;
