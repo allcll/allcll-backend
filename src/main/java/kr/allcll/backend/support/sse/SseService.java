@@ -19,9 +19,7 @@ public class SseService {
     private final AdminConfigStorage adminConfigStorage;
 
     public SseEmitter connect(String token) {
-        if (adminConfigStorage.sseNotAccessible()) {
-            throw new AllcllException(AllcllErrorCode.SSE_CONNECTION_DENIED);
-        }
+        adminConfigStorage.validateSseConnection();
         SseEmitter sseEmitter = createSseEmitter();
         sseEmitterStorage.add(token, sseEmitter);
         SseEventBuilder initialEvent = SseEventBuilderFactory.createInitialEvent();
@@ -34,9 +32,7 @@ public class SseService {
     }
 
     public void propagate(String eventName, Object data) {
-        if (adminConfigStorage.sseNotAccessible()) {
-            throw new AllcllException(AllcllErrorCode.SSE_CONNECTION_DENIED);
-        }
+        adminConfigStorage.validateSseConnection();
         sseEmitterStorage.getEmitters().forEach(emitter -> {
             SseEventBuilder eventBuilder = SseEventBuilderFactory.create(eventName, data);
             sendEvent(emitter, eventBuilder);
@@ -44,9 +40,7 @@ public class SseService {
     }
 
     public void propagate(String token, String eventName, Object data) {
-        if (adminConfigStorage.sseNotAccessible()) {
-            throw new AllcllException(AllcllErrorCode.SSE_CONNECTION_DENIED);
-        }
+        adminConfigStorage.validateSseConnection();
         sseEmitterStorage.getEmitter(token).ifPresent(emitter -> {
             SseEventBuilder eventBuilder = SseEventBuilderFactory.create(eventName, data);
             sendEvent(emitter, eventBuilder);
