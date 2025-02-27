@@ -72,7 +72,7 @@ public class SeatService {
     }
 
     public PreSeatsResponse getAllPreSeats() {
-        List<Seat> allByCreatedDate = seatRepository.findAllByCreatedDate((LocalDate.of(2025, 2, 14)));
+        List<Seat> allByCreatedDate = seatRepository.findAllByCreatedDate((LocalDate.of(2025, 2, 28)));
         return PreSeatsResponse.from(allByCreatedDate);
     }
 }
