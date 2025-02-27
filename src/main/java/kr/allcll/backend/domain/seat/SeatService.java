@@ -1,18 +1,20 @@
 package kr.allcll.backend.domain.seat;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
+import kr.allcll.backend.domain.seat.dto.PreSeatsResponse;
+import kr.allcll.backend.domain.seat.dto.SeatDto;
+import kr.allcll.backend.domain.seat.dto.SeatsResponse;
 import kr.allcll.backend.domain.seat.pin.Pin;
 import kr.allcll.backend.domain.seat.pin.PinRepository;
 import kr.allcll.backend.domain.seat.pin.dto.PinSeatsResponse;
-import kr.allcll.backend.domain.seat.dto.SeatDto;
-import kr.allcll.backend.domain.seat.dto.SeatsResponse;
-import kr.allcll.backend.support.sse.SseService;
 import kr.allcll.backend.domain.subject.Subject;
+import kr.allcll.backend.support.sse.SseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -67,5 +69,10 @@ public class SeatService {
                 scheduledTasks.remove(token);
             },
             new Date(System.currentTimeMillis() + TASK_PERIOD));
+    }
+
+    public PreSeatsResponse getAllPreSeats() {
+        List<Seat> allByCreatedDate = seatRepository.findAllByCreatedDate((LocalDate.of(2025, 2, 14)));
+        return PreSeatsResponse.from(allByCreatedDate);
     }
 }
