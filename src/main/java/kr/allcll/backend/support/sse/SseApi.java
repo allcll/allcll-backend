@@ -1,7 +1,7 @@
 package kr.allcll.backend.support.sse;
 
-import kr.allcll.backend.support.web.ThreadLocalHolder;
 import kr.allcll.backend.domain.seat.SeatService;
+import kr.allcll.backend.support.web.ThreadLocalHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,6 @@ public class SseApi {
     public ResponseEntity<SseEmitter> getServerSentEventConnection() {
         String token = ThreadLocalHolder.SHARED_TOKEN.get();
         SseEmitter emitter = sseService.connect(token);
-        seatService.sendNonMajorSeats();
         seatService.sendPinSeatsInformation(token);
         return ResponseEntity.ok()
             .header("X-Accel-Buffering", "no")

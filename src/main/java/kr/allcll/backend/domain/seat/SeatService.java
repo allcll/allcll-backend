@@ -34,6 +34,7 @@ public class SeatService {
     private final ThreadPoolTaskScheduler scheduler;
     private final ScheduleStorage scheduleStorage;
 
+    // TODO: admin 에서 호출
     public void sendNonMajorSeats() {
         Runnable nonMajorTask = () -> {
             List<SeatDto> nonMajorSeatDtos = seatStorage.getNonMajorSeats(NON_MAJOR_SUBJECT_QUERY_LIMIT);
