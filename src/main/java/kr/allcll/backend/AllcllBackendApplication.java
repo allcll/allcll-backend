@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SeatFinderApplication {
+public class AllcllBackendApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(SeatFinderApplication.class, args);
+        SpringApplication.run(AllcllBackendApplication.class, args);
     }
 
 }

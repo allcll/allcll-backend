@@ -28,7 +28,7 @@ logging:
   level:
     kr:
       allcll:
-        seatfinder:
+        allcll-backend:
           sse: debug
 
 app:
