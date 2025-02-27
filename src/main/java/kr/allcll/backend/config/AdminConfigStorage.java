@@ -1,4 +1,4 @@
-package kr.allcll.backend.support.sse;
+package kr.allcll.backend.config;
 
 import org.springframework.stereotype.Component;
 

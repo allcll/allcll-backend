@@ -14,7 +14,7 @@ import java.util.List;
 import kr.allcll.backend.domain.seat.dto.SeatDto;
 import kr.allcll.backend.domain.subject.Subject;
 import kr.allcll.backend.fixture.SubjectFixture;
-import kr.allcll.backend.support.sse.AdminConfigStorage;
+import kr.allcll.backend.config.AdminConfigStorage;
 import kr.allcll.backend.support.sse.SseService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
