@@ -20,6 +20,7 @@ public class SseApi {
     public ResponseEntity<SseEmitter> getServerSentEventConnection() {
         String token = ThreadLocalHolder.SHARED_TOKEN.get();
         SseEmitter emitter = sseService.connect(token);
+        seatService.sendNonMajorSeats();
         seatService.sendPinSeatsInformation(token);
         return ResponseEntity.ok()
             .header("X-Accel-Buffering", "no")
