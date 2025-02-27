@@ -14,11 +14,8 @@ import java.util.List;
 import kr.allcll.backend.domain.seat.dto.SeatDto;
 import kr.allcll.backend.domain.subject.Subject;
 import kr.allcll.backend.fixture.SubjectFixture;
-import kr.allcll.backend.support.exception.AllcllErrorCode;
-import kr.allcll.backend.support.sse.SseAccessStorage;
+import kr.allcll.backend.support.sse.AdminConfigStorage;
 import kr.allcll.backend.support.sse.SseService;
-import org.assertj.core.api.Assertions;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,14 +41,14 @@ class SeatServiceTest {
     private SeatStorage seatStorage;
 
     @Autowired
-    private SseAccessStorage sseAccessStorage;
+    private AdminConfigStorage adminConfigStorage;
 
     @Autowired
     private SseService sseService;
 
     @BeforeEach
     void setUp() {
-        sseAccessStorage.connectionClose();
+        adminConfigStorage.connectionClose();
         RestAssured.port = port;
     }
 
@@ -80,7 +77,7 @@ class SeatServiceTest {
     @Test
     void sendNonMajorSeatInfoTest() throws JsonProcessingException {
         // given
-        sseAccessStorage.connectionOpen();
+        adminConfigStorage.connectionOpen();
         String expected = """
             {
               "seatResponses": [

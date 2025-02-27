@@ -30,7 +30,7 @@ class SseServiceTest {
     private SseService sseService;
 
     @Autowired
-    private SseAccessStorage sseAccessStorage;
+    private AdminConfigStorage adminConfigStorage;
 
     @MockitoBean
     private SeatService seatService;
@@ -47,7 +47,7 @@ class SseServiceTest {
     @Test
     void sseConnectionTest() {
         // given
-        sseAccessStorage.connectionOpen();
+        adminConfigStorage.connectionOpen();
 
         // when
         Response response = RestAssured.given()
@@ -67,7 +67,7 @@ class SseServiceTest {
     @Test
     void ssePropagationTest() {
         // given
-        sseAccessStorage.connectionOpen();
+        adminConfigStorage.connectionOpen();
         Response response1 = RestAssured.given()
             .accept("text/event-stream")
             .when()

@@ -15,10 +15,10 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEvent
 public class SseService {
 
     private final SseEmitterStorage sseEmitterStorage;
-    private final SseAccessStorage sseAccessStorage;
+    private final AdminConfigStorage adminConfigStorage;
 
     public SseEmitter connect(String token) {
-        if (sseAccessStorage.isNotAccessible()) {
+        if (adminConfigStorage.sseNotAccessible()) {
             throw new AllcllException(AllcllErrorCode.SSE_CONNECTION_DENIED);
         }
         SseEmitter sseEmitter = createSseEmitter();
@@ -33,7 +33,7 @@ public class SseService {
     }
 
     public void propagate(String eventName, Object data) {
-        if (sseAccessStorage.isNotAccessible()) {
+        if (adminConfigStorage.sseNotAccessible()) {
             throw new AllcllException(AllcllErrorCode.SSE_CONNECTION_DENIED);
         }
         sseEmitterStorage.getEmitters().forEach(emitter -> {
@@ -43,7 +43,7 @@ public class SseService {
     }
 
     public void propagate(String token, String eventName, Object data) {
-        if (sseAccessStorage.isNotAccessible()) {
+        if (adminConfigStorage.sseNotAccessible()) {
             throw new AllcllException(AllcllErrorCode.SSE_CONNECTION_DENIED);
         }
         sseEmitterStorage.getEmitter(token).ifPresent(emitter -> {
