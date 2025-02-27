@@ -1,9 +1,11 @@
 package kr.allcll.backend.domain.seat;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
+import kr.allcll.backend.domain.seat.dto.PreSeatsResponse;
 import kr.allcll.backend.domain.seat.dto.SeatDto;
 import kr.allcll.backend.domain.seat.dto.SeatsResponse;
 import kr.allcll.backend.domain.seat.pin.Pin;
@@ -70,5 +72,10 @@ public class SeatService {
                 scheduleStorage.deleteSchedule(token);
             },
             new Date(System.currentTimeMillis() + TASK_PERIOD));
+    }
+
+    public PreSeatsResponse getAllPreSeats() {
+        List<Seat> allByCreatedDate = seatRepository.findAllByCreatedDate((LocalDate.of(2025, 2, 14)));
+        return PreSeatsResponse.from(allByCreatedDate);
     }
 }
