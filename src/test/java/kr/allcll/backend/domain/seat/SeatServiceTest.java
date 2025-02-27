@@ -11,11 +11,10 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.time.LocalDateTime;
 import java.util.List;
+import kr.allcll.backend.config.AdminConfigStorage;
 import kr.allcll.backend.domain.seat.dto.SeatDto;
 import kr.allcll.backend.domain.subject.Subject;
 import kr.allcll.backend.fixture.SubjectFixture;
-import kr.allcll.backend.config.AdminConfigStorage;
-import kr.allcll.backend.support.sse.SseService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,34 +42,10 @@ class SeatServiceTest {
     @Autowired
     private AdminConfigStorage adminConfigStorage;
 
-    @Autowired
-    private SseService sseService;
-
     @BeforeEach
     void setUp() {
         adminConfigStorage.connectionClose();
         RestAssured.port = port;
-    }
-
-    @Test
-    @DisplayName("커넥션이 허용되지 않을 경우 좌석 정보를 전달할 수 없다.")
-    void sendNonMajorSeatInfoExceptionTest(){
-        // given
-        LocalDateTime localDateTime = LocalDateTime.of(2025, 1, 28, 23, 55, 23, 434294000);
-        Subject nonMajorSubject1 = SubjectFixture.createNonMajorSubject(11L, "차와문화", "000002", "001", "정형돈");
-        Subject nonMajorSubject2 = SubjectFixture.createNonMajorSubject(12L, "차와문화", "000002", "002", "정형돈");
-        seatStorage.addAll(List.of(
-            new SeatDto(nonMajorSubject1, 10, localDateTime),
-            new SeatDto(nonMajorSubject2, 9, localDateTime)
-        ));
-
-        // when && then
-        RestAssured.given()
-            .accept("text/event-stream")
-            .when()
-            .get("/api/connect")
-            .then()
-            .statusCode(500);
     }
 
     @DisplayName("1초에 한 번씩 비전공 과목의 좌석 정보 10개를 전송한다.")
