@@ -7,7 +7,9 @@ import io.restassured.response.Response;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import kr.allcll.backend.config.AdminConfigStorage;
 import kr.allcll.backend.domain.seat.SeatService;
+import kr.allcll.backend.domain.seat.SeatStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,6 +31,12 @@ class SseServiceTest {
     @Autowired
     private SseService sseService;
 
+    @Autowired
+    private AdminConfigStorage adminConfigStorage;
+
+    @Autowired
+    private SeatStorage seatStorage;
+
     @MockitoBean
     private SeatService seatService;
 
@@ -40,9 +48,26 @@ class SseServiceTest {
         RestAssured.port = port;
     }
 
+    @Test
+    @DisplayName("커넥션이 허용되지 않을 경우 좌석 정보를 전달할 수 없다.")
+    void sendNonMajorSeatInfoExceptionTest() {
+        // given
+        adminConfigStorage.connectionClose();
+
+        // when && then
+        RestAssured.given()
+            .when()
+            .get("/api/connect")
+            .then()
+            .statusCode(400);
+    }
+
     @DisplayName("SSE를 연결하고, 최초 메시지를 받는다.")
     @Test
     void sseConnectionTest() {
+        // given
+        adminConfigStorage.connectionOpen();
+
         // when
         Response response = RestAssured.given()
             .accept("text/event-stream")
@@ -61,6 +86,7 @@ class SseServiceTest {
     @Test
     void ssePropagationTest() {
         // given
+        adminConfigStorage.connectionOpen();
         Response response1 = RestAssured.given()
             .accept("text/event-stream")
             .when()

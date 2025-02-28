@@ -1,6 +1,9 @@
 package kr.allcll.backend.support.sse;
 
 import java.io.IOException;
+import kr.allcll.backend.config.AdminConfigStorage;
+import kr.allcll.backend.support.exception.AllcllErrorCode;
+import kr.allcll.backend.support.exception.AllcllException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,8 +16,10 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEvent
 public class SseService {
 
     private final SseEmitterStorage sseEmitterStorage;
+    private final AdminConfigStorage adminConfigStorage;
 
     public SseEmitter connect(String token) {
+        adminConfigStorage.validateSseConnection();
         SseEmitter sseEmitter = createSseEmitter();
         sseEmitterStorage.add(token, sseEmitter);
         SseEventBuilder initialEvent = SseEventBuilderFactory.createInitialEvent();
@@ -27,6 +32,7 @@ public class SseService {
     }
 
     public void propagate(String eventName, Object data) {
+        adminConfigStorage.validateSseConnection();
         sseEmitterStorage.getEmitters().forEach(emitter -> {
             SseEventBuilder eventBuilder = SseEventBuilderFactory.create(eventName, data);
             sendEvent(emitter, eventBuilder);
@@ -34,6 +40,7 @@ public class SseService {
     }
 
     public void propagate(String token, String eventName, Object data) {
+        adminConfigStorage.validateSseConnection();
         sseEmitterStorage.getEmitter(token).ifPresent(emitter -> {
             SseEventBuilder eventBuilder = SseEventBuilderFactory.create(eventName, data);
             sendEvent(emitter, eventBuilder);

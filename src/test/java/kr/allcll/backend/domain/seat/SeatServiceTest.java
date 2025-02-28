@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.time.LocalDateTime;
 import java.util.List;
+import kr.allcll.backend.config.AdminConfigStorage;
 import kr.allcll.backend.domain.seat.dto.SeatDto;
 import kr.allcll.backend.domain.subject.Subject;
 import kr.allcll.backend.fixture.SubjectFixture;
@@ -38,8 +39,12 @@ class SeatServiceTest {
     @Autowired
     private SeatStorage seatStorage;
 
+    @Autowired
+    private AdminConfigStorage adminConfigStorage;
+
     @BeforeEach
     void setUp() {
+        adminConfigStorage.connectionClose();
         RestAssured.port = port;
     }
 
@@ -47,6 +52,7 @@ class SeatServiceTest {
     @Test
     void sendNonMajorSeatInfoTest() throws JsonProcessingException {
         // given
+        adminConfigStorage.connectionOpen();
         String expected = """
             {
               "seatResponses": [

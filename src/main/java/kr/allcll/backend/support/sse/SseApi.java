@@ -1,7 +1,7 @@
 package kr.allcll.backend.support.sse;
 
-import kr.allcll.backend.support.web.ThreadLocalHolder;
 import kr.allcll.backend.domain.seat.SeatService;
+import kr.allcll.backend.support.web.ThreadLocalHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
