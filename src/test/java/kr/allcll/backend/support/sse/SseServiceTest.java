@@ -7,14 +7,9 @@ import io.restassured.response.Response;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.time.LocalDateTime;
-import java.util.List;
 import kr.allcll.backend.config.AdminConfigStorage;
 import kr.allcll.backend.domain.seat.SeatService;
 import kr.allcll.backend.domain.seat.SeatStorage;
-import kr.allcll.backend.domain.seat.dto.SeatDto;
-import kr.allcll.backend.domain.subject.Subject;
-import kr.allcll.backend.fixture.SubjectFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -55,15 +50,9 @@ class SseServiceTest {
 
     @Test
     @DisplayName("커넥션이 허용되지 않을 경우 좌석 정보를 전달할 수 없다.")
-    void sendNonMajorSeatInfoExceptionTest(){
+    void sendNonMajorSeatInfoExceptionTest() {
         // given
-        LocalDateTime localDateTime = LocalDateTime.of(2025, 1, 28, 23, 55, 23, 434294000);
-        Subject nonMajorSubject1 = SubjectFixture.createNonMajorSubject(11L, "차와문화", "000002", "001", "정형돈");
-        Subject nonMajorSubject2 = SubjectFixture.createNonMajorSubject(12L, "차와문화", "000002", "002", "정형돈");
-        seatStorage.addAll(List.of(
-            new SeatDto(nonMajorSubject1, 10, localDateTime),
-            new SeatDto(nonMajorSubject2, 9, localDateTime)
-        ));
+        adminConfigStorage.connectionClose();
 
         // when && then
         RestAssured.given()

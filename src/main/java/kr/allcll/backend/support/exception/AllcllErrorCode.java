@@ -19,7 +19,8 @@ public enum AllcllErrorCode {
     EXTERNAL_CONNECTION_TERMINATED("외부 서버와의 연결이 종료되었습니다."),
 
     SSE_EMITTER_NOT_FOUND("존재하지 않는 SSE 연결입니다"),
-    SSE_CONNECTION_DENIED("현재 SSE 연결을 할 수 없습니다.");
+    SSE_CONNECTION_DENIED("현재 SSE 연결을 할 수 없습니다."),
+    ;
 
     private String message;
 
