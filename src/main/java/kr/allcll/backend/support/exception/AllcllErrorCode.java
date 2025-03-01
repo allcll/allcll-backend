@@ -20,6 +20,7 @@ public enum AllcllErrorCode {
 
     SSE_EMITTER_NOT_FOUND("존재하지 않는 SSE 연결입니다"),
     SSE_CONNECTION_DENIED("현재 SSE 연결을 할 수 없습니다."),
+    SSE_CONNECTION_ALREADY_OPEN("SSE가 이미 연결되어 있습니다."),
     ;
 
     private String message;
