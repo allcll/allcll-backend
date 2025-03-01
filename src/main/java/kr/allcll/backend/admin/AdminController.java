@@ -11,7 +11,7 @@ public class AdminController {
 
     private final AdminService adminService;
 
-    @PostMapping("/admin/set-sse-connection-open")
+    @PostMapping("/admin/sse-connect")
     public ResponseEntity<Void> sseConnect() {
         adminService.sseConnect();
         return ResponseEntity.ok().build();
