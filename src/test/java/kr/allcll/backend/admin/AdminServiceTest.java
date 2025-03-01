@@ -54,4 +54,31 @@ class AdminServiceTest {
                 .hasMessage(AllcllErrorCode.SSE_CONNECTION_ALREADY_OPEN.getMessage());
         }
     }
+
+    @Nested
+    @DisplayName("SSE 연결 불가능 상태로 변경한다.")
+    class sseDisconnectTest {
+
+        @Test
+        @DisplayName("연결 가능 상태였을 경우 변경을 성공한다.")
+        void sseDisconnect() {
+            // given
+            adminConfigStorage.connectionOpen();
+
+            // when
+            adminService.sseDisconnect();
+
+            // then
+            assertThat(adminConfigStorage.sseNotAccessible()).isTrue();
+        }
+
+        @Test
+        @DisplayName("이미 연결 불가능 상태였을 경우 예외가 발생한다.")
+        void sseDisconnectException() {
+            // when && then
+            assertThatThrownBy(() -> adminService.sseDisconnect())
+                .isInstanceOf(AllcllException.class)
+                .hasMessage(AllcllErrorCode.SSE_CONNECTION_ALREADY_CLOSED.getMessage());
+        }
+    }
 }
