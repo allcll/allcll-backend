@@ -19,4 +19,10 @@ public class AdminService {
         adminConfigStorage.connectionOpen();
     }
 
+    public void sseDisconnect() {
+        if (adminConfigStorage.sseNotAccessible()) {
+            throw new AllcllException(AllcllErrorCode.SSE_CONNECTION_ALREADY_CLOSED);
+        }
+        adminConfigStorage.connectionClose();
+    }
 }

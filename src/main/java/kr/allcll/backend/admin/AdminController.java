@@ -16,4 +16,10 @@ public class AdminController {
         adminService.sseConnect();
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/admin/sse-disconnect")
+    public ResponseEntity<Void> sseDisconnect() {
+        adminService.sseDisconnect();
+        return ResponseEntity.ok().build();
+    }
 }
