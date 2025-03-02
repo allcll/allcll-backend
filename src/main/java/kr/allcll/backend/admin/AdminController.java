@@ -22,4 +22,10 @@ public class AdminController {
         adminService.sseDisconnect();
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/admin/send-non-major")
+    public ResponseEntity<Void> startToSendNonMajor() {
+        adminService.startToSendNonMajor();
+        return ResponseEntity.ok().build();
+    }
 }
