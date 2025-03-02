@@ -19,7 +19,6 @@ public class ExternalConfig {
     public ApplicationRunner runAfterStartup() {
         return args -> {
             try {
-                externalPreInvoker.saveNonMajorSubjects();
                 externalPreInvoker.sendSseConnectionToExternal();
             } catch (Exception e) {
                 log.error("[서버] 초기 실행 중 오류 발생: {}", e.getMessage(), e);
