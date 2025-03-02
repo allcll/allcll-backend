@@ -12,6 +12,8 @@ public enum AllcllErrorCode {
     DUPLICATE_STAR("%s은(는) 이미 핀 등록된 과목입니다."),
     STAR_SUBJECT_MISMATCH("즐겨찾기에 등록된 과목이 아닙니다."),
 
+    SEMESTER_NOT_FOUND("현재 학기 정보가 없습니다. 관리자에게 문의해주세요."),
+
     TOKEN_NOT_FOUND("쿠키에 토큰이 존재하지 않습니다."),
 
     BASKET_NOT_FOUND("관심과목 정보가 존재하지 않습니다."),
