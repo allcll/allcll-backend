@@ -94,7 +94,7 @@ class AdminServiceTest {
     }
 
     @Nested
-    @DisplayName("비전공 과목 전송 시나리오 테스트")
+    @DisplayName("비전공 과목 전송 관련 sse 연결 테스트")
     class nonMajorWithSse {
 
         private ScheduledFuture<?> scheduledFuture;
