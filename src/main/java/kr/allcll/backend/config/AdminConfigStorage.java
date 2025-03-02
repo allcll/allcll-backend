@@ -1,7 +1,7 @@
 package kr.allcll.backend.config;
 
 import kr.allcll.backend.support.exception.AllcllErrorCode;
-import kr.allcll.backend.support.exception.AllcllException;
+import kr.allcll.backend.support.exception.AllcllSseException;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -21,9 +21,9 @@ public class AdminConfigStorage {
         return !sseAccessible();
     }
 
-    public void validateSseConnection(){
-        if (sseNotAccessible()){
-            throw new AllcllException(AllcllErrorCode.SSE_CONNECTION_DENIED);
+    public void validateSseConnection() {
+        if (sseNotAccessible()) {
+            throw new AllcllSseException(AllcllErrorCode.SSE_CONNECTION_DENIED);
         }
     }
 

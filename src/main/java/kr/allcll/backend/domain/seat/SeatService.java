@@ -12,6 +12,7 @@ import kr.allcll.backend.domain.seat.pin.Pin;
 import kr.allcll.backend.domain.seat.pin.PinRepository;
 import kr.allcll.backend.domain.seat.pin.dto.PinSeatsResponse;
 import kr.allcll.backend.domain.subject.Subject;
+import kr.allcll.backend.support.exception.AllcllSseException;
 import kr.allcll.backend.support.schedule.ScheduleStorage;
 import kr.allcll.backend.support.sse.SseService;
 import lombok.RequiredArgsConstructor;
@@ -37,17 +38,22 @@ public class SeatService {
     private final ThreadPoolTaskScheduler scheduler;
     private final ScheduleStorage scheduleStorage;
 
-    // TODO: admin 에서 호출
     public void sendNonMajorSeats() {
         Runnable nonMajorTask = () -> {
             List<SeatDto> nonMajorSeatDtos = seatStorage.getNonMajorSeats(NON_MAJOR_SUBJECT_QUERY_LIMIT);
-            sseService.propagate(NON_MAJOR_SEATS_EVENT_NAME, SeatsResponse.from(nonMajorSeatDtos));
+            try {
+                sseService.propagate(NON_MAJOR_SEATS_EVENT_NAME, SeatsResponse.from(nonMajorSeatDtos));
+            } catch (AllcllSseException e) {
+                scheduleStorage.cancelNonMajorSchedule();
+            }
         };
-        scheduler.scheduleAtFixedRate(nonMajorTask, Duration.ofMillis(TASK_DURATION));
+        scheduleStorage.setNonMajorSchedule(
+            scheduler.scheduleAtFixedRate(nonMajorTask, Duration.ofMillis(TASK_DURATION))
+        );
     }
 
     public void sendPinSeatsInformation(String token) {
-        if (scheduleStorage.isAlreadyScheduled(token)) {
+        if (scheduleStorage.isAlreadyScheduledPin(token)) {
             log.info("토큰 {} 에 대해 이미 스케줄된 작업이 존재합니다.", token);
             return;
         }
@@ -62,7 +68,7 @@ public class SeatService {
         };
 
         ScheduledFuture<?> scheduledFuture = scheduler.scheduleAtFixedRate(task, Duration.ofMillis(TASK_DURATION));
-        scheduleStorage.addSchedule(token, scheduledFuture);
+        scheduleStorage.addPinSchedule(token, scheduledFuture);
         scheduleToCancel(token, scheduledFuture);
     }
 
@@ -70,7 +76,7 @@ public class SeatService {
         scheduler.schedule(() -> {
                 log.info("토큰 {}: 태스크 종료", token);
                 scheduledFuture.cancel(true);
-                scheduleStorage.deleteSchedule(token);
+                scheduleStorage.deletePinSchedule(token);
             },
             new Date(System.currentTimeMillis() + TASK_PERIOD));
     }
