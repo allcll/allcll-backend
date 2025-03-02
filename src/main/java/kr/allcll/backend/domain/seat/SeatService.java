@@ -37,7 +37,6 @@ public class SeatService {
     private final PinRepository pinRepository;
     private final ThreadPoolTaskScheduler scheduler;
     private final ScheduleStorage scheduleStorage;
-    private ScheduledFuture<?> nonMajorSchedule;
 
     public void sendNonMajorSeats() {
         Runnable nonMajorTask = () -> {
@@ -45,14 +44,16 @@ public class SeatService {
             try {
                 sseService.propagate(NON_MAJOR_SEATS_EVENT_NAME, SeatsResponse.from(nonMajorSeatDtos));
             } catch (AllcllException e) {
-                nonMajorSchedule.cancel(true);
+                scheduleStorage.cancelNonMajorSchedule();
             }
         };
-        nonMajorSchedule = scheduler.scheduleAtFixedRate(nonMajorTask, Duration.ofMillis(TASK_DURATION));
+        scheduleStorage.setNonMajorSchedule(
+            scheduler.scheduleAtFixedRate(nonMajorTask, Duration.ofMillis(TASK_DURATION))
+        );
     }
 
     public void sendPinSeatsInformation(String token) {
-        if (scheduleStorage.isAlreadyScheduled(token)) {
+        if (scheduleStorage.isAlreadyScheduledPin(token)) {
             log.info("토큰 {} 에 대해 이미 스케줄된 작업이 존재합니다.", token);
             return;
         }
@@ -67,7 +68,7 @@ public class SeatService {
         };
 
         ScheduledFuture<?> scheduledFuture = scheduler.scheduleAtFixedRate(task, Duration.ofMillis(TASK_DURATION));
-        scheduleStorage.addSchedule(token, scheduledFuture);
+        scheduleStorage.addPinSchedule(token, scheduledFuture);
         scheduleToCancel(token, scheduledFuture);
     }
 
@@ -75,7 +76,7 @@ public class SeatService {
         scheduler.schedule(() -> {
                 log.info("토큰 {}: 태스크 종료", token);
                 scheduledFuture.cancel(true);
-                scheduleStorage.deleteSchedule(token);
+                scheduleStorage.deletePinSchedule(token);
             },
             new Date(System.currentTimeMillis() + TASK_PERIOD));
     }
