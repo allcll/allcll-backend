@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class AdminController {
+public class AdminApi {
 
     private final AdminService adminService;
 
