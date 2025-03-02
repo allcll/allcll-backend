@@ -107,13 +107,13 @@ class AdminServiceTest {
             adminConfigStorage.connectionOpen();
             sseService.connect("token");
             AtomicInteger executeCount = new AtomicInteger(0);
-            AtomicInteger countBeforeDisconnect = new AtomicInteger(0);
+            AtomicInteger countAtCancel = new AtomicInteger(0);
             Runnable task = () -> {
                 try {
                     sseService.propagate("message", "Is SSE there?");
                     executeCount.incrementAndGet();
                 } catch (AllcllException e) {
-                    countBeforeDisconnect.set(executeCount.get());
+                    countAtCancel.set(executeCount.get());
                     scheduledFuture.cancel(true);
                 }
             };
@@ -125,8 +125,8 @@ class AdminServiceTest {
 
             // then
             Thread.sleep(taskDuration * 2);
-            int countAfterDisconnect = executeCount.get();
-            assertThat(countBeforeDisconnect.get()).isEqualTo(countAfterDisconnect);
+            int countAfterDuration = executeCount.get();
+            assertThat(countAtCancel.get()).isEqualTo(countAfterDuration);
         }
     }
 }
