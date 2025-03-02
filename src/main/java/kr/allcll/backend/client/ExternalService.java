@@ -5,18 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import kr.allcll.backend.domain.basket.Basket;
-import kr.allcll.backend.domain.basket.BasketRepository;
-import kr.allcll.backend.support.exception.AllcllErrorCode;
-import kr.allcll.backend.support.exception.AllcllException;
-import kr.allcll.backend.client.dto.NonMajorRequest;
 import kr.allcll.backend.client.dto.PinSubject;
 import kr.allcll.backend.client.dto.PinSubjectsRequest;
 import kr.allcll.backend.domain.seat.pin.Pin;
 import kr.allcll.backend.domain.seat.pin.PinRepository;
-import kr.allcll.backend.support.sse.SseEmitterStorage;
 import kr.allcll.backend.domain.subject.Subject;
-import kr.allcll.backend.domain.subject.SubjectRepository;
+import kr.allcll.backend.support.sse.SseEmitterStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,48 +20,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ExternalService {
 
-    private static final String NON_MAJOR_DEPT_CD = "9005";
-    private static final int SUBJECT_OFFER_COUNT = 20;
-
-    private final SubjectRepository subjectRepository;
-    private final BasketRepository basketRepository;
     private final PinRepository pinRepository;
-    private final TopNonMajorStorage topNonMajorStorage;
     private final SseEmitterStorage sseEmitterStorage;
     private final ExternalClient externalClient;
-
-    public void saveNonMajorSubjects() {
-        List<Subject> nonMajorSubjects = subjectRepository.findAllByDeptCd(NON_MAJOR_DEPT_CD);
-        Map<Subject, Integer> nonMajorSeats = getNonMajorSeats(nonMajorSubjects);
-        List<Subject> topSubjects = getTopSubjects(nonMajorSeats);
-        topNonMajorStorage.addAll(topSubjects);
-        log.info("저장한 교양 과목 수: {}", topSubjects.size());
-    }
-
-    private Map<Subject, Integer> getNonMajorSeats(List<Subject> nonMajorSubjects) {
-        Map<Subject, Integer> nonMajorSeats = new HashMap<>();
-        for (Subject subject : nonMajorSubjects) {
-            Long subjectId = subject.getId();
-            Basket basket = basketRepository.findBySubjectId(subjectId).stream()
-                .findAny()
-                .orElseThrow(() -> new AllcllException(AllcllErrorCode.BASKET_NOT_FOUND));
-            Integer seatCount = basket.getTotRcnt();
-            nonMajorSeats.put(subject, seatCount);
-        }
-        return nonMajorSeats;
-    }
-
-    private List<Subject> getTopSubjects(Map<Subject, Integer> nonMajorSeats) {
-        return nonMajorSeats.keySet().stream()
-            .sorted((o1, o2) -> nonMajorSeats.get(o2).compareTo(nonMajorSeats.get(o1)))
-            .limit(SUBJECT_OFFER_COUNT)
-            .toList();
-    }
-
-    public void sendNonMajorToExternal() {
-        List<Subject> topNonMajors = topNonMajorStorage.getSubjects();
-        externalClient.sendNonMajor(NonMajorRequest.from(topNonMajors));
-    }
 
     public void sendWantPinSubjectIdsToCrawler() {
         PinSubjectsRequest request = getPinSubjects();
