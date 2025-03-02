@@ -12,7 +12,7 @@ import kr.allcll.backend.domain.seat.pin.Pin;
 import kr.allcll.backend.domain.seat.pin.PinRepository;
 import kr.allcll.backend.domain.seat.pin.dto.PinSeatsResponse;
 import kr.allcll.backend.domain.subject.Subject;
-import kr.allcll.backend.support.exception.AllcllException;
+import kr.allcll.backend.support.exception.AllcllSseException;
 import kr.allcll.backend.support.schedule.ScheduleStorage;
 import kr.allcll.backend.support.sse.SseService;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +43,7 @@ public class SeatService {
             List<SeatDto> nonMajorSeatDtos = seatStorage.getNonMajorSeats(NON_MAJOR_SUBJECT_QUERY_LIMIT);
             try {
                 sseService.propagate(NON_MAJOR_SEATS_EVENT_NAME, SeatsResponse.from(nonMajorSeatDtos));
-            } catch (AllcllException e) {
+            } catch (AllcllSseException e) {
                 scheduleStorage.cancelNonMajorSchedule();
             }
         };

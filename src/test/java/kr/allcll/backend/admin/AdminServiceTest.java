@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import kr.allcll.backend.config.AdminConfigStorage;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
+import kr.allcll.backend.support.exception.AllcllSseException;
 import kr.allcll.backend.support.sse.SseService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -112,7 +113,7 @@ class AdminServiceTest {
                 try {
                     sseService.propagate("message", "Is SSE there?");
                     executeCount.incrementAndGet();
-                } catch (AllcllException e) {
+                } catch (AllcllSseException e) {
                     countAtCancel.set(executeCount.get());
                     scheduledFuture.cancel(true);
                 }
