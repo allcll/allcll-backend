@@ -12,6 +12,7 @@ import kr.allcll.backend.domain.seat.pin.Pin;
 import kr.allcll.backend.domain.seat.pin.PinRepository;
 import kr.allcll.backend.domain.seat.pin.dto.PinSeatsResponse;
 import kr.allcll.backend.domain.subject.Subject;
+import kr.allcll.backend.support.exception.AllcllException;
 import kr.allcll.backend.support.schedule.ScheduleStorage;
 import kr.allcll.backend.support.sse.SseService;
 import lombok.RequiredArgsConstructor;
@@ -36,14 +37,18 @@ public class SeatService {
     private final PinRepository pinRepository;
     private final ThreadPoolTaskScheduler scheduler;
     private final ScheduleStorage scheduleStorage;
+    private ScheduledFuture<?> nonMajorSchedule;
 
-    // TODO: admin 에서 호출
     public void sendNonMajorSeats() {
         Runnable nonMajorTask = () -> {
             List<SeatDto> nonMajorSeatDtos = seatStorage.getNonMajorSeats(NON_MAJOR_SUBJECT_QUERY_LIMIT);
-            sseService.propagate(NON_MAJOR_SEATS_EVENT_NAME, SeatsResponse.from(nonMajorSeatDtos));
+            try {
+                sseService.propagate(NON_MAJOR_SEATS_EVENT_NAME, SeatsResponse.from(nonMajorSeatDtos));
+            } catch (AllcllException e) {
+                nonMajorSchedule.cancel(true);
+            }
         };
-        scheduler.scheduleAtFixedRate(nonMajorTask, Duration.ofMillis(TASK_DURATION));
+        nonMajorSchedule = scheduler.scheduleAtFixedRate(nonMajorTask, Duration.ofMillis(TASK_DURATION));
     }
 
     public void sendPinSeatsInformation(String token) {
