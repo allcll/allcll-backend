@@ -3,9 +3,13 @@ package kr.allcll.backend.admin;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.Duration;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 import kr.allcll.backend.config.AdminConfigStorage;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
+import kr.allcll.backend.support.sse.SseService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -13,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 class AdminServiceTest {
@@ -22,6 +27,12 @@ class AdminServiceTest {
 
     @Autowired
     private AdminConfigStorage adminConfigStorage;
+
+    @Autowired
+    private ThreadPoolTaskScheduler scheduler;
+
+    @Autowired
+    private SseService sseService;
 
     @AfterEach
     void setUp() {
@@ -79,6 +90,43 @@ class AdminServiceTest {
             assertThatThrownBy(() -> adminService.sseDisconnect())
                 .isInstanceOf(AllcllException.class)
                 .hasMessage(AllcllErrorCode.SSE_CONNECTION_ALREADY_CLOSED.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("비전공 과목 전송 시나리오 테스트")
+    class nonMajorWithSse {
+
+        private ScheduledFuture<?> scheduledFuture;
+
+        @Test
+        @DisplayName("스케줄러를 통해 sse로 데이터 전송 중 연결 해제 되었을 때 스케줄러가 돌지 않는다.")
+        void disconnectAfterSsePropagate() throws InterruptedException {
+            // given
+            int taskDuration = 201;
+            adminConfigStorage.connectionOpen();
+            sseService.connect("token");
+            AtomicInteger executeCount = new AtomicInteger(0);
+            AtomicInteger countBeforeDisconnect = new AtomicInteger(0);
+            Runnable task = () -> {
+                try {
+                    sseService.propagate("message", "Is SSE there?");
+                    executeCount.incrementAndGet();
+                } catch (AllcllException e) {
+                    countBeforeDisconnect.set(executeCount.get());
+                    scheduledFuture.cancel(true);
+                }
+            };
+
+            // when
+            scheduledFuture = scheduler.scheduleAtFixedRate(task, Duration.ofMillis(taskDuration));
+            Thread.sleep(taskDuration * 3);
+            adminConfigStorage.connectionClose();
+
+            // then
+            Thread.sleep(taskDuration * 2);
+            int countAfterDisconnect = executeCount.get();
+            assertThat(countBeforeDisconnect.get()).isEqualTo(countAfterDisconnect);
         }
     }
 }
