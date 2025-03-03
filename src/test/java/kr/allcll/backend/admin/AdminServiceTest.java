@@ -8,7 +8,7 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
-import kr.allcll.backend.admin.dto.ApplicationStatusResponse;
+import kr.allcll.backend.admin.dto.SystemStatusResponse;
 import kr.allcll.backend.config.AdminConfigStorage;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
@@ -143,7 +143,7 @@ class AdminServiceTest {
     class adminGetStatus {
 
         @Test
-        @DisplayName("SSE가 연결 상태였다가 해제 되었을 때 false 반환을 검증한다.")
+        @DisplayName("SSE 연결이 중도 해제 되었을 때 응답을 검증한다.")
         void bothTrueToFalse() throws InterruptedException {
             // given
             adminConfigStorage.connectionOpen();
@@ -153,7 +153,7 @@ class AdminServiceTest {
 
             // when
             Thread.sleep((long) taskDuration * 2);
-            ApplicationStatusResponse response = adminService.getInitialStatus();
+            SystemStatusResponse response = adminService.getInitialStatus();
 
             // then
             assertAll(
@@ -166,7 +166,7 @@ class AdminServiceTest {
         @DisplayName("SSE가 처음부터 연결되지 않았을 때에 응답을 검증한다.")
         void bothFalse(){
             // when
-            ApplicationStatusResponse response = adminService.getInitialStatus();
+            SystemStatusResponse response = adminService.getInitialStatus();
 
             // then
             assertAll(
@@ -182,7 +182,7 @@ class AdminServiceTest {
             adminConfigStorage.connectionOpen();
 
             // when
-            ApplicationStatusResponse response = adminService.getInitialStatus();
+            SystemStatusResponse response = adminService.getInitialStatus();
 
             // then
             assertAll(
@@ -200,7 +200,7 @@ class AdminServiceTest {
 
             // when
             Thread.sleep(taskDuration);
-            ApplicationStatusResponse response = adminService.getInitialStatus();
+            SystemStatusResponse response = adminService.getInitialStatus();
             adminConfigStorage.connectionClose();
 
             // then
