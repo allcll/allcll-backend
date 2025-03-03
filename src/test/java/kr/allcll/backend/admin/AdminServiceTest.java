@@ -143,15 +143,29 @@ class AdminServiceTest {
     class adminGetStatus {
 
         @Test
-        @DisplayName("SSE가 연결되지 않았을 때 정상 응답을 검증한다.")
-        void bothFalse() throws InterruptedException {
+        @DisplayName("SSE가 연결되었다가 끊어졌을 때 정상 응답을 검증한다.")
+        void bothTrueToFalse() throws InterruptedException {
             // given
+            adminConfigStorage.connectionOpen();
             int taskDuration = runScheduleTask();
             Thread.sleep(taskDuration);
             adminConfigStorage.connectionClose();
 
             // when
             Thread.sleep((long) taskDuration * 2);
+            InitialAdminStatus response = adminService.getInitialStatus();
+
+            // then
+            assertAll(
+                () -> assertThat(response.nonMajorStatus()).isFalse(),
+                () -> assertThat(response.sseStatus()).isFalse()
+            );
+        }
+
+        @Test
+        @DisplayName("SSE가 처음부터 연결되지 않았을 때에 응답을 검증한다.")
+        void bothFalse(){
+            // when
             InitialAdminStatus response = adminService.getInitialStatus();
 
             // then
@@ -181,6 +195,7 @@ class AdminServiceTest {
         @DisplayName("SSE가 연결되고, 교양이 전송되고 있을 때 응답을 검증한다.")
         void bothTrue() throws InterruptedException {
             // given
+            adminConfigStorage.connectionOpen();
             int taskDuration = runScheduleTask();
 
             // when
@@ -197,7 +212,6 @@ class AdminServiceTest {
 
         private int runScheduleTask() {
             int taskDuration = 201;
-            adminConfigStorage.connectionOpen();
             sseService.connect("token");
             AtomicInteger executeCount = new AtomicInteger(0);
             Runnable task = () -> {
