@@ -139,7 +139,7 @@ class AdminServiceTest {
     }
 
     @Nested
-    @DisplayName("어드민의 설정값 조회 기능을 테스트한다.")
+    @DisplayName("시스템 설정값 조회 기능을 테스트한다.")
     class adminGetStatus {
 
         @Test
