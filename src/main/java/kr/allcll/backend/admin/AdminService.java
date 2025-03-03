@@ -48,6 +48,6 @@ public class AdminService {
         if (adminConfigStorage.sseAccessible() && scheduleStorage.isNonMajorScheduleNotRunning()) {
             return SystemStatusResponse.of(true, false);
         }
-        throw new AllcllException(AllcllErrorCode.NON_MAJOR_SHOULD_SHUT_DOWN);
+        throw new AllcllException(AllcllErrorCode.DATA_STREAM_SHOULD_SHUT_DOWN);
     }
 }
