@@ -139,11 +139,11 @@ class AdminServiceTest {
     }
 
     @Nested
-    @DisplayName("어드민 조회 기능을 테스트한다.")
+    @DisplayName("어드민의 설정값 조회 기능을 테스트한다.")
     class adminGetStatus {
 
         @Test
-        @DisplayName("SSE 연결이 중도 해제 되었을 때 false 응답을 검증한다.")
+        @DisplayName("SSE 연결이 중도 차단 되었을 때 false 응답을 검증한다.")
         void bothTrueToFalse() throws InterruptedException {
             // given
             adminConfigStorage.connectionOpen();
@@ -163,7 +163,7 @@ class AdminServiceTest {
         }
 
         @Test
-        @DisplayName("SSE가 처음부터 연결되지 않았을 때에 응답을 검증한다.")
+        @DisplayName("SSE가 연결 허용되지 않았을 때에 응답을 검증한다.")
         void bothFalse(){
             // when
             SystemStatusResponse response = adminService.getInitialStatus();
@@ -176,7 +176,7 @@ class AdminServiceTest {
         }
 
         @Test
-        @DisplayName("SSE가 연결되고, 교양이 전송되고 있지 않을 때 응답을 검증한다.")
+        @DisplayName("SSE가 연결 허용되고, 교양이 전송되고 있지 않을 때 응답을 검증한다.")
         void onlySseConnect() {
             // given
             adminConfigStorage.connectionOpen();
@@ -192,7 +192,7 @@ class AdminServiceTest {
         }
 
         @Test
-        @DisplayName("SSE가 연결되고, 교양이 전송되고 있을 때 응답을 검증한다.")
+        @DisplayName("SSE가 연결 허용되고, 교양이 전송되고 있을 때 응답을 검증한다.")
         void bothTrue() throws InterruptedException {
             // given
             adminConfigStorage.connectionOpen();
