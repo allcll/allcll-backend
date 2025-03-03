@@ -23,7 +23,8 @@ public enum AllcllErrorCode {
     SSE_EMITTER_NOT_FOUND("존재하지 않는 SSE 연결입니다"),
     SSE_CONNECTION_DENIED("현재 SSE 연결을 할 수 없습니다."),
     SSE_CONNECTION_ALREADY_OPEN("SSE가 이미 연결되어 있습니다."),
-    SSE_CONNECTION_ALREADY_CLOSED("SSE가 이미 연결 해제 되어있습니다.")
+    SSE_CONNECTION_ALREADY_CLOSED("SSE가 이미 연결 해제 되어있습니다."),
+    DATA_STREAM_SHOULD_SHUT_DOWN("SSE 연결을 해제하였으나 데이터가 전송되고 있습니다. 데이터 전송을 확인해 주세요."),
     ;
 
     private String message;
