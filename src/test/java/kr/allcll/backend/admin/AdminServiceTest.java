@@ -2,14 +2,18 @@ package kr.allcll.backend.admin;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.Duration;
+import java.util.Optional;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
+import kr.allcll.backend.admin.dto.InitialAdminStatus;
 import kr.allcll.backend.config.AdminConfigStorage;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import kr.allcll.backend.support.exception.AllcllSseException;
+import kr.allcll.backend.support.schedule.ScheduleStorage;
 import kr.allcll.backend.support.sse.SseService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,6 +38,9 @@ class AdminServiceTest {
 
     @Autowired
     private SseService sseService;
+
+    @Autowired
+    private ScheduleStorage scheduleStorage;
 
     @AfterEach
     void setUp() {
@@ -128,6 +135,83 @@ class AdminServiceTest {
             Thread.sleep(taskDuration * 2);
             int countAfterDuration = executeCount.get();
             assertThat(countAtCancel.get()).isEqualTo(countAfterDuration);
+        }
+    }
+
+    @Nested
+    @DisplayName("어드민 첫 조회 기능을 테스트한다.")
+    class adminGetStatus {
+
+        @Test
+        @DisplayName("SSE가 연결되지 않았을 때 정상 응답을 검증한다.")
+        void bothFalse() throws InterruptedException {
+            // given
+            int taskDuration = runScheduleTask();
+            Thread.sleep(taskDuration);
+            adminConfigStorage.connectionClose();
+
+            // when
+            Thread.sleep((long) taskDuration * 2);
+            InitialAdminStatus response = adminService.getInitialStatus();
+
+            // then
+            assertAll(
+                () -> assertThat(response.nonMajorStatus()).isFalse(),
+                () -> assertThat(response.sseStatus()).isFalse()
+            );
+        }
+
+        @Test
+        @DisplayName("SSE가 연결되고, 교양이 전송되고 있지 않을 때 응답을 검증한다.")
+        void onlySseConnect() {
+            // given
+            adminConfigStorage.connectionOpen();
+
+            // when
+            InitialAdminStatus response = adminService.getInitialStatus();
+
+            // then
+            assertAll(
+                () -> assertThat(response.nonMajorStatus()).isFalse(),
+                () -> assertThat(response.sseStatus()).isTrue()
+            );
+        }
+
+        @Test
+        @DisplayName("SSE가 연결되고, 교양이 전송되고 있을 때 응답을 검증한다.")
+        void bothTrue() throws InterruptedException {
+            // given
+            int taskDuration = runScheduleTask();
+
+            // when
+            Thread.sleep(taskDuration);
+            InitialAdminStatus response = adminService.getInitialStatus();
+            adminConfigStorage.connectionClose();
+
+            // then
+            assertAll(
+                () -> assertThat(response.nonMajorStatus()).isTrue(),
+                () -> assertThat(response.sseStatus()).isTrue()
+            );
+        }
+
+        private int runScheduleTask() {
+            int taskDuration = 201;
+            adminConfigStorage.connectionOpen();
+            sseService.connect("token");
+            AtomicInteger executeCount = new AtomicInteger(0);
+            Runnable task = () -> {
+                try {
+                    sseService.propagate("message", "Is SSE there?");
+                    executeCount.incrementAndGet();
+                } catch (AllcllSseException e) {
+                    scheduleStorage.cancelNonMajorSchedule();
+                }
+            };
+            scheduleStorage.setNonMajorSchedule(
+                Optional.of(scheduler.scheduleAtFixedRate(task, Duration.ofMillis(taskDuration)))
+            );
+            return taskDuration;
         }
     }
 }
