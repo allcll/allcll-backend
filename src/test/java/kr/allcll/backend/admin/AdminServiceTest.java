@@ -143,7 +143,7 @@ class AdminServiceTest {
     class adminGetStatus {
 
         @Test
-        @DisplayName("SSE 연결이 중도 해제 되었을 때 응답을 검증한다.")
+        @DisplayName("SSE 연결이 중도 해제 되었을 때 false 응답을 검증한다.")
         void bothTrueToFalse() throws InterruptedException {
             // given
             adminConfigStorage.connectionOpen();
