@@ -39,12 +39,15 @@ public class AdminService {
     }
 
     public InitialAdminStatus getInitialStatus() {
-        if (adminConfigStorage.sseNotAccessible()) {
+        if (adminConfigStorage.sseNotAccessible() && scheduleStorage.isNonMajorScheduleNotRunning()) {
             return InitialAdminStatus.from(false, false);
         }
-        if (scheduleStorage.isNonMajorScheduleRunning()) {
+        if (adminConfigStorage.sseAccessible() && scheduleStorage.isNonMajorScheduleRunning()) {
             return InitialAdminStatus.from(true, true);
         }
-        return InitialAdminStatus.from(true, false);
+        if (adminConfigStorage.sseAccessible() && scheduleStorage.isNonMajorScheduleNotRunning()) {
+            return InitialAdminStatus.from(true, false);
+        }
+        throw new AllcllException(AllcllErrorCode.NON_MAJOR_SHOULD_SHUT_DOWN);
     }
 }

@@ -22,6 +22,10 @@ public class ScheduleStorage {
         return nonMajorSchedule.state().equals(State.RUNNING);
     }
 
+    public boolean isNonMajorScheduleNotRunning() {
+        return !isNonMajorScheduleRunning();
+    }
+
     public boolean isAlreadyScheduledPin(String token) {
         return scheduledPinTasks.containsKey(token);
     }
