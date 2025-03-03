@@ -32,8 +32,8 @@ public class AdminApi {
     }
 
     @GetMapping("/admin/system-status")
-    public ResponseEntity<SystemStatusResponse> getInitialStatus() {
-        SystemStatusResponse response = adminService.getInitialStatus();
+    public ResponseEntity<SystemStatusResponse> getSystemStatus() {
+        SystemStatusResponse response = adminService.getSystemStatus();
         return ResponseEntity.ok(response);
     }
 }

@@ -38,7 +38,7 @@ public class AdminService {
         seatService.sendNonMajorSeats();
     }
 
-    public SystemStatusResponse getInitialStatus() {
+    public SystemStatusResponse getSystemStatus() {
         if (adminConfigStorage.sseNotAccessible() && scheduleStorage.isNonMajorScheduleNotRunning()) {
             return SystemStatusResponse.of(false, false);
         }

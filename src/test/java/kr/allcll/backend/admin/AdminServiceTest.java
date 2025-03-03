@@ -153,7 +153,7 @@ class AdminServiceTest {
 
             // when
             Thread.sleep((long) taskDuration * 2);
-            SystemStatusResponse response = adminService.getInitialStatus();
+            SystemStatusResponse response = adminService.getSystemStatus();
 
             // then
             assertAll(
@@ -166,7 +166,7 @@ class AdminServiceTest {
         @DisplayName("SSE가 연결 허용되지 않았을 때에 응답을 검증한다.")
         void bothFalse(){
             // when
-            SystemStatusResponse response = adminService.getInitialStatus();
+            SystemStatusResponse response = adminService.getSystemStatus();
 
             // then
             assertAll(
@@ -182,7 +182,7 @@ class AdminServiceTest {
             adminConfigStorage.connectionOpen();
 
             // when
-            SystemStatusResponse response = adminService.getInitialStatus();
+            SystemStatusResponse response = adminService.getSystemStatus();
 
             // then
             assertAll(
@@ -200,7 +200,7 @@ class AdminServiceTest {
 
             // when
             Thread.sleep(taskDuration);
-            SystemStatusResponse response = adminService.getInitialStatus();
+            SystemStatusResponse response = adminService.getSystemStatus();
             adminConfigStorage.connectionClose();
 
             // then
