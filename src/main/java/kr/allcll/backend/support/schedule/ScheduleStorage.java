@@ -25,7 +25,7 @@ public class ScheduleStorage {
 
     public boolean isNonMajorScheduleRunning() {
         return nonMajorSchedule
-            .map(scheduledFuture -> scheduledFuture.state().equals(State.RUNNING))
+            .map(scheduledFuture -> State.RUNNING.equals(scheduledFuture.state()))
             .orElse(false);
     }
 
