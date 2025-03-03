@@ -2,6 +2,7 @@ package kr.allcll.backend.support.schedule;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future.State;
 import java.util.concurrent.ScheduledFuture;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,10 @@ public class ScheduleStorage {
 
     public void cancelNonMajorSchedule() {
         nonMajorSchedule.cancel(true);
+    }
+
+    public boolean isNonMajorScheduleRunning() {
+        return nonMajorSchedule.state().equals(State.RUNNING);
     }
 
     public boolean isAlreadyScheduledPin(String token) {

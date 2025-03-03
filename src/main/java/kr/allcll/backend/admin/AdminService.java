@@ -1,9 +1,11 @@
 package kr.allcll.backend.admin;
 
+import kr.allcll.backend.admin.dto.InitialAdminStatus;
 import kr.allcll.backend.config.AdminConfigStorage;
 import kr.allcll.backend.domain.seat.SeatService;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
+import kr.allcll.backend.support.schedule.ScheduleStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 public class AdminService {
 
     private final AdminConfigStorage adminConfigStorage;
+    private final ScheduleStorage scheduleStorage;
     private final SeatService seatService;
 
     public void sseConnect() {
@@ -33,5 +36,15 @@ public class AdminService {
             throw new AllcllException(AllcllErrorCode.SSE_CONNECTION_DENIED);
         }
         seatService.sendNonMajorSeats();
+    }
+
+    public InitialAdminStatus getInitialStatus() {
+        if (adminConfigStorage.sseNotAccessible()) {
+            return InitialAdminStatus.from(false, false);
+        }
+        if (scheduleStorage.isNonMajorScheduleRunning()) {
+            return InitialAdminStatus.from(true, true);
+        }
+        return InitialAdminStatus.from(true, false);
     }
 }
