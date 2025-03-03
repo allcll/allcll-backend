@@ -1,6 +1,6 @@
 package kr.allcll.backend.admin;
 
-import kr.allcll.backend.admin.dto.InitialAdminStatus;
+import kr.allcll.backend.admin.dto.ApplicationStatusResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,9 +31,9 @@ public class AdminApi {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/admin/status")
-    public ResponseEntity<InitialAdminStatus> getInitialStatus() {
-        InitialAdminStatus response = adminService.getInitialStatus();
+    @GetMapping("/admin/system-status")
+    public ResponseEntity<ApplicationStatusResponse> getInitialStatus() {
+        ApplicationStatusResponse response = adminService.getInitialStatus();
         return ResponseEntity.ok(response);
     }
 }

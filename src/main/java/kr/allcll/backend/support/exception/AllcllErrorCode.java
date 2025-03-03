@@ -24,7 +24,7 @@ public enum AllcllErrorCode {
     SSE_CONNECTION_DENIED("현재 SSE 연결을 할 수 없습니다."),
     SSE_CONNECTION_ALREADY_OPEN("SSE가 이미 연결되어 있습니다."),
     SSE_CONNECTION_ALREADY_CLOSED("SSE가 이미 연결 해제 되어있습니다."),
-    NON_MAJOR_SHOULD_SHUT_DOWN("SSE가 연결 해제되었으나 교양이 전송되고 있습니다.")
+    NON_MAJOR_SHOULD_SHUT_DOWN("SSE가 연결 해제되었으나 교양이 전송되고 있습니다."),
     ;
 
     private String message;

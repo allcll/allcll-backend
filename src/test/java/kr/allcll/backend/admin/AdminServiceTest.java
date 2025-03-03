@@ -8,7 +8,7 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
-import kr.allcll.backend.admin.dto.InitialAdminStatus;
+import kr.allcll.backend.admin.dto.ApplicationStatusResponse;
 import kr.allcll.backend.config.AdminConfigStorage;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
@@ -139,11 +139,11 @@ class AdminServiceTest {
     }
 
     @Nested
-    @DisplayName("어드민 첫 조회 기능을 테스트한다.")
+    @DisplayName("어드민 조회 기능을 테스트한다.")
     class adminGetStatus {
 
         @Test
-        @DisplayName("SSE가 연결되었다가 끊어졌을 때 정상 응답을 검증한다.")
+        @DisplayName("SSE가 연결 상태였다가 해제 되었을 때 false 반환을 검증한다.")
         void bothTrueToFalse() throws InterruptedException {
             // given
             adminConfigStorage.connectionOpen();
@@ -153,12 +153,12 @@ class AdminServiceTest {
 
             // when
             Thread.sleep((long) taskDuration * 2);
-            InitialAdminStatus response = adminService.getInitialStatus();
+            ApplicationStatusResponse response = adminService.getInitialStatus();
 
             // then
             assertAll(
-                () -> assertThat(response.nonMajorStatus()).isFalse(),
-                () -> assertThat(response.sseStatus()).isFalse()
+                () -> assertThat(response.isNonMajorSending()).isFalse(),
+                () -> assertThat(response.isSseConnect()).isFalse()
             );
         }
 
@@ -166,12 +166,12 @@ class AdminServiceTest {
         @DisplayName("SSE가 처음부터 연결되지 않았을 때에 응답을 검증한다.")
         void bothFalse(){
             // when
-            InitialAdminStatus response = adminService.getInitialStatus();
+            ApplicationStatusResponse response = adminService.getInitialStatus();
 
             // then
             assertAll(
-                () -> assertThat(response.nonMajorStatus()).isFalse(),
-                () -> assertThat(response.sseStatus()).isFalse()
+                () -> assertThat(response.isNonMajorSending()).isFalse(),
+                () -> assertThat(response.isSseConnect()).isFalse()
             );
         }
 
@@ -182,12 +182,12 @@ class AdminServiceTest {
             adminConfigStorage.connectionOpen();
 
             // when
-            InitialAdminStatus response = adminService.getInitialStatus();
+            ApplicationStatusResponse response = adminService.getInitialStatus();
 
             // then
             assertAll(
-                () -> assertThat(response.nonMajorStatus()).isFalse(),
-                () -> assertThat(response.sseStatus()).isTrue()
+                () -> assertThat(response.isNonMajorSending()).isFalse(),
+                () -> assertThat(response.isSseConnect()).isTrue()
             );
         }
 
@@ -200,13 +200,13 @@ class AdminServiceTest {
 
             // when
             Thread.sleep(taskDuration);
-            InitialAdminStatus response = adminService.getInitialStatus();
+            ApplicationStatusResponse response = adminService.getInitialStatus();
             adminConfigStorage.connectionClose();
 
             // then
             assertAll(
-                () -> assertThat(response.nonMajorStatus()).isTrue(),
-                () -> assertThat(response.sseStatus()).isTrue()
+                () -> assertThat(response.isNonMajorSending()).isTrue(),
+                () -> assertThat(response.isSseConnect()).isTrue()
             );
         }
 

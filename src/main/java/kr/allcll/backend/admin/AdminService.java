@@ -1,6 +1,6 @@
 package kr.allcll.backend.admin;
 
-import kr.allcll.backend.admin.dto.InitialAdminStatus;
+import kr.allcll.backend.admin.dto.ApplicationStatusResponse;
 import kr.allcll.backend.config.AdminConfigStorage;
 import kr.allcll.backend.domain.seat.SeatService;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
@@ -38,15 +38,15 @@ public class AdminService {
         seatService.sendNonMajorSeats();
     }
 
-    public InitialAdminStatus getInitialStatus() {
+    public ApplicationStatusResponse getInitialStatus() {
         if (adminConfigStorage.sseNotAccessible() && scheduleStorage.isNonMajorScheduleNotRunning()) {
-            return InitialAdminStatus.from(false, false);
+            return ApplicationStatusResponse.from(false, false);
         }
         if (adminConfigStorage.sseAccessible() && scheduleStorage.isNonMajorScheduleRunning()) {
-            return InitialAdminStatus.from(true, true);
+            return ApplicationStatusResponse.from(true, true);
         }
         if (adminConfigStorage.sseAccessible() && scheduleStorage.isNonMajorScheduleNotRunning()) {
-            return InitialAdminStatus.from(true, false);
+            return ApplicationStatusResponse.from(true, false);
         }
         throw new AllcllException(AllcllErrorCode.NON_MAJOR_SHOULD_SHUT_DOWN);
     }
