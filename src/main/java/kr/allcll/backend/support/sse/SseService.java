@@ -2,6 +2,8 @@ package kr.allcll.backend.support.sse;
 
 import java.io.IOException;
 import kr.allcll.backend.config.AdminConfigStorage;
+import kr.allcll.backend.support.exception.AllcllErrorCode;
+import kr.allcll.backend.support.exception.AllcllException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
