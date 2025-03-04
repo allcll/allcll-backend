@@ -2,6 +2,7 @@ package kr.allcll.backend.domain.seat;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,7 +23,8 @@ public class SeatStorage {
         Collection<SeatDto> seatsValue = seats.values();
         return seatsValue.stream()
             .filter(seat -> seat.getSubject().isNonMajor())
-            .sorted((s1, s2) -> s2.getSeatCount() - s1.getSeatCount())
+            .filter(seat -> seat.getSeatCount() > 0)
+            .sorted(Comparator.comparingInt(SeatDto::getSeatCount))
             .limit(limit)
             .toList();
     }
