@@ -1,9 +1,7 @@
 package kr.allcll.backend.support.schedule;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future.State;
 import java.util.concurrent.ScheduledFuture;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
@@ -13,24 +11,10 @@ import org.springframework.stereotype.Component;
 public class ScheduleStorage {
 
     private final Map<String, ScheduledFuture<?>> scheduledPinTasks = new ConcurrentHashMap<>();
-    private Optional<ScheduledFuture<?>> nonMajorSchedule;
-
-    public ScheduleStorage() {
-        this.nonMajorSchedule = Optional.empty();
-    }
+    private ScheduledFuture<?> nonMajorSchedule;
 
     public void cancelNonMajorSchedule() {
-        nonMajorSchedule.ifPresent(scheduledFuture -> scheduledFuture.cancel(true));
-    }
-
-    public boolean isNonMajorScheduleRunning() {
-        return nonMajorSchedule
-            .map(scheduledFuture -> State.RUNNING.equals(scheduledFuture.state()))
-            .orElse(false);
-    }
-
-    public boolean isNonMajorScheduleNotRunning() {
-        return !isNonMajorScheduleRunning();
+        nonMajorSchedule.cancel(true);
     }
 
     public boolean isAlreadyScheduledPin(String token) {

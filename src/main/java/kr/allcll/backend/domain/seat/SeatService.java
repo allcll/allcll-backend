@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ScheduledFuture;
 import kr.allcll.backend.domain.seat.dto.PreSeatsResponse;
 import kr.allcll.backend.domain.seat.dto.SeatDto;
@@ -49,7 +48,7 @@ public class SeatService {
             }
         };
         scheduleStorage.setNonMajorSchedule(
-            Optional.of(scheduler.scheduleAtFixedRate(nonMajorTask, Duration.ofMillis(TASK_DURATION)))
+            scheduler.scheduleAtFixedRate(nonMajorTask, Duration.ofMillis(TASK_DURATION))
         );
     }
 

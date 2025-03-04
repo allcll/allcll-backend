@@ -2,18 +2,14 @@ package kr.allcll.backend.admin;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.Duration;
-import java.util.Optional;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
-import kr.allcll.backend.admin.dto.SystemStatusResponse;
 import kr.allcll.backend.config.AdminConfigStorage;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import kr.allcll.backend.support.exception.AllcllSseException;
-import kr.allcll.backend.support.schedule.ScheduleStorage;
 import kr.allcll.backend.support.sse.SseService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,9 +34,6 @@ class AdminServiceTest {
 
     @Autowired
     private SseService sseService;
-
-    @Autowired
-    private ScheduleStorage scheduleStorage;
 
     @AfterEach
     void setUp() {
@@ -135,97 +128,6 @@ class AdminServiceTest {
             Thread.sleep(taskDuration * 2);
             int countAfterDuration = executeCount.get();
             assertThat(countAtCancel.get()).isEqualTo(countAfterDuration);
-        }
-    }
-
-    @Nested
-    @DisplayName("시스템 설정값 조회 기능을 테스트한다.")
-    class adminGetStatus {
-
-        @Test
-        @DisplayName("SSE 연결이 중도 해제 되었을 때 false 응답을 검증한다.")
-        void bothTrueToFalse() throws InterruptedException {
-            // given
-            adminConfigStorage.connectionOpen();
-            int taskDuration = runScheduleTask();
-            Thread.sleep(taskDuration);
-            adminConfigStorage.connectionClose();
-
-            // when
-            Thread.sleep((long) taskDuration * 2);
-            SystemStatusResponse response = adminService.getSystemStatus();
-
-            // then
-            assertAll(
-                () -> assertThat(response.isNonMajorSending()).isFalse(),
-                () -> assertThat(response.isSseConnect()).isFalse()
-            );
-        }
-
-        @Test
-        @DisplayName("SSE가 연결 허용되지 않았을 때에 응답을 검증한다.")
-        void bothFalse(){
-            // when
-            SystemStatusResponse response = adminService.getSystemStatus();
-
-            // then
-            assertAll(
-                () -> assertThat(response.isNonMajorSending()).isFalse(),
-                () -> assertThat(response.isSseConnect()).isFalse()
-            );
-        }
-
-        @Test
-        @DisplayName("SSE가 연결 허용되고, 교양이 전송되고 있지 않을 때 응답을 검증한다.")
-        void onlySseConnect() {
-            // given
-            adminConfigStorage.connectionOpen();
-
-            // when
-            SystemStatusResponse response = adminService.getSystemStatus();
-
-            // then
-            assertAll(
-                () -> assertThat(response.isNonMajorSending()).isFalse(),
-                () -> assertThat(response.isSseConnect()).isTrue()
-            );
-        }
-
-        @Test
-        @DisplayName("SSE가 연결 허용되고, 교양이 전송되고 있을 때 응답을 검증한다.")
-        void bothTrue() throws InterruptedException {
-            // given
-            adminConfigStorage.connectionOpen();
-            int taskDuration = runScheduleTask();
-
-            // when
-            Thread.sleep(taskDuration);
-            SystemStatusResponse response = adminService.getSystemStatus();
-            adminConfigStorage.connectionClose();
-
-            // then
-            assertAll(
-                () -> assertThat(response.isNonMajorSending()).isTrue(),
-                () -> assertThat(response.isSseConnect()).isTrue()
-            );
-        }
-
-        private int runScheduleTask() {
-            int taskDuration = 201;
-            sseService.connect("token");
-            AtomicInteger executeCount = new AtomicInteger(0);
-            Runnable task = () -> {
-                try {
-                    sseService.propagate("message", "Is SSE there?");
-                    executeCount.incrementAndGet();
-                } catch (AllcllSseException e) {
-                    scheduleStorage.cancelNonMajorSchedule();
-                }
-            };
-            scheduleStorage.setNonMajorSchedule(
-                Optional.of(scheduler.scheduleAtFixedRate(task, Duration.ofMillis(taskDuration)))
-            );
-            return taskDuration;
         }
     }
 }

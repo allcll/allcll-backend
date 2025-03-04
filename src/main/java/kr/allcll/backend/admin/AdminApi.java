@@ -1,9 +1,7 @@
 package kr.allcll.backend.admin;
 
-import kr.allcll.backend.admin.dto.SystemStatusResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,11 +27,5 @@ public class AdminApi {
     public ResponseEntity<Void> startToSendNonMajor() {
         adminService.startToSendNonMajor();
         return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/admin/system-status")
-    public ResponseEntity<SystemStatusResponse> getSystemStatus() {
-        SystemStatusResponse response = adminService.getSystemStatus();
-        return ResponseEntity.ok(response);
     }
 }
