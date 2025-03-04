@@ -4,6 +4,8 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import kr.allcll.backend.domain.seat.dto.PreSeatsResponse;
 import kr.allcll.backend.domain.seat.dto.SeatDto;
@@ -12,10 +14,10 @@ import kr.allcll.backend.domain.seat.pin.Pin;
 import kr.allcll.backend.domain.seat.pin.PinRepository;
 import kr.allcll.backend.domain.seat.pin.dto.PinSeatsResponse;
 import kr.allcll.backend.domain.subject.Subject;
-import kr.allcll.backend.support.schedule.ScheduleStorage;
 import kr.allcll.backend.support.sse.SseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 
@@ -32,22 +34,19 @@ public class SeatService {
 
     private final SseService sseService;
     private final SeatStorage seatStorage;
-    private final SeatRepository seatRepository;
     private final PinRepository pinRepository;
+    private final SeatRepository seatRepository;
     private final ThreadPoolTaskScheduler scheduler;
-    private final ScheduleStorage scheduleStorage;
+    private final Map<String, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
 
-    // TODO: admin 에서 호출
+    @Scheduled(fixedRate = 1000)
     public void sendNonMajorSeats() {
-        Runnable nonMajorTask = () -> {
-            List<SeatDto> nonMajorSeatDtos = seatStorage.getNonMajorSeats(NON_MAJOR_SUBJECT_QUERY_LIMIT);
-            sseService.propagate(NON_MAJOR_SEATS_EVENT_NAME, SeatsResponse.from(nonMajorSeatDtos));
-        };
-        scheduler.scheduleAtFixedRate(nonMajorTask, Duration.ofMillis(TASK_DURATION));
+        List<SeatDto> nonMajorSeatDtos = seatStorage.getNonMajorSeats(NON_MAJOR_SUBJECT_QUERY_LIMIT);
+        sseService.propagate(NON_MAJOR_SEATS_EVENT_NAME, SeatsResponse.from(nonMajorSeatDtos));
     }
 
     public void sendPinSeatsInformation(String token) {
-        if (scheduleStorage.isAlreadyScheduled(token)) {
+        if (scheduledTasks.containsKey(token)) {
             log.info("토큰 {} 에 대해 이미 스케줄된 작업이 존재합니다.", token);
             return;
         }
@@ -62,15 +61,12 @@ public class SeatService {
         };
 
         ScheduledFuture<?> scheduledFuture = scheduler.scheduleAtFixedRate(task, Duration.ofMillis(TASK_DURATION));
-        scheduleStorage.addSchedule(token, scheduledFuture);
-        scheduleToCancel(token, scheduledFuture);
-    }
+        scheduledTasks.put(token, scheduledFuture);
 
-    private void scheduleToCancel(String token, ScheduledFuture<?> scheduledFuture) {
         scheduler.schedule(() -> {
                 log.info("토큰 {}: 태스크 종료", token);
                 scheduledFuture.cancel(true);
-                scheduleStorage.deleteSchedule(token);
+                scheduledTasks.remove(token);
             },
             new Date(System.currentTimeMillis() + TASK_PERIOD));
     }

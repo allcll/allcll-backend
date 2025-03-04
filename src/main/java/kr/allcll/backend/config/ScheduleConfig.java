@@ -14,7 +14,7 @@ public class ScheduleConfig {
     @Bean
     public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        scheduler.setThreadNamePrefix("subjects-sent-scheduler");
+        scheduler.setThreadNamePrefix("pin-subjects-sent-scheduler");
         scheduler.setPoolSize(20);
         scheduler.setAwaitTerminationSeconds(15);
         scheduler.setRemoveOnCancelPolicy(true);
