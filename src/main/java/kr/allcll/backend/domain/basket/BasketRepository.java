@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface BasketRepository extends JpaRepository<Basket, Long> {
 
     @Query("select b from Basket b "
-        + "join b.subject s "
+        + "join fetch b.subject s "
         + "where s.id = :id "
         + "and s.isDeleted = false")
     List<Basket> findBySubjectId(Long id);
