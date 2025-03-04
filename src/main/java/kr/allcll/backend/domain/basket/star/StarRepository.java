@@ -16,7 +16,7 @@ public interface StarRepository extends JpaRepository<Star, Long> {
     boolean existsBySubjectAndToken(Subject subject, String token);
 
     @Query("select s from Star s "
-        + "join fetch s.subject sub "
+        + "join s.subject sub "
         + "where s.token = :token "
         + "and sub.isDeleted = false")
     List<Star> findAllByToken(String token);

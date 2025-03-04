@@ -11,7 +11,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SeatRepository extends JpaRepository<Seat, Long> {
 
-    @Query("select s from Seat s join s.subject sub "
+    @Query("select s from Seat s "
+        + "join s.subject sub "
         + "where s.subject = :subject "
         + "and s.createdDate = :today "
         + "and sub.isDeleted = false")
