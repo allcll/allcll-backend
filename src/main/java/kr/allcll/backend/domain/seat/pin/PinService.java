@@ -43,7 +43,7 @@ public class PinService {
     public void deletePinOnSubject(Long subjectId, String token) {
         Subject subject = subjectRepository.findById(subjectId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.SUBJECT_NOT_FOUND));
-        Pin pin = pinRepository.findBySubjectAndToken(subject, token)
+        Pin pin = pinRepository.findBySubjectAndTokenToDelete(subject, token)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.PIN_SUBJECT_MISMATCH));
         pinRepository.deleteById(pin.getId());
     }
