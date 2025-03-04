@@ -10,4 +10,6 @@ public abstract class BaseEntity {
 
     String semesterAt;
     LocalDateTime createdAt;
+    LocalDateTime deletedAt;
+    boolean isDeleted;
 }
