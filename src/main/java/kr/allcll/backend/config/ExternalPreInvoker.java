@@ -18,42 +18,16 @@ public class ExternalPreInvoker {
     private final SseClientService sseClientService;
 
     @Retryable(
-        retryFor = {Exception.class},
-        maxAttempts = 60 * 60 * 7,
-        backoff = @Backoff(delay = 100, multiplier = 1.5, maxDelay = 5000)
-    )
-    public void saveNonMajorSubjects() {
-        try {
-            externalService.saveNonMajorSubjects();
-        } catch (Exception e) {
-            log.error("[서버] 상위권 교양 저장 중 오류 발생", e);
-            throw e;
-        }
-        log.info("[서버] 상위권 교양 저장 완료");
-    }
-
-    @Retryable(
         maxAttempts = 12 * 60 * 7,
         backoff = @Backoff(delay = 100, multiplier = 1.5, maxDelay = 5000)
     )
     public void sendSseConnectionToExternal() {
-        sendNonMajorToExternal();
         try {
             keepSseConnection();
         } catch (Exception e) {
             log.error("[외부 서버 통신] {}", e.getMessage(), e);
             throw e;
         }
-    }
-
-    private void sendNonMajorToExternal() {
-        try {
-            externalService.sendNonMajorToExternal();
-        } catch (Exception e) {
-            log.error("[외부 서버 통신] 상위권 교양 전달 중 오류 발생", e);
-            throw e;
-        }
-        log.info("[외부 서버 통신] 상위권 교양 전달 완료");
     }
 
     private void keepSseConnection() {
