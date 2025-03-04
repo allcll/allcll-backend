@@ -10,7 +10,6 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
 
     @Query("select p from Pin p join fetch p.subject s "
         + "where p.token = :tokenId "
-        + "and s.deletedAt is null "
         + "and s.isDeleted = false")
     List<Pin> findAllByToken(String tokenId);
 
@@ -22,13 +21,11 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
     @Query("select case when COUNT(p) > 0 then true else false end from Pin p join p.subject s "
         + "where p.subject = :subject "
         + "and p.token = :token "
-        + "and s.deletedAt is null "
         + "and s.isDeleted = false")
     boolean existsBySubjectAndToken(Subject subject, String token);
 
     @Query("select count(p) from Pin p join p.subject s "
         + "where p.token = :token "
-        + "and s.isDeleted = false "
-        + "and s.deletedAt is null")
+        + "and s.isDeleted = false ")
     Long countAllByToken(String token);
 }

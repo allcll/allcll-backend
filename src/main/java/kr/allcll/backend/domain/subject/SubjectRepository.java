@@ -10,13 +10,11 @@ public interface SubjectRepository extends JpaRepository<Subject, Long>, JpaSpec
 
     @Query("select s from Subject s "
         + "where s.deptCd = :deptCd "
-        + "and s.deletedAt is null "
         + "and s.isDeleted = false")
     List<Subject> findAllByDeptCd(String deptCd);
 
     @Query("select s from Subject s "
         + "where s.id = :id "
-        + "and s.deletedAt is null "
         + "and s.isDeleted = false")
     Optional<Subject> findById(Long id);
 }

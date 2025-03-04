@@ -12,21 +12,18 @@ public interface StarRepository extends JpaRepository<Star, Long> {
         + "join s.subject sub "
         + "where s.subject = :subject "
         + "and s.token = :token "
-        + "and sub.deletedAt is null "
         + "and sub.isDeleted = false")
     boolean existsBySubjectAndToken(Subject subject, String token);
 
     @Query("select s from Star s "
         + "join fetch s.subject sub "
         + "where s.token = :token "
-        + "and sub.deletedAt is null "
         + "and sub.isDeleted = false")
     List<Star> findAllByToken(String token);
 
     @Query("select count(s) from Star s "
         + "join s.subject sub "
         + "where s.token = :token "
-        + "and sub.deletedAt is null "
         + "and sub.isDeleted = false")
     Long countAllByToken(String token);
 
