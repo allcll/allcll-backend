@@ -52,4 +52,8 @@ public class SseEmitterStorage {
     public List<String> getUserTokens() {
         return emitters.keySet().stream().toList();
     }
+
+    public int getActiveConnectionCount() {
+        return emitters.size();
+    }
 }
