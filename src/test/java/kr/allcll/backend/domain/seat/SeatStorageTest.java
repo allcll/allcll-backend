@@ -108,7 +108,7 @@ class SeatStorageTest {
     }
 
     @Test
-    @DisplayName("특정 과목의 여석을 반환한다.")
+    @DisplayName("요청한 과목들의 여석을 반환한다.")
     void getSeatsTest() {
         // given
         Subject subject0 = createSubject("정보보호개론", "003278", "001", "유재석");
