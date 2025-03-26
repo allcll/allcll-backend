@@ -32,8 +32,8 @@ class SeatStorageTest {
         subjectRepository.deleteAllInBatch();
     }
 
-    @DisplayName("동일한 과목의 여석을 저장하면 최근 여석으로 갱신된다.")
     @Test
+    @DisplayName("동일한 과목의 여석을 저장하면 최근 여석으로 갱신된다.")
     void addDuplicateSeatTest() {
         // given
         Subject subject = createSubject("컴퓨터구조", "003278", "001", "유재석");
@@ -58,8 +58,8 @@ class SeatStorageTest {
         - 여석이 0인 것은 조회 안된다.
         - 여석이 적은 것부터 조회한다.
      */
-    @DisplayName("비전공 과목 여석이 규칙에 맞게 반환된다.")
     @Test
+    @DisplayName("비전공 과목 여석이 규칙에 맞게 반환된다.")
     void getNonMajorSeatsTest() {
         // given
         Subject subject0 = createSubject("정보보호개론", "003278", "001", "유재석");
@@ -107,8 +107,8 @@ class SeatStorageTest {
             );
     }
 
-    @DisplayName("특정 과목의 여석을 반환한다.")
     @Test
+    @DisplayName("특정 과목의 여석을 반환한다.")
     void getSeatsTest() {
         // given
         Subject subject0 = createSubject("정보보호개론", "003278", "001", "유재석");
