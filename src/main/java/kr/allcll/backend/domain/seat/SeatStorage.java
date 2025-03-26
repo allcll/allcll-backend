@@ -5,11 +5,14 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import kr.allcll.backend.domain.seat.dto.SeatDto;
 import kr.allcll.backend.domain.subject.Subject;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class SeatStorage {
 
@@ -30,16 +33,20 @@ public class SeatStorage {
     }
 
     public List<SeatDto> getSeats(List<Subject> subjects) {
-        List<SeatDto> result = new ArrayList<>();
-        for (Subject subject : subjects) {
-            for (SeatDto seatDto : seats.values()) {
-                if (seatDto.getSubject().getId().equals(subject.getId())) {
-                    result.add(seatDto);
-                    break;
-                }
-            }
-        }
-        return result;
+        List<SeatDto> seats = new ArrayList<>();
+        subjects.forEach(subject -> findSeat(subject).ifPresentOrElse(
+            seats::add,
+            () -> logSubjectMissing(subject)
+        ));
+        return seats;
+    }
+
+    private Optional<SeatDto> findSeat(Subject subject) {
+        return Optional.ofNullable(seats.get(subject));
+    }
+
+    private void logSubjectMissing(Subject subject) {
+        log.warn("[SeatStorage] 여석 정보가 존재하지 않습니다. subjectId={}, subjectName={}", subject.getId(), subject.getCuriNm());
     }
 
     public void add(SeatDto seatDto) {
@@ -48,5 +55,9 @@ public class SeatStorage {
 
     public void addAll(List<SeatDto> seatDtos) {
         seatDtos.forEach(this::add);
+    }
+
+    public void clear() {
+        seats.clear();
     }
 }
