@@ -19,6 +19,21 @@ public class SubjectFixture {
             "", "", "", "", "");
     }
 
+    public static Subject createNonMajorSubject(
+        String subjectName,
+        String subjectCode,
+        String classCode,
+        String professorName
+    ) {
+        return new Subject("", "", "", "",
+            subjectCode, subjectName,
+            "", "", "", "", "", "", "", "",
+            professorName, "", "", "", "", "",
+            "", "대양휴머니티칼리지",
+            classCode, "", "", "", "", "",
+            "", "", "", "", "");
+    }
+
     public static Subject createSubjectWithDepartmentCode(
         String subjectName,
         String subjectCode,
