@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SeatStorage {
 
-    private final Map<Long, SeatDto> seats;
+    private final Map<Subject, SeatDto> seats;
 
     public SeatStorage() {
         this.seats = new ConcurrentHashMap<>();
@@ -43,12 +43,10 @@ public class SeatStorage {
     }
 
     public void add(SeatDto seatDto) {
-        seats.put(seatDto.getSubject().getId(), seatDto);
+        seats.put(seatDto.getSubject(), seatDto);
     }
 
     public void addAll(List<SeatDto> seatDtos) {
-        for (SeatDto seatDto : seatDtos) {
-            this.seats.put(seatDto.getSubject().getId(), seatDto);
-        }
+        seatDtos.forEach(this::add);
     }
 }
