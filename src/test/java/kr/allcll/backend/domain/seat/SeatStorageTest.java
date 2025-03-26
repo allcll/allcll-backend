@@ -40,16 +40,16 @@ class SeatStorageTest {
         subjectRepository.save(subject);
 
         // when
-        SeatDto seatDto = new SeatDto(subject, 10, LocalDateTime.now());
-        seatStorage.add(seatDto);
+        SeatDto previousSeatDto = new SeatDto(subject, 10, LocalDateTime.now());
+        seatStorage.add(previousSeatDto);
         SeatDto updatedSeatDto = new SeatDto(subject, 5, LocalDateTime.now());
         seatStorage.add(updatedSeatDto);
 
         // then
         List<SeatDto> seats = seatStorage.getSeats(List.of(subject));
-        SeatDto seatDto1 = seats.getFirst();
+        SeatDto resultSeatDto = seats.getFirst();
 
-        assertThat(seatDto1.getSeatCount()).isEqualTo(5);
+        assertThat(resultSeatDto.getSeatCount()).isEqualTo(updatedSeatDto.getSeatCount());
     }
 
     /*
