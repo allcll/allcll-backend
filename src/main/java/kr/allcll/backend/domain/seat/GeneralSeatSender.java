@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class GeneralSeatSender {
 
-    private static final String NON_MAJOR_SEATS_EVENT_NAME = "nonMajorSeats";
-    private static final int NON_MAJOR_SUBJECT_QUERY_LIMIT = 20;
+    private static final String EVENT_NAME = "nonMajorSeats";
+    private static final int QUERY_LIMIT = 20;
     private static final Duration SENDING_PERIOD = Duration.ofSeconds(1);
 
     private final SseService sseService;
@@ -36,17 +36,17 @@ public class GeneralSeatSender {
         if (scheduledTaskHandler.getTaskCount() > 0) {
             return;
         }
-        scheduledTaskHandler.scheduleAtFixedRate(getNonMajorSeatTask(), SENDING_PERIOD);
+        scheduledTaskHandler.scheduleAtFixedRate(getGeneralSeatTask(), SENDING_PERIOD);
     }
 
     public void cancel() {
         scheduledTaskHandler.cancelAll();
     }
 
-    private Runnable getNonMajorSeatTask() {
+    private Runnable getGeneralSeatTask() {
         return () -> {
-            List<SeatDto> nonMajorSeats = seatStorage.getNonMajorSeats(NON_MAJOR_SUBJECT_QUERY_LIMIT);
-            sseService.propagate(NON_MAJOR_SEATS_EVENT_NAME, SeatsResponse.from(nonMajorSeats));
+            List<SeatDto> generalSeats = seatStorage.getGeneralSeats(QUERY_LIMIT);
+            sseService.propagate(EVENT_NAME, SeatsResponse.from(generalSeats));
         };
     }
 }
