@@ -38,7 +38,7 @@ public class ScheduledTaskHandler {
             }
         };
 
-        ScheduledFuture<?> future = scheduler.scheduleWithFixedDelay(wrappedTask, period);
+        ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(wrappedTask, period);
 
         tasks.put(taskId, future);
         statuses.put(taskId, running);
