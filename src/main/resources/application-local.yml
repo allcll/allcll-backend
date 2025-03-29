@@ -32,8 +32,6 @@ logging:
           sse: debug
 
 app:
-  scheduling:
-    enabled: true
   runner:
     enabled: true
 

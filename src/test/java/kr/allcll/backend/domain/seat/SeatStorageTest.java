@@ -60,7 +60,7 @@ class SeatStorageTest {
      */
     @Test
     @DisplayName("비전공 과목 여석이 규칙에 맞게 반환된다.")
-    void getNonMajorSeatsTest() {
+    void getGeneralSeatsTest() {
         // given
         Subject subject0 = createSubject("정보보호개론", "003278", "001", "유재석");
         Subject subject1 = createSubject("컴퓨터구조", "003278", "001", "유재석");
@@ -93,7 +93,7 @@ class SeatStorageTest {
 
         // when
         int queryLimit = 5;
-        List<SeatDto> seats = seatStorage.getNonMajorSeats(queryLimit);
+        List<SeatDto> seats = seatStorage.getGeneralSeats(queryLimit);
 
         // then
         assertThat(seats).hasSize(queryLimit)

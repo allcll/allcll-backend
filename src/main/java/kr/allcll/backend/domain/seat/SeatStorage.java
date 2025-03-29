@@ -22,7 +22,7 @@ public class SeatStorage {
         this.seats = new ConcurrentHashMap<>();
     }
 
-    public List<SeatDto> getNonMajorSeats(int limit) {
+    public List<SeatDto> getGeneralSeats(int limit) {
         Collection<SeatDto> seatsValue = seats.values();
         return seatsValue.stream()
             .filter(seat -> seat.getSubject().isNonMajor())
