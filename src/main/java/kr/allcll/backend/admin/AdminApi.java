@@ -17,7 +17,7 @@ public class AdminApi {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/api/admin/schedule/cancel")
+    @PostMapping("/api/admin/scheduler/cancel")
     public ResponseEntity<Void> cancelScheduling() {
         adminService.cancelScheduling();
         return ResponseEntity.ok().build();
