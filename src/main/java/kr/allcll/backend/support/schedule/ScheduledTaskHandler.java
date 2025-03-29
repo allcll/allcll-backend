@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
@@ -16,32 +15,25 @@ public class ScheduledTaskHandler {
 
     private final ThreadPoolTaskScheduler scheduler;
     private final Map<String, ScheduledFuture<?>> tasks = new ConcurrentHashMap<>();
-    private final Map<String, AtomicBoolean> statuses = new ConcurrentHashMap<>();
 
     public ScheduledTaskHandler(int poolSize, String namePrefix, MeterRegistry meterRegistry) {
         scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(poolSize);
         scheduler.setThreadNamePrefix(namePrefix);
-        scheduler.initialize();
         scheduler.setRemoveOnCancelPolicy(true);
+        scheduler.initialize();
 
         ExecutorServiceMetrics.monitor(meterRegistry, scheduler.getScheduledExecutor(), namePrefix);
     }
 
     public String scheduleAtFixedRate(Runnable task, Duration period) {
         String taskId = UUID.randomUUID().toString();
-        AtomicBoolean running = new AtomicBoolean(true);
+        return scheduleAtFixedRate(taskId, task, period);
+    }
 
-        Runnable wrappedTask = () -> {
-            if (running.get()) {
-                task.run();
-            }
-        };
-
-        ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(wrappedTask, period);
-
+    public String scheduleAtFixedRate(String taskId, Runnable task, Duration period) {
+        ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(task, period);
         tasks.put(taskId, future);
-        statuses.put(taskId, running);
         return taskId;
     }
 
@@ -50,18 +42,15 @@ public class ScheduledTaskHandler {
         if (future != null) {
             future.cancel(true);
         }
-        statuses.remove(taskId);
     }
 
     public void cancelAll() {
         tasks.values().forEach(f -> f.cancel(true));
         tasks.clear();
-        statuses.clear();
     }
 
     public boolean isRunning(String taskId) {
-        AtomicBoolean running = statuses.get(taskId);
-        return running != null && running.get();
+        return tasks.containsKey(taskId);
     }
 
     public int getTaskCount() {
