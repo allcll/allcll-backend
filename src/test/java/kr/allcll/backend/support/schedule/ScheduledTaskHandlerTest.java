@@ -146,6 +146,24 @@ class ScheduledTaskHandlerTest {
             .untilAsserted(() -> assertThat(scheduledTaskHandler.getTaskCount()).isEqualTo(0));
     }
 
+    @Test
+    @DisplayName("Task ID가 동일한 작업을 중복 등록할 수 없다.")
+    void duplicateTask() {
+        ScheduledTaskHandler scheduledTaskHandler = new ScheduledTaskHandler(
+            1,
+            "test-task",
+            new LoggingMeterRegistry()
+        );
+
+        // when
+        String taskId = scheduleTask(scheduledTaskHandler, new AtomicInteger());
+        scheduledTaskHandler.scheduleAtFixedRate(taskId, () -> {
+        }, Duration.ofSeconds(1));
+
+        // then
+        assertThat(scheduledTaskHandler.getTaskCount()).isEqualTo(1);
+    }
+
     private String scheduleTask(ScheduledTaskHandler scheduledTaskHandler, AtomicInteger counter) {
         return scheduledTaskHandler.scheduleAtFixedRate(
             () -> System.out.println("Task is running: " + counter.incrementAndGet()),
