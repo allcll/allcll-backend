@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 
 @Slf4j
 @RestControllerAdvice
@@ -36,6 +37,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleServletException(HttpServletRequest request, ServletException e) {
         log.warn(LOG_FORMAT, request.getMethod(), request.getRequestURI(), getRequestBody(request), e.getMessage());
         return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleAsyncRequestTimeoutException(
+        HttpServletRequest request,
+        AsyncRequestTimeoutException e
+    ) {
+        if (request.getHeader("ALLCLL-SSE-CONNECT") != null) {
+            log.info(LOG_FORMAT, request.getMethod(), request.getRequestURI(), e.getMessage(),
+                "SSE connection timed out");
+            return ResponseEntity.noContent().build();
+        }
+        return handleException(request, e);
     }
 
     @ExceptionHandler
