@@ -1,6 +1,8 @@
 package kr.allcll.backend.config;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import io.micrometer.core.instrument.MeterRegistry;
+import kr.allcll.backend.support.schedule.ScheduledTaskHandler;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -8,7 +10,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 @Configuration
 @EnableScheduling
-@ConditionalOnProperty(name = "app.scheduling.enabled", havingValue = "true", matchIfMissing = true)
 public class ScheduleConfig {
 
     @Bean
@@ -21,5 +22,11 @@ public class ScheduleConfig {
         scheduler.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
         scheduler.initialize();
         return scheduler;
+    }
+
+    @Bean
+    @Qualifier("generalSeatTaskHandler")
+    public ScheduledTaskHandler generalSeatTaskHandler(MeterRegistry meterRegistry) {
+        return new ScheduledTaskHandler(2, "general-seat-sender", meterRegistry);
     }
 }
