@@ -3,9 +3,7 @@ package kr.allcll.backend.support.sse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import kr.allcll.backend.domain.seat.SeatService;
-import kr.allcll.backend.support.sse.SseApi;
-import kr.allcll.backend.support.sse.SseService;
+import kr.allcll.backend.domain.seat.PinSeatSender;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +22,7 @@ class SseApiTest {
     private SseService sseService;
 
     @MockitoBean
-    private SeatService seatService;
+    private PinSeatSender pinSeatSender;
 
     @DisplayName("Server Sent Event를 연결한다.")
     @Test

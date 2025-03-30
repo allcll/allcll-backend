@@ -7,7 +7,7 @@ import io.restassured.response.Response;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import kr.allcll.backend.domain.seat.SeatService;
+import kr.allcll.backend.domain.seat.PinSeatSender;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ class SseServiceTest {
     private SseService sseService;
 
     @MockitoBean
-    private SeatService seatService;
+    private PinSeatSender pinSeatSender;
 
     @LocalServerPort
     private int port;
