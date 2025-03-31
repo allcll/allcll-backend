@@ -32,6 +32,10 @@ public class ScheduledTaskHandler {
     }
 
     public String scheduleAtFixedRate(String taskId, Runnable task, Duration period) {
+        if (tasks.containsKey(taskId)) {
+            log.warn("[ScheduledTaskHandler] Task ID {} 은 이미 스케줄러에 등록되어 있습니다.", taskId);
+            return taskId;
+        }
         ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(task, period);
         tasks.put(taskId, future);
         return taskId;
