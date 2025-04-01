@@ -6,14 +6,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import kr.allcll.backend.domain.basket.BasketRepository;
-import kr.allcll.backend.domain.seat.pin.Pin;
-import kr.allcll.backend.domain.seat.pin.PinRepository;
-import kr.allcll.backend.domain.seat.pin.PinService;
-import kr.allcll.backend.support.exception.AllcllErrorCode;
-import kr.allcll.backend.support.exception.AllcllException;
 import kr.allcll.backend.domain.seat.pin.dto.SubjectIdsResponse;
 import kr.allcll.backend.domain.subject.Subject;
 import kr.allcll.backend.domain.subject.SubjectRepository;
+import kr.allcll.backend.support.exception.AllcllErrorCode;
+import kr.allcll.backend.support.exception.AllcllException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

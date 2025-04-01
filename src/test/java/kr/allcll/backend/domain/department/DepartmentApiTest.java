@@ -6,8 +6,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
-import kr.allcll.backend.domain.department.DepartmentApi;
-import kr.allcll.backend.domain.department.DepartmentService;
 import kr.allcll.backend.domain.department.dto.DepartmentResponse;
 import kr.allcll.backend.domain.department.dto.DepartmentsResponse;
 import org.junit.jupiter.api.DisplayName;

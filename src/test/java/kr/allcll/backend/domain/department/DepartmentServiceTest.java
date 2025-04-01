@@ -2,9 +2,6 @@ package kr.allcll.backend.domain.department;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import kr.allcll.backend.domain.department.Department;
-import kr.allcll.backend.domain.department.DepartmentRepository;
-import kr.allcll.backend.domain.department.DepartmentService;
 import kr.allcll.backend.domain.department.dto.DepartmentResponse;
 import kr.allcll.backend.domain.department.dto.DepartmentsResponse;
 import org.junit.jupiter.api.BeforeEach;

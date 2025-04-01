@@ -6,8 +6,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
-import kr.allcll.backend.domain.basket.BasketApi;
-import kr.allcll.backend.domain.basket.BasketService;
 import kr.allcll.backend.domain.basket.dto.BasketsEachSubject;
 import kr.allcll.backend.domain.basket.dto.BasketsResponse;
 import kr.allcll.backend.domain.basket.dto.EachDepartmentBasket;
