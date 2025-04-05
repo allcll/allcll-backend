@@ -7,7 +7,7 @@ import kr.allcll.backend.support.exception.AllcllException;
 import lombok.Getter;
 
 @Getter
-public enum SemesterCode {
+public enum Semester {
     SPRING_25("2025-1", LocalDate.of(2025, 2, 1), LocalDate.of(2025, 3, 31)),
     SUMMER_25("2025-여름", LocalDate.of(2025, 6, 1), LocalDate.of(2025, 6, 30)),
     FALL_25("2025-2", LocalDate.of(2025, 8, 1), LocalDate.of(2025, 9, 30)),
@@ -18,28 +18,28 @@ public enum SemesterCode {
     private final LocalDate startDate;
     private final LocalDate endDate;
 
-    SemesterCode(String value, LocalDate startDate, LocalDate endDate) {
+    Semester(String value, LocalDate startDate, LocalDate endDate) {
         this.value = value;
         this.startDate = startDate;
         this.endDate = endDate;
     }
 
-    public static SemesterCode getCode(LocalDate date) {
+    public static Semester getCode(LocalDate date) {
         return Arrays.stream(values())
-            .filter(semesterCode -> isDateInRange(semesterCode, date))
+            .filter(semester -> isDateInRange(semester, date))
             .findFirst()
             .orElse(getNextSemester(date));
     }
 
-    private static boolean isDateInRange(SemesterCode semesterCode, LocalDate date) {
-        LocalDate startDate = semesterCode.getStartDate();
-        LocalDate endDate = semesterCode.getEndDate();
+    private static boolean isDateInRange(Semester semester, LocalDate date) {
+        LocalDate startDate = semester.getStartDate();
+        LocalDate endDate = semester.getEndDate();
         return !startDate.isAfter(date) && !endDate.isBefore(date);
     }
 
-    private static SemesterCode getNextSemester(LocalDate date) {
+    private static Semester getNextSemester(LocalDate date) {
         return Arrays.stream(values())
-            .filter(semesterCode -> semesterCode.getStartDate().isAfter(date))
+            .filter(semester -> semester.getStartDate().isAfter(date))
             .findFirst()
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.SEMESTER_NOT_FOUND));
     }

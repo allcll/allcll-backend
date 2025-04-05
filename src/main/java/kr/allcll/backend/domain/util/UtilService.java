@@ -14,8 +14,8 @@ public class UtilService {
 
     public SemesterResponse getSemester() {
         LocalDate now = LocalDate.now(clock);
-        SemesterCode currentSemesterCode = SemesterCode.getCode(now);
-        return SemesterResponse.from(currentSemesterCode);
+        Semester currentSemester = Semester.getCode(now);
+        return SemesterResponse.from(currentSemester);
     }
 
 }

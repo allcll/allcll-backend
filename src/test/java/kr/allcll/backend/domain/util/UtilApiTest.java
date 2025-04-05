@@ -31,7 +31,7 @@ class UtilApiTest {
         String expected = """
             {
                 "code": "SPRING_25",
-                "semesterCode": "2025-1",
+                "semester": "2025-1",
                 "period": {
                     "startDate": "2025-02-01",
                     "endDate": "2025-03-31"
@@ -47,7 +47,7 @@ class UtilApiTest {
             );
 
         // when, then
-        mockMvc.perform(get("/api/service/semesterCode"))
+        mockMvc.perform(get("/api/service/semester"))
             .andExpect(status().isOk())
             .andExpect(content().json(expected));
     }

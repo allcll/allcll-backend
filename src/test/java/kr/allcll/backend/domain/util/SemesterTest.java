@@ -1,14 +1,15 @@
 package kr.allcll.backend.domain.util;
 
-import java.time.LocalDate;
-import kr.allcll.backend.support.exception.AllcllException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+
+import java.time.LocalDate;
+import kr.allcll.backend.support.exception.AllcllException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class SemesterCodeTest {
+class SemesterTest {
 
     @Test
     @DisplayName("학기 시작일에 해당하는 코드가 반환되어야 한다.")
@@ -19,10 +20,10 @@ class SemesterCodeTest {
         LocalDate winterStart = LocalDate.of(2025, 12, 1);
 
         assertAll(
-            () -> assertThat(SemesterCode.getCode(springStart)).isEqualTo(SemesterCode.SPRING_25),
-            () -> assertThat(SemesterCode.getCode(summerStart)).isEqualTo(SemesterCode.SUMMER_25),
-            () -> assertThat(SemesterCode.getCode(fallStart)).isEqualTo(SemesterCode.FALL_25),
-            () -> assertThat(SemesterCode.getCode(winterStart)).isEqualTo(SemesterCode.WINTER_25)
+            () -> assertThat(Semester.getCode(springStart)).isEqualTo(Semester.SPRING_25),
+            () -> assertThat(Semester.getCode(summerStart)).isEqualTo(Semester.SUMMER_25),
+            () -> assertThat(Semester.getCode(fallStart)).isEqualTo(Semester.FALL_25),
+            () -> assertThat(Semester.getCode(winterStart)).isEqualTo(Semester.WINTER_25)
         );
     }
 
@@ -35,10 +36,10 @@ class SemesterCodeTest {
         LocalDate winterEnd = LocalDate.of(2025, 12, 31);
 
         assertAll(
-            () -> assertThat(SemesterCode.getCode(springEnd)).isEqualTo(SemesterCode.SPRING_25),
-            () -> assertThat(SemesterCode.getCode(summerEnd)).isEqualTo(SemesterCode.SUMMER_25),
-            () -> assertThat(SemesterCode.getCode(fallEnd)).isEqualTo(SemesterCode.FALL_25),
-            () -> assertThat(SemesterCode.getCode(winterEnd)).isEqualTo(SemesterCode.WINTER_25)
+            () -> assertThat(Semester.getCode(springEnd)).isEqualTo(Semester.SPRING_25),
+            () -> assertThat(Semester.getCode(summerEnd)).isEqualTo(Semester.SUMMER_25),
+            () -> assertThat(Semester.getCode(fallEnd)).isEqualTo(Semester.FALL_25),
+            () -> assertThat(Semester.getCode(winterEnd)).isEqualTo(Semester.WINTER_25)
         );
     }
 
@@ -51,10 +52,10 @@ class SemesterCodeTest {
         LocalDate winterMiddle = LocalDate.of(2025, 12, 15);
 
         assertAll(
-            () -> assertThat(SemesterCode.getCode(springMiddle)).isEqualTo(SemesterCode.SPRING_25),
-            () -> assertThat(SemesterCode.getCode(summerMiddle)).isEqualTo(SemesterCode.SUMMER_25),
-            () -> assertThat(SemesterCode.getCode(fallMiddle)).isEqualTo(SemesterCode.FALL_25),
-            () -> assertThat(SemesterCode.getCode(winterMiddle)).isEqualTo(SemesterCode.WINTER_25)
+            () -> assertThat(Semester.getCode(springMiddle)).isEqualTo(Semester.SPRING_25),
+            () -> assertThat(Semester.getCode(summerMiddle)).isEqualTo(Semester.SUMMER_25),
+            () -> assertThat(Semester.getCode(fallMiddle)).isEqualTo(Semester.FALL_25),
+            () -> assertThat(Semester.getCode(winterMiddle)).isEqualTo(Semester.WINTER_25)
         );
     }
 
@@ -67,13 +68,13 @@ class SemesterCodeTest {
         LocalDate beforeWinter = LocalDate.of(2025, 11, 30);
 
         assertAll(
-            () -> assertThatThrownBy(() -> SemesterCode.getCode(beforeSpring))
+            () -> assertThatThrownBy(() -> Semester.getCode(beforeSpring))
                 .isInstanceOf(AllcllException.class),
-            () -> assertThatThrownBy(() -> SemesterCode.getCode(beforeSummer))
+            () -> assertThatThrownBy(() -> Semester.getCode(beforeSummer))
                 .isInstanceOf(AllcllException.class),
-            () -> assertThatThrownBy(() -> SemesterCode.getCode(beforeFall))
+            () -> assertThatThrownBy(() -> Semester.getCode(beforeFall))
                 .isInstanceOf(AllcllException.class),
-            () -> assertThatThrownBy(() -> SemesterCode.getCode(beforeWinter))
+            () -> assertThatThrownBy(() -> Semester.getCode(beforeWinter))
                 .isInstanceOf(AllcllException.class)
         );
     }
@@ -87,13 +88,13 @@ class SemesterCodeTest {
         LocalDate afterWinter = LocalDate.of(2026, 1, 1);
 
         assertAll(
-            () -> assertThatThrownBy(() -> SemesterCode.getCode(afterSpring))
+            () -> assertThatThrownBy(() -> Semester.getCode(afterSpring))
                 .isInstanceOf(AllcllException.class),
-            () -> assertThatThrownBy(() -> SemesterCode.getCode(afterSummer))
+            () -> assertThatThrownBy(() -> Semester.getCode(afterSummer))
                 .isInstanceOf(AllcllException.class),
-            () -> assertThatThrownBy(() -> SemesterCode.getCode(afterFall))
+            () -> assertThatThrownBy(() -> Semester.getCode(afterFall))
                 .isInstanceOf(AllcllException.class),
-            () -> assertThatThrownBy(() -> SemesterCode.getCode(afterWinter))
+            () -> assertThatThrownBy(() -> Semester.getCode(afterWinter))
                 .isInstanceOf(AllcllException.class)
         );
     }
@@ -106,11 +107,11 @@ class SemesterCodeTest {
         LocalDate betweenFallAndWinter = LocalDate.of(2025, 10, 15);
 
         assertAll(
-            () -> assertThatThrownBy(() -> SemesterCode.getCode(betweenSpringAndSummer))
+            () -> assertThatThrownBy(() -> Semester.getCode(betweenSpringAndSummer))
                 .isInstanceOf(AllcllException.class),
-            () -> assertThatThrownBy(() -> SemesterCode.getCode(betweenSummerAndFall))
+            () -> assertThatThrownBy(() -> Semester.getCode(betweenSummerAndFall))
                 .isInstanceOf(AllcllException.class),
-            () -> assertThatThrownBy(() -> SemesterCode.getCode(betweenFallAndWinter))
+            () -> assertThatThrownBy(() -> Semester.getCode(betweenFallAndWinter))
                 .isInstanceOf(AllcllException.class)
         );
     }
