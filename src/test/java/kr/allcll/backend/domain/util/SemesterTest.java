@@ -1,11 +1,9 @@
 package kr.allcll.backend.domain.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.LocalDate;
-import kr.allcll.backend.support.exception.AllcllException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -60,7 +58,7 @@ class SemesterTest {
     }
 
     @Test
-    @DisplayName("학기 시작일 하루 전 날짜는 예외를 발생시켜야 한다.")
+    @DisplayName("학기 시작일 하루 전 날짜는 다음 학기를 반환되어야 한다.")
     void shouldThrowExceptionWhenBeforeStartDate() {
         LocalDate beforeSpring = LocalDate.of(2025, 1, 31);
         LocalDate beforeSummer = LocalDate.of(2025, 5, 31);
@@ -68,19 +66,15 @@ class SemesterTest {
         LocalDate beforeWinter = LocalDate.of(2025, 11, 30);
 
         assertAll(
-            () -> assertThatThrownBy(() -> Semester.getCode(beforeSpring))
-                .isInstanceOf(AllcllException.class),
-            () -> assertThatThrownBy(() -> Semester.getCode(beforeSummer))
-                .isInstanceOf(AllcllException.class),
-            () -> assertThatThrownBy(() -> Semester.getCode(beforeFall))
-                .isInstanceOf(AllcllException.class),
-            () -> assertThatThrownBy(() -> Semester.getCode(beforeWinter))
-                .isInstanceOf(AllcllException.class)
+            () -> assertThat(Semester.getCode(beforeSpring)).isEqualTo(Semester.SPRING_25),
+            () -> assertThat(Semester.getCode(beforeSummer)).isEqualTo(Semester.SUMMER_25),
+            () -> assertThat(Semester.getCode(beforeFall)).isEqualTo(Semester.FALL_25),
+            () -> assertThat(Semester.getCode(beforeWinter)).isEqualTo(Semester.WINTER_25)
         );
     }
 
     @Test
-    @DisplayName("학기 종료일 하루 후 날짜는 예외를 발생시켜야 한다.")
+    @DisplayName("학기 종료일 하루 후 날짜는 다음 학기를 반환되어야 한다.")
     void shouldThrowExceptionWhenAfterEndDate() {
         LocalDate afterSpring = LocalDate.of(2025, 4, 1);
         LocalDate afterSummer = LocalDate.of(2025, 7, 1);
@@ -88,31 +82,10 @@ class SemesterTest {
         LocalDate afterWinter = LocalDate.of(2026, 1, 1);
 
         assertAll(
-            () -> assertThatThrownBy(() -> Semester.getCode(afterSpring))
-                .isInstanceOf(AllcllException.class),
-            () -> assertThatThrownBy(() -> Semester.getCode(afterSummer))
-                .isInstanceOf(AllcllException.class),
-            () -> assertThatThrownBy(() -> Semester.getCode(afterFall))
-                .isInstanceOf(AllcllException.class),
-            () -> assertThatThrownBy(() -> Semester.getCode(afterWinter))
-                .isInstanceOf(AllcllException.class)
-        );
-    }
-
-    @Test
-    @DisplayName("학기와 학기 사이의 날짜는 예외를 발생시켜야 한다.")
-    void shouldThrowExceptionWhenBetweenSemesters() {
-        LocalDate betweenSpringAndSummer = LocalDate.of(2025, 4, 15);
-        LocalDate betweenSummerAndFall = LocalDate.of(2025, 7, 15);
-        LocalDate betweenFallAndWinter = LocalDate.of(2025, 10, 15);
-
-        assertAll(
-            () -> assertThatThrownBy(() -> Semester.getCode(betweenSpringAndSummer))
-                .isInstanceOf(AllcllException.class),
-            () -> assertThatThrownBy(() -> Semester.getCode(betweenSummerAndFall))
-                .isInstanceOf(AllcllException.class),
-            () -> assertThatThrownBy(() -> Semester.getCode(betweenFallAndWinter))
-                .isInstanceOf(AllcllException.class)
+            () -> assertThat(Semester.getCode(afterSpring)).isEqualTo(Semester.SUMMER_25),
+            () -> assertThat(Semester.getCode(afterSummer)).isEqualTo(Semester.FALL_25),
+            () -> assertThat(Semester.getCode(afterFall)).isEqualTo(Semester.WINTER_25),
+            () -> assertThat(Semester.getCode(afterWinter)).isEqualTo(Semester.SPRING_26)
         );
     }
 }
