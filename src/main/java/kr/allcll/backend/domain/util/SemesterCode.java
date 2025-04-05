@@ -26,8 +26,20 @@ public enum SemesterCode {
 
     public static SemesterCode getCode(LocalDate date) {
         return Arrays.stream(values())
-            .filter(semesterCode -> !semesterCode.startDate.isAfter(date))
-            .filter(semesterCode -> !semesterCode.endDate.isBefore(date))
+            .filter(semesterCode -> isDateInRange(semesterCode, date))
+            .findFirst()
+            .orElse(getNextSemester(date));
+    }
+
+    private static boolean isDateInRange(SemesterCode semesterCode, LocalDate date) {
+        LocalDate startDate = semesterCode.getStartDate();
+        LocalDate endDate = semesterCode.getEndDate();
+        return !startDate.isAfter(date) && !endDate.isBefore(date);
+    }
+
+    private static SemesterCode getNextSemester(LocalDate date) {
+        return Arrays.stream(values())
+            .filter(semesterCode -> semesterCode.getStartDate().isAfter(date))
             .findFirst()
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.SEMESTER_NOT_FOUND));
     }
