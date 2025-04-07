@@ -14,7 +14,7 @@ public class UtilApi {
 
     @GetMapping("/api/service/semester")
     public ResponseEntity<SemesterResponse> getSemester() {
-        SemesterResponse semesterResponse = utilService.getSemester();
-        return ResponseEntity.ok(semesterResponse);
+        SemesterResponse response = utilService.getSemester();
+        return ResponseEntity.ok(response);
     }
 }
