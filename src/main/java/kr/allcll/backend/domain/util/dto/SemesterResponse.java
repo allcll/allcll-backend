@@ -1,17 +1,19 @@
 package kr.allcll.backend.domain.util.dto;
 
 import java.time.LocalDate;
-import kr.allcll.backend.domain.util.SemesterCode;
+import kr.allcll.backend.domain.util.Semester;
 
 public record SemesterResponse(
+    String code,
     String semester,
     Period period
 ) {
 
-    public static SemesterResponse from(SemesterCode semesterCode) {
+    public static SemesterResponse from(Semester semester) {
         return new SemesterResponse(
-            semesterCode.getValue(),
-            new Period(semesterCode.getStartDate(), semesterCode.getEndDate())
+            semester.name(),
+            semester.getValue(),
+            new Period(semester.getStartDate(), semester.getEndDate())
         );
     }
 
