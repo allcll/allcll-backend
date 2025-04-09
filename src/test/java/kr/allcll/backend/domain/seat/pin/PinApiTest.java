@@ -9,8 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import jakarta.servlet.http.Cookie;
 import java.util.List;
-import kr.allcll.backend.domain.seat.pin.PinApi;
-import kr.allcll.backend.domain.seat.pin.PinService;
 import kr.allcll.backend.domain.seat.pin.dto.SubjectIdResponse;
 import kr.allcll.backend.domain.seat.pin.dto.SubjectIdsResponse;
 import kr.allcll.backend.support.sse.SseService;

@@ -1,7 +1,6 @@
 package kr.allcll.backend.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.allcll.backend.client.dto.NonMajorRequest;
 import kr.allcll.backend.client.dto.PinSubjectsRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,16 +19,6 @@ public class ExternalClient {
 
     private final RestClient restClient;
     private final ExternalProperties externalProperties;
-
-    public void sendNonMajor(NonMajorRequest request) {
-        String payload = toJson(request);
-        restClient.put()
-            .uri(externalProperties.host() + externalProperties.nonMajorPath())
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(payload)
-            .retrieve()
-            .toEntity(String.class);
-    }
 
     public void sendPinSubjects(PinSubjectsRequest request) {
         String payload = toJson(request);
