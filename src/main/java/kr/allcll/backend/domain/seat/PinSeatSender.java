@@ -3,10 +3,7 @@ package kr.allcll.backend.domain.seat;
 import java.time.Duration;
 import java.util.List;
 import kr.allcll.backend.domain.seat.dto.SeatDto;
-import kr.allcll.backend.domain.seat.pin.Pin;
-import kr.allcll.backend.domain.seat.pin.PinRepository;
 import kr.allcll.backend.domain.seat.pin.dto.PinSeatsResponse;
-import kr.allcll.backend.domain.subject.Subject;
 import kr.allcll.backend.support.schedule.ScheduledTaskHandler;
 import kr.allcll.backend.support.sse.SseService;
 import lombok.extern.slf4j.Slf4j;
@@ -21,37 +18,30 @@ public class PinSeatSender {
     private static final int TASK_DURATION = 1000;
 
     private final SseService sseService;
-    private final SeatStorage seatStorage;
-    private final PinRepository pinRepository;
+    private final SeatService seatService;
     private final ScheduledTaskHandler scheduledTaskHandler;
 
     public PinSeatSender(
         SseService sseService,
-        SeatStorage seatStorage,
-        PinRepository pinRepository,
+        SeatService seatService,
         @Qualifier("pinSeatTaskHandler") ScheduledTaskHandler scheduledTaskHandler
     ) {
         this.sseService = sseService;
-        this.seatStorage = seatStorage;
-        this.pinRepository = pinRepository;
+        this.seatService = seatService;
         this.scheduledTaskHandler = scheduledTaskHandler;
     }
 
     public void send(String token) {
-        scheduledTaskHandler.scheduleAtFixedRate(token, getMajorSeatTask(token), Duration.ofMillis(TASK_DURATION));
+        scheduledTaskHandler.scheduleAtFixedRate(token, getPinSeatTask(token), Duration.ofMillis(TASK_DURATION));
     }
 
-    private Runnable getMajorSeatTask(String token) {
+    private Runnable getPinSeatTask(String token) {
         return () -> {
             if (sseService.isDisconnected(token)) {
                 scheduledTaskHandler.cancel(token);
                 return;
             }
-            List<Pin> pins = pinRepository.findAllByToken(token);
-            List<Subject> subjects = pins.stream()
-                .map(Pin::getSubject)
-                .toList();
-            List<SeatDto> pinSeats = seatStorage.getSeats(subjects);
+            List<SeatDto> pinSeats = seatService.getPinSeats(token);
             sseService.propagate(token, PIN_EVENT_NAME, PinSeatsResponse.from(pinSeats));
         };
     }
