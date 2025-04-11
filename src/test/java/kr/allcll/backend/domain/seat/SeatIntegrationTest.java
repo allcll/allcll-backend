@@ -105,6 +105,56 @@ class SeatIntegrationTest {
                   "subjectId": 11,
                   "seatCount": 10,
                   "queryTime": "2025-01-28T23:55:23.434294"
+                },
+                {
+                  "subjectId": 21,
+                  "seatCount": 11,
+                  "queryTime": "2025-01-28T23:55:23.434294"
+                },
+                {
+                  "subjectId": 22,
+                  "seatCount": 12,
+                  "queryTime": "2025-01-28T23:55:23.434294"
+                },
+                {
+                  "subjectId": 23,
+                  "seatCount": 13,
+                  "queryTime": "2025-01-28T23:55:23.434294"
+                },
+                {
+                  "subjectId": 24,
+                  "seatCount": 16,
+                  "queryTime": "2025-01-28T23:55:23.434294"
+                },
+                {
+                  "subjectId": 25,
+                  "seatCount": 20,
+                  "queryTime": "2025-01-28T23:55:23.434294"
+                },
+                {
+                  "subjectId": 26,
+                  "seatCount": 25,
+                  "queryTime": "2025-01-28T23:55:23.434294"
+                },
+                {
+                  "subjectId": 27,
+                  "seatCount": 30,
+                  "queryTime": "2025-01-28T23:55:23.434294"
+                },
+                {
+                  "subjectId": 28,
+                  "seatCount": 35,
+                  "queryTime": "2025-01-28T23:55:23.434294"
+                },
+                {
+                  "subjectId": 29,
+                  "seatCount": 40,
+                  "queryTime": "2025-01-28T23:55:23.434294"
+                },
+                {
+                  "subjectId": 30,
+                  "seatCount": 50,
+                  "queryTime": "2025-01-28T23:55:23.434294"
                 }
               ]
             }
@@ -125,6 +175,16 @@ class SeatIntegrationTest {
         Subject nonMajorSubject8 = SubjectFixture.createNonMajorSubject(18L, "차와문화", "000002", "008", "정형돈");
         Subject nonMajorSubject9 = SubjectFixture.createNonMajorSubject(19L, "차와문화", "000002", "009", "정형돈");
         Subject nonMajorSubject10 = SubjectFixture.createNonMajorSubject(20L, "차와문화", "000002", "010", "정형돈");
+        Subject nonMajorSubject11 = SubjectFixture.createNonMajorSubject(21L, "차와문화", "000002", "011", "정형돈");
+        Subject nonMajorSubject12 = SubjectFixture.createNonMajorSubject(22L, "차와문화", "000002", "012", "정형돈");
+        Subject nonMajorSubject13 = SubjectFixture.createNonMajorSubject(23L, "차와문화", "000002", "013", "정형돈");
+        Subject nonMajorSubject14 = SubjectFixture.createNonMajorSubject(24L, "차와문화", "000002", "014", "정형돈");
+        Subject nonMajorSubject15 = SubjectFixture.createNonMajorSubject(25L, "차와문화", "000002", "015", "정형돈");
+        Subject nonMajorSubject16 = SubjectFixture.createNonMajorSubject(26L, "차와문화", "000002", "016", "정형돈");
+        Subject nonMajorSubject17 = SubjectFixture.createNonMajorSubject(27L, "차와문화", "000002", "017", "정형돈");
+        Subject nonMajorSubject18 = SubjectFixture.createNonMajorSubject(28L, "차와문화", "000002", "018", "정형돈");
+        Subject nonMajorSubject19 = SubjectFixture.createNonMajorSubject(29L, "차와문화", "000002", "019", "정형돈");
+        Subject nonMajorSubject20 = SubjectFixture.createNonMajorSubject(30L, "차와문화", "000002", "020", "정형돈");
         LocalDateTime localDateTime = LocalDateTime.of(2025, 1, 28, 23, 55, 23, 434294000);
 
         seatStorage.addAll(List.of(
@@ -142,7 +202,17 @@ class SeatIntegrationTest {
             new SeatDto(nonMajorSubject7, 4, localDateTime),
             new SeatDto(nonMajorSubject8, 3, localDateTime),
             new SeatDto(nonMajorSubject9, 2, localDateTime),
-            new SeatDto(nonMajorSubject10, 1, localDateTime)
+            new SeatDto(nonMajorSubject10, 1, localDateTime),
+            new SeatDto(nonMajorSubject11, 11, localDateTime),
+            new SeatDto(nonMajorSubject12, 12, localDateTime),
+            new SeatDto(nonMajorSubject13, 13, localDateTime),
+            new SeatDto(nonMajorSubject14, 16, localDateTime),
+            new SeatDto(nonMajorSubject15, 20, localDateTime),
+            new SeatDto(nonMajorSubject16, 25, localDateTime),
+            new SeatDto(nonMajorSubject17, 30, localDateTime),
+            new SeatDto(nonMajorSubject18, 35, localDateTime),
+            new SeatDto(nonMajorSubject19, 40, localDateTime),
+            new SeatDto(nonMajorSubject20, 50, localDateTime)
         ));
 
         // when
