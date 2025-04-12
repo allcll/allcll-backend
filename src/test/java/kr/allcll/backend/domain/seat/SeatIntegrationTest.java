@@ -50,7 +50,7 @@ class SeatIntegrationTest {
     }
 
     @Test
-    @DisplayName("1초에 한 번씩 비전공 과목의 좌석 정보 10개를 전송한다.")
+    @DisplayName("1초에 한 번씩 비전공 과목의 좌석 정보 20개를 전송한다.")
     void sendGeneralSeatTest() {
         // given
         String expected = """
