@@ -11,6 +11,7 @@ import kr.allcll.backend.support.sse.SseService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -55,6 +56,23 @@ class GeneralSeatSenderTest {
 
         // then
         verify(sseService, atLeast(period)).propagate(any(), any());
+    }
+
+    @Test
+    @DisplayName("중복 여석 전송을 방지한다.")
+    void preventDuplicateSendingTest() throws InterruptedException {
+        // given
+        int period = 2;
+        generalSeatSender.send();
+        Thread.sleep(100); // wait for first send
+
+        // when
+        generalSeatSender.send();
+        Thread.sleep(period * 1000); // wait for period
+
+        // then
+        int buffer = 1;
+        verify(sseService, Mockito.atMost(period + buffer)).propagate(any(), any());
     }
 
     @Test
