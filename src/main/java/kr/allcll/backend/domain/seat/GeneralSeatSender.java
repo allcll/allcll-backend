@@ -33,14 +33,14 @@ public class GeneralSeatSender {
     }
 
     public void send() {
-        if (scheduledTaskHandler.getTaskCount() > 0) {
+        if (hasActiveSchedule()) {
             return;
         }
         scheduledTaskHandler.scheduleAtFixedRate(getGeneralSeatTask(), SENDING_PERIOD);
     }
 
-    public void cancel() {
-        scheduledTaskHandler.cancelAll();
+    private boolean hasActiveSchedule() {
+        return scheduledTaskHandler.getTaskCount() > 0;
     }
 
     private Runnable getGeneralSeatTask() {
@@ -48,5 +48,9 @@ public class GeneralSeatSender {
             List<SeatDto> generalSeats = seatStorage.getGeneralSeats(QUERY_LIMIT);
             sseService.propagate(EVENT_NAME, SeatsResponse.from(generalSeats));
         };
+    }
+
+    public void cancel() {
+        scheduledTaskHandler.cancelAll();
     }
 }
