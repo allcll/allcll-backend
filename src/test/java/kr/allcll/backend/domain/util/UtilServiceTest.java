@@ -33,7 +33,7 @@ class UtilServiceTest {
         ZoneId zoneId = ZoneId.systemDefault();
         when(clock.instant()).thenReturn(instant);
         when(clock.getZone()).thenReturn(zoneId);
-      
+
         SemesterResponse semesterResponse = utilService.getSemester();
 
         // then
