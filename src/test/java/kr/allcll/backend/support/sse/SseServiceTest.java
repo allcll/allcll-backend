@@ -7,7 +7,7 @@ import io.restassured.response.Response;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import kr.allcll.backend.domain.seat.SeatService;
+import kr.allcll.backend.domain.seat.PinSeatSender;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,11 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@TestPropertySource(properties = "app.scheduling.enabled=false") // 테스트에서 스케줄러 비활성화
 class SseServiceTest {
 
     private static final Logger log = LoggerFactory.getLogger(SseServiceTest.class);
@@ -30,7 +28,7 @@ class SseServiceTest {
     private SseService sseService;
 
     @MockitoBean
-    private SeatService seatService;
+    private PinSeatSender pinSeatSender;
 
     @LocalServerPort
     private int port;

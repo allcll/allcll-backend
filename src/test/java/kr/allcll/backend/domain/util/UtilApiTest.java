@@ -1,18 +1,18 @@
 package kr.allcll.backend.domain.util;
 
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.time.LocalDate;
 import kr.allcll.backend.domain.util.dto.SemesterResponse;
 import kr.allcll.backend.domain.util.dto.SemesterResponse.Period;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UtilApi.class)
 class UtilApiTest {
@@ -29,6 +29,7 @@ class UtilApiTest {
         // given
         String expected = """
             {
+                "code": "SPRING_25",
                 "semester": "2025-1",
                 "period": {
                     "startDate": "2025-02-01",
@@ -39,6 +40,7 @@ class UtilApiTest {
 
         when(utilService.getSemester())
             .thenReturn(new SemesterResponse(
+                "SPRING_25",
                 "2025-1",
                 new Period(LocalDate.of(2025, 2, 1), LocalDate.of(2025, 3, 31)))
             );

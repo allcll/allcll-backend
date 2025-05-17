@@ -47,4 +47,8 @@ public class SseService {
             SseErrorHandler.handle(e);
         }
     }
+
+    public boolean isDisconnected(String token) {
+        return sseEmitterStorage.getEmitter(token).isEmpty();
+    }
 }

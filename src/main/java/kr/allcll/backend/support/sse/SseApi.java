@@ -1,7 +1,7 @@
 package kr.allcll.backend.support.sse;
 
+import kr.allcll.backend.domain.seat.PinSeatSender;
 import kr.allcll.backend.support.web.ThreadLocalHolder;
-import kr.allcll.backend.domain.seat.SeatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,13 +14,13 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class SseApi {
 
     private final SseService sseService;
-    private final SeatService seatService;
+    private final PinSeatSender pinSeatSender;
 
     @GetMapping(value = "/api/connect", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> getServerSentEventConnection() {
         String token = ThreadLocalHolder.SHARED_TOKEN.get();
         SseEmitter emitter = sseService.connect(token);
-        seatService.sendPinSeatsInformation(token);
+        pinSeatSender.send(token);
         return ResponseEntity.ok()
             .header("X-Accel-Buffering", "no")
             .body(emitter);

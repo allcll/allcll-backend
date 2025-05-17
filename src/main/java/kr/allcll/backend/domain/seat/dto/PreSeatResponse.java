@@ -8,6 +8,6 @@ public record PreSeatResponse(
 ) {
 
     public static PreSeatResponse from(Seat seat) {
-        return new PreSeatResponse(seat.getSubject().getId(), Math.max(seat.getTotLimitRcnt() - seat.getTotRcnt(), 0));
+        return new PreSeatResponse(seat.getSubject().getId(), seat.getSeatNumber());
     }
 }
