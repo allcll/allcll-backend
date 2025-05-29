@@ -53,12 +53,18 @@ public class ExternalService {
         int firstIdx = mapSize / 3;
         int secondIdx = mapSize * 2 / 3;
 
+        return grantPriorityToSubjects(subjectIds, firstIdx, secondIdx);
+    }
+
+    private List<PinSubject> grantPriorityToSubjects(List<Long> subjectIds, int firstIdx, int secondIdx) {
+        List<PinSubject> result = new ArrayList<>();
         List<PinSubject> firstPrioritySubject = getPrioritySubject(subjectIds.subList(0, firstIdx), 1);
         List<PinSubject> secondPrioritySubject = getPrioritySubject(subjectIds.subList(firstIdx, secondIdx), 2);
         List<PinSubject> thirdPrioritySubject = getPrioritySubject(subjectIds.subList(secondIdx, subjectIds.size()), 3);
-        firstPrioritySubject.addAll(secondPrioritySubject);
-        firstPrioritySubject.addAll(thirdPrioritySubject);
-        return firstPrioritySubject;
+        result.addAll(firstPrioritySubject);
+        result.addAll(secondPrioritySubject);
+        result.addAll(thirdPrioritySubject);
+        return result;
     }
 
     private List<PinSubject> getPrioritySubject(List<Long> subjectIds, int priority) {
