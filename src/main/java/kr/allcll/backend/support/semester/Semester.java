@@ -1,4 +1,4 @@
-package kr.allcll.backend.domain.util;
+package kr.allcll.backend.support.semester;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 public enum Semester {
-    SPRING_25("2025-1", LocalDate.of(2025, 2, 1), LocalDate.of(2025, 3, 31)),
+    SPRING_25("2025/1학기", LocalDate.of(2025, 2, 1), LocalDate.of(2025, 3, 31)),
     SUMMER_25("2025-여름", LocalDate.of(2025, 6, 1), LocalDate.of(2025, 6, 30)),
     FALL_25("2025-2", LocalDate.of(2025, 8, 1), LocalDate.of(2025, 9, 30)),
     WINTER_25("2025-겨울", LocalDate.of(2025, 12, 1), LocalDate.of(2025, 12, 31)),

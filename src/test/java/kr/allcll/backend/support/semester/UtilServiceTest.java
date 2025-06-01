@@ -1,4 +1,4 @@
-package kr.allcll.backend.domain.util;
+package kr.allcll.backend.support.semester;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -8,7 +8,6 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import kr.allcll.backend.domain.util.dto.SemesterResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
