@@ -9,8 +9,7 @@ import lombok.Getter;
 @Getter
 public enum Semester {
     /*
-    2025년 1학기 코드 수정할 경우에 참고할 내용
-    https://github.com/allcll/allcll-backend/pull/121#discussion_r2118843479
+    2025년 1학기 코드 수정할 경우에 [참고](https://github.com/allcll/allcll-backend/pull/121#discussion_r2118843479)
      */
     SPRING_25("2025-1", LocalDate.of(2025, 2, 1), LocalDate.of(2025, 3, 31)),
     SUMMER_25("2025-여름", LocalDate.of(2025, 6, 1), LocalDate.of(2025, 6, 30)),
