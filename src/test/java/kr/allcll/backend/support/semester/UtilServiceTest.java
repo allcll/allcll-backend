@@ -37,7 +37,7 @@ class UtilServiceTest {
 
         // then
         assertAll(
-            () -> assertThat(semesterResponse.semester()).isEqualTo("2025-1"),
+            () -> assertThat(semesterResponse.semester()).isEqualTo("2025/1학기"),
             () -> assertThat(semesterResponse.period().startDate()).isEqualTo(LocalDate.of(2025, 2, 1)),
             () -> assertThat(semesterResponse.period().endDate()).isEqualTo(LocalDate.of(2025, 3, 31))
         );
