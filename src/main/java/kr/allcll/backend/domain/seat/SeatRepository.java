@@ -15,12 +15,14 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
         + "join s.subject sub "
         + "where s.subject = :subject "
         + "and s.createdDate = :today "
-        + "and sub.isDeleted = false")
+        + "and sub.isDeleted = false "
+        + "and sub.semesterAt = '2025-여름'")
     Optional<Seat> findBySubjectAndCreatedDate(Subject subject, LocalDate today);
 
     @Query("select s from Seat s "
         + "join s.subject sub "
         + "where s.createdDate = :createdDate "
-        + "and sub.isDeleted = false")
+        + "and sub.isDeleted = false "
+        + "and sub.semesterAt = '2025-여름'")
     List<Seat> findAllByCreatedDate(LocalDate createdDate);
 }
