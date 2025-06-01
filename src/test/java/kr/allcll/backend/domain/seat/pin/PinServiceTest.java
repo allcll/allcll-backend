@@ -11,6 +11,7 @@ import kr.allcll.backend.domain.subject.Subject;
 import kr.allcll.backend.domain.subject.SubjectRepository;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
+import kr.allcll.backend.support.semester.Semester;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,7 +51,7 @@ class PinServiceTest {
         pinService.addPinOnSubject(subjectA.getId(), TOKEN);
 
         // when
-        List<Pin> result = pinRepository.findAllByToken(TOKEN);
+        List<Pin> result = pinRepository.findAllByToken(TOKEN, Semester.now());
 
         // then
         assertThat(result).hasSize(1);
@@ -110,7 +111,7 @@ class PinServiceTest {
         pinService.deletePinOnSubject(subject.getId(), TOKEN);
 
         // then
-        assertThat(pinRepository.findAllByToken(TOKEN)).hasSize(0);
+        assertThat(pinRepository.findAllByToken(TOKEN, Semester.now())).hasSize(0);
     }
 
     @Test
