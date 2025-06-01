@@ -30,7 +30,6 @@ public class AdminRequestValidator {
         Long lastTime = lastRequestTimeByIp.get(ip);
         lastRequestTimeByIp.put(ip, now);
 
-        System.out.println("IP: " + ip + ", Last Request Time: " + lastTime + ", Now: " + now);
         return lastTime != null && now - lastTime < REQUEST_INTERVAL_SECONDS;
     }
 }
