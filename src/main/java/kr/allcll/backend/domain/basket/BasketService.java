@@ -1,6 +1,5 @@
 package kr.allcll.backend.domain.basket;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import kr.allcll.backend.domain.basket.dto.BasketsEachSubject;
@@ -39,7 +38,7 @@ public class BasketService {
         for (Subject subject : subjects) {
             List<Basket> baskets = basketRepository.findBySubjectId(
                 subject.getId(),
-                Semester.getCodeValue(LocalDate.now())
+                Semester.now()
             );
             result.add(BasketsEachSubject.from(subject, baskets));
         }
@@ -68,7 +67,7 @@ public class BasketService {
     private List<Basket> getBaskets(Subject subject) {
         return basketRepository.findBySubjectId(
                 subject.getId(),
-                Semester.getCodeValue(LocalDate.now())
+                Semester.now()
             ).stream()
             .filter(Basket::isNotEmpty)
             .toList();

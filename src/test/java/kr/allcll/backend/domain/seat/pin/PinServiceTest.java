@@ -4,7 +4,6 @@ import static kr.allcll.backend.fixture.SubjectFixture.createSubject;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.time.LocalDate;
 import java.util.List;
 import kr.allcll.backend.domain.basket.BasketRepository;
 import kr.allcll.backend.domain.seat.pin.dto.SubjectIdsResponse;
@@ -52,7 +51,7 @@ class PinServiceTest {
         pinService.addPinOnSubject(subjectA.getId(), TOKEN);
 
         // when
-        List<Pin> result = pinRepository.findAllByToken(TOKEN, Semester.getCodeValue(LocalDate.now()));
+        List<Pin> result = pinRepository.findAllByToken(TOKEN, Semester.now());
 
         // then
         assertThat(result).hasSize(1);
@@ -112,7 +111,7 @@ class PinServiceTest {
         pinService.deletePinOnSubject(subject.getId(), TOKEN);
 
         // then
-        assertThat(pinRepository.findAllByToken(TOKEN, Semester.getCodeValue(LocalDate.now()))).hasSize(0);
+        assertThat(pinRepository.findAllByToken(TOKEN, Semester.now())).hasSize(0);
     }
 
     @Test

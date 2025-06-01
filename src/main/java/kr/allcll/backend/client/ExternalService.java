@@ -1,6 +1,5 @@
 package kr.allcll.backend.client;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +34,7 @@ public class ExternalService {
         List<String> tokens = sseEmitterStorage.getUserTokens();
         Map<Subject, Integer> pinSubjects = new HashMap<>();
         for (String token : tokens) {
-            List<Pin> pins = pinRepository.findAllByToken(token, Semester.getCodeValue(LocalDate.now()));
+            List<Pin> pins = pinRepository.findAllByToken(token, Semester.now());
             for (Pin pin : pins) {
                 Subject subject = pin.getSubject();
                 pinSubjects.merge(subject, 1, Integer::sum);

@@ -24,12 +24,12 @@ public class SeatService {
     public PreSeatsResponse getAllPreSeats() {
         List<Seat> allByCreatedDate = seatRepository.findAllByCreatedDate(
             LocalDate.now().minusDays(1),
-            Semester.getCodeValue(LocalDate.now()));
+            Semester.now());
         return PreSeatsResponse.from(allByCreatedDate);
     }
 
     public List<SeatDto> getPinSeats(String token) {
-        List<Pin> pins = pinRepository.findAllByToken(token, Semester.getCodeValue(LocalDate.now()));
+        List<Pin> pins = pinRepository.findAllByToken(token, Semester.now());
         List<Subject> subjects = pins.stream()
             .map(Pin::getSubject)
             .toList();

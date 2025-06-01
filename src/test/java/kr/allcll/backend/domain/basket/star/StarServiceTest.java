@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.time.LocalDate;
 import java.util.List;
 import kr.allcll.backend.domain.basket.BasketRepository;
 import kr.allcll.backend.domain.basket.star.dto.StarredSubjectIdsResponse;
@@ -61,7 +60,7 @@ class StarServiceTest {
         starService.addStarOnSubject(starSubject.getId(), TOKEN);
 
         // when
-        List<Star> result = starRepository.findAllByToken(TOKEN, Semester.getCodeValue(LocalDate.now()));
+        List<Star> result = starRepository.findAllByToken(TOKEN, Semester.now());
 
         // then
         assertThat(result).hasSize(expected);
@@ -126,7 +125,7 @@ class StarServiceTest {
         starService.deleteStarOnSubject(subject.getId(), TOKEN);
 
         // then
-        assertThat(starRepository.findAllByToken(TOKEN, Semester.getCodeValue(LocalDate.now()))).hasSize(0);
+        assertThat(starRepository.findAllByToken(TOKEN, Semester.now())).hasSize(0);
     }
 
     @Test

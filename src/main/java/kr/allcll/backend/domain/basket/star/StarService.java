@@ -1,6 +1,5 @@
 package kr.allcll.backend.domain.basket.star;
 
-import java.time.LocalDate;
 import java.util.List;
 import kr.allcll.backend.domain.basket.star.dto.StarredSubjectIdResponse;
 import kr.allcll.backend.domain.basket.star.dto.StarredSubjectIdsResponse;
@@ -33,22 +32,22 @@ public class StarService {
     }
 
     private void validateCanAddStar(Subject subject, String token) {
-        Long starCount = starRepository.countAllByToken(token, Semester.getCodeValue(LocalDate.now()));
+        Long starCount = starRepository.countAllByToken(token, Semester.now());
         if (starCount >= MAX_STAR_NUMBER) {
             throw new AllcllException(AllcllErrorCode.STAR_LIMIT_EXCEEDED, MAX_STAR_NUMBER);
         }
-        if (starRepository.existsBySubjectAndToken(subject, token, Semester.getCodeValue(LocalDate.now()))) {
+        if (starRepository.existsBySubjectAndToken(subject, token, Semester.now())) {
             throw new AllcllException(AllcllErrorCode.DUPLICATE_STAR, subject.getCuriNm());
         }
     }
 
     @Transactional
     public void deleteStarOnSubject(Long subjectId, String token) {
-        starRepository.deleteStarBySubjectIdAndToken(subjectId, token, Semester.getCodeValue(LocalDate.now()));
+        starRepository.deleteStarBySubjectIdAndToken(subjectId, token, Semester.now());
     }
 
     public StarredSubjectIdsResponse retrieveStars(String token) {
-        List<Star> stars = starRepository.findAllByToken(token, Semester.getCodeValue(LocalDate.now()));
+        List<Star> stars = starRepository.findAllByToken(token, Semester.now());
         return new StarredSubjectIdsResponse(stars.stream()
             .map(star -> new StarredSubjectIdResponse(star.getSubject().getId()))
             .toList());

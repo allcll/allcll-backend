@@ -35,8 +35,8 @@ public enum Semester {
             .orElse(getNextSemester(date));
     }
 
-    public static String getCodeValue(LocalDate date) {
-        return getCode(date).getValue();
+    public static String now() {
+        return getCode(LocalDate.now()).getValue();
     }
 
     private static boolean isDateInRange(Semester semester, LocalDate date) {

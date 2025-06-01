@@ -23,15 +23,15 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
         and p.token = :token
         and p.semesterAt = :semesterAt
         """)
-    Optional<Pin> findBySubjectAndTokenToDelete(Subject subject, String token, String semesterAt);
+    Optional<Pin> findBySubjectAndToken(Subject subject, String token, String semesterAt);
 
     @Query(""" 
-        select case when COUNT(p) > 0 then true else false end from Pin p
+        select case when count(p) > 0 then true else false end from Pin p
         join p.subject s
         where p.subject = :subject
         and p.token = :token
-        and p.semesterAt = :semesterAt
         and s.isDeleted = false
+        and p.semesterAt = :semesterAt
         """)
     boolean existsBySubjectAndToken(Subject subject, String token, String semesterAt);
 
@@ -39,8 +39,8 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
         select count(p) from Pin p
         join p.subject s
         where p.token = :token
-        and p.semesterAt = :semesterAt
         and s.isDeleted = false
+        and p.semesterAt = :semesterAt
         """)
     Long countAllByToken(String token, String semesterAt);
 }
