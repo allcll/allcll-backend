@@ -1,4 +1,4 @@
-package kr.allcll.backend.domain.util;
+package kr.allcll.backend.support.semester;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;

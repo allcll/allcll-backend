@@ -1,7 +1,6 @@
-package kr.allcll.backend.domain.util.dto;
+package kr.allcll.backend.support.semester;
 
 import java.time.LocalDate;
-import kr.allcll.backend.domain.util.Semester;
 
 public record SemesterResponse(
     String code,

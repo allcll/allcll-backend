@@ -1,8 +1,7 @@
-package kr.allcll.backend.domain.util;
+package kr.allcll.backend.support.semester;
 
 import java.time.Clock;
 import java.time.LocalDate;
-import kr.allcll.backend.domain.util.dto.SemesterResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
