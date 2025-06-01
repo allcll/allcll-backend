@@ -22,7 +22,9 @@ public class SeatService {
     private final SeatStorage seatStorage;
 
     public PreSeatsResponse getAllPreSeats() {
-        List<Seat> allByCreatedDate = seatRepository.findAllByCreatedDate(LocalDate.now().minusDays(1));
+        List<Seat> allByCreatedDate = seatRepository.findAllByCreatedDate(
+            LocalDate.now().minusDays(1),
+            Semester.getCodeValue(LocalDate.now()));
         return PreSeatsResponse.from(allByCreatedDate);
     }
 
