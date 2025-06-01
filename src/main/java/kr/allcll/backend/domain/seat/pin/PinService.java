@@ -1,12 +1,14 @@
 package kr.allcll.backend.domain.seat.pin;
 
+import java.time.LocalDate;
 import java.util.List;
-import kr.allcll.backend.support.exception.AllcllErrorCode;
-import kr.allcll.backend.support.exception.AllcllException;
 import kr.allcll.backend.domain.seat.pin.dto.SubjectIdResponse;
 import kr.allcll.backend.domain.seat.pin.dto.SubjectIdsResponse;
 import kr.allcll.backend.domain.subject.Subject;
 import kr.allcll.backend.domain.subject.SubjectRepository;
+import kr.allcll.backend.support.exception.AllcllErrorCode;
+import kr.allcll.backend.support.exception.AllcllException;
+import kr.allcll.backend.support.semester.Semester;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,11 +32,11 @@ public class PinService {
     }
 
     private void validateCanAddPin(Subject subject, String token) {
-        Long pinCount = pinRepository.countAllByToken(token);
+        Long pinCount = pinRepository.countAllByToken(token, Semester.getCodeValue(LocalDate.now()));
         if (pinCount >= MAX_PIN_NUMBER) {
             throw new AllcllException(AllcllErrorCode.PIN_LIMIT_EXCEEDED, MAX_PIN_NUMBER);
         }
-        if (pinRepository.existsBySubjectAndToken(subject, token)) {
+        if (pinRepository.existsBySubjectAndToken(subject, token, Semester.getCodeValue(LocalDate.now()))) {
             throw new AllcllException(AllcllErrorCode.DUPLICATE_PIN, subject.getCuriNm());
         }
     }
@@ -43,13 +45,13 @@ public class PinService {
     public void deletePinOnSubject(Long subjectId, String token) {
         Subject subject = subjectRepository.findById(subjectId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.SUBJECT_NOT_FOUND));
-        Pin pin = pinRepository.findBySubjectAndTokenToDelete(subject, token)
+        Pin pin = pinRepository.findBySubjectAndTokenToDelete(subject, token, Semester.getCodeValue(LocalDate.now()))
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.PIN_SUBJECT_MISMATCH));
         pinRepository.deleteById(pin.getId());
     }
 
     public SubjectIdsResponse retrievePins(String token) {
-        List<Pin> pins = pinRepository.findAllByToken(token);
+        List<Pin> pins = pinRepository.findAllByToken(token, Semester.getCodeValue(LocalDate.now()));
         return new SubjectIdsResponse(pins.stream()
             .map(pin -> new SubjectIdResponse(pin.getSubject().getId()))
             .toList());
