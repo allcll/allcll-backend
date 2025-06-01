@@ -1,4 +1,4 @@
-<p align="center"><img width="800" alt="image" src="https://github.com/user-attachments/assets/bb494d73-a4b5-4b66-bc0d-c7c2f1bbb615" /></p>
+<p align="center"><img width="800" alt="image" src="https://github.com/user-attachments/assets/824d22ac-8613-4e7b-94a2-b2ed9c55433c" /></p>
 
 # **수강 신청, 올클과 함께하세요!**
 
