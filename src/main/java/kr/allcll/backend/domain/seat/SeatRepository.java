@@ -11,18 +11,22 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SeatRepository extends JpaRepository<Seat, Long> {
 
-    @Query("select s from Seat s "
-        + "join s.subject sub "
-        + "where s.subject = :subject "
-        + "and s.createdDate = :today "
-        + "and sub.isDeleted = false "
-        + "and sub.semesterAt = :semesterAt")
+    @Query(""" 
+        select s from Seat s
+        join s.subject sub
+        where s.subject = :subject
+        and s.createdDate = :today
+        and sub.isDeleted = false
+        and sub.semesterAt = :semesterAt
+        """)
     Optional<Seat> findBySubjectAndCreatedDate(Subject subject, LocalDate today, String semesterAt);
 
-    @Query("select s from Seat s "
-        + "join s.subject sub "
-        + "where s.createdDate = :createdDate "
-        + "and sub.isDeleted = false "
-        + "and sub.semesterAt = :semesterAt")
+    @Query("""
+        select s from Seat s
+        join s.subject sub
+        where s.createdDate = :createdDate
+        and sub.isDeleted = false
+        and sub.semesterAt = :semesterAt
+        """)
     List<Seat> findAllByCreatedDate(LocalDate createdDate, String semesterAt);
 }
