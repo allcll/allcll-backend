@@ -1,15 +1,17 @@
 package kr.allcll.backend.domain.basket;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import kr.allcll.backend.domain.basket.dto.BasketsEachSubject;
 import kr.allcll.backend.domain.basket.dto.BasketsResponse;
 import kr.allcll.backend.domain.basket.dto.SubjectBasketsResponse;
-import kr.allcll.backend.support.exception.AllcllErrorCode;
-import kr.allcll.backend.support.exception.AllcllException;
 import kr.allcll.backend.domain.subject.Subject;
 import kr.allcll.backend.domain.subject.SubjectRepository;
 import kr.allcll.backend.domain.subject.SubjectSpecifications;
+import kr.allcll.backend.support.exception.AllcllErrorCode;
+import kr.allcll.backend.support.exception.AllcllException;
+import kr.allcll.backend.support.semester.Semester;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -35,7 +37,10 @@ public class BasketService {
     private List<BasketsEachSubject> getBasketsEachSubject(List<Subject> subjects) {
         List<BasketsEachSubject> result = new ArrayList<>();
         for (Subject subject : subjects) {
-            List<Basket> baskets = basketRepository.findBySubjectId(subject.getId());
+            List<Basket> baskets = basketRepository.findBySubjectId(
+                subject.getId(),
+                Semester.getCodeValue(LocalDate.now())
+            );
             result.add(BasketsEachSubject.from(subject, baskets));
         }
         return result;
@@ -61,7 +66,10 @@ public class BasketService {
     }
 
     private List<Basket> getBaskets(Subject subject) {
-        return basketRepository.findBySubjectId(subject.getId()).stream()
+        return basketRepository.findBySubjectId(
+                subject.getId(),
+                Semester.getCodeValue(LocalDate.now())
+            ).stream()
             .filter(Basket::isNotEmpty)
             .toList();
     }
