@@ -21,7 +21,7 @@ public class SeatService {
     private final SeatStorage seatStorage;
 
     public PreSeatsResponse getAllPreSeats() {
-        List<Seat> allByCreatedDate = seatRepository.findAllByCreatedDate((LocalDate.of(2025, 2, 28)));
+        List<Seat> allByCreatedDate = seatRepository.findAllByCreatedDate((LocalDate.of(2025, 6, 1)));
         return PreSeatsResponse.from(allByCreatedDate);
     }
 
