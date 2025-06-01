@@ -1,6 +1,7 @@
 package kr.allcll.backend.support.sse;
 
 import java.io.IOException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,7 @@ public class SseService {
         }
     }
 
-    public boolean isDisconnected(String token) {
-        return sseEmitterStorage.getEmitter(token).isEmpty();
+    public List<String> getConnectedTokens() {
+        return sseEmitterStorage.getUserTokens().stream().toList();
     }
 }
