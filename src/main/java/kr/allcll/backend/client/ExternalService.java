@@ -10,6 +10,7 @@ import kr.allcll.backend.client.dto.PinSubjectsRequest;
 import kr.allcll.backend.domain.seat.pin.Pin;
 import kr.allcll.backend.domain.seat.pin.PinRepository;
 import kr.allcll.backend.domain.subject.Subject;
+import kr.allcll.backend.support.semester.Semester;
 import kr.allcll.backend.support.sse.SseEmitterStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,7 @@ public class ExternalService {
         List<String> tokens = sseEmitterStorage.getUserTokens();
         Map<Subject, Integer> pinSubjects = new HashMap<>();
         for (String token : tokens) {
-            List<Pin> pins = pinRepository.findAllByToken(token);
+            List<Pin> pins = pinRepository.findAllByToken(token, Semester.now());
             for (Pin pin : pins) {
                 Subject subject = pin.getSubject();
                 pinSubjects.merge(subject, 1, Integer::sum);
