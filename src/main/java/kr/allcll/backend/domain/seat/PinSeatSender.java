@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class PinSeatSender {
 
     private static final String PIN_EVENT_NAME = "pinSeats";
-    private static final int TASK_DURATION = 1000;
+    private static final Duration SENDING_PERIOD = Duration.ofSeconds(1);
 
     private final SseService sseService;
     private final SeatService seatService;
@@ -31,18 +31,28 @@ public class PinSeatSender {
         this.scheduledTaskHandler = scheduledTaskHandler;
     }
 
-    public void send(String token) {
-        scheduledTaskHandler.scheduleAtFixedRate(token, getPinSeatTask(token), Duration.ofMillis(TASK_DURATION));
+    public void send() {
+        if (hasActiveSchedule()) {
+            return;
+        }
+        scheduledTaskHandler.scheduleAtFixedRate(getPinSeatTask(), SENDING_PERIOD);
     }
 
-    private Runnable getPinSeatTask(String token) {
+    private boolean hasActiveSchedule() {
+        return scheduledTaskHandler.getTaskCount() > 0;
+    }
+
+    private Runnable getPinSeatTask() {
         return () -> {
-            if (sseService.isDisconnected(token)) {
-                scheduledTaskHandler.cancel(token);
-                return;
-            }
-            List<SeatDto> pinSeats = seatService.getPinSeats(token);
-            sseService.propagate(token, PIN_EVENT_NAME, PinSeatsResponse.from(pinSeats));
+            List<String> tokens = sseService.getConnectedTokens();
+            tokens.forEach(token -> {
+                List<SeatDto> pinSeats = seatService.getPinSeats(token);
+                sseService.propagate(token, PIN_EVENT_NAME, PinSeatsResponse.from(pinSeats));
+            });
         };
+    }
+
+    public void cancel() {
+        scheduledTaskHandler.cancelAll();
     }
 }
