@@ -1,15 +1,13 @@
 <configuration>
   <appender class="ch.qos.logback.core.ConsoleAppender" name="CONSOLE">
     <encoder>
-      <!-- 콘솔에 로그 출력 형식 -->
       <pattern>${LOG_PATTERN}</pattern>
     </encoder>
   </appender>
 
   <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="ERROR-ROLLING">
     <encoder>
-      <!-- 날짜, 시간, 로그 레벨, 스레드 이름, 로거 이름, 메시지 형식 -->
-      <pattern>${LOG_PATTERN}</pattern>
+      <pattern>${LOG_FILE_PATTERN}</pattern>
     </encoder>
     <file>${LOG_PATH}/spring-boot-application-error.log</file>
     <filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -19,14 +17,13 @@
     </filter>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <fileNamePattern>${LOG_PATH}/spring-boot-application-error.%d{yyyy-MM-dd}.log</fileNamePattern>
-      <maxHistory>30</maxHistory>
+      <maxHistory>7</maxHistory>
     </rollingPolicy>
   </appender>
 
   <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="WARN-ROLLING">
     <encoder>
-      <!-- 날짜, 시간, 로그 레벨, 스레드 이름, 로거 이름, 메시지 형식 -->
-      <pattern>${LOG_PATTERN}</pattern>
+      <pattern>${LOG_FILE_PATTERN}</pattern>
     </encoder>
     <file>${LOG_PATH}/spring-boot-application-warn.log</file>
     <filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -36,14 +33,13 @@
     </filter>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <fileNamePattern>${LOG_PATH}/spring-boot-application-warn.%d{yyyy-MM-dd}.log</fileNamePattern>
-      <maxHistory>30</maxHistory>
+      <maxHistory>7</maxHistory>
     </rollingPolicy>
   </appender>
 
   <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="INFO-ROLLING">
     <encoder>
-      <!-- 날짜, 시간, 로그 레벨, 스레드 이름, 로거 이름, 메시지 형식 -->
-      <pattern>${LOG_PATTERN}</pattern>
+      <pattern>${LOG_FILE_PATTERN}</pattern>
     </encoder>
     <file>${LOG_PATH}/spring-boot-application-info.log</file>
     <filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -53,14 +49,13 @@
     </filter>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <fileNamePattern>${LOG_PATH}/spring-boot-application-info.%d{yyyy-MM-dd}.log</fileNamePattern>
-      <maxHistory>30</maxHistory>
+      <maxHistory>7</maxHistory>
     </rollingPolicy>
   </appender>
 
   <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="DEBUG-ROLLING">
     <encoder>
-      <!-- 날짜, 시간, 로그 레벨, 스레드 이름, 로거 이름, 메시지 형식 -->
-      <pattern>${LOG_PATTERN}</pattern>
+      <pattern>${LOG_FILE_PATTERN}</pattern>
     </encoder>
     <file>${LOG_PATH}/spring-boot-application-debug.log</file>
     <filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -70,17 +65,20 @@
     </filter>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <fileNamePattern>${LOG_PATH}/spring-boot-application-debug.%d{yyyy-MM-dd}.log</fileNamePattern>
-      <maxHistory>30</maxHistory>
+      <maxHistory>7</maxHistory>
     </rollingPolicy>
   </appender>
 
-  <!-- 로그 패턴에 색상 적용 %clr(pattern){color} -->
   <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
 
-  <!-- log 변수 값 설정 -->
   <property name="LOG_PATTERN"
     value="[%d{yyyy-MM-dd HH:mm:ss}:%-3relative]  %clr(%-5level) %clr(${PID:-}){magenta} %clr(---){faint} %clr([%15.15thread]){faint} %clr(%-40.40logger{36}){cyan} %clr(:){faint} %msg%n"/>
+  <property name="LOG_FILE_PATTERN"
+    value="[%d{yyyy-MM-dd HH:mm:ss}:%-3relative]  %-5level ${PID:-} --- [%15.15thread] %-40.40logger{36} : %msg%n"/>
+
+  <!--  ec2와 local 에서의 로그 경로 분리  -->
   <property name="LOG_PATH" value="${LOG_PATH:-/home/ubuntu/app/logs}"/>
+  <property name="LOCAL_LOG_PATH" value="./logs"/>
 
   <springProfile name="default">
     <root level="INFO">
@@ -88,9 +86,14 @@
     </root>
   </springProfile>
 
+  <!--  local 에서는 콘솔과 파일 모두에 로그 생성  -->
   <springProfile name="local">
+    <property name="LOG_PATH" value="${LOCAL_LOG_PATH}"/>
     <root level="INFO">
       <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="ERROR-ROLLING"/>
+      <appender-ref ref="WARN-ROLLING"/>
+      <appender-ref ref="INFO-ROLLING"/>
     </root>
   </springProfile>
 

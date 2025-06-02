@@ -57,6 +57,10 @@ public class SeatStorage {
         seatDtos.forEach(this::add);
     }
 
+    public List<SeatDto> getAll() {
+        return new ArrayList<>(seats.values());
+    }
+
     public void clear() {
         seats.clear();
     }
