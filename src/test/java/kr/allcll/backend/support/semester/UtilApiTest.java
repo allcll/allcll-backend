@@ -1,12 +1,12 @@
-package kr.allcll.backend.domain.util;
+package kr.allcll.backend.support.semester;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.time.LocalDate;
-import kr.allcll.backend.domain.util.dto.SemesterResponse;
-import kr.allcll.backend.domain.util.dto.SemesterResponse.Period;
+import kr.allcll.backend.support.semester.SemesterResponse.Period;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

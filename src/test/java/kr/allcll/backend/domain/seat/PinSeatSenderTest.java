@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import kr.allcll.backend.domain.seat.pin.PinRepository;
 import kr.allcll.backend.support.schedule.ScheduledTaskHandler;
+import kr.allcll.backend.support.semester.Semester;
 import kr.allcll.backend.support.sse.SseService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,12 +44,12 @@ class PinSeatSenderTest {
     void sendPinSeats() throws InterruptedException {
         // given
         String token = "TEST_TOKEN";
-        when(sseService.isDisconnected(token)).thenReturn(false);
-        when(pinRepository.findAllByToken(token)).thenReturn(List.of());
+        when(sseService.getConnectedTokens()).thenReturn(List.of(token));
+        when(pinRepository.findAllByToken(token, Semester.now())).thenReturn(List.of());
         when(seatStorage.getSeats(any())).thenReturn(List.of());
 
         // when
-        pinSeatSender.send(token);
+        pinSeatSender.send();
         Thread.sleep(1000);
 
         // then
@@ -60,16 +61,15 @@ class PinSeatSenderTest {
     void cancelPinSeatSending() throws InterruptedException {
         // given
         String token = "TEST_TOKEN";
-        when(sseService.isDisconnected(token)).thenReturn(false).thenReturn(true);
-        when(pinRepository.findAllByToken(token)).thenReturn(List.of());
+        when(sseService.getConnectedTokens()).thenReturn(List.of(token)).thenReturn(List.of());
+        when(pinRepository.findAllByToken(token, Semester.now())).thenReturn(List.of());
         when(seatStorage.getSeats(any())).thenReturn(List.of());
 
         // when
-        pinSeatSender.send(token);
-        Thread.sleep(2500);
+        pinSeatSender.send();
+        Thread.sleep(1500);
 
         // then
-        verify(sseService, atLeastOnce()).propagate(any(), any(), any());
-        verify(scheduledTaskHandler, times(1)).cancel(token);
+        verify(sseService, times(1)).propagate(any(), any(), any());
     }
 }

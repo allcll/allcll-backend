@@ -10,6 +10,7 @@ import kr.allcll.backend.client.dto.PinSubjectsRequest;
 import kr.allcll.backend.domain.seat.pin.Pin;
 import kr.allcll.backend.domain.seat.pin.PinRepository;
 import kr.allcll.backend.domain.subject.Subject;
+import kr.allcll.backend.support.semester.Semester;
 import kr.allcll.backend.support.sse.SseEmitterStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,17 +34,17 @@ public class ExternalService {
         List<String> tokens = sseEmitterStorage.getUserTokens();
         Map<Subject, Integer> pinSubjects = new HashMap<>();
         for (String token : tokens) {
-            List<Pin> pins = pinRepository.findAllByToken(token);
+            List<Pin> pins = pinRepository.findAllByToken(token, Semester.now());
             for (Pin pin : pins) {
                 Subject subject = pin.getSubject();
                 pinSubjects.merge(subject, 1, Integer::sum);
             }
         }
-        List<PinSubject> wantPinSubjects = getWantPinSubjects(pinSubjects);
+        List<PinSubject> wantPinSubjects = getPinSubjectsWithPriority(pinSubjects);
         return PinSubjectsRequest.from(wantPinSubjects);
     }
 
-    private List<PinSubject> getWantPinSubjects(Map<Subject, Integer> pinSubjects) {
+    private List<PinSubject> getPinSubjectsWithPriority(Map<Subject, Integer> pinSubjects) {
         List<Long> subjectIds = pinSubjects.keySet().stream()
             .sorted((o1, o2) -> pinSubjects.get(o2).compareTo(pinSubjects.get(o1)))
             .map(Subject::getId)
@@ -53,15 +54,23 @@ public class ExternalService {
         int firstIdx = mapSize / 3;
         int secondIdx = mapSize * 2 / 3;
 
-        List<PinSubject> firstPrioritySubject = getPrioritySubject(subjectIds.subList(0, firstIdx), 1);
-        List<PinSubject> secondPrioritySubject = getPrioritySubject(subjectIds.subList(firstIdx, secondIdx), 2);
-        List<PinSubject> thirdPrioritySubject = getPrioritySubject(subjectIds.subList(secondIdx, subjectIds.size()), 3);
-        firstPrioritySubject.addAll(secondPrioritySubject);
-        firstPrioritySubject.addAll(thirdPrioritySubject);
-        return firstPrioritySubject;
+        return grantPriorityToAllSubjects(subjectIds, firstIdx, secondIdx);
     }
 
-    private List<PinSubject> getPrioritySubject(List<Long> subjectIds, int priority) {
+    private List<PinSubject> grantPriorityToAllSubjects(List<Long> subjectIds, int firstIdx, int secondIdx) {
+        List<PinSubject> result = new ArrayList<>();
+        List<PinSubject> firstPrioritySubject = grantEachPriorityToSubjects(subjectIds.subList(0, firstIdx), 1);
+        List<PinSubject> secondPrioritySubject = grantEachPriorityToSubjects(subjectIds.subList(firstIdx, secondIdx),
+            2);
+        List<PinSubject> thirdPrioritySubject = grantEachPriorityToSubjects(
+            subjectIds.subList(secondIdx, subjectIds.size()), 3);
+        result.addAll(firstPrioritySubject);
+        result.addAll(secondPrioritySubject);
+        result.addAll(thirdPrioritySubject);
+        return result;
+    }
+
+    private List<PinSubject> grantEachPriorityToSubjects(List<Long> subjectIds, int priority) {
         return subjectIds.stream()
             .map(subjectId -> new PinSubject(subjectId, priority))
             .collect(Collectors.toCollection(ArrayList::new));

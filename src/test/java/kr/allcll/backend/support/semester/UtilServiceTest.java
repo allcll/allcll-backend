@@ -1,4 +1,4 @@
-package kr.allcll.backend.domain.util;
+package kr.allcll.backend.support.semester;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -8,7 +8,6 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import kr.allcll.backend.domain.util.dto.SemesterResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +32,12 @@ class UtilServiceTest {
         ZoneId zoneId = ZoneId.systemDefault();
         when(clock.instant()).thenReturn(instant);
         when(clock.getZone()).thenReturn(zoneId);
-      
+
         SemesterResponse semesterResponse = utilService.getSemester();
 
         // then
         assertAll(
-            () -> assertThat(semesterResponse.semester()).isEqualTo("2025-1"),
+            () -> assertThat(semesterResponse.semester()).isEqualTo("2025/1학기"),
             () -> assertThat(semesterResponse.period().startDate()).isEqualTo(LocalDate.of(2025, 2, 1)),
             () -> assertThat(semesterResponse.period().endDate()).isEqualTo(LocalDate.of(2025, 3, 31))
         );

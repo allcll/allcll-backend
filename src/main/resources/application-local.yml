@@ -47,6 +47,10 @@ management:
     web:
       exposure:
         include: prometheus, health
+  datadog:
+    metrics:
+      export:
+        enabled: false
 
 cookie:
   max-age: 2190D
@@ -55,3 +59,6 @@ cookie:
   same-site: strict
   domain: localhost
   path: /
+
+admin:
+  token:

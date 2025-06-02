@@ -13,6 +13,7 @@ import kr.allcll.backend.domain.subject.Subject;
 import kr.allcll.backend.domain.subject.SubjectRepository;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
+import kr.allcll.backend.support.semester.Semester;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -59,7 +60,7 @@ class StarServiceTest {
         starService.addStarOnSubject(starSubject.getId(), TOKEN);
 
         // when
-        List<Star> result = starRepository.findAllByToken(TOKEN);
+        List<Star> result = starRepository.findAllByToken(TOKEN, Semester.now());
 
         // then
         assertThat(result).hasSize(expected);
@@ -124,7 +125,7 @@ class StarServiceTest {
         starService.deleteStarOnSubject(subject.getId(), TOKEN);
 
         // then
-        assertThat(starRepository.findAllByToken(TOKEN)).hasSize(0);
+        assertThat(starRepository.findAllByToken(TOKEN, Semester.now())).hasSize(0);
     }
 
     @Test

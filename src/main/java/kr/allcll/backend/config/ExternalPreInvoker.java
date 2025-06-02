@@ -19,7 +19,7 @@ public class ExternalPreInvoker {
 
     @Retryable(
         maxAttempts = 12 * 60 * 7,
-        backoff = @Backoff(delay = 100, multiplier = 1.5, maxDelay = 5000)
+        backoff = @Backoff(delay = 5000, multiplier = 1.5, maxDelay = 10000)
     )
     public void sendSseConnectionToExternal() {
         try {

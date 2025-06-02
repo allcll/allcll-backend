@@ -1,6 +1,5 @@
-package kr.allcll.backend.domain.util;
+package kr.allcll.backend.support.semester;
 
-import kr.allcll.backend.domain.util.dto.SemesterResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

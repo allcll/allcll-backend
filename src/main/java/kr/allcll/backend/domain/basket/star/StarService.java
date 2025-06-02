@@ -1,12 +1,13 @@
 package kr.allcll.backend.domain.basket.star;
 
 import java.util.List;
-import kr.allcll.backend.support.exception.AllcllErrorCode;
-import kr.allcll.backend.support.exception.AllcllException;
 import kr.allcll.backend.domain.basket.star.dto.StarredSubjectIdResponse;
 import kr.allcll.backend.domain.basket.star.dto.StarredSubjectIdsResponse;
 import kr.allcll.backend.domain.subject.Subject;
 import kr.allcll.backend.domain.subject.SubjectRepository;
+import kr.allcll.backend.support.exception.AllcllErrorCode;
+import kr.allcll.backend.support.exception.AllcllException;
+import kr.allcll.backend.support.semester.Semester;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,22 +32,22 @@ public class StarService {
     }
 
     private void validateCanAddStar(Subject subject, String token) {
-        Long starCount = starRepository.countAllByToken(token);
+        Long starCount = starRepository.countAllByToken(token, Semester.now());
         if (starCount >= MAX_STAR_NUMBER) {
             throw new AllcllException(AllcllErrorCode.STAR_LIMIT_EXCEEDED, MAX_STAR_NUMBER);
         }
-        if (starRepository.existsBySubjectAndToken(subject, token)) {
+        if (starRepository.existsBySubjectAndToken(subject, token, Semester.now())) {
             throw new AllcllException(AllcllErrorCode.DUPLICATE_STAR, subject.getCuriNm());
         }
     }
 
     @Transactional
     public void deleteStarOnSubject(Long subjectId, String token) {
-        starRepository.deleteStarBySubjectIdAndToken(subjectId, token);
+        starRepository.deleteStarBySubjectIdAndToken(subjectId, token, Semester.now());
     }
 
     public StarredSubjectIdsResponse retrieveStars(String token) {
-        List<Star> stars = starRepository.findAllByToken(token);
+        List<Star> stars = starRepository.findAllByToken(token, Semester.now());
         return new StarredSubjectIdsResponse(stars.stream()
             .map(star -> new StarredSubjectIdResponse(star.getSubject().getId()))
             .toList());

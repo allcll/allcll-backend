@@ -40,3 +40,6 @@ cookie:
   same-site: strict
   domain: localhost
   path: /
+
+admin:
+  token:

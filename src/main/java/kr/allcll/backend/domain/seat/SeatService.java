@@ -7,6 +7,7 @@ import kr.allcll.backend.domain.seat.dto.SeatDto;
 import kr.allcll.backend.domain.seat.pin.Pin;
 import kr.allcll.backend.domain.seat.pin.PinRepository;
 import kr.allcll.backend.domain.subject.Subject;
+import kr.allcll.backend.support.semester.Semester;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,12 +22,14 @@ public class SeatService {
     private final SeatStorage seatStorage;
 
     public PreSeatsResponse getAllPreSeats() {
-        List<Seat> allByCreatedDate = seatRepository.findAllByCreatedDate((LocalDate.of(2025, 2, 28)));
+        List<Seat> allByCreatedDate = seatRepository.findAllByCreatedDate(
+            LocalDate.now().minusDays(1),
+            Semester.now());
         return PreSeatsResponse.from(allByCreatedDate);
     }
 
     public List<SeatDto> getPinSeats(String token) {
-        List<Pin> pins = pinRepository.findAllByToken(token);
+        List<Pin> pins = pinRepository.findAllByToken(token, Semester.now());
         List<Subject> subjects = pins.stream()
             .map(Pin::getSubject)
             .toList();
