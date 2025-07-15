@@ -39,10 +39,12 @@ public class TimeTableService {
     }
 
     @Transactional
-    public Object updateTimeTable(Long timetableId, String newTitle, String token) {
+    public TimeTableResponse updateTimeTable(Long timetableId, String newTitle, String token) {
         TimeTable timeTable = validateTimetable(timetableId, token);
 
-        timeTable.updateTimeTable(newTitle,);
+        timeTable.updateTimeTable(newTitle);
+
+        return TimeTableResponse.from(timeTable);
     }
 
     @Transactional

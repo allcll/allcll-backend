@@ -45,6 +45,7 @@ public class TimeTableApi {
         String newTitle = request.get("title");
         return ResponseEntity.ok(timeTableService.updateTimeTable(timetableId, newTitle, ThreadLocalHolder.SHARED_TOKEN.get()));
     }
+
     @DeleteMapping("/api/timetables/{timetableId}")
     public ResponseEntity<Void> deleteTimeTable(@PathVariable Long timetableId) {
         timeTableService.deleteTimeTable(timetableId, ThreadLocalHolder.SHARED_TOKEN.get());
