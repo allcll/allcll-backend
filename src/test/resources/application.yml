@@ -33,6 +33,10 @@ external:
   non-major-path: /api/non-major
   pin-path: /api/pin
 
+cors:
+  dev: ${{secrets.DEV_URL}}
+  admin: ${{secrets.ADMIN_URL}}
+
 cookie:
   max-age: 2190D
   secure: true
