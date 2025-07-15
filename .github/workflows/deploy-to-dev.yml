@@ -10,6 +10,10 @@ jobs:
     environment: develop
     timeout-minutes: 10
 
+    env:
+      DEV_URL: ${{ secrets.DEV_URL }}
+      ADMIN_URL: ${{ secrets.ADMIN_URL }}
+
     defaults:
       run:
         shell: bash
