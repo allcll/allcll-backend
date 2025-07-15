@@ -29,8 +29,11 @@ public class TimeTableApi {
     }
 
     @PostMapping("/api/timetable")
-    public ResponseEntity<Void> createTimeTable() {
-        timeTableService.createTimeTable(ThreadLocalHolder.SHARED_TOKEN.get());
+    public ResponseEntity<Void> createTimeTable(@RequestBody Map<String, String> request) {
+        String timetableName = request.get("timetableName");
+        String semester = request.get("semester");
+
+        timeTableService.createTimeTable(ThreadLocalHolder.SHARED_TOKEN.get(), timetableName, semester);
         return ResponseEntity.ok().build();
     }
 
@@ -42,9 +45,9 @@ public class TimeTableApi {
         String newTitle = request.get("title");
         return ResponseEntity.ok(timeTableService.updateTimeTable(timetableId, newTitle, ThreadLocalHolder.SHARED_TOKEN.get()));
     }
-    @DeleteMapping("/api/timetables")
-    public ResponseEntity<Void> deleteTimeTable() {
-        timeTableService.deleteTimeTable(ThreadLocalHolder.SHARED_TOKEN.get());
-        return ResponseEntity.ok().build();
+    @DeleteMapping("/api/timetables/{timetableId}")
+    public ResponseEntity<Void> deleteTimeTable(@PathVariable Long timetableId) {
+        timeTableService.deleteTimeTable(timetableId, ThreadLocalHolder.SHARED_TOKEN.get());
+        return ResponseEntity.noContent().build();
     }
 }
