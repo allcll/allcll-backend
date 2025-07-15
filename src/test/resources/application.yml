@@ -36,7 +36,6 @@ external:
 cors:
   dev: ${DEV_URL}
   admin: ${ADMIN_URL}
-
 cookie:
   max-age: 2190D
   secure: true
