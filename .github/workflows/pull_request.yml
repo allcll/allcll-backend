@@ -13,6 +13,11 @@ permissions:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    
+    env:
+      DEV_URL: ${{ secrets.DEV_URL }}
+      ADMIN_URL: ${{ secrets.ADMIN_URL }}
+      
     steps:
       - name: 코드 체크아웃
         uses: actions/checkout@v4
