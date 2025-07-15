@@ -21,6 +21,7 @@ public enum AllcllErrorCode {
     EXTERNAL_CONNECTION_TERMINATED("외부 서버와의 연결이 종료되었습니다."),
 
     TOKEN_INVALID("토큰이 일치하지 않습니다."),
+    TIMETABLE_NOT_FOUND("시간표 정보가 존재하지 않습니다."),
     ;
 
     private String message;
