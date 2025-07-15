@@ -41,6 +41,9 @@ external:
   non-major-path: /api/non-major
   pin-path: /api/pin
 
+cors:
+  dev: ${DEV_URL}
+  admin: ${ADMIN_URL}
 
 management:
   endpoints:
