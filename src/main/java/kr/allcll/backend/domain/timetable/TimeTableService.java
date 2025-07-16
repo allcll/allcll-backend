@@ -29,7 +29,7 @@ public class TimeTableService {
     public TimeTableResponse updateTimeTable(Long timetableId, String newTitle, String token) {
         validateToken(token);
 
-        TimeTable timeTable = getMyTimeTable(timetableId, token);
+        TimeTable timeTable = validateAndGetTimeTable(timetableId, token);
         timeTable.updateTimeTable(newTitle);
 
         return TimeTableResponse.from(timeTable);
@@ -39,7 +39,7 @@ public class TimeTableService {
     public void deleteTimeTable(Long timetableId, String token) {
         validateToken(token);
 
-        TimeTable timeTable = getMyTimeTable(timetableId, token);
+        TimeTable timeTable = validateAndGetTimeTable(timetableId, token);
         timeTableRepository.delete(timeTable);
     }
 
@@ -63,7 +63,7 @@ public class TimeTableService {
         }
     }
 
-    private TimeTable getMyTimeTable(Long timetableId, String token) {
+    private TimeTable validateAndGetTimeTable(Long timetableId, String token) {
         TimeTable timeTable = timeTableRepository.findById(timetableId)
                 .orElseThrow(() -> new AllcllException(AllcllErrorCode.TIMETABLE_NOT_FOUND));
 
