@@ -140,11 +140,4 @@ class TimeTableServiceTest {
         assertThat(timeTablesResponse.timeTables().size()).isEqualTo(2);
     }
 
-    @Test
-    void validateToken() {
-    }
-
-    @Test
-    void validateTimetable() {
-    }
 }
