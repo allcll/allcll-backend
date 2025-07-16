@@ -16,20 +16,6 @@ public class TimeTableService {
 
     private final TimeTableRepository timeTableRepository;
 
-    @Transactional(readOnly = true)
-    public TimeTablesResponse getTimetables(String token) {
-        List<TimeTable> timeTables = timeTableRepository.findByToken(token)
-                .orElseThrow(() -> new AllcllException(AllcllErrorCode.TOKEN_INVALID));
-        return new TimeTablesResponse(
-                timeTables.stream()
-                        .map(timeTable -> new TimeTableResponse(
-                                timeTable.getId(),
-                                timeTable.getTimeTableName(),
-                                timeTable.getSemester()))
-                        .toList()
-        );
-    }
-
     @Transactional
     public void createTimeTable(String token, String timeTableName, String semester) {
         validateToken(token);
@@ -52,6 +38,20 @@ public class TimeTableService {
         TimeTable timeTable = validateTimetable(timetableId, token);
 
         timeTableRepository.delete(timeTable);
+    }
+
+    @Transactional(readOnly = true)
+    public TimeTablesResponse getTimetables(String token) {
+        List<TimeTable> timeTables = timeTableRepository.findByToken(token)
+                .orElseThrow(() -> new AllcllException(AllcllErrorCode.TOKEN_INVALID));
+        return new TimeTablesResponse(
+                timeTables.stream()
+                        .map(timeTable -> new TimeTableResponse(
+                                timeTable.getId(),
+                                timeTable.getTimeTableName(),
+                                timeTable.getSemester()))
+                        .toList()
+        );
     }
 
     public void validateToken(String token) {
