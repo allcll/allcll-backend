@@ -27,8 +27,9 @@ public class TimeTableService {
 
     @Transactional
     public TimeTableResponse updateTimeTable(Long timetableId, String newTitle, String token) {
-        TimeTable timeTable = validateTimetable(timetableId, token);
+        validateToken(token);
 
+        TimeTable timeTable = getMyTimeTable(timetableId, token);
         timeTable.updateTimeTable(newTitle);
 
         return TimeTableResponse.from(timeTable);
@@ -36,34 +37,41 @@ public class TimeTableService {
 
     @Transactional
     public void deleteTimeTable(Long timetableId, String token) {
-        TimeTable timeTable = validateTimetable(timetableId, token);
+        validateToken(token);
 
+        TimeTable timeTable = getMyTimeTable(timetableId, token);
         timeTableRepository.delete(timeTable);
     }
 
     @Transactional(readOnly = true)
     public TimeTablesResponse getTimetables(String token) {
+        validateToken(token);
+
         List<TimeTable> timeTables = timeTableRepository.findByToken(token)
                 .orElseThrow(() -> new AllcllException(AllcllErrorCode.TOKEN_INVALID));
+
         return new TimeTablesResponse(
                 timeTables.stream()
-                        .map(timeTable -> new TimeTableResponse(
-                                timeTable.getId(),
-                                timeTable.getTimeTableName(),
-                                timeTable.getSemester()))
+                        .map(TimeTableResponse::from)
                         .toList()
         );
     }
 
-    public void validateToken(String token) {
+    private void validateToken(String token) {
         if (token == null || token.isBlank()) {
             throw new AllcllException(AllcllErrorCode.TOKEN_INVALID);
         }
     }
 
-    public TimeTable validateTimetable(Long timetableId, String token) {
-        return timeTableRepository.findByIdAndToken(timetableId, token)
+    private TimeTable getMyTimeTable(Long timetableId, String token) {
+        TimeTable timeTable = timeTableRepository.findById(timetableId)
                 .orElseThrow(() -> new AllcllException(AllcllErrorCode.TIMETABLE_NOT_FOUND));
+
+        if (!timeTable.getToken().equals(token)) {
+            throw new AllcllException(AllcllErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
+        return timeTable;
     }
 
 }

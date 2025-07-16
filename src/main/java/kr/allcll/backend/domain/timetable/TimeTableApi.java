@@ -2,6 +2,7 @@ package kr.allcll.backend.domain.timetable;
 
 import kr.allcll.backend.domain.timetable.dto.TimeTableRequest;
 import kr.allcll.backend.domain.timetable.dto.TimeTableResponse;
+import kr.allcll.backend.domain.timetable.dto.TimeTableUpdateRequest;
 import kr.allcll.backend.domain.timetable.dto.TimeTablesResponse;
 import kr.allcll.backend.support.web.ThreadLocalHolder;
 import lombok.RequiredArgsConstructor;
@@ -30,12 +31,16 @@ public class TimeTableApi {
     }
 
     @PatchMapping("/api/timetables/{timetableId}")
-    public ResponseEntity updateTimeTable(
+    public ResponseEntity<TimeTableResponse> updateTimeTable(
             @PathVariable Long timetableId,
-            @RequestBody Map<String, String> request
+            @RequestBody TimeTableUpdateRequest request
     ) {
-        String newTitle = request.get("title");
-        return ResponseEntity.ok(timeTableService.updateTimeTable(timetableId, newTitle, ThreadLocalHolder.SHARED_TOKEN.get()));
+        TimeTableResponse response = timeTableService.updateTimeTable(
+                timetableId,
+                request.title(),
+                ThreadLocalHolder.SHARED_TOKEN.get()
+        );
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/api/timetables/{timetableId}")
