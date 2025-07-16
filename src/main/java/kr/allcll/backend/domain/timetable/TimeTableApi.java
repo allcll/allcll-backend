@@ -1,5 +1,6 @@
 package kr.allcll.backend.domain.timetable;
 
+import kr.allcll.backend.domain.timetable.dto.TimeTableRequest;
 import kr.allcll.backend.domain.timetable.dto.TimeTableResponse;
 import kr.allcll.backend.domain.timetable.dto.TimeTablesResponse;
 import kr.allcll.backend.support.web.ThreadLocalHolder;
@@ -23,11 +24,8 @@ public class TimeTableApi {
     private final TimeTableService timeTableService;
 
     @PostMapping("/api/timetable")
-    public ResponseEntity<Void> createTimeTable(@RequestBody Map<String, String> request) {
-        String timetableName = request.get("timetableName");
-        String semester = request.get("semester");
-
-        timeTableService.createTimeTable(ThreadLocalHolder.SHARED_TOKEN.get(), timetableName, semester);
+    public ResponseEntity<Void> createTimeTable(@RequestBody TimeTableRequest request) {
+        timeTableService.createTimeTable(ThreadLocalHolder.SHARED_TOKEN.get(), request);
         return ResponseEntity.ok().build();
     }
 

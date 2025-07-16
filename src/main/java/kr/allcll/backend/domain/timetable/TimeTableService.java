@@ -1,5 +1,6 @@
 package kr.allcll.backend.domain.timetable;
 
+import kr.allcll.backend.domain.timetable.dto.TimeTableRequest;
 import kr.allcll.backend.domain.timetable.dto.TimeTableResponse;
 import kr.allcll.backend.domain.timetable.dto.TimeTablesResponse;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
@@ -17,10 +18,10 @@ public class TimeTableService {
     private final TimeTableRepository timeTableRepository;
 
     @Transactional
-    public void createTimeTable(String token, String timeTableName, String semester) {
+    public void createTimeTable(String token, TimeTableRequest request) {
         validateToken(token);
 
-        TimeTable timeTable = new TimeTable(token, timeTableName, semester);
+        TimeTable timeTable = new TimeTable(token, request.timetableName(), request.semester());
         timeTableRepository.save(timeTable);
     }
 
