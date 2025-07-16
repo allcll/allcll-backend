@@ -47,8 +47,10 @@ public class TimeTableService {
     public TimeTablesResponse getTimetables(String token) {
         validateToken(token);
 
-        List<TimeTable> timeTables = timeTableRepository.findByToken(token)
-                .orElseThrow(() -> new AllcllException(AllcllErrorCode.TOKEN_INVALID));
+        List<TimeTable> timeTables = timeTableRepository.findAllByToken(token);
+        if (timeTables.isEmpty()) {
+            throw new AllcllException(AllcllErrorCode.TOKEN_INVALID);
+        }
 
         return new TimeTablesResponse(
                 timeTables.stream()

@@ -38,7 +38,4 @@ public class TimeTable extends BaseEntity {
         this.timeTableName = newTitle;
     }
 
-    public void updateSemester(String newSemester) {
-        this.semester = newSemester;
-    }
 }

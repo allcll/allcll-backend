@@ -1,7 +1,6 @@
 package kr.allcll.backend.domain.timetable;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -16,7 +15,7 @@ public interface TimeTableRepository extends JpaRepository<TimeTable, Long>{
         SELECT t FROM TimeTable t 
         WHERE t.token = :token
         """)
-    Optional<List<TimeTable>> findByToken(@Param("token") String token);
+    List<TimeTable> findAllByToken(@Param("token") String token);
 
     @Query("""
         SELECT t FROM TimeTable t 
