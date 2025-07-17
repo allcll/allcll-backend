@@ -1,11 +1,12 @@
 package kr.allcll.backend.domain.timetable.dto;
 
 import kr.allcll.backend.domain.timetable.TimeTable;
+import kr.allcll.backend.support.semester.Semester;
 
 public record TimeTableResponse (
         Long timeTableId,
         String timeTableName,
-        String semester
+        Semester semester
 ){
     public static TimeTableResponse from(TimeTable timeTable) {
         return new TimeTableResponse(

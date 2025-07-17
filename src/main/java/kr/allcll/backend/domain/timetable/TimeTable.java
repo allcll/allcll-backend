@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import kr.allcll.backend.support.entity.BaseEntity;
+import kr.allcll.backend.support.semester.Semester;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,9 +25,9 @@ public class TimeTable extends BaseEntity {
 
     private String timeTableName;
 
-    private String semester;
+    private Semester semester;
 
-    public TimeTable(String token, String timeTableName, String semester) {
+    public TimeTable(String token, String timeTableName, Semester semester) {
         this.token = token;
         this.timeTableName = timeTableName;
         this.semester = semester;

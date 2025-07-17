@@ -3,6 +3,7 @@ package kr.allcll.backend.domain.timetable;
 import jakarta.servlet.http.Cookie;
 import kr.allcll.backend.domain.timetable.dto.TimeTableResponse;
 import kr.allcll.backend.domain.timetable.dto.TimeTablesResponse;
+import kr.allcll.backend.support.semester.Semester;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,7 @@ class TimeTableApiTest {
         String json = """
                 {
                     "timetableName": "시간표 1",
-                    "semester": "2023-1"
+                    "semester": "FALL_25"
                 }
                 """;
 
@@ -62,7 +63,7 @@ class TimeTableApiTest {
                 }
                 """;
 
-        TimeTableResponse mockResponse = new TimeTableResponse(timetableId, "새로운 시간표 제목", "2025-1");
+        TimeTableResponse mockResponse = new TimeTableResponse(timetableId, "새로운 시간표 제목", Semester.FALL_25);
         when(timeTableService.updateTimeTable(timetableId, "새로운 시간표 제목", TOKEN))
                 .thenReturn(mockResponse);
 
@@ -93,20 +94,20 @@ class TimeTableApiTest {
                         {
                           "timeTableId": 1,
                           "timeTableName": "시간표1",
-                          "semester": "2025-1"
+                          "semester": "FALL_25"
                         },
                         {
                           "timeTableId": 2,
                           "timeTableName": "시간표2",
-                          "semester": "2025-1"
+                          "semester": "FALL_25"
                         }
                     ]
                 }
                 """;
 
         List<TimeTableResponse> list = List.of(
-                new TimeTableResponse(1L, "시간표1", "2025-1"),
-                new TimeTableResponse(2L, "시간표2", "2025-1")
+                new TimeTableResponse(1L, "시간표1", Semester.FALL_25),
+                new TimeTableResponse(2L, "시간표2", Semester.FALL_25)
         );
         when(timeTableService.getTimetables(TOKEN)).thenReturn(new TimeTablesResponse(list));
 
