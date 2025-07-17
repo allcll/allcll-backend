@@ -54,6 +54,23 @@ class TimeTableApiTest {
     }
 
     @Test
+    @DisplayName("유효하지 않은 학기 코드가 들어올 경우 400 에러가 발생한다")
+    void createTimeTable_invalidSemester_returnsBadRequest() throws Exception {
+        String invalidRequestJson = """
+        {
+          "timetableName": "시간표1",
+          "semester": "잘못된 학기코드"
+        }
+        """;
+
+        mockMvc.perform(post("/api/timetable")
+                        .cookie(new Cookie("token", "token1"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidRequestJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("시간표를 수정할 때 요청과 응답을 확인한다.")
     void updateTimeTable() throws Exception {
         Long timetableId = 1L;
