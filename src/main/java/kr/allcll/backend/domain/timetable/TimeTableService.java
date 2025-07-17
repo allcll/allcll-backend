@@ -1,6 +1,6 @@
 package kr.allcll.backend.domain.timetable;
 
-import kr.allcll.backend.domain.timetable.dto.TimeTableRequest;
+import kr.allcll.backend.domain.timetable.dto.TimeTableCreateRequest;
 import kr.allcll.backend.domain.timetable.dto.TimeTableResponse;
 import kr.allcll.backend.domain.timetable.dto.TimeTablesResponse;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
@@ -18,27 +18,23 @@ public class TimeTableService {
     private final TimeTableRepository timeTableRepository;
 
     @Transactional
-    public void createTimeTable(String token, TimeTableRequest request) {
+    public void createTimeTable(String token, TimeTableCreateRequest request) {
         validateToken(token);
-
-        TimeTable timeTable = new TimeTable(token, request.timetableName(), request.semester());
+        TimeTable timeTable = new TimeTable(token, request.timeTableName(), request.semester());
         timeTableRepository.save(timeTable);
     }
 
     @Transactional
-    public TimeTableResponse updateTimeTable(Long timetableId, String newTitle, String token) {
+    public TimeTableResponse updateTimeTable(Long timetableId, String updatedTitle, String token) {
         validateToken(token);
-
         TimeTable timeTable = validateAndGetTimeTable(timetableId, token);
-        timeTable.updateTimeTable(newTitle);
-
+        timeTable.updateTimeTable(updatedTitle);
         return TimeTableResponse.from(timeTable);
     }
 
     @Transactional
     public void deleteTimeTable(Long timetableId, String token) {
         validateToken(token);
-
         TimeTable timeTable = validateAndGetTimeTable(timetableId, token);
         timeTableRepository.delete(timeTable);
     }
@@ -46,12 +42,10 @@ public class TimeTableService {
     @Transactional(readOnly = true)
     public TimeTablesResponse getTimetables(String token) {
         validateToken(token);
-
         List<TimeTable> timeTables = timeTableRepository.findAllByToken(token);
         if (timeTables.isEmpty()) {
             throw new AllcllException(AllcllErrorCode.TOKEN_INVALID);
         }
-
         return new TimeTablesResponse(
                 timeTables.stream()
                         .map(TimeTableResponse::from)
@@ -68,12 +62,9 @@ public class TimeTableService {
     private TimeTable validateAndGetTimeTable(Long timetableId, String token) {
         TimeTable timeTable = timeTableRepository.findById(timetableId)
                 .orElseThrow(() -> new AllcllException(AllcllErrorCode.TIMETABLE_NOT_FOUND));
-
         if (!timeTable.getToken().equals(token)) {
             throw new AllcllException(AllcllErrorCode.UNAUTHORIZED_ACCESS);
         }
-
         return timeTable;
     }
-
 }

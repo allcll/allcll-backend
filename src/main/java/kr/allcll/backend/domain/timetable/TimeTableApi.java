@@ -1,6 +1,6 @@
 package kr.allcll.backend.domain.timetable;
 
-import kr.allcll.backend.domain.timetable.dto.TimeTableRequest;
+import kr.allcll.backend.domain.timetable.dto.TimeTableCreateRequest;
 import kr.allcll.backend.domain.timetable.dto.TimeTableResponse;
 import kr.allcll.backend.domain.timetable.dto.TimeTableUpdateRequest;
 import kr.allcll.backend.domain.timetable.dto.TimeTablesResponse;
@@ -15,9 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Map;
-
 @RestController
 @RequiredArgsConstructor
 public class TimeTableApi {
@@ -25,32 +22,32 @@ public class TimeTableApi {
     private final TimeTableService timeTableService;
 
     @PostMapping("/api/timetable")
-    public ResponseEntity<Void> createTimeTable(@RequestBody TimeTableRequest request) {
+    public ResponseEntity<Void> createTimeTable(@RequestBody TimeTableCreateRequest request) {
         timeTableService.createTimeTable(ThreadLocalHolder.SHARED_TOKEN.get(), request);
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/api/timetables/{timetableId}")
+    @PatchMapping("/api/timetables/{timeTableId}")
     public ResponseEntity<TimeTableResponse> updateTimeTable(
-            @PathVariable Long timetableId,
+            @PathVariable Long timeTableId,
             @RequestBody TimeTableUpdateRequest request
     ) {
         TimeTableResponse response = timeTableService.updateTimeTable(
-                timetableId,
+                timeTableId,
                 request.title(),
                 ThreadLocalHolder.SHARED_TOKEN.get()
         );
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/api/timetables/{timetableId}")
-    public ResponseEntity<Void> deleteTimeTable(@PathVariable Long timetableId) {
-        timeTableService.deleteTimeTable(timetableId, ThreadLocalHolder.SHARED_TOKEN.get());
+    @DeleteMapping("/api/timetables/{timeTableId}")
+    public ResponseEntity<Void> deleteTimeTable(@PathVariable Long timeTableId) {
+        timeTableService.deleteTimeTable(timeTableId, ThreadLocalHolder.SHARED_TOKEN.get());
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/api/timetables")
-    public ResponseEntity<TimeTablesResponse> getTimetables() {
+    public ResponseEntity<TimeTablesResponse> getTimeTables() {
         TimeTablesResponse timeTablesResponse = timeTableService.getTimetables(ThreadLocalHolder.SHARED_TOKEN.get());
         return ResponseEntity.ok(timeTablesResponse);
     }

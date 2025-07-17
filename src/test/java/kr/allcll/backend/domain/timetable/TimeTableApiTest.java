@@ -86,7 +86,7 @@ class TimeTableApiTest {
 
     @Test
     @DisplayName("시간표를 조회할 때 요청과 응답을 확인한다.")
-    void getTimetables() throws Exception {
+    void getTimeTables() throws Exception {
         String expected = """
                 {
                     "timeTables": [

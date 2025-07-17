@@ -1,6 +1,6 @@
 package kr.allcll.backend.domain.timetable;
 
-import kr.allcll.backend.domain.timetable.dto.TimeTableRequest;
+import kr.allcll.backend.domain.timetable.dto.TimeTableCreateRequest;
 import kr.allcll.backend.domain.timetable.dto.TimeTablesResponse;
 import kr.allcll.backend.fixture.TimeTableFixture;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
@@ -37,8 +37,8 @@ class TimeTableServiceTest {
     @DisplayName("시간표 정상 생성을 검증한다.")
     void createTimeTable() {
         // given
-        TimeTableRequest request1 = new TimeTableRequest("새 시간표1", "2025-1");
-        TimeTableRequest request2 = new TimeTableRequest("새 시간표2", "2025-2");
+        TimeTableCreateRequest request1 = new TimeTableCreateRequest("새 시간표1", "2025-1");
+        TimeTableCreateRequest request2 = new TimeTableCreateRequest("새 시간표2", "2025-2");
 
         // when
         timeTableService.createTimeTable(TOKEN1, request1);
@@ -55,7 +55,7 @@ class TimeTableServiceTest {
     @DisplayName("시간표 생성 시 토큰이 비어있는 경우에 대한 예외를 검증한다.")
     void cannotCreateTimeTableByEmptyToken() {
         // given
-        TimeTableRequest request = new TimeTableRequest("시간표", "2025-2");
+        TimeTableCreateRequest request = new TimeTableCreateRequest("시간표", "2025-2");
 
         // when & then
         assertThatThrownBy(() -> timeTableService.createTimeTable(EMPTY_TOKEN, request))
@@ -130,7 +130,7 @@ class TimeTableServiceTest {
         // given
         TimeTable timeTable1 = TimeTableFixture.createTimeTable(TOKEN1, "내 시간표1", "2025-2");
         TimeTable timeTable2 = TimeTableFixture.createTimeTable(TOKEN1, "내 시간표2", "2025-2");
-        TimeTable timeTable3 = TimeTableFixture.createTimeTable(TOKEN2, "내 시간표3", "2025-2");
+        TimeTable timeTable3 = TimeTableFixture.createTimeTable(TOKEN2, "다른 사람 시간표", "2025-2");
         timeTableRepository.saveAll(List.of(timeTable1, timeTable2, timeTable3));
 
         // when
