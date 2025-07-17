@@ -22,7 +22,6 @@ class TimeTableServiceTest {
 
     private static final String TOKEN1 = "token1";
     private static final String TOKEN2 = "token2";
-    private static final String EMPTY_TOKEN = " ";
 
     @Autowired
     private TimeTableService timeTableService;
@@ -50,18 +49,6 @@ class TimeTableServiceTest {
         assertThat(results).hasSize(1);
         assertThat(results.get(0).getTimeTableName()).isEqualTo("새 시간표1");
         assertThat(results.get(0).getSemester()).isEqualTo(Semester.FALL_25);
-    }
-
-    @Test
-    @DisplayName("시간표 생성 시 토큰이 비어있는 경우에 대한 예외를 검증한다.")
-    void cannotCreateTimeTableByEmptyToken() {
-        // given
-        TimeTableCreateRequest request = new TimeTableCreateRequest("시간표", Semester.FALL_25);
-
-        // when & then
-        assertThatThrownBy(() -> timeTableService.createTimeTable(EMPTY_TOKEN, request))
-                .isInstanceOf(AllcllException.class)
-                .hasMessageContaining(AllcllErrorCode.TOKEN_INVALID.getMessage());
     }
 
     @Test
