@@ -19,7 +19,6 @@ public class TimeTableService {
 
     @Transactional
     public void createTimeTable(String token, TimeTableCreateRequest request) {
-        validateToken(token);
         TimeTable timeTable = new TimeTable(token, request.timeTableName(), request.semester());
         timeTableRepository.save(timeTable);
     }
@@ -27,7 +26,8 @@ public class TimeTableService {
     @Transactional
     public TimeTableResponse updateTimeTable(Long timetableId, String updatedTitle, String token) {
         validateToken(token);
-        TimeTable timeTable = validateAndGetTimeTable(timetableId, token);
+        TimeTable timeTable = getTimeTableById(timetableId);
+        validateTimeTableAccess(timeTable, token);
         timeTable.updateTimeTable(updatedTitle);
         return TimeTableResponse.from(timeTable);
     }
@@ -35,7 +35,8 @@ public class TimeTableService {
     @Transactional
     public void deleteTimeTable(Long timetableId, String token) {
         validateToken(token);
-        TimeTable timeTable = validateAndGetTimeTable(timetableId, token);
+        TimeTable timeTable = getTimeTableById(timetableId);
+        validateTimeTableAccess(timeTable, token);
         timeTableRepository.delete(timeTable);
     }
 
@@ -59,12 +60,14 @@ public class TimeTableService {
         }
     }
 
-    private TimeTable validateAndGetTimeTable(Long timetableId, String token) {
-        TimeTable timeTable = timeTableRepository.findById(timetableId)
+    private TimeTable getTimeTableById(Long timetableId) {
+        return timeTableRepository.findById(timetableId)
                 .orElseThrow(() -> new AllcllException(AllcllErrorCode.TIMETABLE_NOT_FOUND));
-        if (!timeTable.getToken().equals(token)) {
+    }
+
+    private void validateTimeTableAccess(TimeTable timeTable, String token) {
+        if (!token.equals(timeTable.getToken())) {
             throw new AllcllException(AllcllErrorCode.UNAUTHORIZED_ACCESS);
         }
-        return timeTable;
     }
 }
