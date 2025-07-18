@@ -29,13 +29,13 @@ public class TimeTableApi {
 
     @PatchMapping("/api/timetables/{timeTableId}")
     public ResponseEntity<TimeTableResponse> updateTimeTable(
-            @PathVariable Long timeTableId,
-            @RequestBody TimeTableUpdateRequest request
+        @PathVariable Long timeTableId,
+        @RequestBody TimeTableUpdateRequest request
     ) {
         TimeTableResponse response = timeTableService.updateTimeTable(
-                timeTableId,
-                request.title(),
-                ThreadLocalHolder.SHARED_TOKEN.get()
+            timeTableId,
+            request.title(),
+            ThreadLocalHolder.SHARED_TOKEN.get()
         );
         return ResponseEntity.ok(response);
     }

@@ -1,5 +1,6 @@
 package kr.allcll.backend.domain.timetable;
 
+import java.util.List;
 import kr.allcll.backend.domain.timetable.dto.TimeTableCreateRequest;
 import kr.allcll.backend.domain.timetable.dto.TimeTableResponse;
 import kr.allcll.backend.domain.timetable.dto.TimeTablesResponse;
@@ -9,9 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class TimeTableService {
 
@@ -40,14 +40,13 @@ public class TimeTableService {
         timeTableRepository.delete(timeTable);
     }
 
-    @Transactional(readOnly = true)
     public TimeTablesResponse getTimetables(String token) {
         validateToken(token);
         List<TimeTable> timeTables = timeTableRepository.findAllByToken(token);
         return new TimeTablesResponse(
-                timeTables.stream()
-                        .map(TimeTableResponse::from)
-                        .toList()
+            timeTables.stream()
+                .map(TimeTableResponse::from)
+                .toList()
         );
     }
 
@@ -59,7 +58,7 @@ public class TimeTableService {
 
     private TimeTable getTimeTableById(Long timetableId) {
         return timeTableRepository.findById(timetableId)
-                .orElseThrow(() -> new AllcllException(AllcllErrorCode.TIMETABLE_NOT_FOUND));
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.TIMETABLE_NOT_FOUND));
     }
 
     private void validateTimeTableAccess(TimeTable timeTable, String token) {
