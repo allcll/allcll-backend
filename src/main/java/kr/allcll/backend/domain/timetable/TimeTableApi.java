@@ -21,7 +21,7 @@ public class TimeTableApi {
 
     private final TimeTableService timeTableService;
 
-    @PostMapping("/api/timetable")
+    @PostMapping("/api/timetables")
     public ResponseEntity<Void> createTimeTable(@RequestBody TimeTableCreateRequest request) {
         timeTableService.createTimeTable(ThreadLocalHolder.SHARED_TOKEN.get(), request);
         return ResponseEntity.ok().build();
@@ -34,7 +34,7 @@ public class TimeTableApi {
     ) {
         TimeTableResponse response = timeTableService.updateTimeTable(
             timeTableId,
-            request.title(),
+            request.timeTableName(),
             ThreadLocalHolder.SHARED_TOKEN.get()
         );
         return ResponseEntity.ok(response);
