@@ -1,5 +1,9 @@
 package kr.allcll.backend.domain.timetable;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.util.List;
 import kr.allcll.backend.domain.timetable.dto.TimeTableCreateRequest;
 import kr.allcll.backend.domain.timetable.dto.TimeTablesResponse;
 import kr.allcll.backend.fixture.TimeTableFixture;
@@ -11,11 +15,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class TimeTableServiceTest {
@@ -63,7 +62,7 @@ class TimeTableServiceTest {
 
         // then
         TimeTable updated = timeTableRepository.findByIdAndToken(timeTable.getId(), TOKEN1)
-                .orElseThrow();
+            .orElseThrow();
         assertThat(updated.getTimeTableName()).isEqualTo("새로운 이름");
     }
 
@@ -76,11 +75,11 @@ class TimeTableServiceTest {
 
         // when & then
         assertThatThrownBy(() -> timeTableService.updateTimeTable(timeTable.getId(), "새로운 이름", TOKEN2))
-                .isInstanceOf(AllcllException.class)
-                .hasMessageContaining(AllcllErrorCode.UNAUTHORIZED_ACCESS.getMessage());
+            .isInstanceOf(AllcllException.class)
+            .hasMessageContaining(AllcllErrorCode.UNAUTHORIZED_ACCESS.getMessage());
 
         TimeTable updated = timeTableRepository.findByIdAndToken(timeTable.getId(), TOKEN1)
-                .orElseThrow();
+            .orElseThrow();
         assertThat(updated.getTimeTableName()).isEqualTo("기존 이름");
     }
 
@@ -108,8 +107,8 @@ class TimeTableServiceTest {
 
         // when & then
         assertThatThrownBy(() -> timeTableService.deleteTimeTable(timeTable.getId(), TOKEN2))
-                .isInstanceOf(AllcllException.class)
-                .hasMessageContaining(AllcllErrorCode.UNAUTHORIZED_ACCESS.getMessage());
+            .isInstanceOf(AllcllException.class)
+            .hasMessageContaining(AllcllErrorCode.UNAUTHORIZED_ACCESS.getMessage());
     }
 
     @Test

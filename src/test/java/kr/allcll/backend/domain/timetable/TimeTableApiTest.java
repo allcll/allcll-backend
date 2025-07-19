@@ -1,6 +1,16 @@
 package kr.allcll.backend.domain.timetable;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import jakarta.servlet.http.Cookie;
+import java.util.List;
 import kr.allcll.backend.domain.timetable.dto.TimeTableResponse;
 import kr.allcll.backend.domain.timetable.dto.TimeTablesResponse;
 import kr.allcll.backend.support.semester.Semester;
@@ -12,17 +22,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-
-import java.util.List;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TimeTableApi.class)
 class TimeTableApiTest {
@@ -40,34 +39,34 @@ class TimeTableApiTest {
     @DisplayName("시간표를 생성할 때 요청과 응답을 확인한다.")
     void createTimeTable() throws Exception {
         String json = """
-                {
-                    "timetableName": "시간표 1",
-                    "semester": "FALL_25"
-                }
-                """;
+            {
+                "timetableName": "시간표 1",
+                "semester": "FALL_25"
+            }
+            """;
 
-        mockMvc.perform(post("/api/timetable")
-                        .cookie(TOKEN_COOKIE)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isOk());
+        mockMvc.perform(post("/api/timetables")
+                .cookie(TOKEN_COOKIE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isOk());
     }
 
     @Test
     @DisplayName("유효하지 않은 학기 코드가 들어올 경우 400 에러가 발생한다")
     void createTimeTable_invalidSemester_returnsBadRequest() throws Exception {
         String invalidRequestJson = """
-        {
-          "timetableName": "시간표1",
-          "semester": "잘못된 학기코드"
-        }
-        """;
+            {
+              "timetableName": "시간표1",
+              "semester": "잘못된 학기코드"
+            }
+            """;
 
-        mockMvc.perform(post("/api/timetable")
-                        .cookie(new Cookie("token", "token1"))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(invalidRequestJson))
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/api/timetables")
+                .cookie(new Cookie("token", "token1"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(invalidRequestJson))
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -75,20 +74,20 @@ class TimeTableApiTest {
     void updateTimeTable() throws Exception {
         Long timetableId = 1L;
         String json = """
-                {
-                    "title": "새로운 시간표 제목"
-                }
-                """;
+            {
+                "title": "새로운 시간표 제목"
+            }
+            """;
 
         TimeTableResponse mockResponse = new TimeTableResponse(timetableId, "새로운 시간표 제목", Semester.FALL_25);
         when(timeTableService.updateTimeTable(timetableId, "새로운 시간표 제목", TOKEN))
-                .thenReturn(mockResponse);
+            .thenReturn(mockResponse);
 
         mockMvc.perform(patch("/api/timetables/{timetableId}", timetableId)
-                        .cookie(TOKEN_COOKIE)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isOk());
+                .cookie(TOKEN_COOKIE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isOk());
     }
 
     @Test
@@ -98,42 +97,42 @@ class TimeTableApiTest {
         doNothing().when(timeTableService).deleteTimeTable(timetableId, TOKEN);
 
         mockMvc.perform(delete("/api/timetables/{timetableId}", timetableId)
-                        .cookie(TOKEN_COOKIE))
-                .andExpect(status().isNoContent());
+                .cookie(TOKEN_COOKIE))
+            .andExpect(status().isNoContent());
     }
 
     @Test
     @DisplayName("시간표를 조회할 때 요청과 응답을 확인한다.")
     void getTimeTables() throws Exception {
         String expected = """
-                {
-                    "timeTables": [
-                        {
-                          "timeTableId": 1,
-                          "timeTableName": "시간표1",
-                          "semester": "FALL_25"
-                        },
-                        {
-                          "timeTableId": 2,
-                          "timeTableName": "시간표2",
-                          "semester": "FALL_25"
-                        }
-                    ]
-                }
-                """;
+            {
+                "timeTables": [
+                    {
+                      "timeTableId": 1,
+                      "timeTableName": "시간표1",
+                      "semester": "FALL_25"
+                    },
+                    {
+                      "timeTableId": 2,
+                      "timeTableName": "시간표2",
+                      "semester": "FALL_25"
+                    }
+                ]
+            }
+            """;
 
         List<TimeTableResponse> list = List.of(
-                new TimeTableResponse(1L, "시간표1", Semester.FALL_25),
-                new TimeTableResponse(2L, "시간표2", Semester.FALL_25)
+            new TimeTableResponse(1L, "시간표1", Semester.FALL_25),
+            new TimeTableResponse(2L, "시간표2", Semester.FALL_25)
         );
         when(timeTableService.getTimetables(TOKEN)).thenReturn(new TimeTablesResponse(list));
 
         MvcResult result = mockMvc.perform(get("/api/timetables")
-                        .cookie(TOKEN_COOKIE))
-                .andExpect(status().isOk())
-                .andReturn();
+                .cookie(TOKEN_COOKIE))
+            .andExpect(status().isOk())
+            .andReturn();
 
         assertThat(result.getResponse().getContentAsString())
-                .isEqualToIgnoringWhitespace(expected);
+            .isEqualToIgnoringWhitespace(expected);
     }
 }
