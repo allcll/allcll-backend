@@ -1,7 +1,8 @@
 package kr.allcll.backend.domain.timetable;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,11 +21,11 @@ public class TimeTable extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "token")
     private String token;
 
     private String timeTableName;
 
+    @Enumerated(EnumType.STRING)
     private Semester semester;
 
     public TimeTable(String token, String timeTableName, Semester semester) {

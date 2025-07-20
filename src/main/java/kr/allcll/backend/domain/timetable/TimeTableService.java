@@ -25,7 +25,6 @@ public class TimeTableService {
 
     @Transactional
     public TimeTableResponse updateTimeTable(Long timetableId, String updatedTitle, String token) {
-        validateToken(token);
         TimeTable timeTable = getTimeTableById(timetableId);
         validateTimeTableAccess(timeTable, token);
         timeTable.updateTimeTable(updatedTitle);
@@ -34,26 +33,18 @@ public class TimeTableService {
 
     @Transactional
     public void deleteTimeTable(Long timetableId, String token) {
-        validateToken(token);
         TimeTable timeTable = getTimeTableById(timetableId);
         validateTimeTableAccess(timeTable, token);
         timeTableRepository.delete(timeTable);
     }
 
     public TimeTablesResponse getTimetables(String token) {
-        validateToken(token);
         List<TimeTable> timeTables = timeTableRepository.findAllByToken(token);
         return new TimeTablesResponse(
             timeTables.stream()
                 .map(TimeTableResponse::from)
                 .toList()
         );
-    }
-
-    private void validateToken(String token) {
-        if (token == null || token.isBlank()) {
-            throw new AllcllException(AllcllErrorCode.TOKEN_INVALID);
-        }
     }
 
     private TimeTable getTimeTableById(Long timetableId) {
