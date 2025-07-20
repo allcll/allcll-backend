@@ -36,8 +36,8 @@ class TimeTableServiceTest {
     @DisplayName("시간표 정상 생성을 검증한다.")
     void createTimeTable() {
         // given
-        TimeTableCreateRequest request1 = new TimeTableCreateRequest("새 시간표1", Semester.FALL_25);
-        TimeTableCreateRequest request2 = new TimeTableCreateRequest("새 시간표2", Semester.FALL_25);
+        TimeTableCreateRequest request1 = new TimeTableCreateRequest("새 시간표1", "2025-2");
+        TimeTableCreateRequest request2 = new TimeTableCreateRequest("새 시간표2", "2025-2");
 
         // when
         timeTableService.createTimeTable(TOKEN1, request1);
@@ -48,6 +48,20 @@ class TimeTableServiceTest {
         assertThat(results).hasSize(1);
         assertThat(results.get(0).getTimeTableName()).isEqualTo("새 시간표1");
         assertThat(results.get(0).getSemester()).isEqualTo(Semester.FALL_25);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 학기 코드가 들어오면 AllcllException이 발생한다")
+    void createTimeTable_invalidSemester_throwsException() {
+        // given
+        String invalidSemester = "1999-2";
+        TimeTableCreateRequest request = new TimeTableCreateRequest("시간표1", invalidSemester);
+        String token = "token";
+
+        // when & then
+        assertThatThrownBy(() -> timeTableService.createTimeTable(token, request))
+            .isInstanceOf(AllcllException.class)
+            .hasMessage("유효하지 않은 학기입니다.");
     }
 
     @Test

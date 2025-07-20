@@ -13,17 +13,20 @@ import jakarta.servlet.http.Cookie;
 import java.util.List;
 import kr.allcll.backend.domain.timetable.dto.TimeTableResponse;
 import kr.allcll.backend.domain.timetable.dto.TimeTablesResponse;
-import kr.allcll.backend.support.semester.Semester;
+import kr.allcll.backend.support.exception.GlobalExceptionHandler;
+import kr.allcll.backend.support.web.ThreadLocalHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 @WebMvcTest(TimeTableApi.class)
+@Import(GlobalExceptionHandler.class)
 class TimeTableApiTest {
 
     @Autowired
@@ -41,7 +44,7 @@ class TimeTableApiTest {
         String json = """
             {
                 "timetableName": "시간표 1",
-                "semester": "FALL_25"
+                "semester": "2025-2"
             }
             """;
 
@@ -50,23 +53,6 @@ class TimeTableApiTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
             .andExpect(status().isOk());
-    }
-
-    @Test
-    @DisplayName("유효하지 않은 학기 코드가 들어올 경우 400 에러가 발생한다")
-    void createTimeTable_invalidSemester_returnsBadRequest() throws Exception {
-        String invalidRequestJson = """
-            {
-              "timetableName": "시간표1",
-              "semester": "잘못된 학기코드"
-            }
-            """;
-
-        mockMvc.perform(post("/api/timetables")
-                .cookie(new Cookie("token", "token1"))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(invalidRequestJson))
-            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -79,7 +65,7 @@ class TimeTableApiTest {
             }
             """;
 
-        TimeTableResponse mockResponse = new TimeTableResponse(timetableId, "새로운 시간표 제목", Semester.FALL_25);
+        TimeTableResponse mockResponse = new TimeTableResponse(timetableId, "새로운 시간표 제목", "2025-2");
         when(timeTableService.updateTimeTable(timetableId, "새로운 시간표 제목", TOKEN))
             .thenReturn(mockResponse);
 
@@ -104,26 +90,28 @@ class TimeTableApiTest {
     @Test
     @DisplayName("시간표를 조회할 때 요청과 응답을 확인한다.")
     void getTimeTables() throws Exception {
+        ThreadLocalHolder.SHARED_TOKEN.set(TOKEN);
+
         String expected = """
             {
                 "timeTables": [
                     {
                       "timeTableId": 1,
                       "timeTableName": "시간표1",
-                      "semester": "FALL_25"
+                      "semester": "2025-2"
                     },
                     {
                       "timeTableId": 2,
                       "timeTableName": "시간표2",
-                      "semester": "FALL_25"
+                      "semester": "2025-2"
                     }
                 ]
             }
             """;
 
         List<TimeTableResponse> list = List.of(
-            new TimeTableResponse(1L, "시간표1", Semester.FALL_25),
-            new TimeTableResponse(2L, "시간표2", Semester.FALL_25)
+            new TimeTableResponse(1L, "시간표1", "2025-2"),
+            new TimeTableResponse(2L, "시간표2", "2025-2")
         );
         when(timeTableService.getTimetables(TOKEN)).thenReturn(new TimeTablesResponse(list));
 
@@ -131,6 +119,8 @@ class TimeTableApiTest {
                 .cookie(TOKEN_COOKIE))
             .andExpect(status().isOk())
             .andReturn();
+
+        System.out.println("응답 내용: " + result.getResponse().getContentAsString());
 
         assertThat(result.getResponse().getContentAsString())
             .isEqualToIgnoringWhitespace(expected);
