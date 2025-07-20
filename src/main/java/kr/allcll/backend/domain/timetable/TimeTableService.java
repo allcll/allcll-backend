@@ -19,7 +19,7 @@ public class TimeTableService {
 
     @Transactional
     public void createTimeTable(String token, TimeTableCreateRequest request) {
-        TimeTable timeTable = new TimeTable(token, request.timeTableName(), request.semester());
+        TimeTable timeTable = new TimeTable(token, request.timeTableName(), request.toSemester());
         timeTableRepository.save(timeTable);
     }
 
