@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.List;
 import kr.allcll.backend.domain.timetable.dto.TimeTableCreateRequest;
 import kr.allcll.backend.domain.timetable.dto.TimeTablesResponse;
-import kr.allcll.backend.fixture.TimeTableFixture;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import kr.allcll.backend.support.semester.Semester;
@@ -68,7 +67,7 @@ class TimeTableServiceTest {
     @DisplayName("시간표 이름 정상 수정을 검증한다.")
     void updateTimeTable() {
         // given
-        TimeTable timeTable = TimeTableFixture.createTimeTable(TOKEN1, "기존 이름", Semester.FALL_25);
+        TimeTable timeTable = new TimeTable(TOKEN1, "기존 이름", Semester.FALL_25);
         timeTableRepository.saveAndFlush(timeTable);
 
         // when
@@ -84,7 +83,7 @@ class TimeTableServiceTest {
     @DisplayName("시간표 이름 수정 시 토큰이 일치하지 않는 경우에 대한 예외를 검증한다.")
     void cannotUpdateTimeTable() {
         // given
-        TimeTable timeTable = TimeTableFixture.createTimeTable(TOKEN1, "기존 이름", Semester.FALL_25);
+        TimeTable timeTable = new TimeTable(TOKEN1, "기존 이름", Semester.FALL_25);
         timeTableRepository.saveAndFlush(timeTable);
 
         // when & then
@@ -101,7 +100,7 @@ class TimeTableServiceTest {
     @DisplayName("시간표 정상 삭제를 검증한다")
     void deleteTimeTable() {
         // given
-        TimeTable timeTable = TimeTableFixture.createTimeTable(TOKEN1, "내 시간표", Semester.FALL_25);
+        TimeTable timeTable = new TimeTable(TOKEN1, "내 시간표", Semester.FALL_25);
         timeTableRepository.saveAndFlush(timeTable);
 
         // when
@@ -116,7 +115,7 @@ class TimeTableServiceTest {
     @DisplayName("토큰이 일치하지 않는 경우 삭제에 대한 예외를 검증한다.")
     void deleteTimeTableDifferentToken() {
         // given
-        TimeTable timeTable = TimeTableFixture.createTimeTable(TOKEN1, "내 시간표", Semester.FALL_25);
+        TimeTable timeTable = new TimeTable(TOKEN1, "내 시간표", Semester.FALL_25);
         timeTableRepository.saveAndFlush(timeTable);
 
         // when & then
@@ -129,9 +128,9 @@ class TimeTableServiceTest {
     @DisplayName("토큰이 일치하는 시간표들을 검색하는 기능을 테스트한다.")
     void getTimetables() {
         // given
-        TimeTable timeTable1 = TimeTableFixture.createTimeTable(TOKEN1, "내 시간표1", Semester.FALL_25);
-        TimeTable timeTable2 = TimeTableFixture.createTimeTable(TOKEN1, "내 시간표2", Semester.FALL_25);
-        TimeTable timeTable3 = TimeTableFixture.createTimeTable(TOKEN2, "다른 사람 시간표", Semester.FALL_25);
+        TimeTable timeTable1 = new TimeTable(TOKEN1, "내 시간표1", Semester.FALL_25);
+        TimeTable timeTable2 = new TimeTable(TOKEN1, "내 시간표2", Semester.FALL_25);
+        TimeTable timeTable3 = new TimeTable(TOKEN2, "다른 사람 시간표", Semester.FALL_25);
         timeTableRepository.saveAll(List.of(timeTable1, timeTable2, timeTable3));
 
         // when
