@@ -18,6 +18,12 @@ public interface TimeTableRepository extends JpaRepository<TimeTable, Long> {
 
     @Query("""
         SELECT t FROM TimeTable t 
+        WHERE t.id = :id
+        """)
+    Optional<TimeTable> findById(@Param("id") Long id);
+
+    @Query("""
+        SELECT t FROM TimeTable t 
         WHERE t.id = :id 
         AND t.token = :token
         """)
