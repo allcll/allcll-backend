@@ -40,7 +40,7 @@ public class CustomSchedule extends BaseEntity {
     @JoinColumn(name = "timetable_id")
     private TimeTable timeTable;
 
-    @Column(name = "subject_name")
+    @Column(name = "subject_name", nullable = false)
     private String subjectName;
 
     @Column(name = "professor_name")
