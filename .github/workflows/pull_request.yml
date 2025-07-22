@@ -17,7 +17,7 @@ jobs:
     env:
       DEV_URL: ${{ secrets.DEV_URL }}
       ADMIN_URL: ${{ secrets.ADMIN_URL }}
-      
+
     steps:
       - name: SSH 설정
         run: |
@@ -25,7 +25,7 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan github.com >> ~/.ssh/known_hosts
-    
+
       - name: 코드 체크아웃
         uses: actions/checkout@v4
         with:
