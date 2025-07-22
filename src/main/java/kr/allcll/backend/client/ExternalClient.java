@@ -1,13 +1,11 @@
 package kr.allcll.backend.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.allcll.backend.client.dto.PinSubjectsRequest;
+import kr.allcll.crawler.seat.PinSubjectUpdateRequest;
+import kr.allcll.crawler.seat.TargetSubjectService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClient;
 
 @Slf4j
 @Component
@@ -15,26 +13,9 @@ import org.springframework.web.client.RestClient;
 @EnableConfigurationProperties(ExternalProperties.class)
 public class ExternalClient {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private final TargetSubjectService targetSubjectService;
 
-    private final RestClient restClient;
-    private final ExternalProperties externalProperties;
-
-    public void sendPinSubjects(PinSubjectsRequest request) {
-        String payload = toJson(request);
-        restClient.put()
-            .uri(externalProperties.host() + externalProperties.pinPath())
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(payload)
-            .retrieve()
-            .toEntity(String.class);
-    }
-
-    private String toJson(Object object) {
-        try {
-            return objectMapper.writeValueAsString(object);
-        } catch (Exception e) {
-            throw new RuntimeException("JSON 변환 중 오류 발생", e);
-        }
+    public void sendPinSubjects(PinSubjectUpdateRequest request) {
+        targetSubjectService.loadPinSubjects(request);
     }
 }
