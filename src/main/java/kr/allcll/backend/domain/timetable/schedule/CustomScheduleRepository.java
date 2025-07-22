@@ -14,7 +14,6 @@ public interface CustomScheduleRepository extends JpaRepository<CustomSchedule, 
     @Query("""
         SELECT cs FROM CustomSchedule cs 
         WHERE cs.timeTable.id = :timetableId 
-        AND cs.isDeleted = false
         """)
     List<CustomSchedule> findAllByTimeTableId(@Param("timetableId") Long timetableId);
 
