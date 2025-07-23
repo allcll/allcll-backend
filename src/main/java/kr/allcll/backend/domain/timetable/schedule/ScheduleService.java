@@ -53,9 +53,7 @@ public class ScheduleService {
                 request.subjectName(),
                 request.professorName(),
                 request.location(),
-                request.dayOfWeeks(),
-                LocalTime.parse(request.startTime()),
-                LocalTime.parse(request.endTime())
+                request.timeSlots()
             );
             customScheduleRepository.save(schedule);
             return ScheduleResponse.fromCustom(schedule);
@@ -94,9 +92,7 @@ public class ScheduleService {
             request.subjectName(),
             request.professorName(),
             request.location(),
-            request.dayOfWeeks(),
-            request.startTime() != null ? LocalTime.parse(request.startTime()) : null,
-            request.endTime() != null ? LocalTime.parse(request.endTime()) : null
+            request.timeSlots()
         );
 
         return ScheduleResponse.fromCustom(schedule);
