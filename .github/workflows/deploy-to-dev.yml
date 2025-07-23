@@ -19,6 +19,15 @@ jobs:
         shell: bash
 
     steps:
+      - name: set SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/id_ed25519
+
       - name: Checkout application-dev.yml to config path
         uses: actions/checkout@v4
         with:
@@ -34,8 +43,11 @@ jobs:
           mkdir -p /home/ubuntu/app
           cp config/application-dev.yml /home/ubuntu/app/application-dev.yml
 
-      - name: CheckOut
+      - name: Checkout Main Repository with Submodules
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
