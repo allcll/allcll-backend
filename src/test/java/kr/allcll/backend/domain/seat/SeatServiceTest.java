@@ -11,6 +11,7 @@ import kr.allcll.backend.domain.seat.pin.PinRepository;
 import kr.allcll.backend.domain.subject.Subject;
 import kr.allcll.backend.domain.subject.SubjectRepository;
 import kr.allcll.backend.fixture.SubjectFixture;
+import kr.allcll.crawler.seat.ChangeStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -68,11 +69,11 @@ class SeatServiceTest {
         pinRepository.saveAll(List.of(pin1, pin2, pin3, pin4, pin5));
 
         LocalDateTime now = LocalDateTime.now();
-        SeatDto seat1 = new SeatDto(subject1, 1, now);
-        SeatDto seat2 = new SeatDto(subject2, 2, now);
-        SeatDto seat3 = new SeatDto(subject3, 3, now);
-        SeatDto seat4 = new SeatDto(subject4, 4, now);
-        SeatDto seat5 = new SeatDto(subject5, 5, now);
+        SeatDto seat1 = new SeatDto(subject1, 1, now, ChangeStatus.IN);
+        SeatDto seat2 = new SeatDto(subject2, 2, now, ChangeStatus.IN);
+        SeatDto seat3 = new SeatDto(subject3, 3, now, ChangeStatus.IN);
+        SeatDto seat4 = new SeatDto(subject4, 4, now, ChangeStatus.IN);
+        SeatDto seat5 = new SeatDto(subject5, 5, now, ChangeStatus.IN);
         seatStorage.addAll(List.of(seat1, seat2, seat3, seat4, seat5));
 
         // when
