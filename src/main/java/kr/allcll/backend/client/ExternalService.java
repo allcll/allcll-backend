@@ -75,4 +75,8 @@ public class ExternalService {
             .map(subjectId -> new PinSubject(subjectId, priority))
             .collect(Collectors.toCollection(ArrayList::new));
     }
+
+    public void getTargetSubjectsFromCrawler() {
+        externalClient.getAllTargetSubjects();
+    }
 }
