@@ -3,7 +3,8 @@ package kr.allcll.backend.domain.timetable.schedule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.time.LocalTime;
+import java.util.Collections;
+import java.util.List;
 import kr.allcll.backend.domain.subject.Subject;
 import kr.allcll.backend.domain.subject.SubjectRepository;
 import kr.allcll.backend.domain.timetable.TimeTable;
@@ -11,6 +12,7 @@ import kr.allcll.backend.domain.timetable.TimeTableRepository;
 import kr.allcll.backend.domain.timetable.schedule.dto.ScheduleCreateRequest;
 import kr.allcll.backend.domain.timetable.schedule.dto.ScheduleResponse;
 import kr.allcll.backend.domain.timetable.schedule.dto.ScheduleUpdateRequest;
+import kr.allcll.backend.domain.timetable.schedule.dto.TimeSlotDto;
 import kr.allcll.backend.domain.timetable.schedule.dto.TimeTableDetailResponse;
 import kr.allcll.backend.fixture.SubjectFixture;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
@@ -48,6 +50,7 @@ class ScheduleServiceTest {
 
     private TimeTable timeTable;
     private Subject subject;
+    private TimeSlotDto timeSlot;
 
     @BeforeEach
     void setUp() {
@@ -70,6 +73,13 @@ class ScheduleServiceTest {
                 "001",
                 "변재욱")
         );
+
+        timeSlot = new TimeSlotDto(
+            "월",
+            "09:00",
+            "10:30"
+        );
+
     }
 
     @Test
@@ -81,9 +91,7 @@ class ScheduleServiceTest {
             "커스텀 과목",
             "커스텀 교수",
             "커스텀 강의실 위치",
-            "커스텀 요일",
-            "09:00",
-            "10:30"
+            List.of(timeSlot)
         );
 
         ScheduleResponse response = scheduleService.addSchedule(timeTable.getId(), request, VALID_TOKEN);
@@ -93,9 +101,9 @@ class ScheduleServiceTest {
         assertThat(response.subjectName()).isEqualTo("커스텀 과목");
         assertThat(response.professorName()).isEqualTo("커스텀 교수");
         assertThat(response.location()).isEqualTo("커스텀 강의실 위치");
-        assertThat(response.dayOfWeeks()).isEqualTo("커스텀 요일");
-        assertThat(response.startTime()).isEqualTo("09:00");
-        assertThat(response.endTime()).isEqualTo("10:30");
+        assertThat(response.timeSlots()).hasSize(1)
+            .extracting(TimeSlotDto::dayOfWeeks)
+            .containsExactly("월");
 
         CustomSchedule saved = customScheduleRepository.findByIdAndTimeTableId(response.scheduleId(), timeTable.getId())
             .orElseThrow();
@@ -108,7 +116,8 @@ class ScheduleServiceTest {
         ScheduleCreateRequest request = new ScheduleCreateRequest(
             ScheduleType.OFFICIAL,
             subject.getId(),
-            null, null, null, null, null, null
+            null, null, null,
+            Collections.emptyList()
         );
 
         ScheduleResponse response = scheduleService.addSchedule(timeTable.getId(), request, VALID_TOKEN);
@@ -128,7 +137,8 @@ class ScheduleServiceTest {
         ScheduleCreateRequest request = new ScheduleCreateRequest(
             ScheduleType.OFFICIAL,
             subject.getId(),
-            null, null, null, null, null, null
+            null, null, null,
+            Collections.emptyList()
         );
 
         scheduleService.addSchedule(timeTable.getId(), request, VALID_TOKEN);
@@ -150,9 +160,7 @@ class ScheduleServiceTest {
             "커스텀 과목",
             "커스텀 교수님 성함",
             "커스텀 강의실 위치",
-            "커스텀 요일",
-            "09:00",
-            "10:30"
+            List.of(timeSlot)
         );
         assertThatThrownBy(() ->
             scheduleService.addSchedule(NOT_FOUND_ID, request, VALID_TOKEN)
@@ -169,9 +177,7 @@ class ScheduleServiceTest {
             "커스텀 과목",
             "커스텀 교수님 성함",
             "커스텀 강의실 위치",
-            "커스텀 요일",
-            "09:00",
-            "10:30"
+            List.of(timeSlot)
         );
         assertThatThrownBy(() ->
             scheduleService.addSchedule(timeTable.getId(), request, INVALID_TOKEN)
@@ -185,7 +191,8 @@ class ScheduleServiceTest {
         ScheduleCreateRequest request = new ScheduleCreateRequest(
             ScheduleType.OFFICIAL,
             NOT_FOUND_ID,
-            null, null, null, null, null, null
+            null, null, null,
+            Collections.emptyList()
         );
         assertThatThrownBy(() ->
             scheduleService.addSchedule(timeTable.getId(), request, VALID_TOKEN)
@@ -203,9 +210,7 @@ class ScheduleServiceTest {
                 "커스텀 과목",
                 "커스텀 교수님 성함",
                 "커스텀 강의실 위치",
-                "커스텀 요일",
-                LocalTime.of(9, 0),
-                LocalTime.of(10, 30)
+                List.of(timeSlot)
             ));
 
         TimeTableDetailResponse detailResponse = scheduleService.getTimeTableWithSchedules(
@@ -225,17 +230,13 @@ class ScheduleServiceTest {
                 "커스텀 과목",
                 "커스텀 교수님 성함",
                 "커스텀 강의실 위치",
-                "커스텀 요일",
-                LocalTime.of(9, 0),
-                LocalTime.of(10, 30)
+                List.of(timeSlot)
             ));
         ScheduleUpdateRequest request = new ScheduleUpdateRequest(
             "수정된 커스텀 과목",
             "수정된 교수님 성함",
             "수정된 강의실 위치",
-            "수정된 요일",
-            "10:30",
-            "12:00"
+            List.of(timeSlot)
         );
 
         ScheduleResponse response = scheduleService.updateSchedule(
@@ -247,9 +248,7 @@ class ScheduleServiceTest {
         assertThat(response.subjectName()).isEqualTo("수정된 커스텀 과목");
         assertThat(response.professorName()).isEqualTo("수정된 교수님 성함");
         assertThat(response.location()).isEqualTo("수정된 강의실 위치");
-        assertThat(response.dayOfWeeks()).isEqualTo("수정된 요일");
-        assertThat(response.startTime()).isEqualTo("10:30");
-        assertThat(response.endTime()).isEqualTo("12:00");
+        assertThat(response.timeSlots()).extracting(TimeSlotDto::dayOfWeeks).containsExactly("월");
 
         CustomSchedule updated = customScheduleRepository.findById(customSchedule.getId()).orElseThrow();
         assertThat(updated.getSubjectName()).isEqualTo("수정된 커스텀 과목");
@@ -258,20 +257,20 @@ class ScheduleServiceTest {
     @Test
     @DisplayName("커스텀 일정의 일부 정보가 정상적으로 수정되는지 확인한다.")
     void updatePartialCustomSchedule() {
+        TimeSlotDto willDeleteTimeSlot = new TimeSlotDto("목", "12:00", "13:30");
         CustomSchedule customSchedule = customScheduleRepository.save(
             new CustomSchedule(
                 timeTable,
                 "커스텀 과목",
                 "커스텀 교수님 성함",
                 "커스텀 강의실 위치",
-                "커스텀 요일",
-                LocalTime.of(9, 0),
-                LocalTime.of(10, 30)
+                List.of(timeSlot, willDeleteTimeSlot)
             ));
         ScheduleUpdateRequest request = new ScheduleUpdateRequest(
             "수정된 커스텀 과목",
             "수정된 교수님 성함",
-            null, null, null, null
+            null,
+            List.of(timeSlot)
         );
 
         ScheduleResponse response = scheduleService.updateSchedule(
@@ -283,9 +282,8 @@ class ScheduleServiceTest {
         assertThat(response.subjectName()).isEqualTo("수정된 커스텀 과목");
         assertThat(response.professorName()).isEqualTo("수정된 교수님 성함");
         assertThat(response.location()).isEqualTo("커스텀 강의실 위치");
-        assertThat(response.dayOfWeeks()).isEqualTo("커스텀 요일");
-        assertThat(response.startTime()).isEqualTo("09:00");
-        assertThat(response.endTime()).isEqualTo("10:30");
+        assertThat(response.timeSlots()).extracting(TimeSlotDto::dayOfWeeks).containsExactly("월");
+        assertThat(response.timeSlots()).extracting(TimeSlotDto::dayOfWeeks).doesNotContain("목");
 
         CustomSchedule updated = customScheduleRepository.findById(customSchedule.getId()).orElseThrow();
         assertThat(updated.getSubjectName()).isEqualTo("수정된 커스텀 과목");
@@ -300,9 +298,7 @@ class ScheduleServiceTest {
                 "커스텀 과목",
                 "커스텀 교수님 성함",
                 "커스텀 강의실 위치",
-                "커스텀 요일",
-                LocalTime.of(9, 0),
-                LocalTime.of(10, 30)
+                List.of(timeSlot)
             ));
         scheduleService.deleteSchedule(timeTable.getId(), customSchedule.getId(), VALID_TOKEN);
         assertThat(customScheduleRepository.existsById(customSchedule.getId())).isFalse();
