@@ -1,6 +1,7 @@
 package kr.allcll.backend.domain.timetable.schedule;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -10,8 +11,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
-import java.time.LocalTime;
+import java.util.List;
 import kr.allcll.backend.domain.timetable.TimeTable;
+import kr.allcll.backend.domain.timetable.schedule.dto.TimeSlotDto;
 import kr.allcll.backend.support.entity.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -49,58 +51,33 @@ public class CustomSchedule extends BaseEntity {
     @Column(name = "location")
     private String location;
 
-    @Column(name = "day_of_weeks")
-    private String dayOfWeeks;
-
-    @Column(name = "start_time")
-    private LocalTime startTime;
-
-    @Column(name = "end_time")
-    private LocalTime endTime;
+    @Column(name = "time_slots", columnDefinition = "json")
+    @Convert(converter = TimeSlotListConverter.class)
+    private List<TimeSlotDto> timeSlots;
 
     public CustomSchedule(
         TimeTable timeTable,
         String subjectName,
         String professorName,
         String location,
-        String dayOfWeeks,
-        LocalTime startTime,
-        LocalTime endTime
+        List<TimeSlotDto> timeSlots
     ) {
         this.timeTable = timeTable;
         this.subjectName = subjectName;
         this.professorName = professorName;
         this.location = location;
-        this.dayOfWeeks = dayOfWeeks;
-        this.startTime = startTime;
-        this.endTime = endTime;
+        this.timeSlots = timeSlots;
     }
 
     public void updateSchedule(
         String subjectName,
         String professorName,
         String location,
-        String dayOfWeeks,
-        LocalTime startTime,
-        LocalTime endTime
+        List<TimeSlotDto> timeSlots
     ) {
-        if (subjectName != null) {
-            this.subjectName = subjectName;
-        }
-        if (professorName != null) {
-            this.professorName = professorName;
-        }
-        if (location != null) {
-            this.location = location;
-        }
-        if (dayOfWeeks != null) {
-            this.dayOfWeeks = dayOfWeeks;
-        }
-        if (startTime != null) {
-            this.startTime = startTime;
-        }
-        if (endTime != null) {
-            this.endTime = endTime;
-        }
+        if (subjectName != null) this.subjectName = subjectName;
+        if (professorName != null) this.professorName = professorName;
+        if (location != null) this.location = location;
+        if (timeSlots != null) this.timeSlots = timeSlots;
     }
 }
