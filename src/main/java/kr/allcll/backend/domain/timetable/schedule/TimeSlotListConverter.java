@@ -8,6 +8,8 @@ import jakarta.persistence.Converter;
 import java.util.Collections;
 import java.util.List;
 import kr.allcll.backend.domain.timetable.schedule.dto.TimeSlotDto;
+import kr.allcll.backend.support.exception.AllcllErrorCode;
+import kr.allcll.backend.support.exception.AllcllException;
 
 @Converter
 public class TimeSlotListConverter implements AttributeConverter<List<TimeSlotDto>, String> {
@@ -18,7 +20,7 @@ public class TimeSlotListConverter implements AttributeConverter<List<TimeSlotDt
         try {
             return mapper.writeValueAsString(attribute);
         } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("Could not convert TimeSlot list to JSON", e);
+            throw new AllcllException(AllcllErrorCode.JSON_CONVERT_ERROR);
         }
     }
 
