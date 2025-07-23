@@ -1,12 +1,12 @@
 package kr.allcll.backend.domain.timetable.schedule.dto;
 
+import java.util.List;
+
 public record ScheduleUpdateRequest(
     String subjectName,
     String professorName,
     String location,
-    String dayOfWeeks,
-    String startTime,
-    String endTime
+    List<TimeSlotDto> timeSlots
 ) {
 
 }

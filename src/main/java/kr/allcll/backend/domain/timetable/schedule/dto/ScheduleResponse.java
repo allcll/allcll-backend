@@ -1,5 +1,7 @@
 package kr.allcll.backend.domain.timetable.schedule.dto;
 
+import java.util.Collections;
+import java.util.List;
 import kr.allcll.backend.domain.subject.Subject;
 import kr.allcll.backend.domain.timetable.schedule.CustomSchedule;
 import kr.allcll.backend.domain.timetable.schedule.OfficialSchedule;
@@ -12,9 +14,7 @@ public record ScheduleResponse(
     String subjectName,
     String professorName,
     String location,
-    String dayOfWeeks,
-    String startTime,
-    String endTime
+    List<TimeSlotDto> timeSlots
 ) {
 
     public static ScheduleResponse fromOfficial(OfficialSchedule schedule, Subject subject) {
@@ -25,9 +25,7 @@ public record ScheduleResponse(
             null,
             null,
             null,
-            null,
-            null,
-            null
+            Collections.emptyList()
         );
     }
 
@@ -39,9 +37,7 @@ public record ScheduleResponse(
             schedule.getSubjectName(),
             schedule.getProfessorName(),
             schedule.getLocation(),
-            schedule.getDayOfWeeks(),
-            schedule.getStartTime().toString(),
-            schedule.getEndTime().toString()
+            schedule.getTimeSlots()
         );
     }
 }
