@@ -14,17 +14,15 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/timetables")
 @RequiredArgsConstructor
 public class ScheduleApi {
 
     private final ScheduleService scheduleService;
 
-    @PostMapping("/{timeTableId}/schedules")
+    @PostMapping("/api/timetables/{timeTableId}/schedules")
     public ResponseEntity<ScheduleResponse> addSchedule(
         @PathVariable(name = "timeTableId") Long timeTableId,
         @RequestBody ScheduleCreateRequest scheduleRequest
@@ -38,7 +36,7 @@ public class ScheduleApi {
             );
     }
 
-    @GetMapping("/{timeTableId}/schedules")
+    @GetMapping("/api/timetables/{timeTableId}/schedules")
     public ResponseEntity<TimeTableDetailResponse> getTimeTableWithSchedules(
         @PathVariable(name = "timeTableId") Long timeTableId
     ) {
@@ -47,7 +45,7 @@ public class ScheduleApi {
         );
     }
 
-    @PatchMapping("/{timeTableId}/schedules/{scheduleId}")
+    @PatchMapping("/api/timetables/{timeTableId}/schedules/{scheduleId}")
     public ResponseEntity<ScheduleResponse> updateSchedule(
         @PathVariable(name = "timeTableId") Long timeTableId,
         @PathVariable(name = "scheduleId") Long scheduleId,
@@ -62,7 +60,7 @@ public class ScheduleApi {
         return ResponseEntity.ok(updated);
     }
 
-    @DeleteMapping("{timeTableId}/schedules/{scheduleId}")
+    @DeleteMapping("/api/timetables/{timeTableId}/schedules/{scheduleId}")
     public ResponseEntity<Void> deleteSchedule(
         @PathVariable(name = "timeTableId") Long timeTableId,
         @PathVariable(name = "scheduleId") Long scheduleId
