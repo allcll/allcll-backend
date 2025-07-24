@@ -85,7 +85,7 @@ public class ScheduleService {
 
         CustomSchedule schedule = customScheduleRepository
             .findByIdAndTimeTableId(scheduleId, timeTable.getId())
-            .orElseThrow(() -> new AllcllException(AllcllErrorCode.SCHEDULE_NOT_FOUND));
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.CUSTOM_SCHEDULE_NOT_FOUND));
 
         schedule.updateSchedule(
             request.subjectName(),
@@ -115,7 +115,7 @@ public class ScheduleService {
             return;
         }
 
-        throw new AllcllException(AllcllErrorCode.SCHEDULE_NOT_FOUND);
+        throw new AllcllException(AllcllErrorCode.CUSTOM_SCHEDULE_NOT_FOUND);
     }
 
     private TimeTable getAuthorizedTimeTable(Long timeTableId, String token) {
