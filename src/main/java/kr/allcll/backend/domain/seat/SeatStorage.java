@@ -25,14 +25,13 @@ public class SeatStorage {
         this.seats = new ConcurrentHashMap<>();
     }
 
-    public List<SeatDto> getGeneralSeats(int limit) {
+    public List<SeatDto> getGeneralSeats() {
         Collection<SeatDto> seatsValue = seats.values();
         return seatsValue.stream()
             .filter(seat -> seat.getSubject().isNonMajor())
             .filter(seat ->
                 Duration.between(seat.getQueryTime(), LocalDateTime.now()).getSeconds() <= LIMIT_QUERY_TIME)
             .sorted(Comparator.comparingInt(SeatDto::getSeatCount))
-            .limit(limit)
             .toList();
     }
 
