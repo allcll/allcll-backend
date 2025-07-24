@@ -75,9 +75,9 @@ public class CustomSchedule extends BaseEntity {
         String location,
         List<TimeSlotDto> timeSlots
     ) {
-        if (subjectName != null) this.subjectName = subjectName;
-        if (professorName != null) this.professorName = professorName;
-        if (location != null) this.location = location;
-        if (timeSlots != null) this.timeSlots = timeSlots;
+        this.subjectName = subjectName;
+        this.professorName = professorName;
+        this.location = location;
+        this.timeSlots = timeSlots;
     }
 }
