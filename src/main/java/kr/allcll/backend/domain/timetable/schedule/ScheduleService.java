@@ -1,6 +1,5 @@
 package kr.allcll.backend.domain.timetable.schedule;
 
-import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -65,7 +64,7 @@ public class ScheduleService {
 
         List<ScheduleResponse> schedules = Stream.concat(
                 officialScheduleRepository.findAllByTimeTableId(timeTableId).stream()
-                    .map(s -> ScheduleResponse.fromOfficial(s, s.getSubject())),
+                    .map(schedule -> ScheduleResponse.fromOfficial(schedule, schedule.getSubject())),
                 customScheduleRepository.findAllByTimeTableId(timeTableId).stream()
                     .map(ScheduleResponse::fromCustom)
             )
