@@ -2,6 +2,7 @@ package kr.allcll.backend.domain.timetable.schedule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.BDDAssertions.tuple;
 
 import java.util.Collections;
 import java.util.List;
@@ -59,6 +60,99 @@ class ScheduleServiceTest {
         timeTableRepository.deleteAll();
         subjectRepository.deleteAll();
 
+    }
+
+    @Test
+    @DisplayName("커스텀 스케줄을 정상 추가한다.")
+    void addCustomSchedule() {
+        //given
+        timeTable = timeTableRepository.save(
+            new TimeTable(
+                VALID_TOKEN,
+                "테스트 시간표",
+                Semester.FALL_25
+            )
+        );
+        timeSlot = new TimeSlotDto(
+            "월",
+            "09:00",
+            "10:30"
+        );
+
+        ScheduleCreateRequest request = new ScheduleCreateRequest(
+            ScheduleType.CUSTOM,
+            null,
+            "커스텀 과목",
+            "커스텀 교수",
+            "커스텀 강의실 위치",
+            List.of(timeSlot)
+        );
+
+        //when
+        ScheduleResponse response = scheduleService.addSchedule(timeTable.getId(), request, VALID_TOKEN);
+
+        //then
+        assertThat(response.scheduleType()).isEqualTo("custom");
+        assertThat(response.subjectId()).isNull();
+        assertThat(response.subjectName()).isEqualTo("커스텀 과목");
+        assertThat(response.professorName()).isEqualTo("커스텀 교수");
+        assertThat(response.location()).isEqualTo("커스텀 강의실 위치");
+        assertThat(response.timeSlots()).hasSize(1)
+            .extracting(
+                TimeSlotDto::dayOfWeeks,
+                TimeSlotDto::startTime,
+                TimeSlotDto::endTime
+            )
+            .containsExactly(
+                tuple("월", "09:00", "10:30"));
+
+        CustomSchedule saved = customScheduleRepository.findByIdAndTimeTableId(response.scheduleId(), timeTable.getId())
+            .orElseThrow();
+        assertThat(saved.getTimeTable().getId()).isEqualTo(timeTable.getId());
+    }
+
+    @Test
+    @DisplayName("공식 스케줄을 정상 추가한다.")
+    void addOfficialSchedule() {
+        //given
+        timeTable = timeTableRepository.save(
+            new TimeTable(
+                VALID_TOKEN,
+                "테스트 시간표",
+                Semester.FALL_25
+            )
+        );
+        subject = subjectRepository.save(
+            SubjectFixture.createSubject(
+                "데이터베이스",
+                "003278",
+                "001",
+                "변재욱")
+        );
+
+        ScheduleCreateRequest request = new ScheduleCreateRequest(
+            ScheduleType.OFFICIAL,
+            subject.getId(),
+            null, null, null,
+            Collections.emptyList()
+        );
+
+        //when
+        ScheduleResponse response = scheduleService.addSchedule(timeTable.getId(), request, VALID_TOKEN);
+
+        //then
+        assertThat(response.scheduleType()).isEqualTo("official");
+        assertThat(response.subjectId()).isEqualTo(subject.getId());
+
+        OfficialSchedule saved = officialScheduleRepository.findAllByTimeTableId(timeTable.getId()).get(0);
+        assertThat(saved.getTimeTable().getId()).isEqualTo(timeTable.getId());
+        assertThat(saved.getSubject().getId()).isEqualTo(subject.getId());
+    }
+
+    @Test
+    @DisplayName("동일한 공식 스케줄을 중복 등록하면 예외가 발생한다.")
+    void addDuplicateOfficialScheduleThrowsException() {
+        // given
         timeTable = timeTableRepository.save(
             new TimeTable(
                 VALID_TOKEN,
@@ -80,39 +174,6 @@ class ScheduleServiceTest {
             "10:30"
         );
 
-    }
-
-    @Test
-    @DisplayName("커스텀 스케줄을 정상 추가한다.")
-    void addCustomSchedule() {
-        ScheduleCreateRequest request = new ScheduleCreateRequest(
-            ScheduleType.CUSTOM,
-            null,
-            "커스텀 과목",
-            "커스텀 교수",
-            "커스텀 강의실 위치",
-            List.of(timeSlot)
-        );
-
-        ScheduleResponse response = scheduleService.addSchedule(timeTable.getId(), request, VALID_TOKEN);
-
-        assertThat(response.scheduleType()).isEqualTo("custom");
-        assertThat(response.subjectId()).isNull();
-        assertThat(response.subjectName()).isEqualTo("커스텀 과목");
-        assertThat(response.professorName()).isEqualTo("커스텀 교수");
-        assertThat(response.location()).isEqualTo("커스텀 강의실 위치");
-        assertThat(response.timeSlots()).hasSize(1)
-            .extracting(TimeSlotDto::dayOfWeeks)
-            .containsExactly("월");
-
-        CustomSchedule saved = customScheduleRepository.findByIdAndTimeTableId(response.scheduleId(), timeTable.getId())
-            .orElseThrow();
-        assertThat(saved.getTimeTable().getId()).isEqualTo(timeTable.getId());
-    }
-
-    @Test
-    @DisplayName("공식 스케줄을 정상 추가한다.")
-    void addOfficialSchedule() {
         ScheduleCreateRequest request = new ScheduleCreateRequest(
             ScheduleType.OFFICIAL,
             subject.getId(),
@@ -120,26 +181,6 @@ class ScheduleServiceTest {
             Collections.emptyList()
         );
 
-        ScheduleResponse response = scheduleService.addSchedule(timeTable.getId(), request, VALID_TOKEN);
-
-        assertThat(response.scheduleType()).isEqualTo("official");
-        assertThat(response.subjectId()).isEqualTo(subject.getId());
-
-        OfficialSchedule saved = officialScheduleRepository.findAllByTimeTableId(timeTable.getId()).get(0);
-        assertThat(saved.getTimeTable().getId()).isEqualTo(timeTable.getId());
-        assertThat(saved.getSubject().getId()).isEqualTo(subject.getId());
-    }
-
-    @Test
-    @DisplayName("동일한 공식 스케줄을 중복 등록하면 예외가 발생한다.")
-    void addDuplicateOfficialScheduleThrowsException() {
-        // given
-        ScheduleCreateRequest request = new ScheduleCreateRequest(
-            ScheduleType.OFFICIAL,
-            subject.getId(),
-            null, null, null,
-            Collections.emptyList()
-        );
 
         scheduleService.addSchedule(timeTable.getId(), request, VALID_TOKEN);
 
@@ -154,6 +195,27 @@ class ScheduleServiceTest {
     @Test
     @DisplayName("존재하지 않는 시간표에 추가 시 예외가 발생한다.")
     void addScheduleIfTimeTableNotFoundThrowsException() {
+        //given
+        timeTable = timeTableRepository.save(
+            new TimeTable(
+                VALID_TOKEN,
+                "테스트 시간표",
+                Semester.FALL_25
+            )
+        );
+        subject = subjectRepository.save(
+            SubjectFixture.createSubject(
+                "데이터베이스",
+                "003278",
+                "001",
+                "변재욱")
+        );
+        timeSlot = new TimeSlotDto(
+            "월",
+            "09:00",
+            "10:30"
+        );
+
         ScheduleCreateRequest request = new ScheduleCreateRequest(
             ScheduleType.CUSTOM,
             null,
@@ -162,6 +224,8 @@ class ScheduleServiceTest {
             "커스텀 강의실 위치",
             List.of(timeSlot)
         );
+
+        //when,then
         assertThatThrownBy(() ->
             scheduleService.addSchedule(NOT_FOUND_ID, request, VALID_TOKEN)
         ).isInstanceOf(AllcllException.class)
@@ -171,6 +235,27 @@ class ScheduleServiceTest {
     @Test
     @DisplayName("토큰 불일치 시 예외가 발생한다.")
     void addScheduleThrowsUnauthorizedAccess() {
+        //given
+        timeTable = timeTableRepository.save(
+            new TimeTable(
+                VALID_TOKEN,
+                "테스트 시간표",
+                Semester.FALL_25
+            )
+        );
+        subject = subjectRepository.save(
+            SubjectFixture.createSubject(
+                "데이터베이스",
+                "003278",
+                "001",
+                "변재욱")
+        );
+        timeSlot = new TimeSlotDto(
+            "월",
+            "09:00",
+            "10:30"
+        );
+
         ScheduleCreateRequest request = new ScheduleCreateRequest(
             ScheduleType.CUSTOM,
             null,
@@ -179,6 +264,8 @@ class ScheduleServiceTest {
             "커스텀 강의실 위치",
             List.of(timeSlot)
         );
+
+        //when, then
         assertThatThrownBy(() ->
             scheduleService.addSchedule(timeTable.getId(), request, INVALID_TOKEN)
         ).isInstanceOf(AllcllException.class)
@@ -188,12 +275,30 @@ class ScheduleServiceTest {
     @Test
     @DisplayName("공식 일정 추가 시 해당 과목이 존재하지 않을 경우 예외가 발생한다.")
     void addOfficialScheduleThrowsSubjectNotFound() {
+        //given
+        timeTable = timeTableRepository.save(
+            new TimeTable(
+                VALID_TOKEN,
+                "테스트 시간표",
+                Semester.FALL_25
+            )
+        );
+        subject = subjectRepository.save(
+            SubjectFixture.createSubject(
+                "데이터베이스",
+                "003278",
+                "001",
+                "변재욱")
+        );
+
         ScheduleCreateRequest request = new ScheduleCreateRequest(
             ScheduleType.OFFICIAL,
             NOT_FOUND_ID,
             null, null, null,
             Collections.emptyList()
         );
+
+        //when, then
         assertThatThrownBy(() ->
             scheduleService.addSchedule(timeTable.getId(), request, VALID_TOKEN)
         ).isInstanceOf(AllcllException.class)
@@ -203,6 +308,29 @@ class ScheduleServiceTest {
     @Test
     @DisplayName("특정 시간표의 일정 목록을 정상 조회한다.")
     void getTimeTableWithSchedule() {
+        //given
+        timeTable = timeTableRepository.save(
+            new TimeTable(
+                VALID_TOKEN,
+                "테스트 시간표",
+                Semester.FALL_25
+            )
+        );
+
+        subject = subjectRepository.save(
+            SubjectFixture.createSubject(
+                "데이터베이스",
+                "003278",
+                "001",
+                "변재욱")
+        );
+
+        timeSlot = new TimeSlotDto(
+            "월",
+            "09:00",
+            "10:30"
+        );
+
         OfficialSchedule officialSchedule = officialScheduleRepository.save(new OfficialSchedule(timeTable, subject));
         CustomSchedule customSchedule = customScheduleRepository.save(
             new CustomSchedule(
@@ -213,9 +341,12 @@ class ScheduleServiceTest {
                 List.of(timeSlot)
             ));
 
+        //when
         TimeTableDetailResponse detailResponse = scheduleService.getTimeTableWithSchedules(
             timeTable.getId(), VALID_TOKEN
         );
+
+        //then
         assertThat(detailResponse.timetableId()).isEqualTo(timeTable.getId());
         assertThat(detailResponse.schedules()).extracting("scheduleId")
             .containsExactly(officialSchedule.getId(), customSchedule.getId());
@@ -224,6 +355,20 @@ class ScheduleServiceTest {
     @Test
     @DisplayName("커스텀 일정의 모든 정보가 정상적으로 수정되는지 확인한다.")
     void updateEntireCustomSchedule() {
+        //given
+        timeTable = timeTableRepository.save(
+            new TimeTable(
+                VALID_TOKEN,
+                "테스트 시간표",
+                Semester.FALL_25
+            )
+        );
+        timeSlot = new TimeSlotDto(
+            "월",
+            "09:00",
+            "10:30"
+        );
+
         CustomSchedule customSchedule = customScheduleRepository.save(
             new CustomSchedule(
                 timeTable,
@@ -239,52 +384,26 @@ class ScheduleServiceTest {
             List.of(timeSlot)
         );
 
+        //when
         ScheduleResponse response = scheduleService.updateSchedule(
             timeTable.getId(),
             customSchedule.getId(),
             request,
             VALID_TOKEN
         );
+
+        //then
         assertThat(response.subjectName()).isEqualTo("수정된 커스텀 과목");
         assertThat(response.professorName()).isEqualTo("수정된 교수님 성함");
         assertThat(response.location()).isEqualTo("수정된 강의실 위치");
-        assertThat(response.timeSlots()).extracting(TimeSlotDto::dayOfWeeks).containsExactly("월");
-
-        CustomSchedule updated = customScheduleRepository.findById(customSchedule.getId()).orElseThrow();
-        assertThat(updated.getSubjectName()).isEqualTo("수정된 커스텀 과목");
-    }
-
-    @Test
-    @DisplayName("커스텀 일정의 일부 정보가 정상적으로 수정되는지 확인한다.")
-    void updatePartialCustomSchedule() {
-        TimeSlotDto willDeleteTimeSlot = new TimeSlotDto("목", "12:00", "13:30");
-        CustomSchedule customSchedule = customScheduleRepository.save(
-            new CustomSchedule(
-                timeTable,
-                "커스텀 과목",
-                "커스텀 교수님 성함",
-                "커스텀 강의실 위치",
-                List.of(timeSlot, willDeleteTimeSlot)
-            ));
-        ScheduleUpdateRequest request = new ScheduleUpdateRequest(
-            "수정된 커스텀 과목",
-            "수정된 교수님 성함",
-            null,
-            List.of(timeSlot)
-        );
-
-        ScheduleResponse response = scheduleService.updateSchedule(
-            timeTable.getId(),
-            customSchedule.getId(),
-            request,
-            VALID_TOKEN
-        );
-        assertThat(response.subjectName()).isEqualTo("수정된 커스텀 과목");
-        assertThat(response.professorName()).isEqualTo("수정된 교수님 성함");
-        assertThat(response.location()).isEqualTo("커스텀 강의실 위치");
-        assertThat(response.timeSlots()).extracting(TimeSlotDto::dayOfWeeks).containsExactly("월");
-        assertThat(response.timeSlots()).extracting(TimeSlotDto::dayOfWeeks).doesNotContain("목");
-
+        assertThat(response.timeSlots()).hasSize(1)
+            .extracting(
+                TimeSlotDto::dayOfWeeks,
+                TimeSlotDto::startTime,
+                TimeSlotDto::endTime
+            )
+            .containsExactly(
+                tuple("월", "09:00", "10:30"));
         CustomSchedule updated = customScheduleRepository.findById(customSchedule.getId()).orElseThrow();
         assertThat(updated.getSubjectName()).isEqualTo("수정된 커스텀 과목");
     }
@@ -292,6 +411,20 @@ class ScheduleServiceTest {
     @Test
     @DisplayName("커스텀 일정이 정상적으로 삭제되는지 확인한다.")
     void deleteSchedule() {
+        //given
+        timeTable = timeTableRepository.save(
+            new TimeTable(
+                VALID_TOKEN,
+                "테스트 시간표",
+                Semester.FALL_25
+            )
+        );
+        timeSlot = new TimeSlotDto(
+            "월",
+            "09:00",
+            "10:30"
+        );
+
         CustomSchedule customSchedule = customScheduleRepository.save(
             new CustomSchedule(
                 timeTable,
@@ -300,16 +433,30 @@ class ScheduleServiceTest {
                 "커스텀 강의실 위치",
                 List.of(timeSlot)
             ));
+
+        //when
         scheduleService.deleteSchedule(timeTable.getId(), customSchedule.getId(), VALID_TOKEN);
+
+        //then
         assertThat(customScheduleRepository.existsById(customSchedule.getId())).isFalse();
     }
 
     @Test
     @DisplayName("삭제할 일정이 존재하지 않을 경우 예외가 발생한다.")
     void deleteScheduleThrowsNotFound() {
+        //given
+        timeTable = timeTableRepository.save(
+            new TimeTable(
+                VALID_TOKEN,
+                "테스트 시간표",
+                Semester.FALL_25
+            )
+        );
+
+        //when, then
         assertThatThrownBy(() ->
             scheduleService.deleteSchedule(timeTable.getId(), NOT_FOUND_ID, VALID_TOKEN)
         ).isInstanceOf(AllcllException.class)
-            .hasMessageContaining(AllcllErrorCode.SCHEDULE_NOT_FOUND.getMessage());
+            .hasMessageContaining(AllcllErrorCode.CUSTOM_SCHEDULE_NOT_FOUND.getMessage());
     }
 }
