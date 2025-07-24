@@ -121,7 +121,7 @@ public class ScheduleService {
     private TimeTable getAuthorizedTimeTable(Long timeTableId, String token) {
         TimeTable timeTable = timeTableRepository.findById(timeTableId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.TIMETABLE_NOT_FOUND));
-        if (!timeTable.getToken().equals(token)) {
+        if (!token.equals(timeTable.getToken())) {
             throw new AllcllException(AllcllErrorCode.UNAUTHORIZED_ACCESS);
         }
         return timeTable;
