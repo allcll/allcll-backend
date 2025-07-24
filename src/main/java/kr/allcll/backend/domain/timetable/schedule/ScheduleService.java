@@ -9,6 +9,7 @@ import kr.allcll.backend.domain.subject.SubjectRepository;
 import kr.allcll.backend.domain.timetable.TimeTable;
 import kr.allcll.backend.domain.timetable.TimeTableRepository;
 import kr.allcll.backend.domain.timetable.schedule.dto.ScheduleCreateRequest;
+import kr.allcll.backend.domain.timetable.schedule.dto.ScheduleDeleteRequest;
 import kr.allcll.backend.domain.timetable.schedule.dto.ScheduleResponse;
 import kr.allcll.backend.domain.timetable.schedule.dto.ScheduleUpdateRequest;
 import kr.allcll.backend.domain.timetable.schedule.dto.TimeTableDetailResponse;
@@ -101,21 +102,17 @@ public class ScheduleService {
     public void deleteSchedule(
         Long timeTableId,
         Long scheduleId,
+        ScheduleDeleteRequest request,
         String token
     ) {
         TimeTable timeTable = getAuthorizedTimeTable(timeTableId, token);
 
-        int deletedCustom = customScheduleRepository.deleteByIdAndTimeTableId(scheduleId, timeTable.getId());
-        if (deletedCustom > 0) {
-            return;
+        if (request.scheduleType() == ScheduleType.OFFICIAL) {
+            officialScheduleRepository.deleteByIdAndTimeTableId(scheduleId, timeTable.getId());
         }
-
-        int deletedOfficial = officialScheduleRepository.deleteByIdAndTimeTableId(scheduleId, timeTable.getId());
-        if (deletedOfficial > 0) {
-            return;
+        else {
+            customScheduleRepository.deleteByIdAndTimeTableId(scheduleId, timeTable.getId());
         }
-
-        throw new AllcllException(AllcllErrorCode.CUSTOM_SCHEDULE_NOT_FOUND);
     }
 
     private TimeTable getAuthorizedTimeTable(Long timeTableId, String token) {

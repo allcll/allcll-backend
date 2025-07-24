@@ -1,6 +1,7 @@
 package kr.allcll.backend.domain.timetable.schedule;
 
 import kr.allcll.backend.domain.timetable.schedule.dto.ScheduleCreateRequest;
+import kr.allcll.backend.domain.timetable.schedule.dto.ScheduleDeleteRequest;
 import kr.allcll.backend.domain.timetable.schedule.dto.ScheduleResponse;
 import kr.allcll.backend.domain.timetable.schedule.dto.ScheduleUpdateRequest;
 import kr.allcll.backend.domain.timetable.schedule.dto.TimeTableDetailResponse;
@@ -25,11 +26,11 @@ public class ScheduleApi {
     @PostMapping("/api/timetables/{timeTableId}/schedules")
     public ResponseEntity<ScheduleResponse> addSchedule(
         @PathVariable(name = "timeTableId") Long timeTableId,
-        @RequestBody ScheduleCreateRequest scheduleRequest
+        @RequestBody ScheduleCreateRequest createRequest
     ) {
         ScheduleResponse response = scheduleService.addSchedule(
             timeTableId,
-            scheduleRequest,
+            createRequest,
             ThreadLocalHolder.SHARED_TOKEN.get());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -61,11 +62,13 @@ public class ScheduleApi {
     @DeleteMapping("/api/timetables/{timeTableId}/schedules/{scheduleId}")
     public ResponseEntity<Void> deleteSchedule(
         @PathVariable(name = "timeTableId") Long timeTableId,
-        @PathVariable(name = "scheduleId") Long scheduleId
+        @PathVariable(name = "scheduleId") Long scheduleId,
+        @RequestBody ScheduleDeleteRequest deleteRequest
     ) {
         scheduleService.deleteSchedule(
             timeTableId,
             scheduleId,
+            deleteRequest,
             ThreadLocalHolder.SHARED_TOKEN.get()
         );
         return ResponseEntity.noContent().build();
