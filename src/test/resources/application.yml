@@ -34,8 +34,8 @@ external:
   pin-path: /api/pin
 
 cors:
-  dev: ${DEV_URL}
-  admin: ${ADMIN_URL}
+  dev: ""
+  admin: ""
 cookie:
   max-age: 2190D
   secure: true
