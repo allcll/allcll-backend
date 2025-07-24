@@ -16,6 +16,7 @@ import jakarta.servlet.http.Cookie;
 import java.util.Collections;
 import java.util.List;
 import kr.allcll.backend.domain.timetable.schedule.dto.ScheduleCreateRequest;
+import kr.allcll.backend.domain.timetable.schedule.dto.ScheduleDeleteRequest;
 import kr.allcll.backend.domain.timetable.schedule.dto.ScheduleResponse;
 import kr.allcll.backend.domain.timetable.schedule.dto.ScheduleUpdateRequest;
 import kr.allcll.backend.domain.timetable.schedule.dto.TimeSlotDto;
@@ -46,7 +47,6 @@ class ScheduleApiTest {
     @Test
     @DisplayName("시간표 일정에 커스텀 과목을 정상적으로 등록할 때 요청과 응답을 확인한다.")
     void addCustomSchedule() throws Exception {
-
         // given
         TimeSlotDto timeSlot = new TimeSlotDto("월", "09:00", "10:30");
         ScheduleCreateRequest request = new ScheduleCreateRequest(
@@ -283,11 +283,15 @@ class ScheduleApiTest {
     @DisplayName("일정을 정상적으로 삭제할 때의 요청과 응답을 확인한다.")
     void deleteSchedule() throws Exception {
         // given
-        doNothing().when(scheduleService).deleteSchedule(eq(1L), eq(1L), eq(VALID_TOKEN));
+        ScheduleDeleteRequest request = new ScheduleDeleteRequest(ScheduleType.CUSTOM);
+        doNothing().when(scheduleService).deleteSchedule(eq(1L), eq(1L), any(ScheduleDeleteRequest.class), eq(VALID_TOKEN));
 
         // when, then
         mockMvc.perform(delete(BASE_URL + "/{timeTableId}/schedules/{scheduleId}", 1L, 1L)
-                .cookie(new Cookie("token", VALID_TOKEN)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .cookie(new Cookie("token", VALID_TOKEN))
+            )
             .andExpect(status().isNoContent());
     }
 }
