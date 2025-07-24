@@ -44,7 +44,7 @@ public class ExternalClient {
             seatStorage.add(
                 new SeatDto(subject,
                     eachChange.remainSeat(),
-                    LocalDateTime.now(),
+                    LocalDateTime.now(), //TODO: 추후 버퍼 쪽으로 이동
                     eachChange.changeStatus()
                 )
             );
