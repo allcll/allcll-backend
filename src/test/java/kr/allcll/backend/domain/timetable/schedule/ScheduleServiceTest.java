@@ -50,10 +50,6 @@ class ScheduleServiceTest {
     @Autowired
     private SubjectRepository subjectRepository;
 
-    private TimeTable timeTable;
-    private Subject subject;
-    private TimeSlotDto timeSlot;
-
     @AfterEach
     void clean() {
         officialScheduleRepository.deleteAllInBatch();
@@ -66,14 +62,14 @@ class ScheduleServiceTest {
     @DisplayName("커스텀 스케줄을 정상 추가한다.")
     void addCustomSchedule() {
         //given
-        timeTable = timeTableRepository.save(
+        TimeTable timeTable = timeTableRepository.save(
             new TimeTable(
                 VALID_TOKEN,
                 "테스트 시간표",
                 Semester.FALL_25
             )
         );
-        timeSlot = new TimeSlotDto(
+        TimeSlotDto timeSlot = new TimeSlotDto(
             "월",
             "09:00",
             "10:30"
@@ -115,14 +111,14 @@ class ScheduleServiceTest {
     @DisplayName("공식 스케줄을 정상 추가한다.")
     void addOfficialSchedule() {
         //given
-        timeTable = timeTableRepository.save(
+        TimeTable timeTable = timeTableRepository.save(
             new TimeTable(
                 VALID_TOKEN,
                 "테스트 시간표",
                 Semester.FALL_25
             )
         );
-        subject = subjectRepository.save(
+        Subject subject = subjectRepository.save(
             SubjectFixture.createSubject(
                 "데이터베이스",
                 "003278",
@@ -153,25 +149,19 @@ class ScheduleServiceTest {
     @DisplayName("동일한 공식 스케줄을 중복 등록하면 예외가 발생한다.")
     void addDuplicateOfficialScheduleThrowsException() {
         // given
-        timeTable = timeTableRepository.save(
+        TimeTable timeTable = timeTableRepository.save(
             new TimeTable(
                 VALID_TOKEN,
                 "테스트 시간표",
                 Semester.FALL_25
             )
         );
-        subject = subjectRepository.save(
+        Subject subject = subjectRepository.save(
             SubjectFixture.createSubject(
                 "데이터베이스",
                 "003278",
                 "001",
                 "변재욱")
-        );
-
-        timeSlot = new TimeSlotDto(
-            "월",
-            "09:00",
-            "10:30"
         );
 
         ScheduleCreateRequest request = new ScheduleCreateRequest(
@@ -196,21 +186,21 @@ class ScheduleServiceTest {
     @DisplayName("존재하지 않는 시간표에 추가 시 예외가 발생한다.")
     void addScheduleIfTimeTableNotFoundThrowsException() {
         //given
-        timeTable = timeTableRepository.save(
+        TimeTable timeTable = timeTableRepository.save(
             new TimeTable(
                 VALID_TOKEN,
                 "테스트 시간표",
                 Semester.FALL_25
             )
         );
-        subject = subjectRepository.save(
+        Subject subject = subjectRepository.save(
             SubjectFixture.createSubject(
                 "데이터베이스",
                 "003278",
                 "001",
                 "변재욱")
         );
-        timeSlot = new TimeSlotDto(
+        TimeSlotDto timeSlot = new TimeSlotDto(
             "월",
             "09:00",
             "10:30"
@@ -236,26 +226,18 @@ class ScheduleServiceTest {
     @DisplayName("토큰 불일치 시 예외가 발생한다.")
     void addScheduleThrowsUnauthorizedAccess() {
         //given
-        timeTable = timeTableRepository.save(
+        TimeTable timeTable = timeTableRepository.save(
             new TimeTable(
                 VALID_TOKEN,
                 "테스트 시간표",
                 Semester.FALL_25
             )
         );
-        subject = subjectRepository.save(
-            SubjectFixture.createSubject(
-                "데이터베이스",
-                "003278",
-                "001",
-                "변재욱")
-        );
-        timeSlot = new TimeSlotDto(
+        TimeSlotDto timeSlot = new TimeSlotDto(
             "월",
             "09:00",
             "10:30"
         );
-
         ScheduleCreateRequest request = new ScheduleCreateRequest(
             ScheduleType.CUSTOM,
             null,
@@ -276,21 +258,20 @@ class ScheduleServiceTest {
     @DisplayName("공식 일정 추가 시 해당 과목이 존재하지 않을 경우 예외가 발생한다.")
     void addOfficialScheduleThrowsSubjectNotFound() {
         //given
-        timeTable = timeTableRepository.save(
+        TimeTable timeTable = timeTableRepository.save(
             new TimeTable(
                 VALID_TOKEN,
                 "테스트 시간표",
                 Semester.FALL_25
             )
         );
-        subject = subjectRepository.save(
+        Subject subject = subjectRepository.save(
             SubjectFixture.createSubject(
                 "데이터베이스",
                 "003278",
                 "001",
                 "변재욱")
         );
-
         ScheduleCreateRequest request = new ScheduleCreateRequest(
             ScheduleType.OFFICIAL,
             NOT_FOUND_ID,
@@ -309,21 +290,21 @@ class ScheduleServiceTest {
     @DisplayName("특정 시간표의 일정 목록을 정상 조회한다.")
     void getTimeTableWithSchedule() {
         //given
-        timeTable = timeTableRepository.save(
+        TimeTable timeTable = timeTableRepository.save(
             new TimeTable(
                 VALID_TOKEN,
                 "테스트 시간표",
                 Semester.FALL_25
             )
         );
-        subject = subjectRepository.save(
+        Subject subject = subjectRepository.save(
             SubjectFixture.createSubject(
                 "데이터베이스",
                 "003278",
                 "001",
                 "변재욱")
         );
-        timeSlot = new TimeSlotDto(
+        TimeSlotDto timeSlot = new TimeSlotDto(
             "월",
             "09:00",
             "10:30"
@@ -354,32 +335,36 @@ class ScheduleServiceTest {
     @DisplayName("커스텀 일정의 모든 정보가 정상적으로 수정되는지 확인한다.")
     void updateEntireCustomSchedule() {
         //given
-        timeTable = timeTableRepository.save(
+        TimeTable timeTable = timeTableRepository.save(
             new TimeTable(
                 VALID_TOKEN,
                 "테스트 시간표",
                 Semester.FALL_25
             )
         );
-        timeSlot = new TimeSlotDto(
+        TimeSlotDto existingTimeSlot = new TimeSlotDto(
             "월",
             "09:00",
             "10:30"
         );
-
+        TimeSlotDto updateTimeSlot = new TimeSlotDto(
+            "화",
+            "10:30",
+            "12:00"
+        );
         CustomSchedule customSchedule = customScheduleRepository.save(
             new CustomSchedule(
                 timeTable,
                 "커스텀 과목",
                 "커스텀 교수님 성함",
                 "커스텀 강의실 위치",
-                List.of(timeSlot)
+                List.of(existingTimeSlot)
             ));
         ScheduleUpdateRequest request = new ScheduleUpdateRequest(
             "수정된 커스텀 과목",
             "수정된 교수님 성함",
             "수정된 강의실 위치",
-            List.of(timeSlot)
+            List.of(updateTimeSlot)
         );
 
         //when
@@ -401,7 +386,7 @@ class ScheduleServiceTest {
                 TimeSlotDto::endTime
             )
             .containsExactly(
-                tuple("월", "09:00", "10:30"));
+                tuple("화", "10:30", "12:00"));
         CustomSchedule updated = customScheduleRepository.findById(customSchedule.getId()).orElseThrow();
         assertThat(updated.getSubjectName()).isEqualTo("수정된 커스텀 과목");
     }
@@ -413,14 +398,14 @@ class ScheduleServiceTest {
         ScheduleDeleteRequest request = new ScheduleDeleteRequest(
             ScheduleType.OFFICIAL
         );
-        timeTable = timeTableRepository.save(
+        TimeTable timeTable = timeTableRepository.save(
             new TimeTable(
                 VALID_TOKEN,
                 "테스트 시간표",
                 Semester.FALL_25
             )
         );
-        subject = subjectRepository.save(
+        Subject subject = subjectRepository.save(
             SubjectFixture.createSubject(
                 "데이터베이스",
                 "003278",
@@ -448,14 +433,14 @@ class ScheduleServiceTest {
         ScheduleDeleteRequest request = new ScheduleDeleteRequest(
             ScheduleType.CUSTOM
         );
-        timeTable = timeTableRepository.save(
+        TimeTable timeTable = timeTableRepository.save(
             new TimeTable(
                 VALID_TOKEN,
                 "테스트 시간표",
                 Semester.FALL_25
             )
         );
-        timeSlot = new TimeSlotDto(
+        TimeSlotDto timeSlot = new TimeSlotDto(
             "월",
             "09:00",
             "10:30"
