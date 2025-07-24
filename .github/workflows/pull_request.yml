@@ -36,7 +36,7 @@ jobs:
 
       - name: 서브모듈 최신 커밋으로 업데이트
         run: |
-          git submodule update --init --remote --merge
+          git submodule update --init --remote --checkout
 
       - name: JDK 21 세팅
         uses: actions/setup-java@v4
