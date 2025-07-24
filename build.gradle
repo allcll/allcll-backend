@@ -30,6 +30,7 @@ dependencies {
     implementation 'io.micrometer:micrometer-registry-datadog'
     implementation 'org.springframework.retry:spring-retry'
     implementation 'org.springframework:spring-aspects'
+    implementation(project(":crawler"))
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
