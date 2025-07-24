@@ -20,7 +20,7 @@ public record ScheduleResponse(
     public static ScheduleResponse fromOfficial(OfficialSchedule schedule, Subject subject) {
         return new ScheduleResponse(
             schedule.getId(),
-            ScheduleType.OFFICIAL.toValue(),
+            ScheduleType.OFFICIAL.getValue(),
             subject.getId(),
             null,
             null,
@@ -32,7 +32,7 @@ public record ScheduleResponse(
     public static ScheduleResponse fromCustom(CustomSchedule schedule) {
         return new ScheduleResponse(
             schedule.getId(),
-            ScheduleType.CUSTOM.toValue(),
+            ScheduleType.CUSTOM.getValue(),
             null,
             schedule.getSubjectName(),
             schedule.getProfessorName(),

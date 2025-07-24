@@ -37,7 +37,7 @@ public class ScheduleService {
     ) {
         TimeTable timeTable = getAuthorizedTimeTable(timeTableId, token);
 
-        if (request.scheduleType() == ScheduleType.OFFICIAL) {
+        if (request.scheduleType().equals(ScheduleType.OFFICIAL.getValue())) {
             validateDuplicatedSubject(request, timeTable);
             Subject subject = subjectRepository.findById(request.subjectId())
                 .orElseThrow(() -> new AllcllException(AllcllErrorCode.SUBJECT_NOT_FOUND));
@@ -107,7 +107,7 @@ public class ScheduleService {
     ) {
         TimeTable timeTable = getAuthorizedTimeTable(timeTableId, token);
 
-        if (request.scheduleType() == ScheduleType.OFFICIAL) {
+        if (request.scheduleType().equals(ScheduleType.OFFICIAL.getValue())) {
             officialScheduleRepository.deleteByIdAndTimeTableId(scheduleId, timeTable.getId());
         }
         else {

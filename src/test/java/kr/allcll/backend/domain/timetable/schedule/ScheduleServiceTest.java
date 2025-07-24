@@ -76,7 +76,7 @@ class ScheduleServiceTest {
         );
 
         ScheduleCreateRequest request = new ScheduleCreateRequest(
-            ScheduleType.CUSTOM,
+            ScheduleType.CUSTOM.getValue(),
             null,
             "커스텀 과목",
             "커스텀 교수",
@@ -127,7 +127,7 @@ class ScheduleServiceTest {
         );
 
         ScheduleCreateRequest request = new ScheduleCreateRequest(
-            ScheduleType.OFFICIAL,
+            ScheduleType.OFFICIAL.getValue(),
             subject.getId(),
             null, null, null,
             Collections.emptyList()
@@ -165,7 +165,7 @@ class ScheduleServiceTest {
         );
 
         ScheduleCreateRequest request = new ScheduleCreateRequest(
-            ScheduleType.OFFICIAL,
+            ScheduleType.OFFICIAL.getValue(),
             subject.getId(),
             null, null, null,
             Collections.emptyList()
@@ -207,7 +207,7 @@ class ScheduleServiceTest {
         );
 
         ScheduleCreateRequest request = new ScheduleCreateRequest(
-            ScheduleType.CUSTOM,
+            ScheduleType.CUSTOM.getValue(),
             null,
             "커스텀 과목",
             "커스텀 교수님 성함",
@@ -239,7 +239,7 @@ class ScheduleServiceTest {
             "10:30"
         );
         ScheduleCreateRequest request = new ScheduleCreateRequest(
-            ScheduleType.CUSTOM,
+            ScheduleType.CUSTOM.getValue(),
             null,
             "커스텀 과목",
             "커스텀 교수님 성함",
@@ -273,7 +273,7 @@ class ScheduleServiceTest {
                 "변재욱")
         );
         ScheduleCreateRequest request = new ScheduleCreateRequest(
-            ScheduleType.OFFICIAL,
+            ScheduleType.OFFICIAL.getValue(),
             NOT_FOUND_ID,
             null, null, null,
             Collections.emptyList()
@@ -396,7 +396,7 @@ class ScheduleServiceTest {
     void deleteOfficialSchedule() {
         //given
         ScheduleDeleteRequest request = new ScheduleDeleteRequest(
-            ScheduleType.OFFICIAL
+            ScheduleType.OFFICIAL.getValue()
         );
         TimeTable timeTable = timeTableRepository.save(
             new TimeTable(
@@ -431,7 +431,7 @@ class ScheduleServiceTest {
     void deleteCustomSchedule() {
         //given
         ScheduleDeleteRequest request = new ScheduleDeleteRequest(
-            ScheduleType.CUSTOM
+            ScheduleType.CUSTOM.getValue()
         );
         TimeTable timeTable = timeTableRepository.save(
             new TimeTable(

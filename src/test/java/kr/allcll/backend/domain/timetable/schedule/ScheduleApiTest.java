@@ -50,7 +50,7 @@ class ScheduleApiTest {
         // given
         TimeSlotDto timeSlot = new TimeSlotDto("월", "09:00", "10:30");
         ScheduleCreateRequest request = new ScheduleCreateRequest(
-            ScheduleType.CUSTOM,
+            ScheduleType.CUSTOM.getValue(),
             null,
             "커스텀 과목",
             "커스텀 교수",
@@ -59,7 +59,7 @@ class ScheduleApiTest {
         );
         ScheduleResponse response = new ScheduleResponse(
             1L,
-            ScheduleType.CUSTOM.toValue(),
+            ScheduleType.CUSTOM.getValue(),
             null,
             "커스텀 과목",
             "커스텀 교수",
@@ -104,7 +104,7 @@ class ScheduleApiTest {
     void addOfficialSchedule() throws Exception {
         // given
         ScheduleCreateRequest request = new ScheduleCreateRequest(
-            ScheduleType.OFFICIAL,
+            ScheduleType.OFFICIAL.getValue(),
             1L,
             null,
             null,
@@ -113,7 +113,7 @@ class ScheduleApiTest {
         );
         ScheduleResponse response = new ScheduleResponse(
             1L,
-            ScheduleType.OFFICIAL.toValue(),
+            ScheduleType.OFFICIAL.getValue(),
             1L,
             null,
             null,
@@ -155,7 +155,7 @@ class ScheduleApiTest {
         List<ScheduleResponse> scheduleResponses = List.of(
             new ScheduleResponse(
                 1L,
-                ScheduleType.OFFICIAL.toValue(),
+                ScheduleType.OFFICIAL.getValue(),
                 1L,
                 null,
                 null,
@@ -164,7 +164,7 @@ class ScheduleApiTest {
             ),
             new ScheduleResponse(
                 2L,
-                ScheduleType.CUSTOM.toValue(),
+                ScheduleType.CUSTOM.getValue(),
                 null,
                 "커스텀 과목",
                 "커스텀 교수",
@@ -239,7 +239,7 @@ class ScheduleApiTest {
         );
         ScheduleResponse response = new ScheduleResponse(
             1L,
-            ScheduleType.CUSTOM.toValue(),
+            ScheduleType.CUSTOM.getValue(),
             null,
             "수정된 커스텀 과목",
             "수정된 교수",
@@ -283,7 +283,7 @@ class ScheduleApiTest {
     @DisplayName("일정을 정상적으로 삭제할 때의 요청과 응답을 확인한다.")
     void deleteSchedule() throws Exception {
         // given
-        ScheduleDeleteRequest request = new ScheduleDeleteRequest(ScheduleType.CUSTOM);
+        ScheduleDeleteRequest request = new ScheduleDeleteRequest(ScheduleType.CUSTOM.getValue());
         doNothing().when(scheduleService).deleteSchedule(eq(1L), eq(1L), any(ScheduleDeleteRequest.class), eq(VALID_TOKEN));
 
         // when, then
