@@ -55,8 +55,8 @@ class SeatStorageTest {
 
     /*
         - 비전공 과목만 조회한다.
-        - limit 개수만큼 조회한다.
-        - 여석이 0인 것은 조회 안된다.
+        deprecated - limit 개수만큼 조회한다.
+        deprecated - 여석이 0인 것은 조회 안된다.
         - 여석이 적은 것부터 조회한다.
      */
     @Test
@@ -93,18 +93,18 @@ class SeatStorageTest {
                 seatDto11));
 
         // when
-        int queryLimit = 5;
-        List<SeatDto> seats = seatStorage.getGeneralSeats(queryLimit);
+        List<SeatDto> seats = seatStorage.getGeneralSeats();
 
         // then
-        assertThat(seats).hasSize(queryLimit)
+        assertThat(seats).hasSize(6)
             .extracting(SeatDto::getSubject, SeatDto::getSeatCount)
             .containsExactly(
                 tuple(subject8, 0),
                 tuple(subject7, 1),
                 tuple(subject10, 1),
                 tuple(subject6, 2),
-                tuple(subject9, 2)
+                tuple(subject9, 2),
+                tuple(subject5, 3)
             );
     }
 
