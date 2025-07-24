@@ -5,7 +5,6 @@ import kr.allcll.backend.domain.timetable.schedule.ScheduleType;
 import org.antlr.v4.runtime.misc.NotNull;
 
 public record ScheduleCreateRequest(
-    @NotNull
     ScheduleType scheduleType,
     Long subjectId,
     String subjectName,
