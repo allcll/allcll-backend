@@ -11,15 +11,15 @@ import org.springframework.stereotype.Repository;
 public interface OfficialScheduleRepository extends JpaRepository<OfficialSchedule, Long> {
 
     @Query("""
-        SELECT os FROM OfficialSchedule os 
-        WHERE os.timeTable.id = :timetableId 
+        SELECT os FROM OfficialSchedule os
+        WHERE os.timeTable.id = :timetableId
         """)
     List<OfficialSchedule> findAllByTimeTableId(@Param("timetableId") Long timetableId);
 
     @Modifying
     @Query("""
-        DELETE FROM OfficialSchedule os 
-        WHERE os.id = :id 
+        DELETE FROM OfficialSchedule os
+        WHERE os.id = :id
         AND os.timeTable.id = :timeTableId
         """)
     int deleteByIdAndTimeTableId(

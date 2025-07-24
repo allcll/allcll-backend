@@ -12,8 +12,8 @@ import org.springframework.stereotype.Repository;
 public interface CustomScheduleRepository extends JpaRepository<CustomSchedule, Long> {
 
     @Query("""
-        SELECT cs FROM CustomSchedule cs 
-        WHERE cs.timeTable.id = :timetableId 
+        SELECT cs FROM CustomSchedule cs
+        WHERE cs.timeTable.id = :timetableId
         """)
     List<CustomSchedule> findAllByTimeTableId(@Param("timetableId") Long timetableId);
 
@@ -30,8 +30,8 @@ public interface CustomScheduleRepository extends JpaRepository<CustomSchedule, 
 
     @Modifying
     @Query("""
-        DELETE FROM CustomSchedule cs 
-        WHERE cs.id = :id 
+        DELETE FROM CustomSchedule cs
+        WHERE cs.id = :id
         AND cs.timeTable.id = :timeTableId
         """)
     int deleteByIdAndTimeTableId(
