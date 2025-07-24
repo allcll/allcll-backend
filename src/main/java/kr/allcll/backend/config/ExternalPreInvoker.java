@@ -24,7 +24,7 @@ public class ExternalPreInvoker {
         log.info("[ExternalPreInvoker] 핀 과목 전달 완료");
     }
 
-    @Scheduled(fixedDelay = 1000 * 10)
+    @Scheduled(fixedDelay = 1000)
     void getTargetSubjectsFromExternal() {
         try {
             externalService.getTargetSubjectsFromCrawler();
