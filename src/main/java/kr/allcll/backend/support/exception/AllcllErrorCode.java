@@ -27,7 +27,8 @@ public enum AllcllErrorCode {
     CUSTOM_SCHEDULE_NOT_FOUND("커스텀 일정을 찾을 수 없습니다."),
     DUPLICATE_SCHEDULE("이미 시간표에 등록된 일정입니다."),
     JSON_CONVERT_ERROR("TimeSlot JSON 변환 중 오류가 발생했습니다."),
-    INVALID_SCHEDULE_TYPE("유효하지 않은 일정 타입입니다.");
+    INVALID_SCHEDULE_TYPE("유효하지 않은 일정 타입입니다."),
+    ;
 
     private String message;
 
