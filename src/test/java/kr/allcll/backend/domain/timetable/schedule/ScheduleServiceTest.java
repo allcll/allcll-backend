@@ -59,8 +59,8 @@ class ScheduleServiceTest {
     }
 
     @Test
-    @DisplayName("커스텀 스케줄을 정상 추가한다.")
-    void addCustomSchedule() {
+    @DisplayName("커스텀 일정 추가 시 올바른 응답을 반환한다.")
+    void addCustomScheduleReturnsValidResponse() {
         //given
         TimeTable timeTable = timeTableRepository.save(
             new TimeTable(
@@ -101,15 +101,51 @@ class ScheduleServiceTest {
             )
             .containsExactly(
                 tuple("월", "09:00", "10:30"));
+    }
 
-        CustomSchedule saved = customScheduleRepository.findByIdAndTimeTableId(response.scheduleId(), timeTable.getId())
+    @Test
+    @DisplayName("커스텀 일정 추가 후 실제 DB에 저장되는지 확인한다.")
+    void addCustomSchedulePersistsToDatabase() {
+        //given
+        TimeTable timeTable = timeTableRepository.save(
+            new TimeTable(
+                VALID_TOKEN,
+                "테스트 시간표",
+                Semester.FALL_25
+            )
+        );
+        TimeSlotDto timeSlot = new TimeSlotDto(
+            "월",
+            "09:00",
+            "10:30"
+        );
+
+        ScheduleCreateRequest request = new ScheduleCreateRequest(
+            ScheduleType.CUSTOM.getValue(),
+            null,
+            "커스텀 과목",
+            "커스텀 교수",
+            "커스텀 강의실 위치",
+            List.of(timeSlot)
+        );
+
+        ScheduleResponse response = scheduleService.addSchedule(timeTable.getId(), request, VALID_TOKEN);
+
+        //when
+        CustomSchedule saved = customScheduleRepository
+            .findByIdAndTimeTableId(response.scheduleId(), timeTable.getId())
             .orElseThrow();
+
+        //then
+        assertThat(saved.getSubjectName()).isEqualTo("커스텀 과목");
+        assertThat(saved.getProfessorName()).isEqualTo("커스텀 교수");
+        assertThat(saved.getLocation()).isEqualTo("커스텀 강의실 위치");
         assertThat(saved.getTimeTable().getId()).isEqualTo(timeTable.getId());
     }
 
     @Test
-    @DisplayName("공식 스케줄을 정상 추가한다.")
-    void addOfficialSchedule() {
+    @DisplayName("공식 스케줄 추가 시 올바른 응답을 반환한다.")
+    void addOfficialScheduleReturnsValidResponse() {
         //given
         TimeTable timeTable = timeTableRepository.save(
             new TimeTable(
@@ -139,8 +175,40 @@ class ScheduleServiceTest {
         //then
         assertThat(response.scheduleType()).isEqualTo("official");
         assertThat(response.subjectId()).isEqualTo(subject.getId());
+    }
 
+    @Test
+    @DisplayName("공식 스케줄 추가 후 실제 DB에 저장되는지 확인한다.")
+    void addOfficialSchedulePersistsToDatabase() {
+        //given
+        TimeTable timeTable = timeTableRepository.save(
+            new TimeTable(
+                VALID_TOKEN,
+                "테스트 시간표",
+                Semester.FALL_25
+            )
+        );
+        Subject subject = subjectRepository.save(
+            SubjectFixture.createSubject(
+                "데이터베이스",
+                "003278",
+                "001",
+                "변재욱")
+        );
+
+        ScheduleCreateRequest request = new ScheduleCreateRequest(
+            ScheduleType.OFFICIAL.getValue(),
+            subject.getId(),
+            null, null, null,
+            Collections.emptyList()
+        );
+
+        scheduleService.addSchedule(timeTable.getId(), request, VALID_TOKEN);
+
+        //when
         OfficialSchedule saved = officialScheduleRepository.findAllByTimeTableId(timeTable.getId()).get(0);
+
+        //then
         assertThat(saved.getTimeTable().getId()).isEqualTo(timeTable.getId());
         assertThat(saved.getSubject().getId()).isEqualTo(subject.getId());
     }
