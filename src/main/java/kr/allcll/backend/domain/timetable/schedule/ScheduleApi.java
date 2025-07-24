@@ -27,22 +27,20 @@ public class ScheduleApi {
         @PathVariable(name = "timeTableId") Long timeTableId,
         @RequestBody ScheduleCreateRequest scheduleRequest
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-            .body(
-                scheduleService.addSchedule(
-                    timeTableId,
-                    scheduleRequest,
-                    ThreadLocalHolder.SHARED_TOKEN.get())
-            );
+        ScheduleResponse response = scheduleService.addSchedule(
+            timeTableId,
+            scheduleRequest,
+            ThreadLocalHolder.SHARED_TOKEN.get());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/api/timetables/{timeTableId}/schedules")
     public ResponseEntity<TimeTableDetailResponse> getTimeTableWithSchedules(
         @PathVariable(name = "timeTableId") Long timeTableId
     ) {
-        return ResponseEntity.ok(
-            scheduleService.getTimeTableWithSchedules(timeTableId, ThreadLocalHolder.SHARED_TOKEN.get())
-        );
+        TimeTableDetailResponse response = scheduleService.getTimeTableWithSchedules(timeTableId,
+            ThreadLocalHolder.SHARED_TOKEN.get());
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/api/timetables/{timeTableId}/schedules/{scheduleId}")
