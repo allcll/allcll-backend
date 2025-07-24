@@ -13,6 +13,7 @@ import kr.allcll.backend.support.exception.AllcllException;
 
 @Converter
 public class TimeSlotListConverter implements AttributeConverter<List<TimeSlotDto>, String> {
+
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @Override
@@ -27,7 +28,8 @@ public class TimeSlotListConverter implements AttributeConverter<List<TimeSlotDt
     @Override
     public List<TimeSlotDto> convertToEntityAttribute(String dbData) {
         try {
-            return mapper.readValue(dbData, new TypeReference<List<TimeSlotDto>>() {});
+            return mapper.readValue(dbData, new TypeReference<List<TimeSlotDto>>() {
+            });
         } catch (JsonProcessingException e) {
             return Collections.emptyList();
         }
