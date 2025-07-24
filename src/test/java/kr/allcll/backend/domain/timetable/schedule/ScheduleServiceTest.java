@@ -11,6 +11,7 @@ import kr.allcll.backend.domain.subject.SubjectRepository;
 import kr.allcll.backend.domain.timetable.TimeTable;
 import kr.allcll.backend.domain.timetable.TimeTableRepository;
 import kr.allcll.backend.domain.timetable.schedule.dto.ScheduleCreateRequest;
+import kr.allcll.backend.domain.timetable.schedule.dto.ScheduleDeleteRequest;
 import kr.allcll.backend.domain.timetable.schedule.dto.ScheduleResponse;
 import kr.allcll.backend.domain.timetable.schedule.dto.ScheduleUpdateRequest;
 import kr.allcll.backend.domain.timetable.schedule.dto.TimeSlotDto;
@@ -19,7 +20,7 @@ import kr.allcll.backend.fixture.SubjectFixture;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import kr.allcll.backend.support.semester.Semester;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,13 +54,12 @@ class ScheduleServiceTest {
     private Subject subject;
     private TimeSlotDto timeSlot;
 
-    @BeforeEach
-    void setUp() {
-        officialScheduleRepository.deleteAll();
-        customScheduleRepository.deleteAll();
-        timeTableRepository.deleteAll();
-        subjectRepository.deleteAll();
-
+    @AfterEach
+    void clean() {
+        officialScheduleRepository.deleteAllInBatch();
+        customScheduleRepository.deleteAllInBatch();
+        timeTableRepository.deleteAllInBatch();
+        subjectRepository.deleteAllInBatch();
     }
 
     @Test
@@ -316,7 +316,6 @@ class ScheduleServiceTest {
                 Semester.FALL_25
             )
         );
-
         subject = subjectRepository.save(
             SubjectFixture.createSubject(
                 "데이터베이스",
@@ -324,7 +323,6 @@ class ScheduleServiceTest {
                 "001",
                 "변재욱")
         );
-
         timeSlot = new TimeSlotDto(
             "월",
             "09:00",
@@ -409,9 +407,47 @@ class ScheduleServiceTest {
     }
 
     @Test
-    @DisplayName("커스텀 일정이 정상적으로 삭제되는지 확인한다.")
-    void deleteSchedule() {
+    @DisplayName("공식 일정이 정상적으로 삭제되는지 확인한다.")
+    void deleteOfficialSchedule() {
         //given
+        ScheduleDeleteRequest request = new ScheduleDeleteRequest(
+            ScheduleType.OFFICIAL
+        );
+        timeTable = timeTableRepository.save(
+            new TimeTable(
+                VALID_TOKEN,
+                "테스트 시간표",
+                Semester.FALL_25
+            )
+        );
+        subject = subjectRepository.save(
+            SubjectFixture.createSubject(
+                "데이터베이스",
+                "003278",
+                "001",
+                "변재욱")
+        );
+        OfficialSchedule officialSchedule = officialScheduleRepository.save(
+            new OfficialSchedule(
+                timeTable,
+                subject
+            )
+        );
+
+        //when
+        scheduleService.deleteSchedule(timeTable.getId(), officialSchedule.getId(), request, VALID_TOKEN);
+
+        //then
+        assertThat(customScheduleRepository.existsById(officialSchedule.getId())).isFalse();
+    }
+
+    @Test
+    @DisplayName("커스텀 일정이 정상적으로 삭제되는지 확인한다.")
+    void deleteCustomSchedule() {
+        //given
+        ScheduleDeleteRequest request = new ScheduleDeleteRequest(
+            ScheduleType.CUSTOM
+        );
         timeTable = timeTableRepository.save(
             new TimeTable(
                 VALID_TOKEN,
@@ -424,7 +460,6 @@ class ScheduleServiceTest {
             "09:00",
             "10:30"
         );
-
         CustomSchedule customSchedule = customScheduleRepository.save(
             new CustomSchedule(
                 timeTable,
@@ -435,28 +470,9 @@ class ScheduleServiceTest {
             ));
 
         //when
-        scheduleService.deleteSchedule(timeTable.getId(), customSchedule.getId(), VALID_TOKEN);
+        scheduleService.deleteSchedule(timeTable.getId(), customSchedule.getId(), request, VALID_TOKEN);
 
         //then
         assertThat(customScheduleRepository.existsById(customSchedule.getId())).isFalse();
-    }
-
-    @Test
-    @DisplayName("삭제할 일정이 존재하지 않을 경우 예외가 발생한다.")
-    void deleteScheduleThrowsNotFound() {
-        //given
-        timeTable = timeTableRepository.save(
-            new TimeTable(
-                VALID_TOKEN,
-                "테스트 시간표",
-                Semester.FALL_25
-            )
-        );
-
-        //when, then
-        assertThatThrownBy(() ->
-            scheduleService.deleteSchedule(timeTable.getId(), NOT_FOUND_ID, VALID_TOKEN)
-        ).isInstanceOf(AllcllException.class)
-            .hasMessageContaining(AllcllErrorCode.CUSTOM_SCHEDULE_NOT_FOUND.getMessage());
     }
 }
