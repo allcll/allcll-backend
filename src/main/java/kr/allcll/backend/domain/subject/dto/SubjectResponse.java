@@ -8,7 +8,12 @@ public record SubjectResponse(
     String subjectCode,
     String classCode,
     String professorName,
-    String deptCd
+    String deptCd,
+    String manageDeptNm,
+    String studentYear,
+    String lesnTime,
+    String lesnRoom,
+    String tmNum
 ) {
 
     public static SubjectResponse from(Subject subject) {
@@ -18,7 +23,12 @@ public record SubjectResponse(
             subject.getCuriNo(),
             subject.getClassName(),
             subject.getLesnEmp(),
-            subject.getDeptCd()
+            subject.getDeptCd(),
+            subject.getManageDeptNm(),
+            subject.getStudentYear(),
+            subject.getLesnTime(),
+            subject.getLesnRoom(),
+            subject.getTmNum()
         );
     }
 }
