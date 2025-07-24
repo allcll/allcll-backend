@@ -30,6 +30,10 @@ public class ExternalService {
         externalClient.sendPinSubjects(request);
     }
 
+    public void getTargetSubjectsFromCrawler() {
+        externalClient.getAllTargetSubjects();
+    }
+
     private PinSubjectUpdateRequest getPinSubjects() {
         List<String> tokens = sseEmitterStorage.getUserTokens();
         Map<Subject, Integer> pinSubjects = new HashMap<>();
@@ -74,9 +78,5 @@ public class ExternalService {
         return subjectIds.stream()
             .map(subjectId -> new PinSubject(subjectId, priority))
             .collect(Collectors.toCollection(ArrayList::new));
-    }
-
-    public void getTargetSubjectsFromCrawler() {
-        externalClient.getAllTargetSubjects();
     }
 }
