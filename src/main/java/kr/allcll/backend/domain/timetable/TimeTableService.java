@@ -4,6 +4,8 @@ import java.util.List;
 import kr.allcll.backend.domain.timetable.dto.TimeTableCreateRequest;
 import kr.allcll.backend.domain.timetable.dto.TimeTableResponse;
 import kr.allcll.backend.domain.timetable.dto.TimeTablesResponse;
+import kr.allcll.backend.domain.timetable.schedule.CustomScheduleRepository;
+import kr.allcll.backend.domain.timetable.schedule.OfficialScheduleRepository;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class TimeTableService {
 
     private final TimeTableRepository timeTableRepository;
+    private final CustomScheduleRepository customScheduleRepository;
+    private final OfficialScheduleRepository officialScheduleRepository;
 
     @Transactional
     public TimeTableResponse createTimeTable(String token, TimeTableCreateRequest request) {
@@ -36,6 +40,8 @@ public class TimeTableService {
     public void deleteTimeTable(Long timetableId, String token) {
         TimeTable timeTable = getTimeTableById(timetableId);
         validateTimeTableAccess(timeTable, token);
+        customScheduleRepository.deleteAllByTimeTableId(timeTable.getId());
+        officialScheduleRepository.deleteAllByTimeTableId(timeTable.getId());
         timeTableRepository.delete(timeTable);
     }
 
