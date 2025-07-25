@@ -37,4 +37,11 @@ public interface CustomScheduleRepository extends JpaRepository<CustomSchedule, 
     int deleteByIdAndTimeTableId(
         @Param("id") Long id,
         @Param("timeTableId") Long timeTableId);
+
+    @Modifying
+    @Query("""
+        DELETE FROM CustomSchedule cs
+        WHERE cs.timeTable.id = :timeTableId
+        """)
+    void deleteAllByTimeTableId(@Param("timeTableId") Long timeTableId);
 }
