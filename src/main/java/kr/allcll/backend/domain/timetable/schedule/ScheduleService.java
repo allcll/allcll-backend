@@ -37,8 +37,6 @@ public class ScheduleService {
         ScheduleCreateRequest request,
         String token
     ) {
-        validateTimeSlots(request.timeSlots());
-
         TimeTable timeTable = getAuthorizedTimeTable(timeTableId, token);
 
         if (ScheduleType.fromValue(request.scheduleType()) == ScheduleType.OFFICIAL) {
@@ -52,6 +50,8 @@ public class ScheduleService {
             return ScheduleResponse.fromOfficial(schedule, subject);
 
         } else {
+            validateTimeSlots(request.timeSlots());
+
             CustomSchedule schedule = new CustomSchedule(
                 timeTable,
                 request.subjectName(),
