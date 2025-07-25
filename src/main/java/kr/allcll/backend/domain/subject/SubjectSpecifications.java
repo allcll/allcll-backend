@@ -33,4 +33,9 @@ public class SubjectSpecifications {
         return ((root, query, builder) ->
             departmentCode == null ? null : builder.equal(root.get("deptCd"), departmentCode));
     }
+
+    public static Specification<Subject> hasSemesterAt(String semesterAt) {
+        return ((root, query, builder) ->
+            semesterAt == null ? null : builder.equal(root.get("semesterAt"), semesterAt));
+    }
 }
