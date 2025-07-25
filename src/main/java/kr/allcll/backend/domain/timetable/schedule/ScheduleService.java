@@ -140,7 +140,7 @@ public class ScheduleService {
             timeSlot -> {
                 LocalTime startTime = LocalTime.parse(timeSlot.startTime());
                 LocalTime endTime = LocalTime.parse(timeSlot.endTime());
-                if (startTime.isAfter(endTime)) {
+                if (startTime.isAfter(endTime) || startTime.equals(endTime)) {
                     throw new AllcllException(AllcllErrorCode.INVALID_TIME);
                 }
             }
