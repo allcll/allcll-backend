@@ -355,6 +355,72 @@ class ScheduleServiceTest {
     }
 
     @Test
+    @DisplayName("커스텀 일정 추가 시 시작 시간이 종료 시간보다 늦은 경우 예외가 발생한다.")
+    void addCustomScheduleIfStartTimeIsLaterThanEndTimeThrowsException() {
+        //given
+        TimeTable timeTable = timeTableRepository.save(
+            new TimeTable(
+                VALID_TOKEN,
+                "테스트 시간표",
+                Semester.FALL_25
+            )
+        );
+        TimeSlotDto timeSlot = new TimeSlotDto(
+            "월",
+            "10:30",
+            "09:00"
+        );
+
+        ScheduleCreateRequest request = new ScheduleCreateRequest(
+            ScheduleType.CUSTOM.getValue(),
+            null,
+            "커스텀 과목",
+            "커스텀 교수",
+            "커스텀 강의실 위치",
+            List.of(timeSlot)
+        );
+
+        //when, then
+        assertThatThrownBy(() ->
+            scheduleService.addSchedule(timeTable.getId(), request, VALID_TOKEN)
+        ).isInstanceOf(AllcllException.class)
+            .hasMessageContaining(AllcllErrorCode.INVALID_TIME.getMessage());
+    }
+
+    @Test
+    @DisplayName("커스텀 일정 추가 시 시작 시간과 종료 시간이 같을 경우 예외가 발생한다.")
+    void addCustomScheduleIfStartTimeIsSameAsEndTimeThrowsException() {
+        //given
+        TimeTable timeTable = timeTableRepository.save(
+            new TimeTable(
+                VALID_TOKEN,
+                "테스트 시간표",
+                Semester.FALL_25
+            )
+        );
+        TimeSlotDto timeSlot = new TimeSlotDto(
+            "월",
+            "10:30",
+            "10:30"
+        );
+
+        ScheduleCreateRequest request = new ScheduleCreateRequest(
+            ScheduleType.CUSTOM.getValue(),
+            null,
+            "커스텀 과목",
+            "커스텀 교수",
+            "커스텀 강의실 위치",
+            List.of(timeSlot)
+        );
+
+        //when, then
+        assertThatThrownBy(() ->
+            scheduleService.addSchedule(timeTable.getId(), request, VALID_TOKEN)
+        ).isInstanceOf(AllcllException.class)
+            .hasMessageContaining(AllcllErrorCode.INVALID_TIME.getMessage());
+    }
+
+    @Test
     @DisplayName("특정 시간표의 일정 목록을 정상 조회한다.")
     void getTimeTableWithSchedule() {
         //given

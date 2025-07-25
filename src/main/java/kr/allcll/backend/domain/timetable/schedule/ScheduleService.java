@@ -1,5 +1,6 @@
 package kr.allcll.backend.domain.timetable.schedule;
 
+import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,6 +13,7 @@ import kr.allcll.backend.domain.timetable.schedule.dto.ScheduleCreateRequest;
 import kr.allcll.backend.domain.timetable.schedule.dto.ScheduleDeleteRequest;
 import kr.allcll.backend.domain.timetable.schedule.dto.ScheduleResponse;
 import kr.allcll.backend.domain.timetable.schedule.dto.ScheduleUpdateRequest;
+import kr.allcll.backend.domain.timetable.schedule.dto.TimeSlotDto;
 import kr.allcll.backend.domain.timetable.schedule.dto.TimeTableDetailResponse;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
@@ -48,6 +50,8 @@ public class ScheduleService {
             return ScheduleResponse.fromOfficial(schedule, subject);
 
         } else {
+            validateTimeSlots(request.timeSlots());
+
             CustomSchedule schedule = new CustomSchedule(
                 timeTable,
                 request.subjectName(),
@@ -82,6 +86,8 @@ public class ScheduleService {
         ScheduleUpdateRequest request,
         String token
     ) {
+        validateTimeSlots(request.timeSlots());
+
         TimeTable timeTable = getAuthorizedTimeTable(timetableId, token);
 
         CustomSchedule schedule = customScheduleRepository
@@ -127,5 +133,17 @@ public class ScheduleService {
         if (officialScheduleRepository.existsByTimeTableIdAndSubjectId(timeTable.getId(), request.subjectId())) {
             throw new AllcllException(AllcllErrorCode.DUPLICATE_SCHEDULE);
         }
+    }
+
+    private void validateTimeSlots(List<TimeSlotDto> timeSlots) {
+        timeSlots.forEach(
+            timeSlot -> {
+                LocalTime startTime = LocalTime.parse(timeSlot.startTime());
+                LocalTime endTime = LocalTime.parse(timeSlot.endTime());
+                if (startTime.isAfter(endTime) || startTime.equals(endTime)) {
+                    throw new AllcllException(AllcllErrorCode.INVALID_TIME);
+                }
+            }
+        );
     }
 }
