@@ -30,7 +30,8 @@ public class TimeTableService {
 
     @Transactional
     public TimeTableResponse updateTimeTable(Long timetableId, String updatedTitle, String token) {
-        TimeTable timeTable = getTimeTableById(timetableId);
+        TimeTable timeTable = timeTableRepository.findById(timetableId)
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.TIMETABLE_NOT_FOUND));
         validateTimeTableAccess(timeTable, token);
         timeTable.updateTimeTable(updatedTitle);
         return TimeTableResponse.from(timeTable);
@@ -38,7 +39,8 @@ public class TimeTableService {
 
     @Transactional
     public void deleteTimeTable(Long timetableId, String token) {
-        TimeTable timeTable = getTimeTableById(timetableId);
+        TimeTable timeTable = timeTableRepository.findById(timetableId)
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.TIMETABLE_NOT_FOUND));
         validateTimeTableAccess(timeTable, token);
         customScheduleRepository.deleteAllByTimeTableId(timeTable.getId());
         officialScheduleRepository.deleteAllByTimeTableId(timeTable.getId());
