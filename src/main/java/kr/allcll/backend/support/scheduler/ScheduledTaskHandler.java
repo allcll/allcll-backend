@@ -1,4 +1,4 @@
-package kr.allcll.backend.support.schedule;
+package kr.allcll.backend.support.scheduler;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
