@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 public class SeatStorage {
 
     private final Map<Subject, SeatDto> seats;
-    private static final int LIMIT_QUERY_TIME = 20;
+    private static final int LIMIT_QUERY_TIME = 3;
 
     public SeatStorage() {
         this.seats = new ConcurrentHashMap<>();

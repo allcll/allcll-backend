@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.util.List;
 import kr.allcll.backend.domain.seat.dto.SeatDto;
 import kr.allcll.backend.domain.seat.dto.SeatsResponse;
-import kr.allcll.backend.support.schedule.ScheduledTaskHandler;
+import kr.allcll.backend.support.scheduler.ScheduledTaskHandler;
 import kr.allcll.backend.support.sse.SseService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;

@@ -1,4 +1,4 @@
-package kr.allcll.backend.support.schedule;
+package kr.allcll.backend.support.scheduler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
