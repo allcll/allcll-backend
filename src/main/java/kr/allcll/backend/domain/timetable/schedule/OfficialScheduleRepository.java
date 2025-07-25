@@ -36,4 +36,11 @@ public interface OfficialScheduleRepository extends JpaRepository<OfficialSchedu
         @Param("timetableId") Long timetableId,
         @Param("subjectId") Long subjectId
     );
+
+    @Modifying
+    @Query("""
+        DELETE FROM OfficialSchedule os
+        WHERE os.timeTable.id = :timeTableId
+        """)
+    void deleteAllByTimeTableId(@Param("timeTableId") Long timeTableId);
 }
