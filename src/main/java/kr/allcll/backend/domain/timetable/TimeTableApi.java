@@ -22,9 +22,9 @@ public class TimeTableApi {
     private final TimeTableService timeTableService;
 
     @PostMapping("/api/timetables")
-    public ResponseEntity<Void> createTimeTable(@RequestBody TimeTableCreateRequest request) {
-        timeTableService.createTimeTable(ThreadLocalHolder.SHARED_TOKEN.get(), request);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<TimeTableResponse> createTimeTable(@RequestBody TimeTableCreateRequest request) {
+        TimeTableResponse response = timeTableService.createTimeTable(ThreadLocalHolder.SHARED_TOKEN.get(), request);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/api/timetables/{timeTableId}")
