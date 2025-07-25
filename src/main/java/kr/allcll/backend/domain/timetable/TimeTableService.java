@@ -56,11 +56,6 @@ public class TimeTableService {
         );
     }
 
-    private TimeTable getTimeTableById(Long timetableId) {
-        return timeTableRepository.findById(timetableId)
-            .orElseThrow(() -> new AllcllException(AllcllErrorCode.TIMETABLE_NOT_FOUND));
-    }
-
     private void validateTimeTableAccess(TimeTable timeTable, String token) {
         if (!token.equals(timeTable.getToken())) {
             throw new AllcllException(AllcllErrorCode.UNAUTHORIZED_ACCESS);
