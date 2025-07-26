@@ -1,6 +1,7 @@
 package kr.allcll.backend.domain.timetable.schedule;
 
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,7 +51,8 @@ public class ScheduleService {
             return ScheduleResponse.fromOfficial(schedule, subject);
 
         } else {
-            List<TimeSlotDto> normalizedTimeSlots = normalizeAndValidateTimeSlots(request.timeSlots());
+            List<TimeSlotDto> normalizedTimeSlots = normalizeTimeSlots(request.timeSlots());
+            validateTimeSlots(normalizedTimeSlots);
 
             CustomSchedule schedule = new CustomSchedule(
                 timeTable,
@@ -86,7 +88,8 @@ public class ScheduleService {
         ScheduleUpdateRequest request,
         String token
     ) {
-        List<TimeSlotDto> normalizedTimeSlots = normalizeAndValidateTimeSlots(request.timeSlots());
+        List<TimeSlotDto> normalizedTimeSlots = normalizeTimeSlots(request.timeSlots());
+        validateTimeSlots(normalizedTimeSlots);
 
         TimeTable timeTable = getAuthorizedTimeTable(timetableId, token);
 
@@ -135,39 +138,49 @@ public class ScheduleService {
         }
     }
 
-    private List<TimeSlotDto> normalizeAndValidateTimeSlots(List<TimeSlotDto> timeSlots) {
-        return timeSlots.stream().map(
-                timeSlot -> {
-                    String startTimeRequest = normalizeTimeFormat(timeSlot.startTime());
-                    String endTimeRequest = normalizeTimeFormat(timeSlot.endTime());
-
-                    LocalTime startTime = LocalTime.parse(startTimeRequest);
-                    LocalTime endTime = LocalTime.parse(endTimeRequest);
-
-                    if (startTime.isAfter(endTime) || startTime.equals(endTime)) {
-                        throw new AllcllException(AllcllErrorCode.INVALID_TIME);
-                    }
-                    return new TimeSlotDto(timeSlot.dayOfWeeks(), startTime.toString(), endTime.toString());
-                })
+    private List<TimeSlotDto> normalizeTimeSlots(List<TimeSlotDto> timeSlots) {
+        return timeSlots.stream()
+            .map(timeSlot -> {
+                String startTimeRequest = normalizeTimeFormat(timeSlot.startTime());
+                String endTimeRequest = normalizeTimeFormat(timeSlot.endTime());
+                return new TimeSlotDto(timeSlot.dayOfWeeks(), startTimeRequest, endTimeRequest);
+            })
             .collect(Collectors.toList());
     }
 
+    private void validateTimeSlots(List<TimeSlotDto> timeSlots) {
+        timeSlots.forEach(
+            timeSlot -> {
+                LocalTime startTime = LocalTime.parse(timeSlot.startTime());
+                LocalTime endTime = LocalTime.parse(timeSlot.endTime());
+                if (startTime.isAfter(endTime) || startTime.equals(endTime)) {
+                    throw new AllcllException(AllcllErrorCode.INVALID_TIME);
+                }
+            }
+        );
+    }
+
     private String normalizeTimeFormat(String time) {
-        if (time == null || time.isBlank()) {
-            return "00:00";
+        final String DELIMITER = ":";
+        List<String> timeParts = Arrays.stream(time.split(DELIMITER)).toList();
+
+        String hour = getNormalizedHour(timeParts.get(0));
+        String minute = getNormalizedMinute(timeParts.get(1));
+
+        return hour + DELIMITER + minute;
+    }
+
+    private String getNormalizedHour(String hourPart) {
+        if (hourPart.length() == 1) {
+            return "0" + hourPart;
         }
+        return hourPart;
+    }
 
-        String[] parts = time.split(":");
-        if (parts.length != 2) {
-            return "00:00";
+    private String getNormalizedMinute(String minutePart) {
+        if (minutePart.length() == 1) {
+            return "0" + minutePart;
         }
-
-        String hourPart = parts[0].equalsIgnoreCase("undefined") ? "00" : parts[0];
-        String minutePart = parts[1].equalsIgnoreCase("undefined") ? "00" : parts[1];
-
-        String hour = hourPart.length() == 1 ? "0" + hourPart : hourPart;
-        String minute = minutePart.length() == 1 ? "0" + minutePart : minutePart;
-
-        return hour + ":" + minute;
+        return minutePart;
     }
 }
