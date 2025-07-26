@@ -27,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ScheduleService {
 
+    private final String DELIMITER = ":";
+
     private final TimeTableRepository timeTableRepository;
     private final SubjectRepository subjectRepository;
     private final OfficialScheduleRepository officialScheduleRepository;
@@ -145,7 +147,7 @@ public class ScheduleService {
                 String endTimeRequest = normalizeTimeFormat(timeSlot.endTime());
                 return new TimeSlotDto(timeSlot.dayOfWeeks(), startTimeRequest, endTimeRequest);
             })
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private void validateTimeSlots(List<TimeSlotDto> timeSlots) {
@@ -161,7 +163,6 @@ public class ScheduleService {
     }
 
     private String normalizeTimeFormat(String time) {
-        final String DELIMITER = ":";
         List<String> timeParts = Arrays.stream(time.split(DELIMITER)).toList();
 
         String hour = getNormalizedHour(timeParts.get(0));
