@@ -239,7 +239,6 @@ class ScheduleServiceTest {
             Collections.emptyList()
         );
 
-
         scheduleService.addSchedule(timeTable.getId(), request, VALID_TOKEN);
 
         // when, then
@@ -352,6 +351,46 @@ class ScheduleServiceTest {
             scheduleService.addSchedule(timeTable.getId(), request, VALID_TOKEN)
         ).isInstanceOf(AllcllException.class)
             .hasMessageContaining(AllcllErrorCode.SUBJECT_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("커스텀 일정 추가 시간 요청값에 한 자리 수가 포함되어도 정상 동작한다.")
+    void addCustomScheduleWithInvalidFormedTimeShouldSucceed() {
+        // given
+        TimeTable timeTable = timeTableRepository.save(
+            new TimeTable(
+                VALID_TOKEN,
+                "테스트 시간표",
+                Semester.FALL_25
+            )
+        );
+
+        TimeSlotDto invalidTimeSlot = new TimeSlotDto(
+            "월",
+            "7:00",
+            "9:00"
+        );
+
+        ScheduleCreateRequest request = new ScheduleCreateRequest(
+            ScheduleType.CUSTOM.getValue(),
+            null,
+            "커스텀 과목",
+            "커스텀 교수",
+            "커스텀 강의실 위치",
+            List.of(invalidTimeSlot)
+        );
+
+        // when
+        ScheduleResponse response = scheduleService.addSchedule(timeTable.getId(), request, VALID_TOKEN);
+
+        assertThat(response.timeSlots()).hasSize(1)
+            .extracting(
+                TimeSlotDto::dayOfWeeks,
+                TimeSlotDto::startTime,
+                TimeSlotDto::endTime
+            )
+            .containsExactly(
+                tuple("월", "07:00", "09:00"));
     }
 
     @Test

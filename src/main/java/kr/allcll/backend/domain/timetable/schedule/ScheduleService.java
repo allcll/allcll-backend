@@ -1,6 +1,7 @@
 package kr.allcll.backend.domain.timetable.schedule;
 
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ScheduleService {
 
+    private static final String DELIMITER = ":";
+
     private final TimeTableRepository timeTableRepository;
     private final SubjectRepository subjectRepository;
     private final OfficialScheduleRepository officialScheduleRepository;
@@ -50,14 +53,15 @@ public class ScheduleService {
             return ScheduleResponse.fromOfficial(schedule, subject);
 
         } else {
-            validateTimeSlots(request.timeSlots());
+            List<TimeSlotDto> normalizedTimeSlots = normalizeTimeSlots(request.timeSlots());
+            validateTimeSlots(normalizedTimeSlots);
 
             CustomSchedule schedule = new CustomSchedule(
                 timeTable,
                 request.subjectName(),
                 request.professorName(),
                 request.location(),
-                request.timeSlots()
+                normalizedTimeSlots
             );
             customScheduleRepository.save(schedule);
             return ScheduleResponse.fromCustom(schedule);
@@ -86,7 +90,8 @@ public class ScheduleService {
         ScheduleUpdateRequest request,
         String token
     ) {
-        validateTimeSlots(request.timeSlots());
+        List<TimeSlotDto> normalizedTimeSlots = normalizeTimeSlots(request.timeSlots());
+        validateTimeSlots(normalizedTimeSlots);
 
         TimeTable timeTable = getAuthorizedTimeTable(timetableId, token);
 
@@ -98,7 +103,7 @@ public class ScheduleService {
             request.subjectName(),
             request.professorName(),
             request.location(),
-            request.timeSlots()
+            normalizedTimeSlots
         );
 
         return ScheduleResponse.fromCustom(schedule);
@@ -135,6 +140,16 @@ public class ScheduleService {
         }
     }
 
+    private List<TimeSlotDto> normalizeTimeSlots(List<TimeSlotDto> timeSlots) {
+        return timeSlots.stream()
+            .map(timeSlot -> {
+                String startTimeRequest = normalizeTimeFormat(timeSlot.startTime());
+                String endTimeRequest = normalizeTimeFormat(timeSlot.endTime());
+                return new TimeSlotDto(timeSlot.dayOfWeeks(), startTimeRequest, endTimeRequest);
+            })
+            .toList();
+    }
+
     private void validateTimeSlots(List<TimeSlotDto> timeSlots) {
         timeSlots.forEach(
             timeSlot -> {
@@ -145,5 +160,28 @@ public class ScheduleService {
                 }
             }
         );
+    }
+
+    private String normalizeTimeFormat(String time) {
+        List<String> timeParts = Arrays.stream(time.split(DELIMITER)).toList();
+
+        String hour = getNormalizedHour(timeParts.get(0));
+        String minute = getNormalizedMinute(timeParts.get(1));
+
+        return hour + DELIMITER + minute;
+    }
+
+    private String getNormalizedHour(String hourPart) {
+        if (hourPart.length() == 1) {
+            return "0" + hourPart;
+        }
+        return hourPart;
+    }
+
+    private String getNormalizedMinute(String minutePart) {
+        if (minutePart.length() == 1) {
+            return "0" + minutePart;
+        }
+        return minutePart;
     }
 }
