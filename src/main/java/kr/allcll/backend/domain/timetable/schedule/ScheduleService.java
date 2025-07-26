@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ScheduleService {
 
-    private final String DELIMITER = ":";
+    private static final String DELIMITER = ":";
 
     private final TimeTableRepository timeTableRepository;
     private final SubjectRepository subjectRepository;
