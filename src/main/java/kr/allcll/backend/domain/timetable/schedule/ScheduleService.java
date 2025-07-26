@@ -50,14 +50,14 @@ public class ScheduleService {
             return ScheduleResponse.fromOfficial(schedule, subject);
 
         } else {
-            validateTimeSlots(request.timeSlots());
+            List<TimeSlotDto> normalizedTimeSlots = normalizeAndValidateTimeSlots(request.timeSlots());
 
             CustomSchedule schedule = new CustomSchedule(
                 timeTable,
                 request.subjectName(),
                 request.professorName(),
                 request.location(),
-                request.timeSlots()
+                normalizedTimeSlots
             );
             customScheduleRepository.save(schedule);
             return ScheduleResponse.fromCustom(schedule);
@@ -86,7 +86,7 @@ public class ScheduleService {
         ScheduleUpdateRequest request,
         String token
     ) {
-        validateTimeSlots(request.timeSlots());
+        List<TimeSlotDto> normalizedTimeSlots = normalizeAndValidateTimeSlots(request.timeSlots());
 
         TimeTable timeTable = getAuthorizedTimeTable(timetableId, token);
 
@@ -98,7 +98,7 @@ public class ScheduleService {
             request.subjectName(),
             request.professorName(),
             request.location(),
-            request.timeSlots()
+            normalizedTimeSlots
         );
 
         return ScheduleResponse.fromCustom(schedule);
@@ -135,15 +135,39 @@ public class ScheduleService {
         }
     }
 
-    private void validateTimeSlots(List<TimeSlotDto> timeSlots) {
-        timeSlots.forEach(
-            timeSlot -> {
-                LocalTime startTime = LocalTime.parse(timeSlot.startTime());
-                LocalTime endTime = LocalTime.parse(timeSlot.endTime());
-                if (startTime.isAfter(endTime) || startTime.equals(endTime)) {
-                    throw new AllcllException(AllcllErrorCode.INVALID_TIME);
-                }
-            }
-        );
+    private List<TimeSlotDto> normalizeAndValidateTimeSlots(List<TimeSlotDto> timeSlots) {
+        return timeSlots.stream().map(
+                timeSlot -> {
+                    String startTimeRequest = normalizeTimeFormat(timeSlot.startTime());
+                    String endTimeRequest = normalizeTimeFormat(timeSlot.endTime());
+
+                    LocalTime startTime = LocalTime.parse(startTimeRequest);
+                    LocalTime endTime = LocalTime.parse(endTimeRequest);
+
+                    if (startTime.isAfter(endTime) || startTime.equals(endTime)) {
+                        throw new AllcllException(AllcllErrorCode.INVALID_TIME);
+                    }
+                    return new TimeSlotDto(timeSlot.dayOfWeeks(), startTime.toString(), endTime.toString());
+                })
+            .collect(Collectors.toList());
+    }
+
+    private String normalizeTimeFormat(String time) {
+        if (time == null || time.isBlank()) {
+            return "00:00";
+        }
+
+        String[] parts = time.split(":");
+        if (parts.length != 2) {
+            return "00:00";
+        }
+
+        String hourPart = parts[0].equalsIgnoreCase("undefined") ? "00" : parts[0];
+        String minutePart = parts[1].equalsIgnoreCase("undefined") ? "00" : parts[1];
+
+        String hour = hourPart.length() == 1 ? "0" + hourPart : hourPart;
+        String minute = minutePart.length() == 1 ? "0" + minutePart : minutePart;
+
+        return hour + ":" + minute;
     }
 }
