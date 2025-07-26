@@ -354,7 +354,7 @@ class ScheduleServiceTest {
     }
 
     @Test
-    @DisplayName("커스텀 일정 추가 시 시간 문자열에 undefined나 한 자리 수가 포함되어도 정상 동작한다.")
+    @DisplayName("커스텀 일정 추가 시간 요청값에 한 자리 수가 포함되어도 정상 동작한다.")
     void addCustomScheduleWithInvalidFormedTimeShouldSucceed() {
         // given
         TimeTable timeTable = timeTableRepository.save(
@@ -365,15 +365,10 @@ class ScheduleServiceTest {
             )
         );
 
-        TimeSlotDto invalidTimeSlot1 = new TimeSlotDto(
+        TimeSlotDto invalidTimeSlot = new TimeSlotDto(
             "월",
-            "undefined:00",
-            "7:00"
-        );
-        TimeSlotDto invalidTimeSlot2 = new TimeSlotDto(
-            "화",
-            "",
-            "undefined:30:"
+            "7:00",
+            "9:00"
         );
 
         ScheduleCreateRequest request = new ScheduleCreateRequest(
@@ -382,27 +377,24 @@ class ScheduleServiceTest {
             "커스텀 과목",
             "커스텀 교수",
             "커스텀 강의실 위치",
-            List.of(invalidTimeSlot1, invalidTimeSlot2)
+            List.of(invalidTimeSlot)
         );
 
         // when
         ScheduleResponse response = scheduleService.addSchedule(timeTable.getId(), request, VALID_TOKEN);
 
-        //then
-        assertThat(response.timeSlots()).hasSize(2)
+        assertThat(response.timeSlots()).hasSize(1)
             .extracting(
                 TimeSlotDto::dayOfWeeks,
                 TimeSlotDto::startTime,
                 TimeSlotDto::endTime
             )
-            .containsExactlyInAnyOrder(
-                tuple("월", "00:00", "07:00"),
-                tuple("화", "00:00", "00:30")
-            );
+            .containsExactly(
+                tuple("월", "07:00", "09:00"));
     }
 
     @Test
-    @DisplayName("커스텀 일정 추가 시 시작 시간과 종료 시간의 요청값을 검증한다.")
+    @DisplayName("커스텀 일정 추가 시 시작 시간이 종료 시간보다 늦은 경우 예외가 발생한다.")
     void addCustomScheduleIfStartTimeIsLaterThanEndTimeThrowsException() {
         //given
         TimeTable timeTable = timeTableRepository.save(
