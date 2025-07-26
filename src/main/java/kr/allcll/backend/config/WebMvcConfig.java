@@ -36,7 +36,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 adminUrl,
                 "https://allcll.kr",
                 "https://www.allcll.kr",
-                "http://localhost:5173"
+                "https://localhost:5173"
             )
             .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
             .allowCredentials(true);
