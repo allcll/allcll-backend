@@ -13,9 +13,30 @@ permissions:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    
+    env:
+      DEV_URL: ${{ secrets.DEV_URL }}
+      ADMIN_URL: ${{ secrets.ADMIN_URL }}
+
     steps:
+      - name: SSH 설정
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/id_ed25519
+
       - name: 코드 체크아웃
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: 서브모듈 최신 커밋으로 업데이트
+        run: |
+          git submodule update --init --remote --checkout
 
       - name: JDK 21 세팅
         uses: actions/setup-java@v4

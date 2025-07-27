@@ -1,0 +1,4 @@
+[submodule "allcll-crawler"]
+	path = allcll-crawler
+	url = git@github.com:allcll/allcll-crawler.git
+	branch = main

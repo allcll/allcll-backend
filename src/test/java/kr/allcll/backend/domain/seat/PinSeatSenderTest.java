@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import kr.allcll.backend.domain.seat.pin.PinRepository;
-import kr.allcll.backend.support.schedule.ScheduledTaskHandler;
+import kr.allcll.backend.support.scheduler.ScheduledTaskHandler;
 import kr.allcll.backend.support.semester.Semester;
 import kr.allcll.backend.support.sse.SseService;
 import org.junit.jupiter.api.DisplayName;

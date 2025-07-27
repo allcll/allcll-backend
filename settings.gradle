@@ -1,1 +1,4 @@
 rootProject.name = 'allcll-backend'
+
+include(":crawler")
+project(":crawler").projectDir = file("allcll-crawler")

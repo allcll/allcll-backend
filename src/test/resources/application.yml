@@ -33,6 +33,9 @@ external:
   non-major-path: /api/non-major
   pin-path: /api/pin
 
+cors:
+  dev: ""
+  admin: ""
 cookie:
   max-age: 2190D
   secure: true

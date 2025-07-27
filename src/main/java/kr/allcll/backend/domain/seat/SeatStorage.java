@@ -1,5 +1,7 @@
 package kr.allcll.backend.domain.seat;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -17,18 +19,19 @@ import org.springframework.stereotype.Component;
 public class SeatStorage {
 
     private final Map<Subject, SeatDto> seats;
+    private static final int LIMIT_QUERY_TIME = 3;
 
     public SeatStorage() {
         this.seats = new ConcurrentHashMap<>();
     }
 
-    public List<SeatDto> getGeneralSeats(int limit) {
+    public List<SeatDto> getGeneralSeats() {
         Collection<SeatDto> seatsValue = seats.values();
         return seatsValue.stream()
-//            .filter(seat -> seat.getSubject().isNonMajor())
-            .filter(seat -> seat.getSeatCount() > 0)
+            .filter(seat -> seat.getSubject().isNonMajor())
+            .filter(seat ->
+                Duration.between(seat.getQueryTime(), LocalDateTime.now()).getSeconds() <= LIMIT_QUERY_TIME)
             .sorted(Comparator.comparingInt(SeatDto::getSeatCount))
-            .limit(limit)
             .toList();
     }
 
@@ -38,7 +41,10 @@ public class SeatStorage {
             seats::add,
             () -> logSubjectMissing(subject)
         ));
-        return seats;
+        return seats.stream()
+            .filter(seat ->
+                Duration.between(seat.getQueryTime(), LocalDateTime.now()).getSeconds() <= LIMIT_QUERY_TIME)
+            .toList();
     }
 
     private Optional<SeatDto> findSeat(Subject subject) {

@@ -5,13 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import kr.allcll.backend.client.dto.PinSubject;
-import kr.allcll.backend.client.dto.PinSubjectsRequest;
 import kr.allcll.backend.domain.seat.pin.Pin;
 import kr.allcll.backend.domain.seat.pin.PinRepository;
 import kr.allcll.backend.domain.subject.Subject;
 import kr.allcll.backend.support.semester.Semester;
 import kr.allcll.backend.support.sse.SseEmitterStorage;
+import kr.allcll.crawler.seat.PinSubjectUpdateRequest;
+import kr.allcll.crawler.seat.PinSubjectUpdateRequest.PinSubject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,11 +26,15 @@ public class ExternalService {
     private final ExternalClient externalClient;
 
     public void sendWantPinSubjectIdsToCrawler() {
-        PinSubjectsRequest request = getPinSubjects();
+        PinSubjectUpdateRequest request = getPinSubjects();
         externalClient.sendPinSubjects(request);
     }
 
-    private PinSubjectsRequest getPinSubjects() {
+    public void getTargetSubjectsFromCrawler() {
+        externalClient.getAllTargetSubjects();
+    }
+
+    private PinSubjectUpdateRequest getPinSubjects() {
         List<String> tokens = sseEmitterStorage.getUserTokens();
         Map<Subject, Integer> pinSubjects = new HashMap<>();
         for (String token : tokens) {
@@ -41,7 +45,7 @@ public class ExternalService {
             }
         }
         List<PinSubject> wantPinSubjects = getPinSubjectsWithPriority(pinSubjects);
-        return PinSubjectsRequest.from(wantPinSubjects);
+        return new PinSubjectUpdateRequest(wantPinSubjects);
     }
 
     private List<PinSubject> getPinSubjectsWithPriority(Map<Subject, Integer> pinSubjects) {

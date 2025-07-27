@@ -1,7 +1,7 @@
 package kr.allcll.backend.config;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import kr.allcll.backend.support.schedule.ScheduledTaskHandler;
+import kr.allcll.backend.support.scheduler.ScheduledTaskHandler;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

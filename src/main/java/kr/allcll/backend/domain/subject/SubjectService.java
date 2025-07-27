@@ -2,6 +2,7 @@ package kr.allcll.backend.domain.subject;
 
 import java.util.List;
 import kr.allcll.backend.domain.subject.dto.SubjectsResponse;
+import kr.allcll.backend.support.semester.Semester;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,8 @@ public class SubjectService {
         String classCode,
         String professorName
     ) {
-        Specification<Subject> condition = getCondition(subjectId, subjectName, subjectCode, classCode, professorName);
+        Specification<Subject> condition = getCondition(subjectId, subjectName, subjectCode, classCode, professorName,
+            Semester.now());
         List<Subject> subjects = subjectRepository.findAll(condition);
         return SubjectsResponse.from(subjects);
     }
@@ -31,14 +33,14 @@ public class SubjectService {
         String subjectName,
         String subjectCode,
         String classCode,
-        String professorName
+        String professorName,
+        String semesterAt
     ) {
-        return Specification.where(
-                SubjectSpecifications.hasSubjectId(subjectId))
+        return Specification.where(SubjectSpecifications.hasSubjectId(subjectId))
             .and(SubjectSpecifications.hasSubjectName(subjectName))
             .and(SubjectSpecifications.hasSubjectCode(subjectCode))
             .and(SubjectSpecifications.hasClassCode(classCode))
-            .and(SubjectSpecifications.hasProfessorName(professorName)
-            );
+            .and(SubjectSpecifications.hasProfessorName(professorName))
+            .and(SubjectSpecifications.hasSemesterAt(semesterAt));
     }
 }
