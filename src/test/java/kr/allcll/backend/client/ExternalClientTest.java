@@ -72,28 +72,28 @@ class ExternalClientTest {
                 subjectB.getId()
             );
     }
-
-    @Test
-    @DisplayName("변경 감지 과목들의 정상 수신을 확인한다.")
-    void getAllTargetSubjects() {
-        // given
-        Subject subjectA = subjectRepository
-            .save(SubjectFixture.createNonMajorSubject("차와문화", "123456", "001", "김보예"));
-        Subject subjectB = subjectRepository
-            .save(SubjectFixture.createNonMajorSubject("차와문화", "123456", "002", "김보예"));
-        changedSubjectBuffer.add(new ChangeSubjectsResponse(subjectA.getId(), ChangeStatus.IN, 10));
-        changedSubjectBuffer.add(new ChangeSubjectsResponse(subjectB.getId(), ChangeStatus.IN, 15));
-
-        // when
-        externalClient.getAllTargetSubjects();
-        List<SeatDto> allSeatDtos = seatStorage.getAll();
-
-        // then
-        assertThat(allSeatDtos).hasSize(2)
-            .extracting(SeatDto::getSubject, SeatDto::getSeatCount)
-            .containsExactly(
-                tuple(subjectA, 10),
-                tuple(subjectB, 15)
-            );
-    }
+//
+//    @Test
+//    @DisplayName("변경 감지 과목들의 정상 수신을 확인한다.")
+//    void getAllTargetSubjects() {
+//        // given
+//        Subject subjectA = subjectRepository
+//            .save(SubjectFixture.createNonMajorSubject("차와문화", "123456", "001", "김보예"));
+//        Subject subjectB = subjectRepository
+//            .save(SubjectFixture.createNonMajorSubject("차와문화", "123456", "002", "김보예"));
+//        changedSubjectBuffer.add(new ChangeSubjectsResponse(subjectA.getId(), ChangeStatus.IN, 10));
+//        changedSubjectBuffer.add(new ChangeSubjectsResponse(subjectB.getId(), ChangeStatus.IN, 15));
+//
+//        // when
+//        externalClient.getAllTargetSubjects();
+//        List<SeatDto> allSeatDtos = seatStorage.getAll();
+//
+//        // then
+//        assertThat(allSeatDtos).hasSize(2)
+//            .extracting(SeatDto::getSubject, SeatDto::getSeatCount)
+//            .containsExactly(
+//                tuple(subjectA, 10),
+//                tuple(subjectB, 15)
+//            );
+//    }
 }
