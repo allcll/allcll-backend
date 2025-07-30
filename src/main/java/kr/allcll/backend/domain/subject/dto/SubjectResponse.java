@@ -13,7 +13,11 @@ public record SubjectResponse(
     String studentYear,
     String lesnTime,
     String lesnRoom,
-    String tmNum
+    String tmNum,
+    String remark,
+    String curiTypeCdNm,
+    String curiLangNm,
+    Boolean isDeleted
 ) {
 
     public static SubjectResponse from(Subject subject) {
@@ -28,7 +32,11 @@ public record SubjectResponse(
             subject.getStudentYear(),
             subject.getLesnTime(),
             subject.getLesnRoom(),
-            subject.getTmNum()
+            subject.getTmNum(),
+            subject.getRemark(),
+            subject.getCuriTypeCdNm(),
+            subject.getCuriLangNm(),
+            subject.isDeleted()
         );
     }
 }
