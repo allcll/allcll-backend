@@ -24,4 +24,8 @@ public abstract class BaseEntity {
             this.createdAt = createdAt;
         }
     }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
 }
