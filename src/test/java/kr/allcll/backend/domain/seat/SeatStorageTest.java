@@ -10,7 +10,6 @@ import java.util.List;
 import kr.allcll.backend.domain.seat.dto.SeatDto;
 import kr.allcll.backend.domain.subject.Subject;
 import kr.allcll.backend.domain.subject.SubjectRepository;
-import kr.allcll.crawler.seat.ChangeStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
