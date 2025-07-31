@@ -27,7 +27,7 @@ public class BasketService {
         String professorName,
         String subjectName
     ) {
-        Specification<Subject> condition = getCondition(departmentCode, professorName, subjectName);
+        Specification<Subject> condition = getCondition(departmentCode, professorName, subjectName, Semester.now());
         List<Subject> subjects = subjectRepository.findAll(condition);
         List<BasketsEachSubject> result = getBasketsEachSubject(subjects);
         return new BasketsResponse(result);
@@ -48,12 +48,15 @@ public class BasketService {
     private Specification<Subject> getCondition(
         String departmentCode,
         String professorName,
-        String subjectName
+        String subjectName,
+        String semesterAt
     ) {
         return Specification.where(
             SubjectSpecifications.hasDepartmentCode(departmentCode)
                 .and(SubjectSpecifications.hasProfessorName(professorName))
                 .and(SubjectSpecifications.hasSubjectName(subjectName))
+                .and(SubjectSpecifications.hasSemesterAt(semesterAt))
+                .and(SubjectSpecifications.isNotDeleted())
         );
     }
 
