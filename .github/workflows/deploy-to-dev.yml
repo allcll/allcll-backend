@@ -72,7 +72,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Test with Gradle Wrapper
-        run: ./gradlew build
+        run: ./gradlew clean build --no-build-cache
 
       - name: Copy JAR to Local
         run: |
