@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class GeneralSeatSender {
 
     private static final String EVENT_NAME = "nonMajorSeats";
-    private static final int QUERY_LIMIT = 40;
+    private static final int QUERY_LIMIT = 20;
     private static final int SEASON_SEMESTER_QUERY_LIMIT = 39; // 2025-하계 전체 제공을 위한 쿼리 제한 수
     private static final Duration SENDING_PERIOD = Duration.ofSeconds(1);
 
@@ -46,7 +46,7 @@ public class GeneralSeatSender {
 
     private Runnable getGeneralSeatTask() {
         return () -> {
-            List<SeatDto> generalSeats = seatStorage.getGeneralSeats();
+            List<SeatDto> generalSeats = seatStorage.getGeneralSeats(QUERY_LIMIT);
             sseService.propagate(EVENT_NAME, SeatsResponse.from(generalSeats));
         };
     }

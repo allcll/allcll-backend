@@ -1,7 +1,5 @@
 package kr.allcll.backend.domain.seat;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -25,13 +23,13 @@ public class SeatStorage {
         this.seats = new ConcurrentHashMap<>();
     }
 
-    public List<SeatDto> getGeneralSeats() {
+    public List<SeatDto> getGeneralSeats(int limit) {
         Collection<SeatDto> seatsValue = seats.values();
         return seatsValue.stream()
             .filter(seat -> seat.getSubject().isNonMajor())
-            .filter(seat ->
-                Duration.between(seat.getQueryTime(), LocalDateTime.now()).getSeconds() <= LIMIT_QUERY_TIME)
+            .filter(seat -> seat.getSeatCount() > 0)
             .sorted(Comparator.comparingInt(SeatDto::getSeatCount))
+            .limit(limit)
             .toList();
     }
 
@@ -41,10 +39,7 @@ public class SeatStorage {
             seats::add,
             () -> logSubjectMissing(subject)
         ));
-        return seats.stream()
-            .filter(seat ->
-                Duration.between(seat.getQueryTime(), LocalDateTime.now()).getSeconds() <= LIMIT_QUERY_TIME)
-            .toList();
+        return seats;
     }
 
     private Optional<SeatDto> findSeat(Subject subject) {

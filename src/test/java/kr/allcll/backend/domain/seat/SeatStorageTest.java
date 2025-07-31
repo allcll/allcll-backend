@@ -10,7 +10,6 @@ import java.util.List;
 import kr.allcll.backend.domain.seat.dto.SeatDto;
 import kr.allcll.backend.domain.subject.Subject;
 import kr.allcll.backend.domain.subject.SubjectRepository;
-import kr.allcll.crawler.seat.ChangeStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,9 +40,9 @@ class SeatStorageTest {
         subjectRepository.save(subject);
 
         // when
-        SeatDto previousSeatDto = new SeatDto(subject, 10, LocalDateTime.now(), ChangeStatus.IN);
+        SeatDto previousSeatDto = new SeatDto(subject, 10, LocalDateTime.now());
         seatStorage.add(previousSeatDto);
-        SeatDto updatedSeatDto = new SeatDto(subject, 5, LocalDateTime.now(), ChangeStatus.UPDATE);
+        SeatDto updatedSeatDto = new SeatDto(subject, 5, LocalDateTime.now());
         seatStorage.add(updatedSeatDto);
 
         // then
@@ -77,29 +76,28 @@ class SeatStorageTest {
         subjectRepository.saveAll(
             List.of(subject0, subject1, subject2, subject3, subject4, subject5, subject6, subject7, subject8, subject9,
                 subject10));
-        SeatDto seatDto1 = new SeatDto(subject0, 8, LocalDateTime.now(), ChangeStatus.IN);
-        SeatDto seatDto2 = new SeatDto(subject1, 7, LocalDateTime.now(), ChangeStatus.IN);
-        SeatDto seatDto3 = new SeatDto(subject2, 6, LocalDateTime.now(), ChangeStatus.IN);
-        SeatDto seatDto4 = new SeatDto(subject3, 5, LocalDateTime.now(), ChangeStatus.IN);
-        SeatDto seatDto5 = new SeatDto(subject4, 4, LocalDateTime.now(), ChangeStatus.IN);
-        SeatDto seatDto6 = new SeatDto(subject5, 3, LocalDateTime.now(), ChangeStatus.IN);
-        SeatDto seatDto7 = new SeatDto(subject6, 2, LocalDateTime.now(), ChangeStatus.IN);
-        SeatDto seatDto8 = new SeatDto(subject7, 1, LocalDateTime.now(), ChangeStatus.IN);
-        SeatDto seatDto9 = new SeatDto(subject8, 0, LocalDateTime.now(), ChangeStatus.OUT);
-        SeatDto seatDto10 = new SeatDto(subject9, 2, LocalDateTime.now(), ChangeStatus.IN);
-        SeatDto seatDto11 = new SeatDto(subject10, 1, LocalDateTime.now(), ChangeStatus.IN);
+        SeatDto seatDto1 = new SeatDto(subject0, 8, LocalDateTime.now());
+        SeatDto seatDto2 = new SeatDto(subject1, 7, LocalDateTime.now());
+        SeatDto seatDto3 = new SeatDto(subject2, 6, LocalDateTime.now());
+        SeatDto seatDto4 = new SeatDto(subject3, 5, LocalDateTime.now());
+        SeatDto seatDto5 = new SeatDto(subject4, 4, LocalDateTime.now());
+        SeatDto seatDto6 = new SeatDto(subject5, 3, LocalDateTime.now());
+        SeatDto seatDto7 = new SeatDto(subject6, 2, LocalDateTime.now());
+        SeatDto seatDto8 = new SeatDto(subject7, 1, LocalDateTime.now());
+        SeatDto seatDto9 = new SeatDto(subject8, 0, LocalDateTime.now());
+        SeatDto seatDto10 = new SeatDto(subject9, 2, LocalDateTime.now());
+        SeatDto seatDto11 = new SeatDto(subject10, 1, LocalDateTime.now());
         seatStorage.addAll(
             List.of(seatDto1, seatDto2, seatDto3, seatDto4, seatDto5, seatDto6, seatDto7, seatDto8, seatDto9, seatDto10,
                 seatDto11));
 
         // when
-        List<SeatDto> seats = seatStorage.getGeneralSeats();
+        List<SeatDto> seats = seatStorage.getGeneralSeats(5);
 
         // then
-        assertThat(seats).hasSize(6)
+        assertThat(seats).hasSize(5)
             .extracting(SeatDto::getSubject, SeatDto::getSeatCount)
             .containsExactly(
-                tuple(subject8, 0),
                 tuple(subject7, 1),
                 tuple(subject10, 1),
                 tuple(subject6, 2),
@@ -126,17 +124,17 @@ class SeatStorageTest {
         subjectRepository.saveAll(
             List.of(subject0, subject1, subject2, subject3, subject4, subject5, subject6, subject7, subject8, subject9,
                 subject10));
-        SeatDto seatDto1 = new SeatDto(subject0, 8, LocalDateTime.now(), ChangeStatus.IN);
-        SeatDto seatDto2 = new SeatDto(subject1, 7, LocalDateTime.now(), ChangeStatus.IN);
-        SeatDto seatDto3 = new SeatDto(subject2, 6, LocalDateTime.now(), ChangeStatus.IN);
-        SeatDto seatDto4 = new SeatDto(subject3, 5, LocalDateTime.now(), ChangeStatus.IN);
-        SeatDto seatDto5 = new SeatDto(subject4, 4, LocalDateTime.now(), ChangeStatus.IN);
-        SeatDto seatDto6 = new SeatDto(subject5, 3, LocalDateTime.now(), ChangeStatus.IN);
-        SeatDto seatDto7 = new SeatDto(subject6, 2, LocalDateTime.now(), ChangeStatus.IN);
-        SeatDto seatDto8 = new SeatDto(subject7, 1, LocalDateTime.now(), ChangeStatus.IN);
-        SeatDto seatDto9 = new SeatDto(subject8, 0, LocalDateTime.now(), ChangeStatus.IN);
-        SeatDto seatDto10 = new SeatDto(subject9, 2, LocalDateTime.now(), ChangeStatus.IN);
-        SeatDto seatDto11 = new SeatDto(subject10, 1, LocalDateTime.now(), ChangeStatus.IN);
+        SeatDto seatDto1 = new SeatDto(subject0, 8, LocalDateTime.now());
+        SeatDto seatDto2 = new SeatDto(subject1, 7, LocalDateTime.now());
+        SeatDto seatDto3 = new SeatDto(subject2, 6, LocalDateTime.now());
+        SeatDto seatDto4 = new SeatDto(subject3, 5, LocalDateTime.now());
+        SeatDto seatDto5 = new SeatDto(subject4, 4, LocalDateTime.now());
+        SeatDto seatDto6 = new SeatDto(subject5, 3, LocalDateTime.now());
+        SeatDto seatDto7 = new SeatDto(subject6, 2, LocalDateTime.now());
+        SeatDto seatDto8 = new SeatDto(subject7, 1, LocalDateTime.now());
+        SeatDto seatDto9 = new SeatDto(subject8, 0, LocalDateTime.now());
+        SeatDto seatDto10 = new SeatDto(subject9, 2, LocalDateTime.now());
+        SeatDto seatDto11 = new SeatDto(subject10, 1, LocalDateTime.now());
         seatStorage.addAll(
             List.of(seatDto1, seatDto2, seatDto3, seatDto4, seatDto5, seatDto6, seatDto7, seatDto8, seatDto9, seatDto10,
                 seatDto11));
