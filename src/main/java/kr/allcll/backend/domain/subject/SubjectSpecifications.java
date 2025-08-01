@@ -38,4 +38,9 @@ public class SubjectSpecifications {
         return ((root, query, builder) ->
             semesterAt == null ? null : builder.equal(root.get("semesterAt"), semesterAt));
     }
+
+    public static Specification<Subject> isNotDeleted() {
+        return (root, query, builder) ->
+            builder.isFalse(root.get("isDeleted"));
+    }
 }

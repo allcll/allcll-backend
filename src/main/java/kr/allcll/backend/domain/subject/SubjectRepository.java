@@ -16,6 +16,9 @@ public interface SubjectRepository extends JpaRepository<Subject, Long>, JpaSpec
         """)
     List<Subject> findAllByDeptCd(String deptCd, String semesterAt);
 
+    @Query("select s from Subject s where s.isDeleted = false")
+    List<Subject> findAll();
+
     @Query("""
         select s from Subject s
         where s.id = :id

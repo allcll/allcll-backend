@@ -41,6 +41,7 @@ public class SubjectService {
             .and(SubjectSpecifications.hasSubjectCode(subjectCode))
             .and(SubjectSpecifications.hasClassCode(classCode))
             .and(SubjectSpecifications.hasProfessorName(professorName))
-            .and(SubjectSpecifications.hasSemesterAt(semesterAt));
+            .and(SubjectSpecifications.hasSemesterAt(semesterAt))
+            .and(SubjectSpecifications.isNotDeleted());
     }
 }
