@@ -36,12 +36,6 @@ public class BasketApiTest {
                 "baskets": [
                     {
                         "subjectId": 1,
-                        "subjectName": "컴퓨터구조",
-                        "departmentName": "전자정보공학과",
-                        "departmentCode": "3210",
-                        "subjectCode": "004310",
-                        "classCode": "001",
-                        "professorName": "김보예",
                         "totalCount": 14
                     }
                 ]
@@ -51,9 +45,7 @@ public class BasketApiTest {
         // when
         when(basketService.findBasketsByCondition(null, null, null)).thenReturn(
             new BasketsResponse(List.of(
-                new BasketsEachSubject(1L, "컴퓨터구조",
-                    "전자정보공학과", "3210",
-                    "004310", "001", "김보예", 14)
+                new BasketsEachSubject(1L, 14)
             ))
         );
         MvcResult result = mockMvc.perform(get("/api/baskets")).andExpect(status().isOk()).andReturn();
