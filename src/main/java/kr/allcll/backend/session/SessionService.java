@@ -28,7 +28,6 @@ public class SessionService {
 
     public CredentialResponse getCredential(String userId) {
         Credential credential = credentials.findByUserId(userId);
-        log.info(credential.getUserId());
         return CredentialResponse.fromCredential(credential);
     }
 
