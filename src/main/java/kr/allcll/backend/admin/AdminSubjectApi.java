@@ -12,7 +12,7 @@ public class AdminSubjectApi {
 
     private final CrawlerSubjectService crawlerSubjectService;
 
-    @PostMapping("/api/subjects")
+    @PostMapping("/api/admin/subjects")
     public void syncSubjects(
         @RequestParam String userId,
         @RequestParam String year,
