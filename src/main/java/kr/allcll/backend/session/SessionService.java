@@ -60,8 +60,8 @@ public class SessionService {
     }
 
     public void cancelSessionScheduling() {
-        credentials.deleteAll();
         threadPoolTaskScheduler.cancelAll();
+        credentials.deleteAll();
         userTaskMap.clear();
     }
 }
