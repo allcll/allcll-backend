@@ -20,7 +20,7 @@ public class AdminSseApi {
     private final SchedulerService schedulerService;
     private final AdminRequestValidator validator;
 
-    @GetMapping(value = "/api/admin/connect", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/api/admin/sse-connect", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> getServerSentEventConnection(HttpServletRequest request) {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();

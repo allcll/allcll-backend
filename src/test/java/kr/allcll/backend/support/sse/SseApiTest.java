@@ -37,7 +37,7 @@ class SseApiTest {
     @Test
     void getServerSentEventConnection() throws Exception {
         // when, then
-        mockMvc.perform(get("/api/admin/connect")
+        mockMvc.perform(get("/api/admin/sse-connect")
                 .accept(MediaType.TEXT_EVENT_STREAM_VALUE))
             .andExpect(status().isOk());
     }
