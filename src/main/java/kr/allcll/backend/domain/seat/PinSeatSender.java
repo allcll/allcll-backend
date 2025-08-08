@@ -38,7 +38,7 @@ public class PinSeatSender {
         scheduledTaskHandler.scheduleAtFixedRate(getPinSeatTask(), SENDING_PERIOD);
     }
 
-    private boolean hasActiveSchedule() {
+    public boolean hasActiveSchedule() {
         return scheduledTaskHandler.getTaskCount() > 0;
     }
 

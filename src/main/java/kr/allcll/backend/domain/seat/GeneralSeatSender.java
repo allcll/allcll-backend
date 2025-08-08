@@ -40,7 +40,7 @@ public class GeneralSeatSender {
         scheduledTaskHandler.scheduleAtFixedRate(getGeneralSeatTask(), SENDING_PERIOD);
     }
 
-    private boolean hasActiveSchedule() {
+    public boolean hasActiveSchedule() {
         return scheduledTaskHandler.getTaskCount() > 0;
     }
 
