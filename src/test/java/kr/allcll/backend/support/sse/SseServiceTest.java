@@ -7,13 +7,16 @@ import io.restassured.response.Response;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import kr.allcll.backend.admin.AdminRequestValidator;
 import kr.allcll.backend.domain.seat.PinSeatSender;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -24,8 +27,14 @@ class SseServiceTest {
 
     private static final Logger log = LoggerFactory.getLogger(SseServiceTest.class);
 
+    @Value("${admin.token}")
+    private String adminToken;
+
     @Autowired
     private SseService sseService;
+
+    @MockitoBean
+    private AdminRequestValidator validator;
 
     @MockitoBean
     private PinSeatSender pinSeatSender;
@@ -42,10 +51,14 @@ class SseServiceTest {
     @Test
     void sseConnectionTest() {
         // when
+        Mockito.when(validator.isUnauthorized(Mockito.any())).thenReturn(false);
+        Mockito.when(validator.isRateLimited(Mockito.any())).thenReturn(false);
+
         Response response = RestAssured.given()
             .accept("text/event-stream")
+            .header("X-ADMIN-TOKEN", adminToken)
             .when()
-            .get("/api/connect")
+            .get("/api/admin/connect")
             .then()
             .statusCode(200)
             .extract()
@@ -59,10 +72,14 @@ class SseServiceTest {
     @Test
     void ssePropagationTest() {
         // given
+        Mockito.when(validator.isUnauthorized(Mockito.any())).thenReturn(false);
+        Mockito.when(validator.isRateLimited(Mockito.any())).thenReturn(false);
+
         Response response1 = RestAssured.given()
             .accept("text/event-stream")
+            .header("X-ADMIN-TOKEN", adminToken)
             .when()
-            .get("/api/connect")
+            .get("/api/admin/connect")
             .then()
             .statusCode(200)
             .extract()
@@ -70,8 +87,9 @@ class SseServiceTest {
 
         Response response2 = RestAssured.given()
             .accept("text/event-stream")
+            .header("X-ADMIN-TOKEN", adminToken)
             .when()
-            .get("/api/connect")
+            .get("/api/admin/connect")
             .then()
             .statusCode(200)
             .extract()
