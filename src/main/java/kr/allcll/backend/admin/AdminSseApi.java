@@ -22,28 +22,6 @@ public class AdminSseApi {
     private final SchedulerService schedulerService;
     private final AdminRequestValidator validator;
 
-    @GetMapping(value = "/api/admin/sse-connect", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public ResponseEntity<SseEmitter> getServerSentEventConnection(HttpServletRequest request) {
-        if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
-            return ResponseEntity.status(401).build();
-        }
-        String token = ThreadLocalHolder.SHARED_TOKEN.get();
-        SseEmitter emitter = sseService.connect(token);
-        return ResponseEntity.ok()
-            .header("X-Accel-Buffering", "no")
-            .body(emitter);
-    }
-
-    @GetMapping("/api/admin/sse/check")
-    public ResponseEntity<SseStatusResponse> getSseConnectedStatus(HttpServletRequest request) {
-        if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
-            return ResponseEntity.status(401).build();
-        }
-        String token = ThreadLocalHolder.SHARED_TOKEN.get();
-        SseStatusResponse sseStatusResponse = sseService.isConnected(token);
-        return ResponseEntity.ok().body(sseStatusResponse);
-    }
-
     @PostMapping("/api/admin/seat-scheduler/start")
     public ResponseEntity<Void> startScheduling(HttpServletRequest request) {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
