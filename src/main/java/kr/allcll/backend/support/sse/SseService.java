@@ -2,6 +2,7 @@ package kr.allcll.backend.support.sse;
 
 import java.io.IOException;
 import java.util.List;
+import kr.allcll.backend.support.sse.dto.SseStatusResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -45,11 +46,17 @@ public class SseService {
         try {
             sseEmitter.send(eventBuilder);
         } catch (IOException e) {
+            log.warn("전송 실패 - SSE 연결이 끊겼습니다.: {}", e.getMessage());
             SseErrorHandler.handle(e);
         }
     }
 
     public List<String> getConnectedTokens() {
         return sseEmitterStorage.getUserTokens().stream().toList();
+    }
+
+    public SseStatusResponse isConnected(String token) {
+        boolean isConnected = sseEmitterStorage.getEmitter(token).isPresent();
+        return SseStatusResponse.of(isConnected);
     }
 }

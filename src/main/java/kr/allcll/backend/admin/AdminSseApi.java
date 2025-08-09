@@ -2,7 +2,9 @@ package kr.allcll.backend.admin;
 
 import jakarta.servlet.http.HttpServletRequest;
 import kr.allcll.backend.support.scheduler.SchedulerService;
+import kr.allcll.backend.support.scheduler.dto.SeatSchedulerStatusResponse;
 import kr.allcll.backend.support.sse.SseService;
+import kr.allcll.backend.support.sse.dto.SseStatusResponse;
 import kr.allcll.backend.support.web.ThreadLocalHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -32,7 +34,17 @@ public class AdminSseApi {
             .body(emitter);
     }
 
-    @PostMapping("/api/admin/scheduler/start")
+    @GetMapping("/api/admin/sse/check")
+    public ResponseEntity<SseStatusResponse> getSseConnectedStatus(HttpServletRequest request) {
+        if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
+            return ResponseEntity.status(401).build();
+        }
+        String token = ThreadLocalHolder.SHARED_TOKEN.get();
+        SseStatusResponse sseStatusResponse = sseService.isConnected(token);
+        return ResponseEntity.ok().body(sseStatusResponse);
+    }
+
+    @PostMapping("/api/admin/seat-scheduler/start")
     public ResponseEntity<Void> startScheduling(HttpServletRequest request) {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
@@ -41,12 +53,21 @@ public class AdminSseApi {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/api/admin/scheduler/cancel")
+    @PostMapping("/api/admin/seat-scheduler/cancel")
     public ResponseEntity<Void> cancelScheduling(HttpServletRequest request) {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
         }
         schedulerService.cancelScheduling();
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/api/admin/seat-scheduler/check")
+    public ResponseEntity<SeatSchedulerStatusResponse> checkSchedulerStatus(HttpServletRequest request) {
+        if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
+            return ResponseEntity.status(401).build();
+        }
+        SeatSchedulerStatusResponse seatSchedulerStatusResponse = schedulerService.getSeatSchedulerStatus();
+        return ResponseEntity.ok(seatSchedulerStatusResponse);
     }
 }
