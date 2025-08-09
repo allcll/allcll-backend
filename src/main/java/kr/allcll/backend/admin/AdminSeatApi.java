@@ -2,6 +2,7 @@ package kr.allcll.backend.admin;
 
 import jakarta.servlet.http.HttpServletRequest;
 import kr.allcll.crawler.seat.CrawlerSeatService;
+import kr.allcll.crawler.seat.SeatStatusResponse;
 import kr.allcll.crawler.seat.TargetSubjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +39,15 @@ public class AdminSeatApi {
         targetSubjectService.loadAllSubjects();
         crawlerSeatService.getSeasonSeatPeriodically(userId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/api/admin/seat/check")
+    public ResponseEntity<SeatStatusResponse> getSeatStatus(HttpServletRequest request) {
+        if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
+            return ResponseEntity.status(401).build();
+        }
+        SeatStatusResponse seatStatusResponse = crawlerSeatService.getSeatCrawlerStatus();
+        return ResponseEntity.ok(seatStatusResponse);
     }
 
     @PostMapping("/api/admin/seat/cancel")
