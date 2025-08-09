@@ -3,6 +3,14 @@ spring:
     driver-class-name: org.h2.Driver
     url: 'jdbc:h2:mem:test'
     username: sa
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: allclllclla@gmail.com
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
 
   h2:
     console:
