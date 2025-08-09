@@ -24,7 +24,7 @@ public class SchedulerService {
     }
 
     public SeatSchedulerStatusResponse getSeatSchedulerStatus() {
-        boolean isActive = generalSeatSender.hasActiveSchedule() && pinSeatSender.hasActiveSchedule();
-        return SeatSchedulerStatusResponse.of(isActive);
+        boolean isSending = generalSeatSender.hasActiveSchedule() && pinSeatSender.hasActiveSchedule();
+        return SeatSchedulerStatusResponse.of(isSending);
     }
 }
