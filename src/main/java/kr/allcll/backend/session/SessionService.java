@@ -37,25 +37,18 @@ public class SessionService {
     }
 
     public void startSession(String userId) {
-        if (userTaskMap.containsKey(userId) && threadPoolTaskScheduler.isRunning(userTaskMap.get(userId))) {
+        if(threadPoolTaskScheduler.isRunning(userId)) {
             log.info("이미 해당 인증 정보로 세션 갱신 중입니다: {}", userId);
             return;
         }
         Credential credential = credentials.findByUserId(userId);
         Runnable resetSessionTask = () -> sessionClient.execute(credential, new EmptyPayload());
 
-        String taskId = threadPoolTaskScheduler.scheduleAtFixedRate(resetSessionTask, Duration.ofSeconds(10));
-        userTaskMap.put(userId, taskId);
+        String taskId = threadPoolTaskScheduler.scheduleAtFixedRate(userId, resetSessionTask, Duration.ofSeconds(10));
     }
 
     public SessionStatusResponse getSessionStatus(String userId) {
-        String taskId = userTaskMap.get(userId);
-
-        boolean isActive = false;
-        if (taskId != null) {
-            isActive = threadPoolTaskScheduler.isRunning(taskId);
-        }
-
+        boolean isActive = threadPoolTaskScheduler.isRunning(userId);
         return SessionStatusResponse.of(isActive);
     }
 
