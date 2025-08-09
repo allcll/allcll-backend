@@ -1,8 +1,6 @@
 package kr.allcll.backend.session;
 
 import java.time.Duration;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import kr.allcll.backend.session.dto.CredentialResponse;
 import kr.allcll.backend.session.dto.SessionStatusResponse;
 import kr.allcll.backend.session.dto.SetCredentialRequest;
@@ -19,8 +17,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class SessionService {
-
-    private final Map<String, String> userTaskMap = new ConcurrentHashMap<>();
 
     private final Credentials credentials;
     private final CrawlerScheduledTaskHandler threadPoolTaskScheduler;
@@ -44,7 +40,7 @@ public class SessionService {
         Credential credential = credentials.findByUserId(userId);
         Runnable resetSessionTask = () -> sessionClient.execute(credential, new EmptyPayload());
 
-        String taskId = threadPoolTaskScheduler.scheduleAtFixedRate(userId, resetSessionTask, Duration.ofSeconds(10));
+        threadPoolTaskScheduler.scheduleAtFixedRate(userId, resetSessionTask, Duration.ofSeconds(10));
     }
 
     public SessionStatusResponse getSessionStatus(String userId) {
@@ -55,6 +51,5 @@ public class SessionService {
     public void cancelSessionScheduling() {
         threadPoolTaskScheduler.cancelAll();
         credentials.deleteAll();
-        userTaskMap.clear();
     }
 }
