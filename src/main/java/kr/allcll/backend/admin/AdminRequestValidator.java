@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class AdminRequestValidator {
 
     private static final String AUTH_HEADER = "X-ADMIN-TOKEN";
-    private static final long REQUEST_INTERVAL_SECONDS = 3;
+    private static final long REQUEST_INTERVAL_SECONDS = 1;
 
     private final Map<String, Long> lastRequestTimeByIp = new ConcurrentHashMap<>();
 
