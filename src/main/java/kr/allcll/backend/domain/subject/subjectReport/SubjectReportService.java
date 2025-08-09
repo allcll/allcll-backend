@@ -23,7 +23,7 @@ public class SubjectReportService {
     private final JavaMailSender emailSender;
     private final ReportTableBuilder reportTableBuilder;
     private final CrawlerSubjectRepository crawlerSubjectRepository;
-    private final String EMAIL_ADDRESS = "hynam1220@naver.com";
+    private final String EMAIL_ADDRESS = "allclllclla@gmail.com";
 
     public void generateSubjectSyncReport(SubjectSyncResult syncResult, CrawlingMetaData metaData) {
         List<CrawlerSubject> allSubjects = crawlerSubjectRepository.findAll();
