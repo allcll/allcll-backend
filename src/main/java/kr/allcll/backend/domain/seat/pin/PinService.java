@@ -25,7 +25,7 @@ public class PinService {
     @Transactional
     public void addPinOnSubject(Long subjectId, String token) {
         Subject subject = subjectRepository.findById(subjectId)
-            .orElseThrow(() -> new AllcllException(AllcllErrorCode.SUBJECT_NOT_FOUND));
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.SUBJECT_NOT_FOUND, subjectId));
         validateCanAddPin(subject, token);
         pinRepository.save(new Pin(token, subject));
     }
@@ -43,7 +43,7 @@ public class PinService {
     @Transactional
     public void deletePinOnSubject(Long subjectId, String token) {
         Subject subject = subjectRepository.findById(subjectId)
-            .orElseThrow(() -> new AllcllException(AllcllErrorCode.SUBJECT_NOT_FOUND));
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.SUBJECT_NOT_FOUND, subjectId));
         Pin pin = pinRepository.findBySubjectAndToken(subject, token, Semester.now())
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.PIN_SUBJECT_MISMATCH));
         pinRepository.deleteById(pin.getId());

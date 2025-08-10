@@ -45,7 +45,7 @@ public class ScheduleService {
         if (ScheduleType.fromValue(request.scheduleType()) == ScheduleType.OFFICIAL) {
             validateDuplicatedSubject(request, timeTable);
             Subject subject = subjectRepository.findById(request.subjectId())
-                .orElseThrow(() -> new AllcllException(AllcllErrorCode.SUBJECT_NOT_FOUND));
+                .orElseThrow(() -> new AllcllException(AllcllErrorCode.SUBJECT_NOT_FOUND, request.subjectId()));
 
             OfficialSchedule schedule = new OfficialSchedule(timeTable, subject);
             officialScheduleRepository.save(schedule);
