@@ -6,12 +6,13 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @Component
 public class AdminRequestValidator {
 
     private static final String AUTH_HEADER = "X-ADMIN-TOKEN";
-    private static final long REQUEST_INTERVAL_SECONDS = 5;
+    private static final long REQUEST_INTERVAL_SECONDS = 1;
 
     private final Map<String, Long> lastRequestTimeByIp = new ConcurrentHashMap<>();
 
@@ -24,6 +25,10 @@ public class AdminRequestValidator {
     }
 
     public boolean isRateLimited(HttpServletRequest request) {
+        if (request.getMethod().equals("GET")) {
+            return false;
+        }
+
         String ip = request.getRemoteAddr();
         long now = Instant.now().getEpochSecond();
 
