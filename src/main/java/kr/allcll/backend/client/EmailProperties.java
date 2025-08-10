@@ -1,34 +1,20 @@
 package kr.allcll.backend.client;
 
-import lombok.Getter;
+import java.util.Properties;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@Getter
-@Component
 @Slf4j
-public class EmailProperties {
+@ConfigurationProperties(prefix = "spring.mail")
+public record EmailProperties(
+    String host,
+    int port,
+    String username,
+    String password,
+    Properties properties
+) {
 
-    @Value("${spring.mail.host:smtp.gmail.com}")
-    private String host;
-
-    @Value("${spring.mail.port:587}")
-    private int port;
-
-    @Value("${spring.mail.username}")
-    private String username;
-
-    @Value("${spring.mail.password}")
-    private String password;
-
-    @Value("${spring.mail.properties.mail.smtp.auth:true}")
-    private boolean auth;
-
-    @Value("${spring.mail.properties.mail.smtp.starttls.enable:true}")
-    private boolean starttlsEnable;
-
-    public EmailProperties() {
+    public EmailProperties {
         log.info("EmailProperties 접근");
     }
 }
