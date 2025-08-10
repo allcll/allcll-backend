@@ -350,7 +350,7 @@ class ScheduleServiceTest {
         assertThatThrownBy(() ->
             scheduleService.addSchedule(timeTable.getId(), request, VALID_TOKEN)
         ).isInstanceOf(AllcllException.class)
-            .hasMessageContaining(AllcllErrorCode.SUBJECT_NOT_FOUND.getMessage());
+            .hasMessageContaining(String.format(AllcllErrorCode.SUBJECT_NOT_FOUND.getMessage(), NOT_FOUND_ID));
     }
 
     @Test
