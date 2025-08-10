@@ -17,4 +17,13 @@ public record CredentialResponse(
             credential.getTokenL()
         );
     }
+
+    public static CredentialResponse ofInvalidCredential(String nullValue) {
+        return new CredentialResponse(
+            nullValue,
+            nullValue,
+            nullValue,
+            nullValue
+        );
+    }
 }
