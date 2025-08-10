@@ -13,6 +13,7 @@ jobs:
     env:
       DEV_URL: ${{ secrets.DEV_URL }}
       ADMIN_URL: ${{ secrets.ADMIN_URL }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
 
     defaults:
       run:
@@ -96,8 +97,10 @@ jobs:
           mkdir -p ${{ secrets.APP_DIR }}/logs
           
           echo "Starting new application..."
-          sudo nohup java -Dspring.profiles.active=prod \
+          sudo -E nohup java \
+          -Dspring.profiles.active=prod \
           -Dspring.config.location=${{ secrets.APP_DIR }}/application-prod.yml \
           -Duser.timezone=Asia/Seoul \
           -Dlogging.file.path=${{ secrets.APP_DIR }}/logs \
+          -DEMAIL_PASSWORD="${EMAIL_PASSWORD}" \
           -jar ${{ secrets.APP_DIR }}/server.jar & 
