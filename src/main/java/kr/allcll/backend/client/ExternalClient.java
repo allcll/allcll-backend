@@ -41,7 +41,7 @@ public class ExternalClient {
         for (ChangeSubjectsResponse eachChange : allChangedSubject) {
             Long subjectId = eachChange.subjectId();
             Subject subject = subjectRepository.findById(subjectId, Semester.now())
-                .orElseThrow(() -> new AllcllException(AllcllErrorCode.SUBJECT_NOT_FOUND));
+                .orElseThrow(() -> new AllcllException(AllcllErrorCode.SUBJECT_NOT_FOUND, subjectId));
             seatStorage.add(
                 new SeatDto(subject,
                     eachChange.remainSeat(),

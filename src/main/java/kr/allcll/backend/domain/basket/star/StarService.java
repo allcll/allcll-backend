@@ -26,7 +26,7 @@ public class StarService {
     public void addStarOnSubject(Long subjectId, String token) {
 
         Subject subject = subjectRepository.findById(subjectId)
-            .orElseThrow(() -> new AllcllException(AllcllErrorCode.SUBJECT_NOT_FOUND));
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.SUBJECT_NOT_FOUND, subjectId));
         validateCanAddStar(subject, token);
         starRepository.save(new Star(token, subject));
     }
