@@ -5,6 +5,7 @@ import jakarta.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import kr.allcll.backend.client.EmailProperties;
 import kr.allcll.crawler.subject.CrawlerSubject;
 import kr.allcll.crawler.subject.CrawlerSubjectDiffResult;
 import kr.allcll.crawler.subject.CrawlerSubjectRepository;
@@ -24,6 +25,7 @@ public class SubjectReportService {
     private final ReportTableBuilder reportTableBuilder;
     private final CrawlerSubjectRepository crawlerSubjectRepository;
     private final String EMAIL_ADDRESS = "allclllclla@gmail.com";
+    private final EmailProperties emailProperties;
 
     public void generateSubjectSyncReport(SubjectSyncResult syncResult, CrawlingMetaData metaData) {
         List<CrawlerSubject> allSubjects = crawlerSubjectRepository.findAll();
@@ -42,7 +44,7 @@ public class SubjectReportService {
 
         String title = "[ALLCLL] 과목 데이터 변경내역 (" + dateTime + ")";
         String content = "<html>" +
-            "<body style='text-align:center; font-family:sans-serif;'>" +
+            "<body style='text-align:left; font-family:sans-serif;'>" +
             "<h2>📊 과목 변경 집계 리포트 </h2>" +
             reportTableBuilder.buildSubjectChangeSummaryTable(totalSubjectsCount, insertSubjectReport,
                 deleteSubjectReport, updateSubjectReport) +
@@ -72,7 +74,7 @@ public class SubjectReportService {
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-            helper.setTo(EMAIL_ADDRESS);
+            helper.setTo(emailProperties.username());
             helper.setSubject(title);
             helper.setText(content, true);
 
