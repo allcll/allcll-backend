@@ -51,7 +51,7 @@ public class ReportTableBuilder {
 
     public String buildSubjectInfoTable(List<CrawlerSubject> subjects) {
         if (subjects == null || subjects.isEmpty()) {
-            return "<p style='color:red;'>❌ 해당 데이터 없음 ❌</p>";
+            return "<p style='color:red; text-align:left;'>❌ 해당 데이터 없음 ❌</p>";
         }
 
         StringBuilder sb = new StringBuilder();
@@ -80,7 +80,7 @@ public class ReportTableBuilder {
 
     public String buildSubjectDiffTable(List<CrawlerSubjectDiffResult> diffs) {
         if (diffs == null || diffs.isEmpty()) {
-            return "<p style='color:red;'>❌ 해당 데이터 없음 ❌</p>";
+            return "<p style='color:red; text-align:left;'>❌ 해당 데이터 없음 ❌</p>";
         }
 
         StringBuilder sb = new StringBuilder();
