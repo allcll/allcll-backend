@@ -6,7 +6,7 @@ import kr.allcll.backend.session.dto.SessionStatusResponse;
 import kr.allcll.backend.session.dto.SetCredentialRequest;
 import kr.allcll.crawler.client.SessionClient;
 import kr.allcll.crawler.client.payload.EmptyPayload;
-import kr.allcll.crawler.common.exception.CrawlerAllcllException;
+import kr.allcll.crawler.common.exception.CrawlerExternalRequestFailException;
 import kr.allcll.crawler.common.schedule.CrawlerScheduledTaskHandler;
 import kr.allcll.crawler.credential.Credential;
 import kr.allcll.crawler.credential.Credentials;
@@ -24,13 +24,22 @@ public class SessionService {
     private final SessionClient sessionClient;
 
     public void setCredential(SetCredentialRequest request) {
+        boolean isValidRequest = isValidCredentialRequest(request);
+        if (!isValidRequest) {
+            return;
+        }
         Credential credential = request.toCredential();
+        validateCredential(credential);
         credentials.addCredential(credential);
     }
 
     public CredentialResponse getCredential(String userId) {
         Credential credential = credentials.findByUserId(userId);
-        return CredentialResponse.fromCredential(credential);
+        boolean isValid = validateCredential(credential);
+        if (isValid) {
+            return CredentialResponse.fromCredential(credential);
+        }
+        return CredentialResponse.ofInvalidCredential(null);
     }
 
     public void startSession(String userId) {
@@ -43,7 +52,7 @@ public class SessionService {
             try {
                 sessionClient.execute(credential, new EmptyPayload());
                 log.info("세션 갱신 성공: userId={}", userId);
-            } catch (CrawlerAllcllException e) {
+            } catch (CrawlerExternalRequestFailException e) {
                 log.error("세션 갱신 실패: userId={}", userId);
                 cancelSessionScheduling();
             }
@@ -59,5 +68,23 @@ public class SessionService {
     public void cancelSessionScheduling() {
         threadPoolTaskScheduler.cancelAll();
         credentials.deleteAll();
+    }
+
+    private boolean isValidCredentialRequest(SetCredentialRequest request) {
+        if (request.tokenJ() == null || request.tokenU() == null || request.tokenR() == null
+            || request.tokenL() == null) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean validateCredential(Credential credential) {
+        try {
+            sessionClient.execute(credential, new EmptyPayload());
+            return true;
+        } catch (CrawlerExternalRequestFailException e) {
+            log.info("세션 갱신 실패: userId={}", credential.getTokenU());
+        }
+        return false;
     }
 }
