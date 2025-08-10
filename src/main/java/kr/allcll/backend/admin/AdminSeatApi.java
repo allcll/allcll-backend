@@ -19,7 +19,7 @@ public class AdminSeatApi {
     private final TargetSubjectService targetSubjectService;
     private final AdminRequestValidator validator;
 
-    @GetMapping("/api/admin/seat/start")
+    @PostMapping("/api/admin/seat/start")
     public ResponseEntity<Void> getSeatPeriodically(HttpServletRequest request,
         @RequestParam(required = false) String userId) {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
@@ -30,7 +30,7 @@ public class AdminSeatApi {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/api/admin/season-seat/start")
+    @PostMapping("/api/admin/season-seat/start")
     public ResponseEntity<Void> seasonSeatStart(HttpServletRequest request,
         @RequestParam(required = false) String userId) {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
