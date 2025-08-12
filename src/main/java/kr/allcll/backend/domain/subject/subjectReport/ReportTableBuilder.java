@@ -92,6 +92,7 @@ public class ReportTableBuilder {
             .append("<th ").append(getThStyle()).append(">강의실 변경</th>")
             .append("<th ").append(getThStyle()).append(">시간 변경</th>")
             .append("<th ").append(getThStyle()).append(">교수명 변경</th>")
+            .append("<th ").append(getThStyle()).append(">isDeleted</th>")
             .append("</tr>");
 
         for (CrawlerSubjectDiffResult diff : diffs) {
@@ -102,6 +103,7 @@ public class ReportTableBuilder {
                 .append("<td ").append(getTdStyle()).append(">").append(diff.lesnRoom()).append("</td>")
                 .append("<td ").append(getTdStyle()).append(">").append(diff.lesnTime()).append("</td>")
                 .append("<td ").append(getTdStyle()).append(">").append(diff.lesnEmp()).append("</td>")
+                .append("<td ").append(getTdStyle()).append(">").append(diff.isDeleted()).append("</td>")
                 .append("</tr>");
         }
 
