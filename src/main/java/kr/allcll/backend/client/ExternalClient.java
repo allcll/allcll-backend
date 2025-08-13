@@ -45,7 +45,7 @@ public class ExternalClient {
             seatStorage.add(
                 new SeatDto(subject,
                     eachChange.remainSeat(),
-                    eachChange.createdAt()
+                    LocalDateTime.now()
 //                    eachChange.changeStatus()
                 )
             );
