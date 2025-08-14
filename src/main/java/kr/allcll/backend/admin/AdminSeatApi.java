@@ -58,4 +58,14 @@ public class AdminSeatApi {
         crawlerSeatService.cancelSeatScheduling();
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/api/admin/pre-seat/fetch")
+    public ResponseEntity<Void> getAllPreSeats(HttpServletRequest request,
+        @RequestParam(required = false) String userId) {
+        if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
+            return ResponseEntity.status(401).build();
+        }
+        crawlerSeatService.getAllPreSeat(userId);
+        return ResponseEntity.ok().build();
+    }
 }
