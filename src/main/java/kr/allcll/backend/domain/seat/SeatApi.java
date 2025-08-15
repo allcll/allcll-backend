@@ -12,7 +12,7 @@ public class SeatApi {
 
     private final SeatService seatService;
 
-    @GetMapping("/api/preSeat")
+    @GetMapping("/api/pre-seat")
     public ResponseEntity<PreSeatsResponse> getAllPreSeats() {
         PreSeatsResponse response = seatService.getAllPreSeats();
         return ResponseEntity.ok(response);
