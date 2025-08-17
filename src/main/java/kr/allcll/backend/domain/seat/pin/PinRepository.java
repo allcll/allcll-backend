@@ -17,6 +17,15 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
         """)
     List<Pin> findAllByToken(String tokenId, String semesterAt);
 
+
+    @Query(""" 
+        select p from Pin p
+        join fetch p.subject s
+        where s.isDeleted = false
+        and p.semesterAt = :semesterAt
+        """)
+    List<Pin> findAllBySemesterAt(String semesterAt);
+
     @Query(""" 
         select p from Pin p
         join p.subject s
