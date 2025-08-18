@@ -1,7 +1,6 @@
 package kr.allcll.backend.client;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,16 +34,19 @@ public class ExternalService {
     }
 
     private PinSubjectUpdateRequest getPinSubjects() {
-        List<String> tokens = sseEmitterStorage.getUserTokens();
-        Map<Subject, Integer> pinSubjects = new HashMap<>();
-        for (String token : tokens) {
-            List<Pin> pins = pinRepository.findAllByToken(token, Semester.now());
-            for (Pin pin : pins) {
-                Subject subject = pin.getSubject();
-                pinSubjects.merge(subject, 1, Integer::sum);
-            }
-        }
-        List<PinSubject> wantPinSubjects = getPinSubjectsWithPriority(pinSubjects);
+        List<String> activeSseTokens = sseEmitterStorage.getUserTokens();
+        List<Pin> currentSemesterPins = pinRepository.findAllBySemesterAt(Semester.now());
+
+        List<Pin> activePins = currentSemesterPins.stream()
+            .filter(pin -> activeSseTokens.contains(pin.getToken()))
+            .toList();
+        Map<Subject, Integer> pinCountBySubject = activePins.stream()
+            .collect(Collectors.groupingBy(
+                Pin::getSubject,
+                Collectors.summingInt(pin -> 1)
+            ));
+
+        List<PinSubject> wantPinSubjects = getPinSubjectsWithPriority(pinCountBySubject);
         return new PinSubjectUpdateRequest(wantPinSubjects);
     }
 
