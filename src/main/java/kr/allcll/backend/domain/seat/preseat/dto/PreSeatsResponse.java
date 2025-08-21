@@ -1,7 +1,7 @@
-package kr.allcll.backend.domain.seat.dto;
+package kr.allcll.backend.domain.seat.preseat.dto;
 
 import java.util.List;
-import kr.allcll.crawler.seat.PreSeatResponse;
+import kr.allcll.crawler.seat.preseat.PreSeatResponse;
 
 public record PreSeatsResponse(
     List<PreSeatResponse> preSeats
