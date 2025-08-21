@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import kr.allcll.crawler.seat.CrawlerSeatService;
 import kr.allcll.crawler.seat.SeatStatusResponse;
 import kr.allcll.crawler.seat.TargetSubjectService;
+import kr.allcll.crawler.seat.preseat.CrawlerPreSeatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminSeatApi {
 
     private final CrawlerSeatService crawlerSeatService;
+    private final CrawlerPreSeatService crawlerPreSeatService;
     private final TargetSubjectService targetSubjectService;
     private final AdminRequestValidator validator;
 
@@ -56,16 +58,6 @@ public class AdminSeatApi {
             return ResponseEntity.status(401).build();
         }
         crawlerSeatService.cancelSeatScheduling();
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/api/admin/pre-seat/fetch")
-    public ResponseEntity<Void> getAllPreSeats(HttpServletRequest request,
-        @RequestParam(required = false) String userId) {
-        if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
-            return ResponseEntity.status(401).build();
-        }
-        crawlerSeatService.getAllPreSeat(userId);
         return ResponseEntity.ok().build();
     }
 }
