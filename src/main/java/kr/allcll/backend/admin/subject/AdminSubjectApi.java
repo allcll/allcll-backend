@@ -1,11 +1,10 @@
-package kr.allcll.backend.admin;
+package kr.allcll.backend.admin.subject;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import kr.allcll.backend.admin.AdminRequestValidator;
 import kr.allcll.backend.domain.subject.subjectReport.CrawlingMetaData;
 import kr.allcll.backend.domain.subject.subjectReport.SubjectReportService;
-import kr.allcll.crawler.subject.CrawlerSubjectService;
-import kr.allcll.crawler.subject.SubjectSyncResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminSubjectApi {
 
     private final AdminRequestValidator validator;
-    private final CrawlerSubjectService crawlerSubjectService;
+    private final AdminSubjectService adminSubjectService;
     private final SubjectReportService subjectReportService;
 
 
@@ -31,7 +30,7 @@ public class AdminSubjectApi {
             return ResponseEntity.status(401).build();
         }
         LocalDateTime startTime = LocalDateTime.now();
-        SubjectSyncResult syncResult = crawlerSubjectService.syncSubjects(userId, year, semesterCode);
+        SubjectSyncResult syncResult = adminSubjectService.syncSubjects(userId, year, semesterCode);
         LocalDateTime endTime = LocalDateTime.now();
 
         CrawlingMetaData metaData = new CrawlingMetaData(startTime, endTime);
