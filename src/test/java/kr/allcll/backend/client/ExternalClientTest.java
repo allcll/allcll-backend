@@ -1,21 +1,17 @@
 package kr.allcll.backend.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 import kr.allcll.backend.AllcllBackendApplication;
+import kr.allcll.backend.admin.seat.ChangedSubjectBuffer;
+import kr.allcll.backend.admin.seat.TargetSubjectStorage;
+import kr.allcll.backend.admin.seat.dto.PinSubjectUpdateRequest;
+import kr.allcll.backend.admin.seat.dto.PinSubjectUpdateRequest.PinSubject;
 import kr.allcll.backend.domain.seat.SeatStorage;
-import kr.allcll.backend.domain.seat.dto.SeatDto;
 import kr.allcll.backend.domain.subject.Subject;
 import kr.allcll.backend.domain.subject.SubjectRepository;
 import kr.allcll.backend.fixture.SubjectFixture;
-import kr.allcll.crawler.seat.ChangeStatus;
-import kr.allcll.crawler.seat.ChangeSubjectsResponse;
-import kr.allcll.crawler.seat.ChangedSubjectBuffer;
-import kr.allcll.crawler.seat.PinSubjectUpdateRequest;
-import kr.allcll.crawler.seat.PinSubjectUpdateRequest.PinSubject;
-import kr.allcll.crawler.seat.TargetSubjectStorage;
 import kr.allcll.crawler.subject.CrawlerSubject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
