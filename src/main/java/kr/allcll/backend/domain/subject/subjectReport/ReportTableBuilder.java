@@ -3,8 +3,8 @@ package kr.allcll.backend.domain.subject.subjectReport;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import kr.allcll.backend.admin.subject.SubjectDiffResult;
 import kr.allcll.crawler.subject.CrawlerSubject;
-import kr.allcll.crawler.subject.CrawlerSubjectDiffResult;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -78,7 +78,7 @@ public class ReportTableBuilder {
         return sb.toString();
     }
 
-    public String buildSubjectDiffTable(List<CrawlerSubjectDiffResult> diffs) {
+    public String buildSubjectDiffTable(List<SubjectDiffResult> diffs) {
         if (diffs == null || diffs.isEmpty()) {
             return "<p style='color:red; text-align:left;'>❌ 해당 데이터 없음 ❌</p>";
         }
@@ -95,7 +95,7 @@ public class ReportTableBuilder {
             .append("<th ").append(getThStyle()).append(">isDeleted</th>")
             .append("</tr>");
 
-        for (CrawlerSubjectDiffResult diff : diffs) {
+        for (SubjectDiffResult diff : diffs) {
             sb.append("<tr>")
                 .append("<td ").append(getTdStyle()).append(">").append(diff.id()).append("</td>")
                 .append("<td ").append(getTdStyle()).append(">").append(diff.curiNo()).append("</td>")
