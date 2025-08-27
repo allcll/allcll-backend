@@ -1,7 +1,10 @@
 package kr.allcll.backend.client;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import kr.allcll.backend.admin.seat.AllSeatBuffer;
+import kr.allcll.backend.admin.seat.TargetSubjectService;
+import kr.allcll.backend.admin.seat.dto.ChangeSubjectsResponse;
+import kr.allcll.backend.admin.seat.dto.PinSubjectUpdateRequest;
 import kr.allcll.backend.domain.seat.SeatStorage;
 import kr.allcll.backend.domain.seat.dto.SeatDto;
 import kr.allcll.backend.domain.subject.Subject;
@@ -9,10 +12,6 @@ import kr.allcll.backend.domain.subject.SubjectRepository;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import kr.allcll.backend.support.semester.Semester;
-import kr.allcll.crawler.seat.AllSeatBuffer;
-import kr.allcll.crawler.seat.ChangeSubjectsResponse;
-import kr.allcll.crawler.seat.PinSubjectUpdateRequest;
-import kr.allcll.crawler.seat.TargetSubjectService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
