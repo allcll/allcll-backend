@@ -1,5 +1,6 @@
 package kr.allcll.backend.admin.seat;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,7 @@ public class LiveBoards {
     public List<ChangeSubjectsResponse> checkStatus(CrawlerSubject crawlerSubject, Integer remainSeat) {
         if (canOnlyIn(crawlerSubject, remainSeat)) {
             liveBoardSubjects.put(crawlerSubject, remainSeat);
-            return List.of(ChangeSubjectsResponse.of(crawlerSubject.getId(), ChangeStatus.IN, remainSeat));
+            return List.of(ChangeSubjectsResponse.of(crawlerSubject.getId(), ChangeStatus.IN, remainSeat, LocalDateTime.now()));
         }
         CrawlerSubject maxCrawlerSubject = findMaxRemainSeatSubject();
         Integer maxSubjectRemainSeat = liveBoardSubjects.get(maxCrawlerSubject);
@@ -35,17 +36,17 @@ public class LiveBoards {
             liveBoardSubjects.put(crawlerSubject, remainSeat);
             liveBoardSubjects.remove(maxCrawlerSubject);
             return List.of(
-                ChangeSubjectsResponse.of(crawlerSubject.getId(), ChangeStatus.IN, remainSeat),
-                ChangeSubjectsResponse.of(maxCrawlerSubject.getId(), ChangeStatus.OUT, maxSubjectRemainSeat)
+                ChangeSubjectsResponse.of(crawlerSubject.getId(), ChangeStatus.IN, remainSeat, LocalDateTime.now()),
+                ChangeSubjectsResponse.of(maxCrawlerSubject.getId(), ChangeStatus.OUT, maxSubjectRemainSeat, LocalDateTime.now())
             );
         }
         if (canOut(crawlerSubject, remainSeat)) {
             liveBoardSubjects.remove(crawlerSubject);
-            return List.of(ChangeSubjectsResponse.of(crawlerSubject.getId(), ChangeStatus.OUT, remainSeat));
+            return List.of(ChangeSubjectsResponse.of(crawlerSubject.getId(), ChangeStatus.OUT, remainSeat, LocalDateTime.now()));
         }
         if (canUpdate(crawlerSubject, remainSeat)) {
             liveBoardSubjects.put(crawlerSubject, remainSeat);
-            return List.of(ChangeSubjectsResponse.of(crawlerSubject.getId(), ChangeStatus.UPDATE, remainSeat));
+            return List.of(ChangeSubjectsResponse.of(crawlerSubject.getId(), ChangeStatus.UPDATE, remainSeat, LocalDateTime.now()));
         }
         return Collections.emptyList();
     }
