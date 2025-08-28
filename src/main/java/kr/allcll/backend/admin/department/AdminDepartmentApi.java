@@ -1,9 +1,8 @@
-package kr.allcll.backend.admin;
+package kr.allcll.backend.admin.department;
 
 import jakarta.servlet.http.HttpServletRequest;
-import kr.allcll.backend.domain.department.DepartmentService;
+import kr.allcll.backend.admin.AdminRequestValidator;
 import kr.allcll.backend.domain.department.dto.DepartmentsResponse;
-import kr.allcll.crawler.department.CrawlerDepartmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AdminDepartmentApi {
 
-    private final CrawlerDepartmentService crawlerDepartmentService;
+    private final AdminDepartmentService adminDepartmentService;
     private final DepartmentService departmentService;
     private final AdminRequestValidator validator;
 
@@ -28,7 +27,7 @@ public class AdminDepartmentApi {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
         }
-        crawlerDepartmentService.fetchAndSaveDepartments(userId, year, semesterCode);
+        adminDepartmentService.fetchAndSaveDepartments(userId, year, semesterCode);
         return ResponseEntity.ok().build();
     }
 
@@ -37,7 +36,7 @@ public class AdminDepartmentApi {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
         }
-        DepartmentsResponse response = departmentService.retrieveAllDepartment();
+        DepartmentsResponse response = departmentService.getAllDepartment();
         return ResponseEntity.ok(response);
     }
 }
