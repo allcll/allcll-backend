@@ -5,6 +5,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import kr.allcll.backend.admin.seat.ChangeStatus;
 import kr.allcll.backend.domain.seat.dto.SeatDto;
 import kr.allcll.backend.domain.seat.pin.Pin;
 import kr.allcll.backend.domain.seat.pin.PinRepository;
@@ -68,11 +69,11 @@ class SeatServiceTest {
         pinRepository.saveAll(List.of(pin1, pin2, pin3, pin4, pin5));
 
         LocalDateTime now = LocalDateTime.now();
-        SeatDto seat1 = new SeatDto(subject1, 1, now);
-        SeatDto seat2 = new SeatDto(subject2, 2, now);
-        SeatDto seat3 = new SeatDto(subject3, 3, now);
-        SeatDto seat4 = new SeatDto(subject4, 4, now);
-        SeatDto seat5 = new SeatDto(subject5, 5, now);
+        SeatDto seat1 = new SeatDto(subject1, 1, now, ChangeStatus.IN);
+        SeatDto seat2 = new SeatDto(subject2, 2, now, ChangeStatus.IN);
+        SeatDto seat3 = new SeatDto(subject3, 3, now, ChangeStatus.IN);
+        SeatDto seat4 = new SeatDto(subject4, 4, now, ChangeStatus.IN);
+        SeatDto seat5 = new SeatDto(subject5, 5, now, ChangeStatus.IN);
         seatStorage.addAll(List.of(seat1, seat2, seat3, seat4, seat5));
 
         // when
