@@ -8,7 +8,7 @@ import kr.allcll.backend.admin.seat.dto.PinSubjectUpdateRequest.PinSubject;
 import kr.allcll.crawler.common.exception.CrawlerAllcllException;
 import kr.allcll.crawler.subject.CrawlerSubject;
 import kr.allcll.crawler.subject.CrawlerSubjectRepository;
-import kr.allcll.crawler.subject.SubjectFilter;
+import kr.allcll.backend.admin.subject.SubjectFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

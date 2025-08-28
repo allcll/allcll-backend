@@ -2,8 +2,8 @@ package kr.allcll.backend.domain.seat.preseat;
 
 import java.util.List;
 import kr.allcll.backend.domain.seat.preseat.dto.PreSeatsResponse;
-import kr.allcll.crawler.seat.preseat.AllPreSeatBuffer;
-import kr.allcll.crawler.seat.preseat.PreSeatResponse;
+import kr.allcll.backend.admin.preseat.AllPreSeatBuffer;
+import kr.allcll.backend.admin.preseat.dto.PreSeatResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

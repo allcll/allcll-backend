@@ -1,7 +1,7 @@
-package kr.allcll.backend.admin;
+package kr.allcll.backend.admin.preseat;
 
 import jakarta.servlet.http.HttpServletRequest;
-import kr.allcll.crawler.seat.preseat.CrawlerPreSeatService;
+import kr.allcll.backend.admin.AdminRequestValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AdminPreSeatApi {
 
-    private final CrawlerPreSeatService crawlerPreSeatService;
+    private final AdminPreSeatService adminPreSeatService;
     private final AdminRequestValidator validator;
 
     @PostMapping("/api/admin/pre-seat/fetch")
@@ -21,7 +21,7 @@ public class AdminPreSeatApi {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
         }
-        crawlerPreSeatService.getAllPreSeat(userId);
+        adminPreSeatService.getAllPreSeat(userId);
         return ResponseEntity.ok().build();
     }
 }

@@ -74,7 +74,7 @@ public class SubjectReportService {
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-            helper.setTo("jujs45177@gmail.com");
+            helper.setTo(emailProperties.username());
             helper.setSubject(title);
             helper.setText(content, true);
 
