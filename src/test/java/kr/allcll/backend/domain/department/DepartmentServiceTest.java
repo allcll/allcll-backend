@@ -2,6 +2,7 @@ package kr.allcll.backend.domain.department;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import kr.allcll.backend.admin.department.DepartmentService;
 import kr.allcll.backend.domain.department.dto.DepartmentResponse;
 import kr.allcll.backend.domain.department.dto.DepartmentsResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +35,7 @@ class DepartmentServiceTest {
         int expected = 2;
 
         // when
-        DepartmentsResponse response = departmentService.retrieveAllDepartment();
+        DepartmentsResponse response = departmentService.getAllDepartment();
 
         // then
         assertThat(response.departments()).hasSize(expected);
@@ -47,7 +48,7 @@ class DepartmentServiceTest {
         departmentRepository.save(new Department("3210", "컴퓨터공학과 소프트웨어융합대학"));
 
         // when
-        DepartmentsResponse response = departmentService.retrieveAllDepartment();
+        DepartmentsResponse response = departmentService.getAllDepartment();
 
         // then
         DepartmentResponse compareResponse = response.departments().getFirst();
