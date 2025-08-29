@@ -7,9 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 import kr.allcll.backend.admin.AdminRequestValidator;
-import kr.allcll.backend.admin.department.AdminDepartmentApi;
 import kr.allcll.backend.admin.department.AdminDepartmentService;
-import kr.allcll.backend.admin.department.DepartmentService;
 import kr.allcll.backend.domain.department.dto.DepartmentResponse;
 import kr.allcll.backend.domain.department.dto.DepartmentsResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -20,8 +18,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-@WebMvcTest(AdminDepartmentApi.class)
-class AdminDepartmentApiTest {
+@WebMvcTest(DepartmentApi.class)
+class DepartmentApiTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -35,7 +33,7 @@ class AdminDepartmentApiTest {
 
     @Test
     @DisplayName("과목 코드 전체 조회의 요청과 응답을 확인한다.")
-    void retrieveAllDepartment() throws Exception {
+    void getAllDepartment() throws Exception {
         // given
         String expected = """
             {
@@ -61,7 +59,7 @@ class AdminDepartmentApiTest {
                 )
             )
         );
-        MvcResult result = mockMvc.perform(get("/api/admin/departments")).andExpect(status().isOk()).andReturn();
+        MvcResult result = mockMvc.perform(get("/api/departments")).andExpect(status().isOk()).andReturn();
 
         // then
         assertThat(result.getResponse().getContentAsString()).isEqualToIgnoringWhitespace(expected);
