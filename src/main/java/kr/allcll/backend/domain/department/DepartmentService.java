@@ -1,8 +1,6 @@
-package kr.allcll.backend.admin.department;
+package kr.allcll.backend.domain.department;
 
 import java.util.List;
-import kr.allcll.backend.domain.department.Department;
-import kr.allcll.backend.domain.department.DepartmentRepository;
 import kr.allcll.backend.domain.department.dto.DepartmentsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
