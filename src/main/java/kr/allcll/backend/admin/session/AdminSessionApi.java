@@ -1,10 +1,10 @@
-package kr.allcll.backend.admin;
+package kr.allcll.backend.admin.session;
 
 import jakarta.servlet.http.HttpServletRequest;
-import kr.allcll.backend.session.SessionService;
-import kr.allcll.backend.session.dto.CredentialResponse;
-import kr.allcll.backend.session.dto.SessionStatusResponse;
-import kr.allcll.backend.session.dto.SetCredentialRequest;
+import kr.allcll.backend.admin.AdminRequestValidator;
+import kr.allcll.backend.admin.session.dto.CredentialResponse;
+import kr.allcll.backend.admin.session.dto.SessionStatusResponse;
+import kr.allcll.backend.admin.session.dto.SetCredentialRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
