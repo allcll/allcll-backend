@@ -1,5 +1,7 @@
 package kr.allcll.backend.admin.seat;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import kr.allcll.backend.admin.seat.dto.ChangeSubjectsResponse;
@@ -20,7 +22,9 @@ public class ChangeDetector {
     private final SjptProperties sjptProperties;
 
     public boolean isRemainSeatChanged(CrawlerSubject crawlerSubject, CrawlerSeat renewedCrawlerSeat) {
-        Optional<CrawlerSeat> previousSeat = crawlerSeatRepository.findByCrawlerSubject(crawlerSubject);
+        LocalDate today = LocalDate.now();
+
+        Optional<CrawlerSeat> previousSeat = crawlerSeatRepository.findByCrawlerSubjectAndCreatedDate(crawlerSubject, today);
         if (previousSeat.isEmpty()) {
             return true;
         }
@@ -41,7 +45,7 @@ public class ChangeDetector {
         } else {
             changedSubjectBuffer.add(
                 ChangeSubjectsResponse.of(crawlerSubject.getId(), ChangeStatus.UPDATE, SeatUtils.getRemainSeat(
-                    renewedCrawlerSeat)));
+                    renewedCrawlerSeat), LocalDateTime.now()));
         }
     }
 

@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicLong;
 import kr.allcll.backend.admin.seat.dto.ChangeSubjectsResponse;
 import kr.allcll.backend.admin.seat.dto.SeatStatusResponse;
+import kr.allcll.backend.admin.subject.TargetSubjectStorage;
 import kr.allcll.crawler.client.SeatClient;
 import kr.allcll.crawler.client.model.SeatResponse;
 import kr.allcll.crawler.client.payload.SeatPayload;
@@ -89,14 +90,48 @@ public class AdminSeatService {
         if (crawlerSubject == null) {
             return;
         }
-        sendExternalRequestWithOutDetect(crawlerSubject, credential);
+        sendExternalRequest(crawlerSubject, credential);
     }
 
     private void sendGeneralSubjectRequest(Credential credential) {
         CrawlerSubject crawlerSubject = targetSubjectStorage.getNextGeneralTarget();
-        sendExternalRequestWithOutDetect(crawlerSubject, credential);
+        sendExternalRequest(crawlerSubject, credential);
     }
 
+    private void sendExternalRequest(CrawlerSubject crawlerSubject, Credential credential) {
+        try {
+            log.info("[SeatService] [학교 서버] 요청 시도 과목: {}", crawlerSubject);
+            SeatPayload requestPayload = SeatPayload.from(crawlerSubject);
+            SeatResponse response = seatClient.execute(credential, requestPayload);
+            CrawlerSeat renewedCrawlerSeat = createSeat(response, crawlerSubject);
+            detectDifferenceAndSave(crawlerSubject, renewedCrawlerSeat);
+        } catch (CrawlerAllcllException e) {
+            log.error(
+                "[여석] 외부 API 호출에 실패했습니다. 과목: " + crawlerSubject.getCuriNo() + "-" + crawlerSubject.getClassName());
+        }
+    }
+
+    private void detectDifferenceAndSave(CrawlerSubject crawlerSubject, CrawlerSeat renewedCrawlerSeat) {
+        if (changeDetector.isRemainSeatChanged(crawlerSubject, renewedCrawlerSeat)) {
+            changeDetector.saveChangeToBuffer(crawlerSubject, renewedCrawlerSeat);
+
+            synchronized (getSubjectLock(crawlerSubject.getId())) {
+                seatPersistenceService.saveSeat(renewedCrawlerSeat);
+            }
+        }
+    }
+
+    private CrawlerSeat createSeat(SeatResponse response, CrawlerSubject crawlerSubject) {
+        return response.toSeat(crawlerSubject, LocalDate.now());
+    }
+
+    private Object getSubjectLock(Long subjectId) {
+        return ("LOCK_" + subjectId).intern();
+    }
+
+    /**
+     * deprecated : 변경감지로 정책 변경에 따라 해당 메서드를 사용하지 않습니다.
+     */
     private void sendExternalRequestWithOutDetect(CrawlerSubject crawlerSubject, Credential credential) {
         try {
             log.info("[SeatService] [학교 서버] 요청 시도 과목: {}", crawlerSubject);
@@ -126,33 +161,5 @@ public class AdminSeatService {
             log.error(
                 "[여석] 외부 API 호출에 실패했습니다. 과목: " + crawlerSubject.getCuriNo() + "-" + crawlerSubject.getClassName());
         }
-    }
-
-    /**
-     * 변경감지로 정책 변경 시 해당 메서드로 변경
-     */
-    private void sendExternalRequest(CrawlerSubject crawlerSubject, Credential credential) {
-        log.info("[SeatService] [학교 서버] 요청 시도 과목: {}", crawlerSubject);
-        SeatPayload requestPayload = SeatPayload.from(crawlerSubject);
-        SeatResponse response = seatClient.execute(credential, requestPayload);
-        CrawlerSeat renewedCrawlerSeat = createSeat(response, crawlerSubject);
-        detectDifferenceAndSave(crawlerSubject, renewedCrawlerSeat);
-    }
-
-    private void detectDifferenceAndSave(CrawlerSubject crawlerSubject, CrawlerSeat renewedCrawlerSeat) {
-        if (changeDetector.isRemainSeatChanged(crawlerSubject, renewedCrawlerSeat)) {
-            changeDetector.saveChangeToBuffer(crawlerSubject, renewedCrawlerSeat);
-            synchronized (getSubjectLock(crawlerSubject.getId())) {
-                seatPersistenceService.saveSeat(renewedCrawlerSeat);
-            }
-        }
-    }
-
-    private CrawlerSeat createSeat(SeatResponse response, CrawlerSubject crawlerSubject) {
-        return response.toSeat(crawlerSubject, LocalDate.now());
-    }
-
-    private Object getSubjectLock(Long subjectId) {
-        return ("LOCK_" + subjectId).intern();
     }
 }

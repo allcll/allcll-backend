@@ -1,14 +1,19 @@
 package kr.allcll.backend.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import kr.allcll.backend.AllcllBackendApplication;
+import kr.allcll.backend.admin.seat.ChangeStatus;
 import kr.allcll.backend.admin.seat.ChangedSubjectBuffer;
-import kr.allcll.backend.admin.seat.TargetSubjectStorage;
+import kr.allcll.backend.admin.subject.TargetSubjectStorage;
+import kr.allcll.backend.admin.seat.dto.ChangeSubjectsResponse;
 import kr.allcll.backend.admin.seat.dto.PinSubjectUpdateRequest;
 import kr.allcll.backend.admin.seat.dto.PinSubjectUpdateRequest.PinSubject;
 import kr.allcll.backend.domain.seat.SeatStorage;
+import kr.allcll.backend.domain.seat.dto.SeatDto;
 import kr.allcll.backend.domain.subject.Subject;
 import kr.allcll.backend.domain.subject.SubjectRepository;
 import kr.allcll.backend.fixture.SubjectFixture;
@@ -68,28 +73,28 @@ class ExternalClientTest {
                 subjectB.getId()
             );
     }
-//
-//    @Test
-//    @DisplayName("변경 감지 과목들의 정상 수신을 확인한다.")
-//    void getAllTargetSubjects() {
-//        // given
-//        Subject subjectA = subjectRepository
-//            .save(SubjectFixture.createNonMajorSubject("차와문화", "123456", "001", "김보예"));
-//        Subject subjectB = subjectRepository
-//            .save(SubjectFixture.createNonMajorSubject("차와문화", "123456", "002", "김보예"));
-//        changedSubjectBuffer.add(new ChangeSubjectsResponse(subjectA.getId(), ChangeStatus.IN, 10));
-//        changedSubjectBuffer.add(new ChangeSubjectsResponse(subjectB.getId(), ChangeStatus.IN, 15));
-//
-//        // when
-//        externalClient.getAllTargetSubjects();
-//        List<SeatDto> allSeatDtos = seatStorage.getAll();
-//
-//        // then
-//        assertThat(allSeatDtos).hasSize(2)
-//            .extracting(SeatDto::getSubject, SeatDto::getSeatCount)
-//            .containsExactly(
-//                tuple(subjectA, 10),
-//                tuple(subjectB, 15)
-//            );
-//    }
+
+    @Test
+    @DisplayName("변경 감지 과목들의 정상 수신을 확인한다.")
+    void getAllTargetSubjects() {
+        // given
+        Subject subjectA = subjectRepository
+            .save(SubjectFixture.createNonMajorSubject("차와문화", "123456", "001", "김보예"));
+        Subject subjectB = subjectRepository
+            .save(SubjectFixture.createNonMajorSubject("차와문화", "123456", "002", "김보예"));
+        changedSubjectBuffer.add(new ChangeSubjectsResponse(subjectA.getId(), ChangeStatus.IN, 10, LocalDateTime.now()));
+        changedSubjectBuffer.add(new ChangeSubjectsResponse(subjectB.getId(), ChangeStatus.IN, 15, LocalDateTime.now()));
+
+        // when
+        externalClient.getAllTargetSubjects();
+        List<SeatDto> allSeatDtos = seatStorage.getAll();
+
+        // then
+        assertThat(allSeatDtos).hasSize(2)
+            .extracting(SeatDto::getSubject, SeatDto::getSeatCount)
+            .containsExactly(
+                tuple(subjectA, 10),
+                tuple(subjectB, 15)
+            );
+    }
 }

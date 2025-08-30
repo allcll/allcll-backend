@@ -8,6 +8,10 @@ import kr.allcll.backend.admin.seat.dto.ChangeSubjectsResponse;
 import kr.allcll.crawler.common.properties.SjptProperties;
 import org.springframework.stereotype.Component;
 
+/**
+ * deprecated : 변경감지로 정책 변경에 따라 해당 클래스를 사용하지 않습니다.
+ */
+
 @Component
 public class AllSeatBuffer {
 
