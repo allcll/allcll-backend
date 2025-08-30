@@ -1,9 +1,9 @@
-package kr.allcll.backend.session;
+package kr.allcll.backend.admin.session;
 
 import java.time.Duration;
-import kr.allcll.backend.session.dto.CredentialResponse;
-import kr.allcll.backend.session.dto.SessionStatusResponse;
-import kr.allcll.backend.session.dto.SetCredentialRequest;
+import kr.allcll.backend.admin.session.dto.CredentialResponse;
+import kr.allcll.backend.admin.session.dto.SessionStatusResponse;
+import kr.allcll.backend.admin.session.dto.SetCredentialRequest;
 import kr.allcll.crawler.client.SessionClient;
 import kr.allcll.crawler.client.payload.EmptyPayload;
 import kr.allcll.crawler.common.exception.CrawlerExternalRequestFailException;
