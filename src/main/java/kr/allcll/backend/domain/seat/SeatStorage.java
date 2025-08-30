@@ -26,11 +26,13 @@ public class SeatStorage {
     }
 
     public List<SeatDto> getGeneralSeats() {
+        LocalDateTime now = LocalDateTime.now();
+
         Collection<SeatDto> seatsValue = seats.values();
         return seatsValue.stream()
             .filter(seat -> seat.getSubject().isNonMajor())
             .filter(seat ->
-                Duration.between(seat.getQueryTime(), LocalDateTime.now()).getSeconds() <= LIMIT_QUERY_TIME)
+                Duration.between(seat.getQueryTime(), now).getSeconds() <= LIMIT_QUERY_TIME)
             .sorted(Comparator.comparingInt(SeatDto::getSeatCount))
             .toList();
     }
