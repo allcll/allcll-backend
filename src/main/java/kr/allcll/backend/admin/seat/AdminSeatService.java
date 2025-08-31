@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicLong;
 import kr.allcll.backend.admin.seat.dto.ChangeSubjectsResponse;
 import kr.allcll.backend.admin.seat.dto.SeatStatusResponse;
+import kr.allcll.backend.support.sse.SseService;
+import kr.allcll.backend.support.sse.SseStatus;
 import kr.allcll.crawler.client.SeatClient;
 import kr.allcll.crawler.client.model.SeatResponse;
 import kr.allcll.crawler.client.payload.SeatPayload;
@@ -25,7 +27,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AdminSeatService {
 
+    private final AtomicLong lastSuccessCrawlingTime = new AtomicLong(0);
     private static final long RECENT_CRAWLING_SUCCESS_THRESHOLD_MS = 3_000;
+
     private final SeatClient seatClient;
     private final Credentials credentials;
     private final TargetSubjectStorage targetSubjectStorage;
@@ -34,15 +38,17 @@ public class AdminSeatService {
     private final SjptProperties sjptProperties;
     private final ChangeDetector changeDetector;
     private final AllSeatBuffer allSeatBuffer;
-    private final AtomicLong lastSuccessCrawlingTime = new AtomicLong(0);
+    private final SseService sseService;
 
     public void getAllSeatPeriodically(String userId) {
+        sseService.updateStatus(SseStatus.LIVE);
         Credential credential = credentials.findByUserId(userId);
         fetchPinSeat(credential);
         fetchGeneralSeat(credential);
     }
 
     public void getSeasonSeatPeriodically(String userId) {
+        sseService.updateStatus(SseStatus.LIVE);
         Credential credential = credentials.findByUserId(userId);
         fetchPinSeat(credential);
         fetchGeneralSeat(credential);
@@ -50,6 +56,7 @@ public class AdminSeatService {
 
     public void cancelSeatScheduling() {
         seatScheduler.cancelAll();
+        sseService.updateStatus(SseStatus.IDLE);
     }
 
     public SeatStatusResponse getSeatCrawlerStatus() {
@@ -125,6 +132,7 @@ public class AdminSeatService {
         } catch (CrawlerAllcllException e) {
             log.error(
                 "[여석] 외부 API 호출에 실패했습니다. 과목: " + crawlerSubject.getCuriNo() + "-" + crawlerSubject.getClassName());
+            sseService.updateStatus(SseStatus.ERROR);
         }
     }
 
