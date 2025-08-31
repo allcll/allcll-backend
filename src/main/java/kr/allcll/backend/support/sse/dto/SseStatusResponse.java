@@ -1,9 +1,11 @@
 package kr.allcll.backend.support.sse.dto;
 
 public record SseStatusResponse(
-    boolean isConnected
+    String status,
+    String message
 ) {
-    public static SseStatusResponse of(boolean isConnected) {
-        return new SseStatusResponse(isConnected);
+
+    public static SseStatusResponse of(String status, String message) {
+        return new SseStatusResponse(status, message);
     }
 }
