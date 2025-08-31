@@ -53,6 +53,7 @@ class SseServiceTest {
 
         // then
         SseTestHelper.assertResponseContainsMessage(response, "success");
+        SseTestHelper.assertResponseContainsMessage(response, "idle");
     }
 
     @DisplayName("동시에 여러 클라이언트와 SSE 연결을 유지하고, 모두에게 메시지를 전달한다.")
@@ -84,6 +85,10 @@ class SseServiceTest {
         String expected = "retry:1000\n"
             + "event:connection\n"
             + "data:success\n"
+            + "\n"
+            + "retry:1000\n"
+            + "event:status\n"
+            + "data:{\"status\":\"idle\",\"message\":\"실시간 여석 제공 전이에요. 서비스가 시작되면 알림을 드릴게요.\"}\n"
             + "\n"
             + "retry:1000\n"
             + "event:message\n"
