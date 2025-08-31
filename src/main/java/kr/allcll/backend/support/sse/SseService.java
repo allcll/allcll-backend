@@ -15,12 +15,14 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEvent
 public class SseService {
 
     private final SseEmitterStorage sseEmitterStorage;
+    private volatile SseStatus currentStatus = SseStatus.IDLE;
 
     public SseEmitter connect(String token) {
         SseEmitter sseEmitter = createSseEmitter();
         sseEmitterStorage.add(token, sseEmitter);
         SseEventBuilder initialEvent = SseEventBuilderFactory.createInitialEvent();
         sendEvent(sseEmitter, initialEvent);
+        sendStatusEvent(sseEmitter);
         return sseEmitter;
     }
 
@@ -42,6 +44,13 @@ public class SseService {
         });
     }
 
+    public void updateStatus(SseStatus newStatus) {
+        if (this.currentStatus != newStatus) {
+            this.currentStatus = newStatus;
+            propagateStatus();
+        }
+    }
+
     private void sendEvent(SseEmitter sseEmitter, SseEventBuilder eventBuilder) {
         try {
             sseEmitter.send(eventBuilder);
@@ -51,12 +60,25 @@ public class SseService {
         }
     }
 
-    public List<String> getConnectedTokens() {
-        return sseEmitterStorage.getUserTokens().stream().toList();
+    private void sendStatusEvent(SseEmitter sseEmitter) {
+        SseStatusResponse sseStatusResponse = SseStatusResponse.of(currentStatus.name().toLowerCase(),
+            currentStatus.getMessage());
+
+        SseEventBuilder eventBuilder = SseEventBuilderFactory.create("status", sseStatusResponse);
+        sendEvent(sseEmitter, eventBuilder);
     }
 
-    public SseStatusResponse isConnected(String token) {
-        boolean isConnected = sseEmitterStorage.getEmitter(token).isPresent();
-        return SseStatusResponse.of(isConnected);
+    private void propagateStatus() {
+        SseStatusResponse statusResponse = SseStatusResponse.of(currentStatus.name().toLowerCase(),
+            currentStatus.getMessage());
+
+        sseEmitterStorage.getEmitters().forEach(emitter -> {
+            SseEventBuilder eventBuilder = SseEventBuilderFactory.create("status", statusResponse);
+            sendEvent(emitter, eventBuilder);
+        });
+    }
+
+    public List<String> getConnectedTokens() {
+        return sseEmitterStorage.getUserTokens().stream().toList();
     }
 }
