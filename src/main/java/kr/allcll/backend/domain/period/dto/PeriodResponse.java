@@ -1,6 +1,7 @@
 package kr.allcll.backend.domain.period.dto;
 
 import java.util.List;
+import kr.allcll.backend.admin.period.dto.PeriodDetailRequest;
 import kr.allcll.backend.domain.period.Period;
 import kr.allcll.backend.support.semester.Semester;
 

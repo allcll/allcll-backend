@@ -1,4 +1,4 @@
-package kr.allcll.backend.domain.period.dto;
+package kr.allcll.backend.admin.period.dto;
 
 
 import java.time.LocalDateTime;
