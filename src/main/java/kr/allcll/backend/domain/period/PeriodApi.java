@@ -3,9 +3,11 @@ package kr.allcll.backend.domain.period;
 import jakarta.servlet.http.HttpServletRequest;
 import kr.allcll.backend.admin.AdminRequestValidator;
 import kr.allcll.backend.domain.period.dto.PeriodRequest;
+import kr.allcll.backend.domain.period.dto.PeriodResponse;
 import kr.allcll.backend.support.semester.Semester;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,4 +31,8 @@ public class PeriodApi {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/api/service-period")
+    public ResponseEntity<PeriodResponse> getPeriod() {
+        return ResponseEntity.ok(periodService.getPeriod());
+    }
 }
