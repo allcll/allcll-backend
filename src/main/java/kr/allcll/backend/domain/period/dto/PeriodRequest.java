@@ -1,0 +1,12 @@
+package kr.allcll.backend.domain.period.dto;
+
+import java.util.List;
+import kr.allcll.backend.support.semester.Semester;
+
+public record PeriodRequest(
+    Semester code,
+    String semester,
+    List<PeriodDetailRequest> services
+) {
+
+}
