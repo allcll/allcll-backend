@@ -1,9 +1,8 @@
-package kr.allcll.backend.admin;
+package kr.allcll.backend.admin.seat;
 
 import jakarta.servlet.http.HttpServletRequest;
-import kr.allcll.crawler.seat.CrawlerSeatService;
-import kr.allcll.crawler.seat.SeatStatusResponse;
-import kr.allcll.crawler.seat.TargetSubjectService;
+import kr.allcll.backend.admin.AdminRequestValidator;
+import kr.allcll.backend.admin.seat.dto.SeatStatusResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AdminSeatApi {
 
-    private final CrawlerSeatService crawlerSeatService;
+    private final AdminSeatService adminSeatService;
     private final TargetSubjectService targetSubjectService;
     private final AdminRequestValidator validator;
 
@@ -26,7 +25,7 @@ public class AdminSeatApi {
             return ResponseEntity.status(401).build();
         }
         targetSubjectService.loadGeneralSubjects();
-        crawlerSeatService.getAllSeatPeriodically(userId);
+        adminSeatService.getAllSeatPeriodically(userId);
         return ResponseEntity.ok().build();
     }
 
@@ -37,7 +36,7 @@ public class AdminSeatApi {
             return ResponseEntity.status(401).build();
         }
         targetSubjectService.loadAllSubjects();
-        crawlerSeatService.getSeasonSeatPeriodically(userId);
+        adminSeatService.getSeasonSeatPeriodically(userId);
         return ResponseEntity.ok().build();
     }
 
@@ -46,7 +45,7 @@ public class AdminSeatApi {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
         }
-        SeatStatusResponse seatStatusResponse = crawlerSeatService.getSeatCrawlerStatus();
+        SeatStatusResponse seatStatusResponse = adminSeatService.getSeatCrawlerStatus();
         return ResponseEntity.ok(seatStatusResponse);
     }
 
@@ -55,17 +54,7 @@ public class AdminSeatApi {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
         }
-        crawlerSeatService.cancelSeatScheduling();
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/api/admin/pre-seat/fetch")
-    public ResponseEntity<Void> getAllPreSeats(HttpServletRequest request,
-        @RequestParam(required = false) String userId) {
-        if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
-            return ResponseEntity.status(401).build();
-        }
-        crawlerSeatService.getAllPreSeat(userId);
+        adminSeatService.cancelSeatScheduling();
         return ResponseEntity.ok().build();
     }
 }

@@ -5,11 +5,11 @@ import jakarta.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import kr.allcll.backend.admin.subject.SubjectDiffResult;
+import kr.allcll.backend.admin.subject.SubjectSyncResult;
 import kr.allcll.backend.client.EmailProperties;
 import kr.allcll.crawler.subject.CrawlerSubject;
-import kr.allcll.crawler.subject.CrawlerSubjectDiffResult;
 import kr.allcll.crawler.subject.CrawlerSubjectRepository;
-import kr.allcll.crawler.subject.SubjectSyncResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -40,7 +40,7 @@ public class SubjectReportService {
         List<CrawlerSubject> insertSubjectReport = subjectSyncResult.subjectsToAdd();
         List<CrawlerSubject> deleteSubjectReport = subjectSyncResult.subjectsToDelete();
         List<CrawlerSubject> updateSubjectReport = subjectSyncResult.subjectsCanUpdate();
-        List<CrawlerSubjectDiffResult> updateSubjectDiffResults = subjectSyncResult.updateDiffs();
+        List<SubjectDiffResult> updateSubjectDiffResults = subjectSyncResult.updateDiffs();
 
         String title = "[ALLCLL] 과목 데이터 변경내역 (" + dateTime + ")";
         String content = "<html>" +

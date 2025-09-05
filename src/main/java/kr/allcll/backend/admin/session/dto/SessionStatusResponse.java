@@ -1,4 +1,4 @@
-package kr.allcll.backend.session.dto;
+package kr.allcll.backend.admin.session.dto;
 
 public record SessionStatusResponse(
     boolean isActive
