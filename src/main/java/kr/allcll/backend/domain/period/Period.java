@@ -40,6 +40,16 @@ public class Period extends BaseEntity {
 
     String message;
 
+    private Period(Semester semesterCode, String semesterValue, ServiceType serviceType,
+        LocalDateTime startDate, LocalDateTime endDate, String message) {
+        this.semesterCode = semesterCode;
+        this.semesterValue = semesterValue;
+        this.serviceType = serviceType;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.message = message;
+    }
+
     public static Period create(
         Semester semesterCode,
         String semesterValue,
@@ -48,6 +58,6 @@ public class Period extends BaseEntity {
         LocalDateTime endDate,
         String message
     ) {
-        return new Period(null, semesterCode, semesterValue, serviceType, startDate, endDate, message);
+        return new Period(semesterCode, semesterValue, serviceType, startDate, endDate, message);
     }
 }
