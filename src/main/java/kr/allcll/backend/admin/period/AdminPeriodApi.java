@@ -19,7 +19,8 @@ public class AdminPeriodApi {
     private final AdminRequestValidator validator;
 
     @PostMapping("/api/admin/service-period")
-    public ResponseEntity<Void> createPeriod(HttpServletRequest request,
+    public ResponseEntity<Void> createPeriod(
+        HttpServletRequest request,
         @RequestParam Semester semesterCode,
         @RequestBody PeriodRequest periodRequest) {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {

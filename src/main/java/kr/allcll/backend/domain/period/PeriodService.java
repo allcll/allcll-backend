@@ -20,7 +20,7 @@ public class PeriodService {
 
     public PeriodResponse getPeriod() {
         Semester semester = Semester.fromValue(Semester.now());
-        List<Period> allPeriods = periodRepository.findAllBySemesterOrderByTypeAndDateDesc(semester);
+        List<Period> allPeriods = periodRepository.findAllBySemesterOrderByServiceTypeAndStartDateDesc(semester);
 
         Map<ServiceType, Period> latestByType = new LinkedHashMap<>();
         for (Period period : allPeriods) {

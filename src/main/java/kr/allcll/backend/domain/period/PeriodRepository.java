@@ -14,5 +14,5 @@ public interface PeriodRepository extends JpaRepository<Period, Long> {
           WHERE p.semesterCode = :semester
           ORDER BY p.serviceType, p.startDate DESC, p.id DESC
         """)
-    List<Period> findAllBySemesterOrderByTypeAndDateDesc(@Param("semester") Semester semester);
+    List<Period> findAllBySemesterOrderByServiceTypeAndStartDateDesc(@Param("semester") Semester semester);
 }

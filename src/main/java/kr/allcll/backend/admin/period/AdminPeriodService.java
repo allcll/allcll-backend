@@ -20,8 +20,8 @@ public class AdminPeriodService {
     private final PeriodRepository periodRepository;
 
     @Transactional
-    public void createPeriod(Semester semesterCode, PeriodRequest periodResponses) {
-        List<PeriodDetailRequest> periodDetailResponse = periodResponses.services();
+    public void createPeriod(Semester semesterCode, PeriodRequest periodRequest) {
+        List<PeriodDetailRequest> periodDetailResponse = periodRequest.serviceInfo();
         String semesterValue = semesterCode.getValue();
 
         for (PeriodDetailRequest periodDetailRequest : periodDetailResponse) {
