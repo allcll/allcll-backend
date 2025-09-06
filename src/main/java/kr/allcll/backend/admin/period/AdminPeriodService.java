@@ -24,17 +24,16 @@ public class AdminPeriodService {
         List<PeriodDetailRequest> periodDetailRequests = periodRequest.serviceInfo();
         String semesterValue = semesterCode.getValue();
 
-        for (PeriodDetailRequest periodDetailRequest : periodDetailRequests) {
-            periodRepository.save(
-                Period.create(
-                    semesterCode,
-                    semesterValue,
-                    periodDetailRequest.serviceType(),
-                    periodDetailRequest.startDate(),
-                    periodDetailRequest.endDate(),
-                    periodDetailRequest.message()
-                )
-            );
-        }
+        List<Period> periods = periodDetailRequests.stream()
+            .map(request -> Period.create(
+                semesterCode,
+                semesterValue,
+                request.serviceType(),
+                request.startDate(),
+                request.endDate(),
+                request.message()
+            ))
+            .toList();
+        periodRepository.saveAll(periods);
     }
 }
