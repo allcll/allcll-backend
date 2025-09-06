@@ -21,10 +21,10 @@ public class AdminPeriodService {
 
     @Transactional
     public void createPeriod(Semester semesterCode, PeriodRequest periodRequest) {
-        List<PeriodDetailRequest> periodDetailResponse = periodRequest.serviceInfo();
+        List<PeriodDetailRequest> periodDetailRequests = periodRequest.serviceInfo();
         String semesterValue = semesterCode.getValue();
 
-        for (PeriodDetailRequest periodDetailRequest : periodDetailResponse) {
+        for (PeriodDetailRequest periodDetailRequest : periodDetailRequests) {
             periodRepository.save(
                 Period.create(
                     semesterCode,
