@@ -2,6 +2,7 @@ package kr.allcll.backend.support.sse;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import kr.allcll.backend.support.sse.dto.SseStatusResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,10 +46,11 @@ public class SseService {
     }
 
     public void updateStatus(SseStatus newStatus) {
-        if (this.currentStatus != newStatus) {
-            this.currentStatus = newStatus;
-            propagateStatus();
+        if (Objects.equals(this.currentStatus, newStatus)) {
+            return;
         }
+        this.currentStatus = newStatus;
+        propagateStatus();
     }
 
     private void sendEvent(SseEmitter sseEmitter, SseEventBuilder eventBuilder) {
