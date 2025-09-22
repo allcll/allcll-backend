@@ -39,14 +39,14 @@ public class AdminSeatService {
     private final SeatStreamStatusService seatStreamStatusService;
 
     public void getAllSeatPeriodically(String userId) {
-        seatStreamStatusService.updateStatus(SeatStreamStatus.LIVE);
+        seatStreamStatusService.updateSeatStreamStatus(SeatStreamStatus.LIVE);
         Credential credential = credentials.findByUserId(userId);
         fetchPinSeat(credential);
         fetchGeneralSeat(credential);
     }
 
     public void getSeasonSeatPeriodically(String userId) {
-        seatStreamStatusService.updateStatus(SeatStreamStatus.LIVE);
+        seatStreamStatusService.updateSeatStreamStatus(SeatStreamStatus.LIVE);
         Credential credential = credentials.findByUserId(userId);
         fetchPinSeat(credential);
         fetchGeneralSeat(credential);
@@ -54,7 +54,7 @@ public class AdminSeatService {
 
     public void cancelSeatScheduling() {
         seatScheduler.cancelAll();
-        seatStreamStatusService.updateStatus(SeatStreamStatus.IDLE);
+        seatStreamStatusService.updateSeatStreamStatus(SeatStreamStatus.IDLE);
     }
 
     public SeatStatusResponse getSeatCrawlerStatus() {
@@ -130,7 +130,7 @@ public class AdminSeatService {
         } catch (CrawlerAllcllException e) {
             log.error(
                 "[여석] 외부 API 호출에 실패했습니다. 과목: " + crawlerSubject.getCuriNo() + "-" + crawlerSubject.getClassName());
-            seatStreamStatusService.updateStatus(SeatStreamStatus.ERROR);
+            seatStreamStatusService.updateSeatStreamStatus(SeatStreamStatus.ERROR);
         }
     }
 

@@ -31,7 +31,7 @@ public class AdminPreSeatService {
     private final CrawlerSubjectRepository crawlerSubjectRepository;
 
     public void getAllPreSeat(String userId) {
-        seatStreamStatusService.updateStatus(SeatStreamStatus.PRESEAT);
+        seatStreamStatusService.updateSeatStreamStatus(SeatStreamStatus.PRESEAT);
         Credential credential = credentials.findByUserId(userId);
         List<CrawlerSubject> crawlerSubjects = crawlerSubjectRepository.findAllBySemesterAt(CrawlerSemester.now());
         for (CrawlerSubject crawlerSubject : crawlerSubjects) {
@@ -55,7 +55,7 @@ public class AdminPreSeatService {
         } catch (CrawlerAllcllException e) {
             log.error(
                 "[여석] 외부 API 호출에 실패했습니다. PreSeat: " + crawlerSubject.getCuriNo() + "-" + crawlerSubject.getClassName());
-            seatStreamStatusService.updateStatus(SeatStreamStatus.ERROR);
+            seatStreamStatusService.updateSeatStreamStatus(SeatStreamStatus.ERROR);
         }
     }
 

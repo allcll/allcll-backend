@@ -14,7 +14,7 @@ public class SeatStreamStatusService {
     private final SseService sseService;
     public final SeatStreamStatusStore seatStreamStatusStore;
 
-    public void updateStatus(SeatStreamStatus newStatus) {
+    public void updateSeatStreamStatus(SeatStreamStatus newStatus) {
         SeatStreamStatus currentStatus = seatStreamStatusStore.getCurrentStatus();
         if (Objects.equals(currentStatus, newStatus)) {
             return;
