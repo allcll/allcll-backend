@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicLong;
 import kr.allcll.backend.admin.seat.dto.ChangeSubjectsResponse;
-import kr.allcll.backend.admin.seat.dto.SeatStatusResponse;
+import kr.allcll.backend.admin.seat.dto.SeatCrawlingStatusResponse;
 import kr.allcll.crawler.client.SeatClient;
 import kr.allcll.crawler.client.model.SeatResponse;
 import kr.allcll.crawler.client.payload.SeatPayload;
@@ -57,7 +57,7 @@ public class AdminSeatService {
         seatStreamStatusService.updateSeatStreamStatus(SeatStreamStatus.IDLE);
     }
 
-    public SeatStatusResponse getSeatCrawlerStatus() {
+    public SeatCrawlingStatusResponse getSeatCrawlingStatus() {
         int seatSchedulerTaskCount = seatScheduler.getTaskCount();
         boolean validSeatSchedulerCount = seatSchedulerTaskCount == sjptProperties.getRequestPerSecondCount();
         boolean validRecentCrawlingSuccess =
@@ -65,7 +65,7 @@ public class AdminSeatService {
 
         boolean isActive = validSeatSchedulerCount && validRecentCrawlingSuccess;
 
-        return SeatStatusResponse.of(isActive);
+        return SeatCrawlingStatusResponse.of(isActive);
     }
 
     private void fetchPinSeat(Credential credential) {
