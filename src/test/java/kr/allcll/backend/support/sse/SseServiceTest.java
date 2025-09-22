@@ -88,7 +88,7 @@ class SseServiceTest {
             + "\n"
             + "retry:1000\n"
             + "event:status\n"
-            + "data:{\"status\":\"idle\",\"message\":\"실시간 여석 제공 전이에요. 서비스가 시작되면 알림을 드릴게요.\"}\n"
+            + "data:{\"status\":\"idle\",\"message\":\"과목 실시간 여석 제공 전이에요. 서비스가 시작되면 알림을 드릴게요.\"}\n"
             + "\n"
             + "retry:1000\n"
             + "event:message\n"
