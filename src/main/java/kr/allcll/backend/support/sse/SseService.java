@@ -2,8 +2,8 @@ package kr.allcll.backend.support.sse;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
-import kr.allcll.backend.support.sse.dto.SseStatusResponse;
+import kr.allcll.backend.admin.seat.SeatStreamStatus;
+import kr.allcll.backend.admin.seat.SeatStreamStatusStore;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,14 +16,20 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEvent
 public class SseService {
 
     private final SseEmitterStorage sseEmitterStorage;
-    private volatile SseStatus currentStatus = SseStatus.IDLE;
+    private final SeatStreamStatusStore seatStreamStatusStore;
 
     public SseEmitter connect(String token) {
         SseEmitter sseEmitter = createSseEmitter();
         sseEmitterStorage.add(token, sseEmitter);
+
         SseEventBuilder initialEvent = SseEventBuilderFactory.createInitialEvent();
         sendEvent(sseEmitter, initialEvent);
-        sendStatusEvent(sseEmitter);
+
+        SeatStreamStatus seatStreamStatus = seatStreamStatusStore.getCurrentStatus();
+        SseEventBuilder initialSeatStreamStatusEvent = SseEventBuilderFactory.createInitialSeatStreamStatusEvent(
+            seatStreamStatus);
+        sendEvent(sseEmitter, initialSeatStreamStatusEvent);
+
         return sseEmitter;
     }
 
@@ -45,14 +51,6 @@ public class SseService {
         });
     }
 
-    public void updateStatus(SseStatus newStatus) {
-        if (Objects.equals(this.currentStatus, newStatus)) {
-            return;
-        }
-        this.currentStatus = newStatus;
-        propagateStatus();
-    }
-
     private void sendEvent(SseEmitter sseEmitter, SseEventBuilder eventBuilder) {
         try {
             sseEmitter.send(eventBuilder);
@@ -60,24 +58,6 @@ public class SseService {
             log.warn("전송 실패 - SSE 연결이 끊겼습니다.: {}", e.getMessage());
             SseErrorHandler.handle(e);
         }
-    }
-
-    private void sendStatusEvent(SseEmitter sseEmitter) {
-        SseStatusResponse sseStatusResponse = SseStatusResponse.of(currentStatus.name().toLowerCase(),
-            currentStatus.getMessage());
-
-        SseEventBuilder eventBuilder = SseEventBuilderFactory.create("status", sseStatusResponse);
-        sendEvent(sseEmitter, eventBuilder);
-    }
-
-    private void propagateStatus() {
-        SseStatusResponse statusResponse = SseStatusResponse.of(currentStatus.name().toLowerCase(),
-            currentStatus.getMessage());
-
-        sseEmitterStorage.getEmitters().forEach(emitter -> {
-            SseEventBuilder eventBuilder = SseEventBuilderFactory.create("status", statusResponse);
-            sendEvent(emitter, eventBuilder);
-        });
     }
 
     public List<String> getConnectedTokens() {
