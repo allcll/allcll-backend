@@ -6,8 +6,6 @@ import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicLong;
 import kr.allcll.backend.admin.seat.dto.ChangeSubjectsResponse;
 import kr.allcll.backend.admin.seat.dto.SeatStatusResponse;
-import kr.allcll.backend.support.sse.SseService;
-import kr.allcll.backend.support.sse.SseStatus;
 import kr.allcll.crawler.client.SeatClient;
 import kr.allcll.crawler.client.model.SeatResponse;
 import kr.allcll.crawler.client.payload.SeatPayload;
@@ -32,23 +30,23 @@ public class AdminSeatService {
 
     private final SeatClient seatClient;
     private final Credentials credentials;
+    private final AllSeatBuffer allSeatBuffer;
+    private final ChangeDetector changeDetector;
+    private final SjptProperties sjptProperties;
     private final TargetSubjectStorage targetSubjectStorage;
     private final CrawlerScheduledTaskHandler seatScheduler;
     private final SeatPersistenceService seatPersistenceService;
-    private final SjptProperties sjptProperties;
-    private final ChangeDetector changeDetector;
-    private final AllSeatBuffer allSeatBuffer;
-    private final SseService sseService;
+    private final SeatStreamStatusService seatStreamStatusService;
 
     public void getAllSeatPeriodically(String userId) {
-        sseService.updateStatus(SseStatus.LIVE);
+        seatStreamStatusService.updateStatus(SeatStreamStatus.LIVE);
         Credential credential = credentials.findByUserId(userId);
         fetchPinSeat(credential);
         fetchGeneralSeat(credential);
     }
 
     public void getSeasonSeatPeriodically(String userId) {
-        sseService.updateStatus(SseStatus.LIVE);
+        seatStreamStatusService.updateStatus(SeatStreamStatus.LIVE);
         Credential credential = credentials.findByUserId(userId);
         fetchPinSeat(credential);
         fetchGeneralSeat(credential);
@@ -56,7 +54,7 @@ public class AdminSeatService {
 
     public void cancelSeatScheduling() {
         seatScheduler.cancelAll();
-        sseService.updateStatus(SseStatus.IDLE);
+        seatStreamStatusService.updateStatus(SeatStreamStatus.IDLE);
     }
 
     public SeatStatusResponse getSeatCrawlerStatus() {
@@ -132,7 +130,7 @@ public class AdminSeatService {
         } catch (CrawlerAllcllException e) {
             log.error(
                 "[여석] 외부 API 호출에 실패했습니다. 과목: " + crawlerSubject.getCuriNo() + "-" + crawlerSubject.getClassName());
-            sseService.updateStatus(SseStatus.ERROR);
+            seatStreamStatusService.updateStatus(SeatStreamStatus.ERROR);
         }
     }
 
