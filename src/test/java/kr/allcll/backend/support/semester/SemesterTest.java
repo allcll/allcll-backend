@@ -78,7 +78,7 @@ class SemesterTest {
     void shouldThrowExceptionWhenAfterEndDate() {
         LocalDate afterSpring = LocalDate.of(2025, 4, 1);
         LocalDate afterSummer = LocalDate.of(2025, 7, 1);
-        LocalDate afterFall = LocalDate.of(2025, 10, 1);
+        LocalDate afterFall = LocalDate.of(2025, 11, 1);
         LocalDate afterWinter = LocalDate.of(2026, 1, 1);
 
         assertAll(
