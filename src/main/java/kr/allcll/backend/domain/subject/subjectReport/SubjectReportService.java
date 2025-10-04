@@ -8,6 +8,7 @@ import java.util.List;
 import kr.allcll.backend.admin.subject.SubjectDiffResult;
 import kr.allcll.backend.admin.subject.SubjectSyncResult;
 import kr.allcll.backend.client.EmailProperties;
+import kr.allcll.backend.support.semester.Semester;
 import kr.allcll.crawler.subject.CrawlerSubject;
 import kr.allcll.crawler.subject.CrawlerSubjectRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ public class SubjectReportService {
     private final EmailProperties emailProperties;
 
     public void generateSubjectSyncReport(SubjectSyncResult syncResult, CrawlingMetaData metaData) {
-        List<CrawlerSubject> allSubjects = crawlerSubjectRepository.findAll();
+        List<CrawlerSubject> allSubjects = crawlerSubjectRepository.findAllBySemesterAt(Semester.now());
         int totalSubjectsCount = allSubjects.size();
 
         sendSubjectReportToEmail(syncResult, metaData, totalSubjectsCount);
