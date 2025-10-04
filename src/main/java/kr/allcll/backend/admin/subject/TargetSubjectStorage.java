@@ -1,4 +1,4 @@
-package kr.allcll.backend.admin.seat;
+package kr.allcll.backend.admin.subject;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -46,7 +46,7 @@ public class GeneralSeatSender {
 
     private Runnable getGeneralSeatTask() {
         return () -> {
-            List<SeatDto> generalSeats = seatStorage.getGeneralSeats(QUERY_LIMIT);
+            List<SeatDto> generalSeats = seatStorage.getGeneralSeats();
             sseService.propagate(EVENT_NAME, SeatsResponse.from(generalSeats));
         };
     }

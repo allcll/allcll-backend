@@ -1,7 +1,7 @@
 package kr.allcll.backend.domain.seat;
 
 import java.util.List;
-import kr.allcll.backend.admin.seat.TargetSubjectService;
+import kr.allcll.backend.admin.subject.TargetSubjectService;
 import kr.allcll.backend.admin.seat.dto.PinSubjectUpdateRequest;
 import kr.allcll.backend.domain.seat.dto.DeprecatedSubjectSummaryResponse;
 import lombok.RequiredArgsConstructor;
