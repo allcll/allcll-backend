@@ -2,7 +2,8 @@ package kr.allcll.backend.support.sse;
 
 import java.io.IOException;
 import java.util.List;
-import kr.allcll.backend.support.sse.dto.SseStatusResponse;
+import kr.allcll.backend.admin.seat.SeatStreamStatus;
+import kr.allcll.backend.admin.seat.SeatStreamStatusStore;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,12 +16,20 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEvent
 public class SseService {
 
     private final SseEmitterStorage sseEmitterStorage;
+    private final SeatStreamStatusStore seatStreamStatusStore;
 
     public SseEmitter connect(String token) {
         SseEmitter sseEmitter = createSseEmitter();
         sseEmitterStorage.add(token, sseEmitter);
+
         SseEventBuilder initialEvent = SseEventBuilderFactory.createInitialEvent();
         sendEvent(sseEmitter, initialEvent);
+
+        SeatStreamStatus seatStreamStatus = seatStreamStatusStore.getCurrentStatus();
+        SseEventBuilder initialSeatStreamStatusEvent = SseEventBuilderFactory.createInitialSeatStreamStatusEvent(
+            seatStreamStatus);
+        sendEvent(sseEmitter, initialSeatStreamStatusEvent);
+
         return sseEmitter;
     }
 
@@ -53,10 +62,5 @@ public class SseService {
 
     public List<String> getConnectedTokens() {
         return sseEmitterStorage.getUserTokens().stream().toList();
-    }
-
-    public SseStatusResponse isConnected(String token) {
-        boolean isConnected = sseEmitterStorage.getEmitter(token).isPresent();
-        return SseStatusResponse.of(isConnected);
     }
 }

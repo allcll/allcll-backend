@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicLong;
 import kr.allcll.backend.admin.seat.dto.ChangeSubjectsResponse;
-import kr.allcll.backend.admin.seat.dto.SeatStatusResponse;
+import kr.allcll.backend.admin.seat.dto.SeatCrawlingStatusResponse;
 import kr.allcll.crawler.client.SeatClient;
 import kr.allcll.crawler.client.model.SeatResponse;
 import kr.allcll.crawler.client.payload.SeatPayload;
@@ -25,24 +25,28 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AdminSeatService {
 
+    private final AtomicLong lastSuccessCrawlingTime = new AtomicLong(0);
     private static final long RECENT_CRAWLING_SUCCESS_THRESHOLD_MS = 3_000;
+
     private final SeatClient seatClient;
     private final Credentials credentials;
+    private final AllSeatBuffer allSeatBuffer;
+    private final ChangeDetector changeDetector;
+    private final SjptProperties sjptProperties;
     private final TargetSubjectStorage targetSubjectStorage;
     private final CrawlerScheduledTaskHandler seatScheduler;
     private final SeatPersistenceService seatPersistenceService;
-    private final SjptProperties sjptProperties;
-    private final ChangeDetector changeDetector;
-    private final AllSeatBuffer allSeatBuffer;
-    private final AtomicLong lastSuccessCrawlingTime = new AtomicLong(0);
+    private final SeatStreamStatusService seatStreamStatusService;
 
     public void getAllSeatPeriodically(String userId) {
+        seatStreamStatusService.updateSeatStreamStatus(SeatStreamStatus.LIVE);
         Credential credential = credentials.findByUserId(userId);
         fetchPinSeat(credential);
         fetchGeneralSeat(credential);
     }
 
     public void getSeasonSeatPeriodically(String userId) {
+        seatStreamStatusService.updateSeatStreamStatus(SeatStreamStatus.LIVE);
         Credential credential = credentials.findByUserId(userId);
         fetchPinSeat(credential);
         fetchGeneralSeat(credential);
@@ -50,9 +54,10 @@ public class AdminSeatService {
 
     public void cancelSeatScheduling() {
         seatScheduler.cancelAll();
+        seatStreamStatusService.updateSeatStreamStatus(SeatStreamStatus.IDLE);
     }
 
-    public SeatStatusResponse getSeatCrawlerStatus() {
+    public SeatCrawlingStatusResponse getSeatCrawlingStatus() {
         int seatSchedulerTaskCount = seatScheduler.getTaskCount();
         boolean validSeatSchedulerCount = seatSchedulerTaskCount == sjptProperties.getRequestPerSecondCount();
         boolean validRecentCrawlingSuccess =
@@ -60,7 +65,7 @@ public class AdminSeatService {
 
         boolean isActive = validSeatSchedulerCount && validRecentCrawlingSuccess;
 
-        return SeatStatusResponse.of(isActive);
+        return SeatCrawlingStatusResponse.of(isActive);
     }
 
     private void fetchPinSeat(Credential credential) {
@@ -125,6 +130,7 @@ public class AdminSeatService {
         } catch (CrawlerAllcllException e) {
             log.error(
                 "[여석] 외부 API 호출에 실패했습니다. 과목: " + crawlerSubject.getCuriNo() + "-" + crawlerSubject.getClassName());
+            seatStreamStatusService.updateSeatStreamStatus(SeatStreamStatus.ERROR);
         }
     }
 

@@ -2,7 +2,7 @@ package kr.allcll.backend.admin.seat;
 
 import jakarta.servlet.http.HttpServletRequest;
 import kr.allcll.backend.admin.AdminRequestValidator;
-import kr.allcll.backend.admin.seat.dto.SeatStatusResponse;
+import kr.allcll.backend.admin.seat.dto.SeatCrawlingStatusResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,12 +41,12 @@ public class AdminSeatApi {
     }
 
     @GetMapping("/api/admin/seat/check")
-    public ResponseEntity<SeatStatusResponse> getSeatStatus(HttpServletRequest request) {
+    public ResponseEntity<SeatCrawlingStatusResponse> getSeatStatus(HttpServletRequest request) {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
         }
-        SeatStatusResponse seatStatusResponse = adminSeatService.getSeatCrawlerStatus();
-        return ResponseEntity.ok(seatStatusResponse);
+        SeatCrawlingStatusResponse seatCrawlingStatusResponse = adminSeatService.getSeatCrawlingStatus();
+        return ResponseEntity.ok(seatCrawlingStatusResponse);
     }
 
     @PostMapping("/api/admin/seat/cancel")
