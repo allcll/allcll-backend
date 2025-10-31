@@ -57,28 +57,28 @@ class SemesterTest {
         );
     }
 
-//    @Test
-//    @DisplayName("학기 시작일 하루 전 날짜는 다음 학기를 반환되어야 한다.")
-//    void shouldThrowExceptionWhenBeforeStartDate() {
-//        LocalDate beforeSpring = LocalDate.of(2025, 1, 31);
-//        LocalDate beforeSummer = LocalDate.of(2025, 5, 31);
-//        LocalDate beforeFall = LocalDate.of(2025, 7, 31);
-//        LocalDate beforeWinter = LocalDate.of(2025, 12, 1);
-//
-//        assertAll(
-//            () -> assertThat(Semester.getCode(beforeSpring)).isEqualTo(Semester.SPRING_25),
-//            () -> assertThat(Semester.getCode(beforeSummer)).isEqualTo(Semester.SUMMER_25),
-//            () -> assertThat(Semester.getCode(beforeFall)).isEqualTo(Semester.FALL_25),
-//            () -> assertThat(Semester.getCode(beforeWinter)).isEqualTo(Semester.WINTER_25)
-//        );
-//    }
+    @Test
+    @DisplayName("학기 시작일 하루 전 날짜는 다음 학기를 반환되어야 한다.")
+    void shouldThrowExceptionWhenBeforeStartDate() {
+        LocalDate beforeSpring = LocalDate.of(2025, 1, 31);
+        LocalDate beforeSummer = LocalDate.of(2025, 5, 31);
+        LocalDate beforeFall = LocalDate.of(2025, 7, 31);
+        LocalDate beforeWinter = LocalDate.of(2025, 11, 30);
+
+        assertAll(
+            () -> assertThat(Semester.getCode(beforeSpring)).isEqualTo(Semester.SPRING_25),
+            () -> assertThat(Semester.getCode(beforeSummer)).isEqualTo(Semester.SUMMER_25),
+            () -> assertThat(Semester.getCode(beforeFall)).isEqualTo(Semester.FALL_25),
+            () -> assertThat(Semester.getCode(beforeWinter)).isEqualTo(Semester.WINTER_25)
+        );
+    }
 
     @Test
     @DisplayName("학기 종료일 하루 후 날짜는 다음 학기를 반환되어야 한다.")
     void shouldThrowExceptionWhenAfterEndDate() {
         LocalDate afterSpring = LocalDate.of(2025, 4, 1);
         LocalDate afterSummer = LocalDate.of(2025, 7, 1);
-        LocalDate afterFall = LocalDate.of(2025, 12, 1);
+        LocalDate afterFall = LocalDate.of(2025, 11, 1);
         LocalDate afterWinter = LocalDate.of(2026, 1, 1);
 
         assertAll(
