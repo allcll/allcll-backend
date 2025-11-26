@@ -1,5 +1,7 @@
 package kr.allcll.backend.admin.seat;
 
+import java.time.LocalDate;
+import java.util.Optional;
 import kr.allcll.crawler.seat.CrawlerSeat;
 import kr.allcll.crawler.seat.CrawlerSeatRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,17 @@ public class SeatPersistenceService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void saveSeat(CrawlerSeat crawlerSeat) {
-        crawlerSeatRepository.save(crawlerSeat);
+        LocalDate today = LocalDate.now();
+
+        Optional<CrawlerSeat> existingSeatOpt = crawlerSeatRepository.findByCrawlerSubjectAndCreatedDate(
+            crawlerSeat.getCrawlerSubject(),
+            today
+        );
+        if (existingSeatOpt.isPresent()) {
+            CrawlerSeat existingCrawlerSeat = existingSeatOpt.get();
+            existingCrawlerSeat.merge(crawlerSeat);
+        } else {
+            crawlerSeatRepository.save(crawlerSeat);
+        }
     }
 }

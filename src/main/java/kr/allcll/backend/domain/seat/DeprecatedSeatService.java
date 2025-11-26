@@ -1,7 +1,7 @@
 package kr.allcll.backend.domain.seat;
 
 import java.util.List;
-import kr.allcll.backend.admin.seat.TargetSubjectStorage;
+import kr.allcll.backend.admin.subject.TargetSubjectStorage;
 import kr.allcll.backend.domain.seat.dto.DeprecatedSubjectSummaryResponse;
 import kr.allcll.crawler.subject.CrawlerSubject;
 import lombok.RequiredArgsConstructor;
