@@ -41,11 +41,12 @@ public class AdminSeatApi {
     }
 
     @GetMapping("/api/admin/seat/check")
-    public ResponseEntity<SeatStatusResponse> getSeatStatus(HttpServletRequest request) {
+    public ResponseEntity<SeatStatusResponse> getSeatStatus(HttpServletRequest request
+        , @RequestParam String userId) {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
         }
-        SeatStatusResponse seatStatusResponse = adminSeatService.getSeatCrawlerStatus();
+        SeatStatusResponse seatStatusResponse = adminSeatService.getSeatCrawlerStatus(userId);
         return ResponseEntity.ok(seatStatusResponse);
     }
 

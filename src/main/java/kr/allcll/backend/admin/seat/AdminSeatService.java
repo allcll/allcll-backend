@@ -52,7 +52,7 @@ public class AdminSeatService {
         seatScheduler.cancelAll();
     }
 
-    public SeatStatusResponse getSeatCrawlerStatus() {
+    public SeatStatusResponse getSeatCrawlerStatus(String userId) {
         int seatSchedulerTaskCount = seatScheduler.getTaskCount();
         boolean validSeatSchedulerCount = seatSchedulerTaskCount == sjptProperties.getRequestPerSecondCount();
         boolean validRecentCrawlingSuccess =
@@ -60,7 +60,7 @@ public class AdminSeatService {
 
         boolean isActive = validSeatSchedulerCount && validRecentCrawlingSuccess;
 
-        return SeatStatusResponse.of(isActive);
+        return SeatStatusResponse.of(userId, isActive);
     }
 
     private void fetchPinSeat(Credential credential) {
