@@ -3,6 +3,7 @@ package kr.allcll.backend.admin.seat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import kr.allcll.backend.admin.seat.dto.ChangeSubjectsResponse;
 import kr.allcll.backend.admin.seat.dto.SeatStatusResponse;
@@ -52,7 +53,7 @@ public class AdminSeatService {
         seatScheduler.cancelAll();
     }
 
-    public SeatStatusResponse getSeatCrawlerStatus(String userId) {
+    public SeatStatusResponse getSeatCrawlerStatus(List<String> userId) {
         int seatSchedulerTaskCount = seatScheduler.getTaskCount();
         boolean validSeatSchedulerCount = seatSchedulerTaskCount == sjptProperties.getRequestPerSecondCount();
         boolean validRecentCrawlingSuccess =
