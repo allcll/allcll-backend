@@ -75,7 +75,6 @@ public class AdminSessionApi {
         return ResponseEntity.ok().body(sessionsStatusResponse);
     }
 
-
     @PostMapping("/api/admin/session/cancel")
     public ResponseEntity<Void> cancelSessionScheduling(HttpServletRequest request) {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
