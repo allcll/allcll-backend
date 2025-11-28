@@ -1,9 +1,12 @@
 package kr.allcll.backend.admin.session;
 
 import java.time.Duration;
+import java.util.List;
 import kr.allcll.backend.admin.session.dto.CredentialResponse;
 import kr.allcll.backend.admin.session.dto.SessionStatusResponse;
 import kr.allcll.backend.admin.session.dto.SetCredentialRequest;
+import kr.allcll.backend.admin.session.dto.UserSessionStatusResponse;
+import kr.allcll.backend.admin.session.dto.UserSessionsStatusResponse;
 import kr.allcll.crawler.client.SessionClient;
 import kr.allcll.crawler.client.payload.EmptyPayload;
 import kr.allcll.crawler.common.exception.CrawlerExternalRequestFailException;
@@ -65,6 +68,17 @@ public class SessionService {
         return SessionStatusResponse.of(isActive);
     }
 
+    public UserSessionsStatusResponse getSessionsStatus(List<String> userIds) {
+        List<UserSessionStatusResponse> responses = userIds.stream()
+            .map(userId -> new UserSessionStatusResponse(
+                userId,
+                threadPoolTaskScheduler.isRunning(userId)
+            ))
+            .toList();
+
+        return new UserSessionsStatusResponse(responses);
+    }
+
     public void cancelSessionScheduling() {
         threadPoolTaskScheduler.cancelAll();
         credentials.deleteAll();
@@ -87,4 +101,5 @@ public class SessionService {
         }
         return false;
     }
+
 }
