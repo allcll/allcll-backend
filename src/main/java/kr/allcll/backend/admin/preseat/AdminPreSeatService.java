@@ -3,6 +3,8 @@ package kr.allcll.backend.admin.preseat;
 import java.time.LocalDate;
 import java.util.List;
 import kr.allcll.backend.admin.preseat.dto.PreSeatResponse;
+import kr.allcll.backend.admin.seat.SeatStreamStatus;
+import kr.allcll.backend.admin.seat.SeatStreamStatusService;
 import kr.allcll.crawler.client.SeatClient;
 import kr.allcll.crawler.client.model.SeatResponse;
 import kr.allcll.crawler.client.payload.SeatPayload;
@@ -25,10 +27,11 @@ public class AdminPreSeatService {
     private final SeatClient seatClient;
     private final Credentials credentials;
     private final AllPreSeatBuffer allPreSeatBuffer;
+    private final SeatStreamStatusService seatStreamStatusService;
     private final CrawlerSubjectRepository crawlerSubjectRepository;
 
-
     public void getAllPreSeat(String userId) {
+        seatStreamStatusService.updateSeatStreamStatus(SeatStreamStatus.PRESEAT);
         Credential credential = credentials.findByUserId(userId);
         List<CrawlerSubject> crawlerSubjects = crawlerSubjectRepository.findAllBySemesterAt(CrawlerSemester.now());
         for (CrawlerSubject crawlerSubject : crawlerSubjects) {
@@ -52,6 +55,7 @@ public class AdminPreSeatService {
         } catch (CrawlerAllcllException e) {
             log.error(
                 "[여석] 외부 API 호출에 실패했습니다. PreSeat: " + crawlerSubject.getCuriNo() + "-" + crawlerSubject.getClassName());
+            seatStreamStatusService.updateSeatStreamStatus(SeatStreamStatus.ERROR);
         }
     }
 
