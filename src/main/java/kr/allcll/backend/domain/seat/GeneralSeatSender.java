@@ -16,7 +16,7 @@ public class GeneralSeatSender {
 
     private static final String EVENT_NAME = "nonMajorSeats";
     private static final int QUERY_LIMIT = 20;
-    private static final int SEASON_SEMESTER_QUERY_LIMIT = 39; // 2025-하계 전체 제공을 위한 쿼리 제한 수
+    private static final int SEASON_SEMESTER_QUERY_LIMIT = 40; // 2025-동계 전체 제공을 위한 쿼리 제한 수
     private static final Duration SENDING_PERIOD = Duration.ofSeconds(1);
 
     private final SseService sseService;
@@ -24,9 +24,9 @@ public class GeneralSeatSender {
     private final ScheduledTaskHandler scheduledTaskHandler;
 
     public GeneralSeatSender(
-        SseService sseService,
-        SeatStorage seatStorage,
-        @Qualifier("generalSeatTaskHandler") ScheduledTaskHandler scheduledTaskHandler
+            SseService sseService,
+            SeatStorage seatStorage,
+            @Qualifier("generalSeatTaskHandler") ScheduledTaskHandler scheduledTaskHandler
     ) {
         this.sseService = sseService;
         this.seatStorage = seatStorage;
@@ -37,7 +37,7 @@ public class GeneralSeatSender {
         if (hasActiveSchedule()) {
             return;
         }
-        scheduledTaskHandler.scheduleAtFixedRate(getGeneralSeatTask(), SENDING_PERIOD);
+        scheduledTaskHandler.scheduleAtFixedRate(getAllSeatTaskAtSeasonSemester(), SENDING_PERIOD);
     }
 
     public boolean hasActiveSchedule() {
@@ -48,6 +48,13 @@ public class GeneralSeatSender {
         return () -> {
             List<SeatDto> generalSeats = seatStorage.getGeneralSeats(QUERY_LIMIT);
             sseService.propagate(EVENT_NAME, SeatsResponse.from(generalSeats));
+        };
+    }
+
+    private Runnable getAllSeatTaskAtSeasonSemester() {
+        return () -> {
+            List<SeatDto> allSeat = seatStorage.getAllSeatsAtSeasonSemester(SEASON_SEMESTER_QUERY_LIMIT);
+            sseService.propagate(EVENT_NAME, SeatsResponse.from(allSeat));
         };
     }
 
