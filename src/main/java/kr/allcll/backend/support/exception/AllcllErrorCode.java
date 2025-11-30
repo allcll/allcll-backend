@@ -28,7 +28,11 @@ public enum AllcllErrorCode {
     DUPLICATE_SCHEDULE("이미 시간표에 등록된 일정입니다."),
     JSON_CONVERT_ERROR("TimeSlot JSON 변환 중 오류가 발생했습니다."),
     INVALID_SCHEDULE_TYPE("유효하지 않은 일정 타입입니다."),
-    INVALID_TIME("시작 시간이 종료 시간과 같거나 늦습니다.");
+    INVALID_TIME("시작 시간이 종료 시간과 같거나 늦습니다."),
+
+    SEAT_CRAWLING_ALREADY_IN_PROGRESS("이미 다른 계정으로 여석 크롤링이 진행중입니다."),
+    SEAT_CRAWLING_IN_MULTIPLE_ACCOUNTS("두 개 이상의 계정으로 여석 크롤링이 진행중입니다.");;
+
 
     private String message;
 
