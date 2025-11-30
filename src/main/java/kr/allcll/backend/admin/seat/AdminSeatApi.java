@@ -26,10 +26,10 @@ public class AdminSeatApi {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
         }
+        schedulerTracker.addUserId(userId);
+
         targetSubjectService.loadGeneralSubjects();
         adminSeatService.getAllSeatPeriodically(userId);
-
-        schedulerTracker.addUserId(userId);
 
         return ResponseEntity.ok().build();
     }
@@ -40,10 +40,10 @@ public class AdminSeatApi {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
         }
+        schedulerTracker.addUserId(userId);
+
         targetSubjectService.loadAllSubjects();
         adminSeatService.getSeasonSeatPeriodically(userId);
-
-        schedulerTracker.addUserId(userId);
 
         return ResponseEntity.ok().build();
     }
