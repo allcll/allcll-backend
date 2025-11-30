@@ -53,7 +53,7 @@ public class GeneralSeatSender {
 
     private Runnable getGeneralSeatTaskAtSeasonSemester() {
         return () -> {
-            List<SeatDto> generalSeats = seatStorage.getGeneralSeats(SEASON_SEMESTER_QUERY_LIMIT);
+            List<SeatDto> generalSeats = seatStorage.getGeneralSeatsAtSeasonSemester(SEASON_SEMESTER_QUERY_LIMIT);
             sseService.propagate(EVENT_NAME, SeatsResponse.from(generalSeats));
         };
     }
