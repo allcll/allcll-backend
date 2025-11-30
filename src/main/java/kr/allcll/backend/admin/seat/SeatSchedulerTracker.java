@@ -15,7 +15,7 @@ public class SeatSchedulerTracker {
         if (userId == null) {
             return;
         }
-        if (!runningUserIds.isEmpty()) {
+        if (!runningUserIds.isEmpty() && !runningUserIds.contains(userId)) {
             throw new AllcllException(AllcllErrorCode.SEAT_CRAWLING_ALREADY_IN_PROGRESS);
         }
         runningUserIds.add(userId);
