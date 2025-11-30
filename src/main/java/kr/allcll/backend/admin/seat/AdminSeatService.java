@@ -3,9 +3,12 @@ package kr.allcll.backend.admin.seat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import kr.allcll.backend.admin.seat.dto.ChangeSubjectsResponse;
 import kr.allcll.backend.admin.seat.dto.SeatStatusResponse;
+import kr.allcll.backend.support.exception.AllcllErrorCode;
+import kr.allcll.backend.support.exception.AllcllException;
 import kr.allcll.crawler.client.SeatClient;
 import kr.allcll.crawler.client.model.SeatResponse;
 import kr.allcll.crawler.client.payload.SeatPayload;
@@ -52,7 +55,10 @@ public class AdminSeatService {
         seatScheduler.cancelAll();
     }
 
-    public SeatStatusResponse getSeatCrawlerStatus() {
+    public SeatStatusResponse getSeatCrawlerStatus(List<String> userId) {
+        if (userId.size() > 1) {
+            throw new AllcllException(AllcllErrorCode.SEAT_CRAWLING_IN_MULTIPLE_ACCOUNTS);
+        }
         int seatSchedulerTaskCount = seatScheduler.getTaskCount();
         boolean validSeatSchedulerCount = seatSchedulerTaskCount == sjptProperties.getRequestPerSecondCount();
         boolean validRecentCrawlingSuccess =
@@ -60,7 +66,7 @@ public class AdminSeatService {
 
         boolean isActive = validSeatSchedulerCount && validRecentCrawlingSuccess;
 
-        return SeatStatusResponse.of(isActive);
+        return SeatStatusResponse.of(userId.getFirst(), isActive);
     }
 
     private void fetchPinSeat(Credential credential) {

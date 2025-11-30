@@ -1,9 +1,15 @@
 package kr.allcll.backend.admin.session;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import kr.allcll.backend.admin.session.dto.CredentialResponse;
 import kr.allcll.backend.admin.session.dto.SessionStatusResponse;
 import kr.allcll.backend.admin.session.dto.SetCredentialRequest;
+import kr.allcll.backend.admin.session.dto.UserSessionStatusResponse;
+import kr.allcll.backend.admin.session.dto.UserSessionsStatusResponse;
 import kr.allcll.crawler.client.SessionClient;
 import kr.allcll.crawler.client.payload.EmptyPayload;
 import kr.allcll.crawler.common.exception.CrawlerExternalRequestFailException;
@@ -22,6 +28,8 @@ public class SessionService {
     private final Credentials credentials;
     private final CrawlerScheduledTaskHandler threadPoolTaskScheduler;
     private final SessionClient sessionClient;
+
+    private final Map<String, LocalDateTime> sessionUpdatedTimes = new ConcurrentHashMap<>();
 
     public void setCredential(SetCredentialRequest request) {
         boolean isValidRequest = isValidCredentialRequest(request);
@@ -51,6 +59,8 @@ public class SessionService {
         Runnable resetSessionTask = () -> {
             try {
                 sessionClient.execute(credential, new EmptyPayload());
+                sessionUpdatedTimes.put(userId, LocalDateTime.now());
+
                 log.info("세션 갱신 성공: userId={}", userId);
             } catch (CrawlerExternalRequestFailException e) {
                 log.error("세션 갱신 실패: userId={}", userId);
@@ -65,9 +75,22 @@ public class SessionService {
         return SessionStatusResponse.of(isActive);
     }
 
+    public UserSessionsStatusResponse getSessionsStatus(List<String> userIds) {
+        List<UserSessionStatusResponse> responses = userIds.stream()
+            .map(userId -> new UserSessionStatusResponse(
+                userId,
+                threadPoolTaskScheduler.isRunning(userId),
+                sessionUpdatedTimes.get(userId)
+            ))
+            .toList();
+
+        return new UserSessionsStatusResponse(responses);
+    }
+
     public void cancelSessionScheduling() {
         threadPoolTaskScheduler.cancelAll();
         credentials.deleteAll();
+        sessionUpdatedTimes.clear();
     }
 
     private boolean isValidCredentialRequest(SetCredentialRequest request) {
@@ -87,4 +110,5 @@ public class SessionService {
         }
         return false;
     }
+
 }
