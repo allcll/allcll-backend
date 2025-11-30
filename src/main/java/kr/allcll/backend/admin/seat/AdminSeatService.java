@@ -55,18 +55,15 @@ public class AdminSeatService {
         seatScheduler.cancelAll();
     }
 
-    public SeatStatusResponse getSeatCrawlerStatus(List<String> userId) {
-        if (userId.size() > 1) {
+    public SeatStatusResponse getSeatCrawlerStatus(List<String> userIds) {
+        if (userIds.isEmpty()) {
+            return SeatStatusResponse.of(null, false);
+        }
+        if (userIds.size() > 1) {
             throw new AllcllException(AllcllErrorCode.SEAT_CRAWLING_IN_MULTIPLE_ACCOUNTS);
         }
-        int seatSchedulerTaskCount = seatScheduler.getTaskCount();
-        boolean validSeatSchedulerCount = seatSchedulerTaskCount == sjptProperties.getRequestPerSecondCount();
-        boolean validRecentCrawlingSuccess =
-            (System.currentTimeMillis() - lastSuccessCrawlingTime.get()) <= RECENT_CRAWLING_SUCCESS_THRESHOLD_MS;
-
-        boolean isActive = validSeatSchedulerCount && validRecentCrawlingSuccess;
-
-        return SeatStatusResponse.of(userId.getFirst(), isActive);
+        boolean isActive = isSeatCrawlingActive();
+        return SeatStatusResponse.of(userIds.getFirst(), isActive);
     }
 
     private void fetchPinSeat(Credential credential) {
@@ -132,6 +129,20 @@ public class AdminSeatService {
             log.error(
                 "[여석] 외부 API 호출에 실패했습니다. 과목: " + crawlerSubject.getCuriNo() + "-" + crawlerSubject.getClassName());
         }
+    }
+
+    private boolean isSeatCrawlingActive() {
+        boolean validSeatSchedulerCount = false;
+        if (seatScheduler.getTaskCount() == sjptProperties.getRequestPerSecondCount()) {
+            validSeatSchedulerCount = true;
+        }
+
+        boolean validRecentCrawlingSuccess = false;
+        if (System.currentTimeMillis() - lastSuccessCrawlingTime.get() <= RECENT_CRAWLING_SUCCESS_THRESHOLD_MS) {
+            validRecentCrawlingSuccess = true;
+        }
+
+        return validSeatSchedulerCount && validRecentCrawlingSuccess;
     }
 
     /**
