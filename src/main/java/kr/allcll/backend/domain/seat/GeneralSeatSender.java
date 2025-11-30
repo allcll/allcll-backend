@@ -37,7 +37,7 @@ public class GeneralSeatSender {
         if (hasActiveSchedule()) {
             return;
         }
-        scheduledTaskHandler.scheduleAtFixedRate(getGeneralSeatTaskAtSeasonSemester(), SENDING_PERIOD);
+        scheduledTaskHandler.scheduleAtFixedRate(getAllSeatTaskAtSeasonSemester(), SENDING_PERIOD);
     }
 
     public boolean hasActiveSchedule() {
@@ -51,10 +51,10 @@ public class GeneralSeatSender {
         };
     }
 
-    private Runnable getGeneralSeatTaskAtSeasonSemester() {
+    private Runnable getAllSeatTaskAtSeasonSemester() {
         return () -> {
-            List<SeatDto> generalSeats = seatStorage.getGeneralSeatsAtSeasonSemester(SEASON_SEMESTER_QUERY_LIMIT);
-            sseService.propagate(EVENT_NAME, SeatsResponse.from(generalSeats));
+            List<SeatDto> allSeat = seatStorage.getAllSeatsAtSeasonSemester(SEASON_SEMESTER_QUERY_LIMIT);
+            sseService.propagate(EVENT_NAME, SeatsResponse.from(allSeat));
         };
     }
 

@@ -33,7 +33,7 @@ public class SeatStorage {
             .toList();
     }
 
-    public List<SeatDto> getGeneralSeatsAtSeasonSemester(int limit) {
+    public List<SeatDto> getAllSeatsAtSeasonSemester(int limit) {
         Collection<SeatDto> seatsValue = seats.values();
         return seatsValue.stream()
                 .filter(seat -> seat.getSeatCount() > 0)
