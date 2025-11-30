@@ -26,7 +26,7 @@ public class SeatStorage {
     public List<SeatDto> getGeneralSeats(int limit) {
         Collection<SeatDto> seatsValue = seats.values();
         return seatsValue.stream()
-            .filter(seat -> seat.getSubject().isNonMajor())
+//            .filter(seat -> seat.getSubject().isNonMajor())
             .filter(seat -> seat.getSeatCount() > 0)
             .sorted(Comparator.comparingInt(SeatDto::getSeatCount))
             .limit(limit)
