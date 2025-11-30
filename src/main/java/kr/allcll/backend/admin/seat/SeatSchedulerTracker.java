@@ -1,7 +1,9 @@
 package kr.allcll.backend.admin.seat;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import org.springframework.stereotype.Component;
@@ -9,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SeatSchedulerTracker {
 
-    private final List<String> runningUserIds = new ArrayList<>();
+    private final Set<String> runningUserIds = new HashSet<>();
 
     public synchronized void addUserId(String userId) {
         if (userId == null) {
