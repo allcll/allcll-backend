@@ -33,6 +33,15 @@ public class SeatStorage {
             .toList();
     }
 
+    public List<SeatDto> getAllSeatsAtSeasonSemester(int limit) {
+        Collection<SeatDto> seatsValue = seats.values();
+        return seatsValue.stream()
+                .filter(seat -> seat.getSeatCount() > 0)
+                .sorted(Comparator.comparingInt(SeatDto::getSeatCount))
+                .limit(limit)
+                .toList();
+    }
+
     public List<SeatDto> getSeats(List<Subject> subjects) {
         List<SeatDto> seats = new ArrayList<>();
         subjects.forEach(subject -> findSeat(subject).ifPresentOrElse(
