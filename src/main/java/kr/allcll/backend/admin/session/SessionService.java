@@ -59,8 +59,6 @@ public class SessionService {
         Runnable resetSessionTask = () -> {
             try {
                 sessionClient.execute(credential, new EmptyPayload());
-                sessionUpdatedTimes.put(userId, LocalDateTime.now());
-
                 log.info("세션 갱신 성공: userId={}", userId);
             } catch (CrawlerExternalRequestFailException e) {
                 log.error("세션 갱신 실패: userId={}", userId);
@@ -68,6 +66,7 @@ public class SessionService {
             }
         };
         threadPoolTaskScheduler.scheduleAtFixedRate(userId, resetSessionTask, Duration.ofSeconds(10));
+        sessionUpdatedTimes.put(userId, LocalDateTime.now());
     }
 
     public SessionStatusResponse getSessionStatus(String userId) {
