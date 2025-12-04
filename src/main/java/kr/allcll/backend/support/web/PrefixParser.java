@@ -6,7 +6,7 @@ import kr.allcll.backend.support.exception.AllcllException;
 
 public class PrefixParser {
 
-    public static List<String> extractAllWithOutDuplicate(List<String> ids) {
+    public static List<String> extractDistinct(List<String> ids) {
         return ids.stream()
             .map(PrefixParser::extract)
             .distinct()

@@ -29,7 +29,7 @@ class PrefixParserTest {
 
     @Test
     @DisplayName("task ID에서 user ID가 중복을 제외하고 추출된다.")
-    void extractAllWithOutDuplicate() {
+    void extractDistinct() {
         // given
         String userIdPrefixA = "[21011138]";
         String userIdPrefixB = "[20010187]";
@@ -44,7 +44,7 @@ class PrefixParserTest {
         }
 
         // when
-        List<String> allId = PrefixParser.extractAllWithOutDuplicate(taskIds);
+        List<String> allId = PrefixParser.extractDistinct(taskIds);
 
         // then
         assertThat(allId)

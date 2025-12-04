@@ -59,7 +59,7 @@ public class AdminSeatService {
 
     public SeatStatusResponse getSeatCrawlerStatus() {
         List<String> allTaskId = seatScheduler.getAllTaskId();
-        List<String> userIds = PrefixParser.extractAllWithOutDuplicate(allTaskId);
+        List<String> userIds = PrefixParser.extractDistinct(allTaskId);
         if (userIds.isEmpty()) {
             return SeatStatusResponse.of(null, false);
         }
