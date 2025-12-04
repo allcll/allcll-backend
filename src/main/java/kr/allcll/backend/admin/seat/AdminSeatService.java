@@ -9,6 +9,8 @@ import kr.allcll.backend.admin.seat.dto.ChangeSubjectsResponse;
 import kr.allcll.backend.admin.seat.dto.SeatStatusResponse;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
+import kr.allcll.backend.support.web.PrefixParser;
+import kr.allcll.backend.support.web.TokenProvider;
 import kr.allcll.crawler.client.SeatClient;
 import kr.allcll.crawler.client.model.SeatResponse;
 import kr.allcll.crawler.client.payload.SeatPayload;
@@ -55,7 +57,9 @@ public class AdminSeatService {
         seatScheduler.cancelAll();
     }
 
-    public SeatStatusResponse getSeatCrawlerStatus(List<String> userIds) {
+    public SeatStatusResponse getSeatCrawlerStatus() {
+        List<String> allTaskId = seatScheduler.getAllTaskId();
+        List<String> userIds = PrefixParser.extractAllWithOutDuplicate(allTaskId);
         if (userIds.isEmpty()) {
             return SeatStatusResponse.of(null, false);
         }
@@ -68,8 +72,10 @@ public class AdminSeatService {
 
     private void fetchPinSeat(Credential credential) {
         int pinSubjectRequestPerSecondCount = sjptProperties.getPinSubjectRequestPerSecondCount();
+        String prefixId = credential.makeUserIdPrefix();
         for (int i = 0; i < pinSubjectRequestPerSecondCount; i++) {
             seatScheduler.scheduleAtFixedRate(
+                prefixId + TokenProvider.create(),
                 () -> sendPinSubjectRequest(credential),
                 Duration.ofSeconds(1)
             );
@@ -79,8 +85,10 @@ public class AdminSeatService {
     private void fetchGeneralSeat(Credential credential) {
         int requestPerSecondCount = sjptProperties.getRequestPerSecondCount();
         int pinSubjectRequestPerSecondCount = sjptProperties.getPinSubjectRequestPerSecondCount();
+        String prefixId = credential.makeUserIdPrefix();
         for (int i = 0; i < requestPerSecondCount - pinSubjectRequestPerSecondCount; i++) {
             seatScheduler.scheduleAtFixedRate(
+                prefixId + TokenProvider.create(),
                 () -> sendGeneralSubjectRequest(credential),
                 Duration.ofSeconds(1)
             );
