@@ -20,6 +20,11 @@ public class PeriodService {
 
     public PeriodResponse getPeriod() {
         Semester semester = Semester.fromValue(Semester.now());
+        List<Period> result = fetchLatestPeriodsForCurrentSemester(semester);
+        return PeriodResponse.from(result);
+    }
+
+    private List<Period> fetchLatestPeriodsForCurrentSemester(Semester semester) {
         List<Period> allPeriods = periodRepository.findAllBySemesterOrderByServiceTypeAndStartDateDesc(semester);
 
         Map<ServiceType, Period> latestByType = new LinkedHashMap<>();
@@ -28,8 +33,6 @@ public class PeriodService {
                 latestByType.put(period.getServiceType(), period);
             }
         }
-        List<Period> result = latestByType.values().stream().toList();
-
-        return PeriodResponse.from(result);
+        return latestByType.values().stream().toList();
     }
 }
