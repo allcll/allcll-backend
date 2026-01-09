@@ -2,6 +2,7 @@ package kr.allcll.backend.domain.timetable;
 
 import java.util.List;
 import java.util.Optional;
+import kr.allcll.backend.support.semester.Semester;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,8 +14,9 @@ public interface TimeTableRepository extends JpaRepository<TimeTable, Long> {
     @Query("""
         SELECT t FROM TimeTable t 
         WHERE t.token = :token
+        AND t.semester = :semester
         """)
-    List<TimeTable> findAllByToken(@Param("token") String token);
+    List<TimeTable> findAllByTokenAndSemester(@Param("token") String token, @Param("semester") Semester semester);
 
     @Query("""
         SELECT t FROM TimeTable t 
