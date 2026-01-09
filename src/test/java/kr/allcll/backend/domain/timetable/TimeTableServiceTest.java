@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import kr.allcll.backend.domain.timetable.dto.TimeTableCreateRequest;
+import kr.allcll.backend.domain.timetable.dto.TimeTableResponse;
 import kr.allcll.backend.domain.timetable.dto.TimeTablesResponse;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
@@ -39,14 +40,20 @@ class TimeTableServiceTest {
         TimeTableCreateRequest request2 = new TimeTableCreateRequest("새 시간표2", "2025-2");
 
         // when
-        timeTableService.createTimeTable(TOKEN1, request1);
-        timeTableService.createTimeTable(TOKEN2, request2);
+        TimeTableResponse timeTableResponse1 = timeTableService.createTimeTable(TOKEN1, request1);
+        TimeTableResponse timeTableResponse2 = timeTableService.createTimeTable(TOKEN2, request2);
 
         // then
-        List<TimeTable> results = timeTableRepository.findAllByToken(TOKEN1);
-        assertThat(results).hasSize(1);
-        assertThat(results.get(0).getTimeTableName()).isEqualTo("새 시간표1");
-        assertThat(results.get(0).getSemester()).isEqualTo(Semester.FALL_25);
+        TimeTable saved1 = timeTableRepository.findById(timeTableResponse1.timeTableId()).orElseThrow();
+        TimeTable saved2 = timeTableRepository.findById(timeTableResponse2.timeTableId()).orElseThrow();
+
+        assertThat(saved1.getToken()).isEqualTo(TOKEN1);
+        assertThat(saved1.getTimeTableName()).isEqualTo("새 시간표1");
+        assertThat(saved1.getSemester()).isEqualTo(Semester.FALL_25);
+
+        assertThat(saved2.getToken()).isEqualTo(TOKEN2);
+        assertThat(saved2.getTimeTableName()).isEqualTo("새 시간표2");
+        assertThat(saved2.getSemester()).isEqualTo(Semester.FALL_25);
     }
 
     @Test
@@ -125,19 +132,44 @@ class TimeTableServiceTest {
     }
 
     @Test
-    @DisplayName("토큰이 일치하는 시간표들을 검색하는 기능을 테스트한다.")
+    @DisplayName("시간표 조회 시 토큰과 학기 값이 모두 일치하는 시간표가 반환되는 것을 검증한다.")
     void getTimetables() {
         // given
-        TimeTable timeTable1 = new TimeTable(TOKEN1, "내 시간표1", Semester.FALL_25);
-        TimeTable timeTable2 = new TimeTable(TOKEN1, "내 시간표2", Semester.FALL_25);
-        TimeTable timeTable3 = new TimeTable(TOKEN2, "다른 사람 시간표", Semester.FALL_25);
-        timeTableRepository.saveAll(List.of(timeTable1, timeTable2, timeTable3));
+        Semester semester = Semester.FALL_25;
+
+        TimeTable timeTable1 = new TimeTable(TOKEN1, "내 시간표1", semester);
+        TimeTable timeTable2 = new TimeTable(TOKEN1, "내 시간표2", semester);
+        TimeTable otherSemester = new TimeTable(TOKEN1, "다른 학기 시간표", Semester.SPRING_26);
+        TimeTable otherToken = new TimeTable(TOKEN2, "다른 사람 시간표", semester);
+
+        timeTableRepository.saveAll(List.of(timeTable1, timeTable2, otherSemester, otherToken));
 
         // when
-        TimeTablesResponse timeTablesResponse = timeTableService.getTimetables(TOKEN1);
+        TimeTablesResponse timeTablesResponse = timeTableService.getTimetables(TOKEN1, semester.getValue());
 
         // then
-        assertThat(timeTablesResponse.timeTables().size()).isEqualTo(2);
+        assertThat(timeTablesResponse.timeTables()).hasSize(2);
+        assertThat(timeTablesResponse.timeTables())
+            .extracting("timeTableName")
+            .containsExactlyInAnyOrder("내 시간표1", "내 시간표2");
     }
 
+    @Test
+    @DisplayName("시간표 조회 시 학기 값이 없으면 예외가 발생한다.")
+    void getTimetables_whenSemesterIsNull_throwsException() {
+        // given
+        Semester semester = Semester.FALL_25;
+
+        TimeTable timeTable1 = new TimeTable(TOKEN1, "내 시간표1", semester);
+        TimeTable timeTable2 = new TimeTable(TOKEN1, "내 시간표2", semester);
+        TimeTable otherSemester = new TimeTable(TOKEN1, "다른 학기 시간표", Semester.SPRING_26);
+        TimeTable otherToken = new TimeTable(TOKEN2, "다른 사람 시간표", semester);
+
+        timeTableRepository.saveAll(List.of(timeTable1, timeTable2, otherSemester, otherToken));
+
+        // when & then
+        assertThatThrownBy(() -> timeTableService.getTimetables(TOKEN1, null))
+            .isInstanceOf(AllcllException.class)
+            .hasMessageContaining(AllcllErrorCode.INVALID_SEMESTER.getMessage());
+    }
 }
