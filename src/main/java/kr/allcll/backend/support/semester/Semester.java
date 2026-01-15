@@ -14,8 +14,8 @@ public enum Semester {
     SPRING_25("2025/1학기", LocalDate.of(2025, 2, 1), LocalDate.of(2025, 3, 31)),
     SUMMER_25("2025-여름", LocalDate.of(2025, 6, 1), LocalDate.of(2025, 6, 30)),
     FALL_25("2025-2", LocalDate.of(2025, 8, 1), LocalDate.of(2025, 11, 30)),
-    WINTER_25("2025-겨울", LocalDate.of(2025, 12, 1), LocalDate.of(2025, 12, 31)),
-    SPRING_26("2026-1", LocalDate.of(2026, 2, 1), LocalDate.of(2026, 3, 31)),
+    WINTER_25("2025-겨울", LocalDate.of(2025, 12, 1), LocalDate.of(2026, 1, 22)),
+    SPRING_26("2026-1", LocalDate.of(2026, 1, 23), LocalDate.of(2026, 6, 30)),
     ;
 
     private final String value;
