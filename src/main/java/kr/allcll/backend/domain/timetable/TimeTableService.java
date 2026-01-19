@@ -8,6 +8,7 @@ import kr.allcll.backend.domain.timetable.schedule.CustomScheduleRepository;
 import kr.allcll.backend.domain.timetable.schedule.OfficialScheduleRepository;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
+import kr.allcll.backend.support.semester.Semester;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,8 +48,10 @@ public class TimeTableService {
         timeTableRepository.delete(timeTable);
     }
 
-    public TimeTablesResponse getTimetables(String token) {
-        List<TimeTable> timeTables = timeTableRepository.findAllByToken(token);
+    public TimeTablesResponse getTimetables(String token, String semesterValue) {
+        Semester semester = Semester.fromValue(semesterValue);
+        List<TimeTable> timeTables = timeTableRepository.findAllByTokenAndSemester(token, semester);
+
         return new TimeTablesResponse(
             timeTables.stream()
                 .map(TimeTableResponse::from)
