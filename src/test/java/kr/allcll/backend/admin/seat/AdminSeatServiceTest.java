@@ -11,6 +11,7 @@ import kr.allcll.backend.support.exception.AllcllException;
 import kr.allcll.backend.support.web.TokenProvider;
 import kr.allcll.crawler.common.properties.SjptProperties;
 import kr.allcll.crawler.common.schedule.CrawlerScheduledTaskHandler;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,11 @@ class AdminSeatServiceTest {
 
     @Autowired
     private SjptProperties sjptProperties;
+
+    @AfterEach
+    void cancelAllSchedule() {
+        seatScheduler.cancelAll();
+    }
 
     @Test
     @DisplayName("userId가 하나이고, 크롤링이 성공하고 있을 시 정상 반환을 검증한다.")
