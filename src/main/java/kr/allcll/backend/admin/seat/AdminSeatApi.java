@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminSeatApi {
 
     private final AdminSeatService adminSeatService;
+    private final BatchService batchService;
     private final TargetSubjectService targetSubjectService;
     private final AdminRequestValidator validator;
 
@@ -27,6 +28,7 @@ public class AdminSeatApi {
 
         targetSubjectService.loadGeneralSubjects();
         adminSeatService.getAllSeatPeriodically(userId);
+        batchService.flushAllSeatPeriodically();
 
         return ResponseEntity.ok().build();
     }
