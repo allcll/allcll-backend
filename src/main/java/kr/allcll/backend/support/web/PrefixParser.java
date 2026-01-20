@@ -14,15 +14,27 @@ public class PrefixParser {
     }
 
     public static String extract(String id) {
-        int start = id.indexOf('[') + 1;
-        int end = id.indexOf(']');
-        if (prefixNotExist(start, end)) {
+        int open = id.indexOf('[');
+        int close = id.indexOf(']');
+        if (prefixNotExist(open, close)) {
             throw new AllcllException(AllcllErrorCode.PREFIX_NOT_FOUND);
         }
-        return id.substring(start, end);
+        return id.substring(open + 1, close);
     }
 
-    private static boolean prefixNotExist(int start, int end) {
-        return start == 0 || end == 1 || start >= end - 1;
+    private static boolean prefixNotExist(int open, int close) {
+        return isOpenMissing(open) || isCloseMissing(close) || isBracketedOrderInvalid(open, close);
+    }
+
+    private static boolean isOpenMissing(int open) {
+        return open < 0;
+    }
+
+    private static boolean isCloseMissing(int close) {
+        return close < 0;
+    }
+
+    private static boolean isBracketedOrderInvalid(int open, int close) {
+        return close <= open + 1;
     }
 }
