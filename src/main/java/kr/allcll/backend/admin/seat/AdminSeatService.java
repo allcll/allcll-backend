@@ -40,6 +40,7 @@ public class AdminSeatService {
     private final ChangeDetector changeDetector;
     private final AllSeatBuffer allSeatBuffer;
     private final AtomicLong lastSuccessCrawlingTime = new AtomicLong(0);
+    private final BatchService batchService;
 
     public void getAllSeatPeriodically(String userId) {
         Credential credential = credentials.findByUserId(userId);
@@ -100,12 +101,61 @@ public class AdminSeatService {
         if (crawlerSubject == null) {
             return;
         }
-        sendExternalRequestWithOutDetect(crawlerSubject, credential);
+        crawlPinSeatAndBuffer(crawlerSubject, credential);
     }
 
     private void sendGeneralSubjectRequest(Credential credential) {
         CrawlerSubject crawlerSubject = targetSubjectStorage.getNextGeneralTarget();
-        sendExternalRequestWithOutDetect(crawlerSubject, credential);
+        crawlGeneralSeatAndBuffer(crawlerSubject, credential);
+    }
+
+    private void crawlPinSeatAndBuffer(CrawlerSubject pinSubject, Credential credential) {
+        try {
+            CrawlerSeat crawlerSeat = sendExternalSeatRequest(pinSubject, credential);
+            batchService.savePinSeatBatch(crawlerSeat);
+
+            lastSuccessCrawlingTime.updateAndGet(
+                previousSuccessTime -> Math.max(previousSuccessTime, System.currentTimeMillis())
+            );
+        } catch (CrawlerAllcllException e) {
+            log.error(
+                "[핀 과목 여석] 외부 API 호출에 실패했습니다. 과목: "
+                    + pinSubject.getCuriNo() + "-"
+                    + pinSubject.getClassName());
+        }
+    }
+
+    private void crawlGeneralSeatAndBuffer(CrawlerSubject generalSubject, Credential credential) {
+        try {
+            CrawlerSeat crawlerSeat = sendExternalSeatRequest(generalSubject, credential);
+            batchService.saveGeneralSeatBatch(crawlerSeat);
+
+            lastSuccessCrawlingTime.updateAndGet(
+                previousSuccessTime -> Math.max(previousSuccessTime, System.currentTimeMillis())
+            );
+        } catch (CrawlerAllcllException e) {
+            log.error(
+                "[교양 과목 여석] 외부 API 호출에 실패했습니다. 과목: "
+                    + generalSubject.getCuriNo() + "-"
+                    + generalSubject.getClassName());
+        }
+    }
+
+    private CrawlerSeat sendExternalSeatRequest(CrawlerSubject crawlerSubject, Credential credential) {
+        log.info("[AdminSeatService] [학교 서버] 요청 시도 과목: {}", crawlerSubject);
+        SeatPayload requestPayload = SeatPayload.from(crawlerSubject);
+        SeatResponse response = seatClient.execute(credential, requestPayload);
+        CrawlerSeat renewedCrawlerSeat = createSeat(response, crawlerSubject);
+
+        allSeatBuffer.add(
+            ChangeSubjectsResponse.of(
+                crawlerSubject.getId(),
+                ChangeStatus.UPDATE, //의미없는 필드
+                SeatUtils.getRemainSeat(renewedCrawlerSeat),
+                LocalDateTime.now()
+            )
+        );
+        return renewedCrawlerSeat;
     }
 
     private void sendExternalRequestWithOutDetect(CrawlerSubject crawlerSubject, Credential credential) {
