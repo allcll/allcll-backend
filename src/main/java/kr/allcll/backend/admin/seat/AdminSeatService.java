@@ -158,37 +158,6 @@ public class AdminSeatService {
         return renewedCrawlerSeat;
     }
 
-    private void sendExternalRequestWithOutDetect(CrawlerSubject crawlerSubject, Credential credential) {
-        try {
-            log.info("[SeatService] [학교 서버] 요청 시도 과목: {}", crawlerSubject);
-            SeatPayload requestPayload = SeatPayload.from(crawlerSubject);
-            SeatResponse response = seatClient.execute(credential, requestPayload);
-            CrawlerSeat renewedCrawlerSeat = createSeat(response, crawlerSubject);
-
-            allSeatBuffer.add(
-                ChangeSubjectsResponse.of(
-                    crawlerSubject.getId(),
-                    ChangeStatus.UPDATE, //의미없는 필드...
-                    SeatUtils.getRemainSeat(renewedCrawlerSeat),
-                    LocalDateTime.now()
-                    //renewedCrawlerSeat.getCreatedAt() //추후 개션 예정
-                )
-            );
-
-            synchronized (getSubjectLock(renewedCrawlerSeat.getId())) {
-                seatPersistenceService.saveSeat(renewedCrawlerSeat);
-            }
-
-            lastSuccessCrawlingTime.updateAndGet(
-                previousSuccessTime -> Math.max(previousSuccessTime, System.currentTimeMillis())
-            );
-
-        } catch (CrawlerAllcllException e) {
-            log.error(
-                "[여석] 외부 API 호출에 실패했습니다. 과목: " + crawlerSubject.getCuriNo() + "-" + crawlerSubject.getClassName());
-        }
-    }
-
     private boolean isSeatCrawlingActive() {
         boolean validSeatSchedulerCount = false;
         if (seatScheduler.getTaskCount() == sjptProperties.getRequestPerSecondCount()) {
