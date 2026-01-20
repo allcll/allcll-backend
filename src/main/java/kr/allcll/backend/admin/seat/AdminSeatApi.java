@@ -1,7 +1,6 @@
 package kr.allcll.backend.admin.seat;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.List;
 import kr.allcll.backend.admin.AdminRequestValidator;
 import kr.allcll.backend.admin.seat.dto.SeatStatusResponse;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,6 @@ public class AdminSeatApi {
     private final AdminSeatService adminSeatService;
     private final TargetSubjectService targetSubjectService;
     private final AdminRequestValidator validator;
-    private final SeatSchedulerTracker schedulerTracker;
 
     @PostMapping("/api/admin/seat/start")
     public ResponseEntity<Void> getSeatPeriodically(HttpServletRequest request,
@@ -26,7 +24,6 @@ public class AdminSeatApi {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
         }
-        schedulerTracker.addUserId(userId);
 
         targetSubjectService.loadGeneralSubjects();
         adminSeatService.getAllSeatPeriodically(userId);
@@ -40,7 +37,6 @@ public class AdminSeatApi {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
         }
-        schedulerTracker.addUserId(userId);
 
         targetSubjectService.loadAllSubjects();
         adminSeatService.getSeasonSeatPeriodically(userId);
@@ -53,8 +49,7 @@ public class AdminSeatApi {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
         }
-        List<String> userIds = schedulerTracker.getUserIds();
-        SeatStatusResponse seatStatusResponse = adminSeatService.getSeatCrawlerStatus(userIds);
+        SeatStatusResponse seatStatusResponse = adminSeatService.getSeatCrawlerStatus();
         return ResponseEntity.ok(seatStatusResponse);
     }
 
@@ -64,8 +59,6 @@ public class AdminSeatApi {
             return ResponseEntity.status(401).build();
         }
         adminSeatService.cancelSeatScheduling();
-
-        schedulerTracker.clearAll();
 
         return ResponseEntity.ok().build();
     }
