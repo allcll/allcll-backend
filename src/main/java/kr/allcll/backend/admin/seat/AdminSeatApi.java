@@ -42,6 +42,7 @@ public class AdminSeatApi {
 
         targetSubjectService.loadAllSubjects();
         adminSeatService.getSeasonSeatPeriodically(userId);
+        batchService.flushAllSeatPeriodically();
 
         return ResponseEntity.ok().build();
     }
