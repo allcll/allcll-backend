@@ -61,6 +61,7 @@ public class AdminSeatApi {
             return ResponseEntity.status(401).build();
         }
         adminSeatService.cancelSeatScheduling();
+        batchService.cancelFlushScheduling();
 
         return ResponseEntity.ok().build();
     }

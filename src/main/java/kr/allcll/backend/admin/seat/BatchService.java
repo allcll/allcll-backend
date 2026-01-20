@@ -69,4 +69,8 @@ public class BatchService {
             seatPersistenceService.saveAllSeat(allCrawlerSeat);
         };
     }
+
+    public void cancelFlushScheduling() {
+        scheduledTaskHandler.cancelAll();
+    }
 }
