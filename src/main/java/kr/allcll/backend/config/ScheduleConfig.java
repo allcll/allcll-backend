@@ -22,4 +22,10 @@ public class ScheduleConfig {
     public ScheduledTaskHandler pinSeatTaskHandler(MeterRegistry meterRegistry) {
         return new ScheduledTaskHandler(20, "pin-seat-sender", meterRegistry);
     }
+
+    @Bean
+    @Qualifier("seatBatchHandler")
+    public ScheduledTaskHandler seatBatchHandler(MeterRegistry meterRegistry) {
+        return new ScheduledTaskHandler(2, "seat-batch-writer", meterRegistry);
+    }
 }
