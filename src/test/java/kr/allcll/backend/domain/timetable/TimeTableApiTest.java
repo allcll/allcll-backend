@@ -61,19 +61,39 @@ class TimeTableApiTest {
         Long timetableId = 1L;
         String json = """
             {
-                "title": "새로운 시간표 제목"
+                "timeTableName": "새로운 시간표 제목"
             }
             """;
 
-        TimeTableResponse mockResponse = new TimeTableResponse(timetableId, "새로운 시간표 제목", "2025-2");
+        String expected = """
+        {
+          "timeTableId": 1,
+          "timeTableName": "새로운 시간표 제목",
+          "semesterCode": "FALL_25",
+          "semesterValue": "2025-2"
+        }
+        """;
+
+        TimeTableResponse mockResponse = new TimeTableResponse(
+            timetableId,
+            "새로운 시간표 제목",
+            "FALL_25",
+            "2025-2"
+        );
         when(timeTableService.updateTimeTable(timetableId, "새로운 시간표 제목", TOKEN))
             .thenReturn(mockResponse);
 
-        mockMvc.perform(patch("/api/timetables/{timetableId}", timetableId)
+        MvcResult result = mockMvc.perform(patch("/api/timetables/{timetableId}", timetableId)
                 .cookie(TOKEN_COOKIE)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
-            .andExpect(status().isOk());
+            .andExpect(status().isOk())
+            .andReturn();
+
+        System.out.println("응답 내용: " + result.getResponse().getContentAsString());
+
+        assertThat(result.getResponse().getContentAsString())
+            .isEqualToIgnoringWhitespace(expected);
     }
 
     @Test
@@ -98,27 +118,28 @@ class TimeTableApiTest {
                     {
                       "timeTableId": 1,
                       "timeTableName": "시간표1",
-                      "semester": "FALL_25"
+                      "semesterCode": "FALL_25",
+                      "semesterValue": "2025-2"
                     },
                     {
                       "timeTableId": 2,
                       "timeTableName": "시간표2",
-                      "semester": "FALL_25"
+                      "semesterCode": "FALL_25",
+                      "semesterValue": "2025-2"
                     }
                 ]
             }
             """;
 
-        String semester = "FALL_25";
         List<TimeTableResponse> list = List.of(
-            new TimeTableResponse(1L, "시간표1", semester),
-            new TimeTableResponse(2L, "시간표2", semester)
+            new TimeTableResponse(1L, "시간표1", "FALL_25", "2025-2"),
+            new TimeTableResponse(2L, "시간표2", "FALL_25", "2025-2")
         );
-        when(timeTableService.getTimetables(TOKEN, semester)).thenReturn(new TimeTablesResponse(list));
+        when(timeTableService.getTimetables(TOKEN, "FALL_25")).thenReturn(new TimeTablesResponse(list));
 
         MvcResult result = mockMvc.perform(get("/api/timetables")
                 .cookie(TOKEN_COOKIE)
-                .param("semester", semester)
+                .param("semester", "FALL_25")
             )
             .andExpect(status().isOk())
             .andReturn();

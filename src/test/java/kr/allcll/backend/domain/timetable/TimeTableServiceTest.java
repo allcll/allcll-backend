@@ -60,7 +60,7 @@ class TimeTableServiceTest {
     @DisplayName("존재하지 않는 학기 코드가 들어오면 AllcllException이 발생한다")
     void createTimeTable_invalidSemester_throwsException() {
         // given
-        String invalidSemester = "1999-2";
+        String invalidSemester = "FALL_99";
         TimeTableCreateRequest request = new TimeTableCreateRequest("시간표1", invalidSemester);
         String token = "token";
 
@@ -136,13 +136,14 @@ class TimeTableServiceTest {
     void getTimetables() {
         // given
         Semester semester = Semester.FALL_25;
+        Semester otherSemester = Semester.SPRING_26;
 
         TimeTable timeTable1 = new TimeTable(TOKEN1, "내 시간표1", semester);
         TimeTable timeTable2 = new TimeTable(TOKEN1, "내 시간표2", semester);
-        TimeTable otherSemester = new TimeTable(TOKEN1, "다른 학기 시간표", Semester.SPRING_26);
-        TimeTable otherToken = new TimeTable(TOKEN2, "다른 사람 시간표", semester);
+        TimeTable otherSemesterTimeTable = new TimeTable(TOKEN1, "다른 학기 시간표", otherSemester);
+        TimeTable otherTokenTimeTable = new TimeTable(TOKEN2, "다른 사람 시간표", semester);
 
-        timeTableRepository.saveAll(List.of(timeTable1, timeTable2, otherSemester, otherToken));
+        timeTableRepository.saveAll(List.of(timeTable1, timeTable2, otherSemesterTimeTable, otherTokenTimeTable));
 
         // when
         TimeTablesResponse timeTablesResponse = timeTableService.getTimetables(TOKEN1, semester.name());
@@ -159,13 +160,14 @@ class TimeTableServiceTest {
     void getTimetables_whenSemesterIsNull_throwsException() {
         // given
         Semester semester = Semester.FALL_25;
+        Semester otherSemester = Semester.SPRING_26;
 
         TimeTable timeTable1 = new TimeTable(TOKEN1, "내 시간표1", semester);
         TimeTable timeTable2 = new TimeTable(TOKEN1, "내 시간표2", semester);
-        TimeTable otherSemester = new TimeTable(TOKEN1, "다른 학기 시간표", Semester.SPRING_26);
-        TimeTable otherToken = new TimeTable(TOKEN2, "다른 사람 시간표", semester);
+        TimeTable otherSemesterTimeTable = new TimeTable(TOKEN1, "다른 학기 시간표", otherSemester);
+        TimeTable otherTokenTimeTable = new TimeTable(TOKEN2, "다른 사람 시간표", semester);
 
-        timeTableRepository.saveAll(List.of(timeTable1, timeTable2, otherSemester, otherToken));
+        timeTableRepository.saveAll(List.of(timeTable1, timeTable2, otherSemesterTimeTable, otherTokenTimeTable));
 
         // when & then
         assertThatThrownBy(() -> timeTableService.getTimetables(TOKEN1, null))
