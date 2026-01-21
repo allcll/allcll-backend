@@ -44,7 +44,7 @@ class TimeTableApiTest {
         String json = """
             {
                 "timetableName": "시간표 1",
-                "semester": "2025-2"
+                "semester": "FALL_25"
             }
             """;
 
@@ -98,18 +98,18 @@ class TimeTableApiTest {
                     {
                       "timeTableId": 1,
                       "timeTableName": "시간표1",
-                      "semester": "2025-2"
+                      "semester": "FALL_25"
                     },
                     {
                       "timeTableId": 2,
                       "timeTableName": "시간표2",
-                      "semester": "2025-2"
+                      "semester": "FALL_25"
                     }
                 ]
             }
             """;
 
-        String semester = "2025-2";
+        String semester = "FALL_25";
         List<TimeTableResponse> list = List.of(
             new TimeTableResponse(1L, "시간표1", semester),
             new TimeTableResponse(2L, "시간표2", semester)

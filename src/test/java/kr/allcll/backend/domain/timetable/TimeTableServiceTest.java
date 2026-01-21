@@ -36,8 +36,8 @@ class TimeTableServiceTest {
     @DisplayName("시간표 정상 생성을 검증한다.")
     void createTimeTable() {
         // given
-        TimeTableCreateRequest request1 = new TimeTableCreateRequest("새 시간표1", "2025-2");
-        TimeTableCreateRequest request2 = new TimeTableCreateRequest("새 시간표2", "2025-2");
+        TimeTableCreateRequest request1 = new TimeTableCreateRequest("새 시간표1", "FALL_25");
+        TimeTableCreateRequest request2 = new TimeTableCreateRequest("새 시간표2", "FALL_25");
 
         // when
         TimeTableResponse timeTableResponse1 = timeTableService.createTimeTable(TOKEN1, request1);
@@ -145,7 +145,7 @@ class TimeTableServiceTest {
         timeTableRepository.saveAll(List.of(timeTable1, timeTable2, otherSemester, otherToken));
 
         // when
-        TimeTablesResponse timeTablesResponse = timeTableService.getTimetables(TOKEN1, semester.getValue());
+        TimeTablesResponse timeTablesResponse = timeTableService.getTimetables(TOKEN1, semester.name());
 
         // then
         assertThat(timeTablesResponse.timeTables()).hasSize(2);
