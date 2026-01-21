@@ -10,12 +10,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class BatchService {
 
+    private static final Duration PIN_SEAT_SAVE_PERIOD = Duration.ofSeconds(1);
+    private static final Duration GENERAL_SEAT_SAVE_PERIOD = Duration.ofSeconds(3);
+
     private final PinSeatBatch pinSeatBatch;
     private final GeneralSeatBatch generalSeatBatch;
     private final SeatPersistenceService seatPersistenceService;
     private final ScheduledTaskHandler scheduledTaskHandler;
-    private static final Duration PIN_SEAT_SAVE_PERIOD = Duration.ofSeconds(1);
-    private static final Duration GENERAL_SEAT_SAVE_PERIOD = Duration.ofSeconds(3);
 
     public BatchService(
         PinSeatBatch pinSeatBatch,
