@@ -48,8 +48,8 @@ public class TimeTableApi {
     }
 
     @GetMapping("/api/timetables")
-    public ResponseEntity<TimeTablesResponse> getTimeTables(@RequestParam String semester) {
-        TimeTablesResponse timeTablesResponse = timeTableService.getTimetables(ThreadLocalHolder.SHARED_TOKEN.get(), semester);
+    public ResponseEntity<TimeTablesResponse> getTimeTables(@RequestParam String semesterCode) {
+        TimeTablesResponse timeTablesResponse = timeTableService.getTimetables(ThreadLocalHolder.SHARED_TOKEN.get(), semesterCode);
         return ResponseEntity.ok(timeTablesResponse);
     }
 }

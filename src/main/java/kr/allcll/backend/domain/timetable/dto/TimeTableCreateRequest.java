@@ -4,10 +4,10 @@ import kr.allcll.backend.support.semester.Semester;
 
 public record TimeTableCreateRequest(
     String timeTableName,
-    String semester
+    String semesterCode
 ) {
 
     public Semester toSemester() {
-        return Semester.fromCode(semester);
+        return Semester.fromCode(semesterCode);
     }
 }
