@@ -12,7 +12,7 @@ public record TimeTableResponse(
         return new TimeTableResponse(
             timeTable.getId(),
             timeTable.getTimeTableName(),
-            timeTable.getSemester().getValue()
+            timeTable.getSemester().name()
         );
     }
 }

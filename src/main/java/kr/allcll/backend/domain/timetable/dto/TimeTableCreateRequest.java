@@ -8,6 +8,6 @@ public record TimeTableCreateRequest(
 ) {
 
     public Semester toSemester() {
-        return Semester.fromValue(semester);
+        return Semester.fromCode(semester);
     }
 }

@@ -48,8 +48,8 @@ public class TimeTableService {
         timeTableRepository.delete(timeTable);
     }
 
-    public TimeTablesResponse getTimetables(String token, String semesterValue) {
-        Semester semester = Semester.fromValue(semesterValue);
+    public TimeTablesResponse getTimetables(String token, String semesterCode) {
+        Semester semester = Semester.fromCode(semesterCode);
         List<TimeTable> timeTables = timeTableRepository.findAllByTokenAndSemester(token, semester);
 
         return new TimeTablesResponse(
