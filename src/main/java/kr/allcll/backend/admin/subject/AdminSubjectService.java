@@ -20,9 +20,9 @@ public class AdminSubjectService {
 
     @Transactional
     public SubjectSyncResult syncSubjects(String userId, String year, String semesterCode) {
-        List<kr.allcll.crawler.subject.CrawlerSubject> allCrawlerSubjects = subjectFetcher.fetchSubjects(userId, year, semesterCode);
+        List<CrawlerSubject> allCrawlerSubjects = subjectFetcher.fetchSubjects(userId, year, semesterCode);
         log.info("[SubjectService] 현재 학사 정보 전체 과목 수: {}", allCrawlerSubjects.size());
-        List<kr.allcll.crawler.subject.CrawlerSubject> existingCrawlerSubjects = crawlerSubjectRepository
+        List<CrawlerSubject> existingCrawlerSubjects = crawlerSubjectRepository
             .findAllBySemesterAtIncludingDeleted(CrawlerSemester.now());
         log.info("[SubjectService] 기존 과목 수: {}", existingCrawlerSubjects.size());
         SubjectSyncResult syncResult = SubjectSyncProcessor.process(allCrawlerSubjects, existingCrawlerSubjects);
@@ -35,7 +35,7 @@ public class AdminSubjectService {
 
     private void deleteRemovedSubjects(SubjectSyncResult syncResult) {
         if (syncResult.subjectsToDeleteIsExist()) {
-            List<kr.allcll.crawler.subject.CrawlerSubject> subjectsToDelete = syncResult.subjectsToDelete();
+            List<CrawlerSubject> subjectsToDelete = syncResult.subjectsToDelete();
             log.info("[SubjectService] 삭제된 과목 수: {}", subjectsToDelete.size());
             softDeleteSubjects(subjectsToDelete);
         }
@@ -43,7 +43,7 @@ public class AdminSubjectService {
 
     private void saveAddedSubjects(SubjectSyncResult syncResult) {
         if (syncResult.subjectsToAddIsExist()) {
-            List<kr.allcll.crawler.subject.CrawlerSubject> subjectsToAdd = syncResult.subjectsToAdd();
+            List<CrawlerSubject> subjectsToAdd = syncResult.subjectsToAdd();
             log.info("[SubjectService] 새로 추가된 과목 수: {}", subjectsToAdd.size());
             crawlerSubjectRepository.saveAll(subjectsToAdd);
         }
@@ -51,10 +51,10 @@ public class AdminSubjectService {
 
     private void updateChangedSubjects(SubjectSyncResult syncResult) {
         if (syncResult.subjectsToUpdateIsExist()) {
-            List<kr.allcll.crawler.subject.CrawlerSubject> subjectsToUpdate = syncResult.subjectsCanUpdate();
+            List<CrawlerSubject> subjectsToUpdate = syncResult.subjectsCanUpdate();
             log.info("[SubjectService] 변경된 과목 수: {}", subjectsToUpdate.size());
-            for (kr.allcll.crawler.subject.CrawlerSubject updatedSubject : subjectsToUpdate) {
-                kr.allcll.crawler.subject.CrawlerSubject existingSubject = crawlerSubjectRepository.findByLogicalKeyIncludingDeleted(
+            for (CrawlerSubject updatedSubject : subjectsToUpdate) {
+                CrawlerSubject existingSubject = crawlerSubjectRepository.findByLogicalKeyIncludingDeleted(
                     updatedSubject.getCuriNo(),
                     updatedSubject.getDeptCd(),
                     updatedSubject.getClassName(),
@@ -66,7 +66,7 @@ public class AdminSubjectService {
         }
     }
 
-    private void softDeleteSubjects(List<kr.allcll.crawler.subject.CrawlerSubject> crawlerSubjects) {
+    private void softDeleteSubjects(List<CrawlerSubject> crawlerSubjects) {
         crawlerSubjects.forEach(CrawlerSubject::delete);
         crawlerSubjectRepository.saveAll(crawlerSubjects);
     }

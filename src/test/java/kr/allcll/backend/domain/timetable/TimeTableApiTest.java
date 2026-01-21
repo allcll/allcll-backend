@@ -109,14 +109,17 @@ class TimeTableApiTest {
             }
             """;
 
+        String semester = "2025-2";
         List<TimeTableResponse> list = List.of(
-            new TimeTableResponse(1L, "시간표1", "2025-2"),
-            new TimeTableResponse(2L, "시간표2", "2025-2")
+            new TimeTableResponse(1L, "시간표1", semester),
+            new TimeTableResponse(2L, "시간표2", semester)
         );
-        when(timeTableService.getTimetables(TOKEN)).thenReturn(new TimeTablesResponse(list));
+        when(timeTableService.getTimetables(TOKEN, semester)).thenReturn(new TimeTablesResponse(list));
 
         MvcResult result = mockMvc.perform(get("/api/timetables")
-                .cookie(TOKEN_COOKIE))
+                .cookie(TOKEN_COOKIE)
+                .param("semester", semester)
+            )
             .andExpect(status().isOk())
             .andReturn();
 

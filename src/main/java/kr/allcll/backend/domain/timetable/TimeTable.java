@@ -32,6 +32,7 @@ public class TimeTable extends BaseEntity {
         this.token = token;
         this.timeTableName = timeTableName;
         this.semester = semester;
+        this.semesterAt = semester.getValue();
     }
 
     public void updateTimeTable(String newTitle) {

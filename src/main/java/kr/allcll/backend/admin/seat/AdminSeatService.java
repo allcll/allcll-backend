@@ -3,9 +3,14 @@ package kr.allcll.backend.admin.seat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import kr.allcll.backend.admin.seat.dto.ChangeSubjectsResponse;
 import kr.allcll.backend.admin.seat.dto.SeatStatusResponse;
+import kr.allcll.backend.support.exception.AllcllErrorCode;
+import kr.allcll.backend.support.exception.AllcllException;
+import kr.allcll.backend.support.web.PrefixParser;
+import kr.allcll.backend.support.web.TokenProvider;
 import kr.allcll.crawler.client.SeatClient;
 import kr.allcll.crawler.client.model.SeatResponse;
 import kr.allcll.crawler.client.payload.SeatPayload;
@@ -53,20 +58,24 @@ public class AdminSeatService {
     }
 
     public SeatStatusResponse getSeatCrawlerStatus() {
-        int seatSchedulerTaskCount = seatScheduler.getTaskCount();
-        boolean validSeatSchedulerCount = seatSchedulerTaskCount == sjptProperties.getRequestPerSecondCount();
-        boolean validRecentCrawlingSuccess =
-            (System.currentTimeMillis() - lastSuccessCrawlingTime.get()) <= RECENT_CRAWLING_SUCCESS_THRESHOLD_MS;
-
-        boolean isActive = validSeatSchedulerCount && validRecentCrawlingSuccess;
-
-        return SeatStatusResponse.of(isActive);
+        List<String> allTaskId = seatScheduler.getAllTaskId();
+        List<String> userIds = PrefixParser.extractDistinct(allTaskId);
+        if (userIds.isEmpty()) {
+            return SeatStatusResponse.of(null, false);
+        }
+        if (userIds.size() > 1) {
+            throw new AllcllException(AllcllErrorCode.SEAT_CRAWLING_IN_MULTIPLE_ACCOUNTS);
+        }
+        boolean isActive = isSeatCrawlingActive();
+        return SeatStatusResponse.of(userIds.getFirst(), isActive);
     }
 
     private void fetchPinSeat(Credential credential) {
         int pinSubjectRequestPerSecondCount = sjptProperties.getPinSubjectRequestPerSecondCount();
+        String prefixId = credential.makeUserIdPrefix();
         for (int i = 0; i < pinSubjectRequestPerSecondCount; i++) {
             seatScheduler.scheduleAtFixedRate(
+                prefixId + TokenProvider.create(),
                 () -> sendPinSubjectRequest(credential),
                 Duration.ofSeconds(1)
             );
@@ -76,8 +85,10 @@ public class AdminSeatService {
     private void fetchGeneralSeat(Credential credential) {
         int requestPerSecondCount = sjptProperties.getRequestPerSecondCount();
         int pinSubjectRequestPerSecondCount = sjptProperties.getPinSubjectRequestPerSecondCount();
+        String prefixId = credential.makeUserIdPrefix();
         for (int i = 0; i < requestPerSecondCount - pinSubjectRequestPerSecondCount; i++) {
             seatScheduler.scheduleAtFixedRate(
+                prefixId + TokenProvider.create(),
                 () -> sendGeneralSubjectRequest(credential),
                 Duration.ofSeconds(1)
             );
@@ -126,6 +137,20 @@ public class AdminSeatService {
             log.error(
                 "[여석] 외부 API 호출에 실패했습니다. 과목: " + crawlerSubject.getCuriNo() + "-" + crawlerSubject.getClassName());
         }
+    }
+
+    private boolean isSeatCrawlingActive() {
+        boolean validSeatSchedulerCount = false;
+        if (seatScheduler.getTaskCount() == sjptProperties.getRequestPerSecondCount()) {
+            validSeatSchedulerCount = true;
+        }
+
+        boolean validRecentCrawlingSuccess = false;
+        if (System.currentTimeMillis() - lastSuccessCrawlingTime.get() <= RECENT_CRAWLING_SUCCESS_THRESHOLD_MS) {
+            validRecentCrawlingSuccess = true;
+        }
+
+        return validSeatSchedulerCount && validRecentCrawlingSuccess;
     }
 
     /**

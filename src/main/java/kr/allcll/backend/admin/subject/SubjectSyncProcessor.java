@@ -13,23 +13,24 @@ import lombok.extern.slf4j.Slf4j;
 public class SubjectSyncProcessor {
 
     public static SubjectSyncResult process(List<CrawlerSubject> newCrawlerSubjects,
-        List<kr.allcll.crawler.subject.CrawlerSubject> existingCrawlerSubjects) {
+        List<CrawlerSubject> existingCrawlerSubjects) {
 
         Set<String> newSubjectsKeySet = newCrawlerSubjects.stream()
             .map(SubjectSyncProcessor::generateSubjectKey)
             .collect(Collectors.toSet());
 
-        Map<String, kr.allcll.crawler.subject.CrawlerSubject> existingSubjectsWithKey = existingCrawlerSubjects.stream()
+        Map<String, CrawlerSubject> existingSubjectsWithKey = existingCrawlerSubjects.stream()
             .collect(Collectors.toMap(
                 SubjectSyncProcessor::generateSubjectKey,
                 subject -> subject
             ));
 
-        List<kr.allcll.crawler.subject.CrawlerSubject> subjectsToAdd = newCrawlerSubjects.stream()
+        List<CrawlerSubject> subjectsToAdd = newCrawlerSubjects.stream()
             .filter(subject -> !existingSubjectsWithKey.containsKey(generateSubjectKey(subject)))
             .toList();
 
-        List<kr.allcll.crawler.subject.CrawlerSubject> subjectsToDelete = existingCrawlerSubjects.stream()
+        List<CrawlerSubject> subjectsToDelete = existingCrawlerSubjects.stream()
+            .filter(subject -> !subject.isDeleted())
             .filter(subject -> !newSubjectsKeySet.contains(generateSubjectKey(subject)))
             .toList();
 
@@ -37,7 +38,7 @@ public class SubjectSyncProcessor {
         List<CrawlerSubject> subjectsToUpdate = newCrawlerSubjects.stream()
             .filter(newSubject -> {
                 String key = generateSubjectKey(newSubject);
-                kr.allcll.crawler.subject.CrawlerSubject existingSubject = existingSubjectsWithKey.get(key);
+                CrawlerSubject existingSubject = existingSubjectsWithKey.get(key);
                 if (existingSubject == null) {
                     return false;
                 }
@@ -67,14 +68,14 @@ public class SubjectSyncProcessor {
         return new SubjectSyncResult(subjectsToAdd, subjectsToDelete, subjectsToUpdate, updateDiffs);
     }
 
-    private static String generateSubjectKey(kr.allcll.crawler.subject.CrawlerSubject crawlerSubject) {
+    private static String generateSubjectKey(CrawlerSubject crawlerSubject) {
         return crawlerSubject.getCuriNo() + "|" +
             crawlerSubject.getDeptCd() + "|" +
             crawlerSubject.getClassName() + "|" +
             crawlerSubject.getSmtCd();
     }
 
-    private static boolean hasDifferent(kr.allcll.crawler.subject.CrawlerSubject oldValue, CrawlerSubject newValue) {
+    private static boolean hasDifferent(CrawlerSubject oldValue, CrawlerSubject newValue) {
         return !safeEquals(oldValue.getLesnRoom(), newValue.getLesnRoom())
             || !safeEquals(oldValue.getLesnTime(), newValue.getLesnTime())
             || !safeEquals(oldValue.getLesnEmp(), newValue.getLesnEmp());
