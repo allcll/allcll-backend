@@ -20,9 +20,17 @@ public class AdminPeriodService {
     private final PeriodRepository periodRepository;
 
     @Transactional
-    public void createPeriod(Semester semesterCode, PeriodRequest periodRequest) {
-        List<PeriodDetailRequest> periodDetailRequests = periodRequest.serviceInfo();
-        String semesterValue = semesterCode.getValue();
+    public void savePeriod(Semester semester, PeriodRequest periodRequest) {
+        Optional<Period> foundPeriod = periodRepository.findBySemesterAndServiceType(semester, periodRequest.serviceType());
+
+        if (foundPeriod.isPresent()) {
+            foundPeriod.get().update(
+                periodRequest.startDate(),
+                periodRequest.endDate(),
+                periodRequest.message()
+            );
+            return;
+        }
 
         List<Period> periods = periodDetailRequests.stream()
             .map(request -> Period.create(
