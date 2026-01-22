@@ -32,7 +32,7 @@ public enum Semester {
         return Arrays.stream(values())
             .filter(semester -> isDateInRange(semester, date))
             .findFirst()
-            .orElse(getNextSemester(date));
+            .orElseGet(() -> getNextSemester(date));
     }
 
     public static String now() {
