@@ -43,14 +43,14 @@ public class BatchService {
         flushGeneralSeatPeriodically();
     }
 
-    private void flushPinSeatPeriodically() {
+    public void flushPinSeatPeriodically() {
         scheduledTaskHandler.scheduleAtFixedRate(
             flushPinSubject(),
             PIN_SEAT_SAVE_PERIOD
         );
     }
 
-    private void flushGeneralSeatPeriodically() {
+    public void flushGeneralSeatPeriodically() {
         scheduledTaskHandler.scheduleAtFixedRate(
             flushGeneralSubject(),
             GENERAL_SEAT_SAVE_PERIOD
