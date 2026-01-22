@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import kr.allcll.backend.admin.seat.dto.ChangeSubjectsResponse;
+import kr.allcll.backend.admin.seat.dto.CrawledSubjectRemainingSeat;
 import kr.allcll.crawler.common.properties.SjptProperties;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AllSeatBuffer {
 
-    private final Queue<ChangeSubjectsResponse> changedSubjectQueue;
+    private final Queue<CrawledSubjectRemainingSeat> changedSubjectQueue;
     private final SjptProperties sjptProperties;
 
     public AllSeatBuffer(SjptProperties sjptProperties) {
@@ -19,17 +19,17 @@ public class AllSeatBuffer {
         this.changedSubjectQueue = new ConcurrentLinkedQueue<>();
     }
 
-    public void add(ChangeSubjectsResponse changedSubject) {
+    public void add(CrawledSubjectRemainingSeat changedSubject) {
         changedSubjectQueue.add(changedSubject);
     }
 
-    public void addAll(List<ChangeSubjectsResponse> changedSubjects) {
+    public void addAll(List<CrawledSubjectRemainingSeat> changedSubjects) {
         changedSubjectQueue.addAll(changedSubjects);
     }
 
-    public List<ChangeSubjectsResponse> getAllAndFlush() {
-        List<ChangeSubjectsResponse> response = new ArrayList<>();
-        ChangeSubjectsResponse item;
+    public List<CrawledSubjectRemainingSeat> getAllAndFlush() {
+        List<CrawledSubjectRemainingSeat> response = new ArrayList<>();
+        CrawledSubjectRemainingSeat item;
         int cnt = 0;
         while (cnt < 100 && (item = changedSubjectQueue.poll()) != null) {
             response.add(item);
