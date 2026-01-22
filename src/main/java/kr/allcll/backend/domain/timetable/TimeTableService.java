@@ -24,7 +24,7 @@ public class TimeTableService {
 
     @Transactional
     public TimeTableResponse createTimeTable(String token, TimeTableCreateRequest request) {
-        TimeTable timeTable = new TimeTable(token, request.timeTableName(), request.semester());
+        TimeTable timeTable = new TimeTable(token, request.timeTableName(), request.semesterCode());
         timeTableRepository.save(timeTable);
         return TimeTableResponse.from(timeTable);
     }

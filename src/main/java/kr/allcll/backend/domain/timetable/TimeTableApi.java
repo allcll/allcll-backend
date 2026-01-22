@@ -49,7 +49,7 @@ public class TimeTableApi {
     }
 
     @GetMapping("/api/timetables")
-    public ResponseEntity<TimeTablesResponse> getTimeTables(@RequestParam Semester semester) {
+    public ResponseEntity<TimeTablesResponse> getTimeTables(@RequestParam("semesterCode") Semester semester) {
         TimeTablesResponse timeTablesResponse = timeTableService.getTimetables(ThreadLocalHolder.SHARED_TOKEN.get(), semester);
         return ResponseEntity.ok(timeTablesResponse);
     }
