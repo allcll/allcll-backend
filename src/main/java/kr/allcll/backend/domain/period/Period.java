@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import kr.allcll.backend.support.entity.BaseEntity;
 import kr.allcll.backend.support.semester.Semester;
@@ -27,9 +28,7 @@ public class Period extends BaseEntity {
     Long id;
 
     @Enumerated(EnumType.STRING)
-    Semester semesterCode;
-
-    String semesterValue;
+    Semester semester;
 
     @Enumerated(EnumType.STRING)
     ServiceType serviceType;
@@ -40,10 +39,9 @@ public class Period extends BaseEntity {
 
     String message;
 
-    private Period(Semester semesterCode, String semesterValue, ServiceType serviceType,
+    private Period(Semester semester, ServiceType serviceType,
         LocalDateTime startDate, LocalDateTime endDate, String message) {
-        this.semesterCode = semesterCode;
-        this.semesterValue = semesterValue;
+        this.semester = semester;
         this.serviceType = serviceType;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -51,13 +49,22 @@ public class Period extends BaseEntity {
     }
 
     public static Period create(
-        Semester semesterCode,
-        String semesterValue,
+        Semester semester,
         ServiceType serviceType,
         LocalDateTime startDate,
         LocalDateTime endDate,
         String message
     ) {
-        return new Period(semesterCode, semesterValue, serviceType, startDate, endDate, message);
+        return new Period(semester, serviceType, startDate, endDate, message);
+    }
+
+    public String getSemesterValue() {
+        return semester.getValue();
+    }
+
+    public void update(LocalDateTime startDate, LocalDateTime endDate, String message) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.message = message;
     }
 }
