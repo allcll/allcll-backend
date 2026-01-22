@@ -3,7 +3,7 @@ package kr.allcll.backend.domain.period;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import kr.allcll.backend.domain.period.dto.PeriodResponse;
+import kr.allcll.backend.domain.period.dto.PeriodsResponse;
 import kr.allcll.backend.support.semester.Semester;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,10 +18,10 @@ public class PeriodService {
 
     private final PeriodRepository periodRepository;
 
-    public PeriodResponse getPeriod() {
+    public PeriodsResponse findAll() {
         Semester semester = Semester.fromValue(Semester.now());
         List<Period> result = fetchLatestPeriodsForCurrentSemester(semester);
-        return PeriodResponse.from(result);
+        return PeriodsResponse.from(result);
     }
 
     private List<Period> fetchLatestPeriodsForCurrentSemester(Semester semester) {
