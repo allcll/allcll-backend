@@ -1,17 +1,15 @@
 package kr.allcll.backend.admin.period;
 
-import java.util.List;
-import kr.allcll.backend.admin.period.dto.PeriodDetailRequest;
+import java.util.Optional;
 import kr.allcll.backend.admin.period.dto.PeriodRequest;
 import kr.allcll.backend.domain.period.Period;
 import kr.allcll.backend.domain.period.PeriodRepository;
+import kr.allcll.backend.domain.period.ServiceType;
 import kr.allcll.backend.support.semester.Semester;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -32,16 +30,12 @@ public class AdminPeriodService {
             return;
         }
 
-        List<Period> periods = periodDetailRequests.stream()
-            .map(request -> Period.create(
-                semesterCode,
-                semesterValue,
-                request.serviceType(),
-                request.startDate(),
-                request.endDate(),
-                request.message()
-            ))
-            .toList();
-        periodRepository.saveAll(periods);
+        Period newPeriod = periodRequest.toPeriod(semester);
+        periodRepository.save(newPeriod);
+    }
+
+    @Transactional
+    public void deletePeriod(Semester semester, ServiceType serviceType) {
+        periodRepository.deleteBySemesterAndServiceType(semester, serviceType);
     }
 }
