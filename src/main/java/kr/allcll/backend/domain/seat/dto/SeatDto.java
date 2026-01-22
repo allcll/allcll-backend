@@ -12,5 +12,4 @@ public class SeatDto {
     private Subject subject;
     private int seatCount;
     private LocalDateTime queryTime;
-//    private ChangeStatus changeStatus;
 }
