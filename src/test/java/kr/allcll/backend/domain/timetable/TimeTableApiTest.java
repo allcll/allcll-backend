@@ -62,7 +62,7 @@ class TimeTableApiTest {
         String json = """
         {
           "timeTableName": "시간표1",
-          "semester": "FALL_99"
+          "semesterCode": "FALL_99"
         }
         """;
 
@@ -157,7 +157,7 @@ class TimeTableApiTest {
 
         MvcResult result = mockMvc.perform(get("/api/timetables")
                 .cookie(TOKEN_COOKIE)
-                .param("semester", "FALL_25")
+                .param("semesterCode", "FALL_25")
             )
             .andExpect(status().isOk())
             .andReturn();
