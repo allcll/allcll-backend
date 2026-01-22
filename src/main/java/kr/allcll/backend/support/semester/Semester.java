@@ -32,7 +32,7 @@ public enum Semester {
         return Arrays.stream(values())
             .filter(semester -> isDateInRange(semester, date))
             .findFirst()
-            .orElse(getNextSemester(date));
+            .orElseGet(() -> getNextSemester(date));
     }
 
     public static String now() {
@@ -50,12 +50,5 @@ public enum Semester {
             .filter(semester -> semester.getStartDate().isAfter(date))
             .findFirst()
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.SEMESTER_NOT_FOUND));
-    }
-
-    public static Semester fromValue(String value) {
-        return Arrays.stream(Semester.values())
-            .filter(s -> s.getValue().equals(value))
-            .findFirst()
-            .orElseThrow(() -> new AllcllException(AllcllErrorCode.INVALID_SEMESTER));
     }
 }

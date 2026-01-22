@@ -3,8 +3,8 @@ package kr.allcll.backend.support.semester;
 import java.time.LocalDate;
 
 public record SemesterResponse(
-    String code,
-    String semester,
+    String semesterCode,
+    String semesterValue,
     Period period
 ) {
 
