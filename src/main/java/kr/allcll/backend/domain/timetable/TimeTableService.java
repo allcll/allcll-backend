@@ -24,7 +24,7 @@ public class TimeTableService {
 
     @Transactional
     public TimeTableResponse createTimeTable(String token, TimeTableCreateRequest request) {
-        TimeTable timeTable = new TimeTable(token, request.timeTableName(), request.toSemester());
+        TimeTable timeTable = new TimeTable(token, request.timeTableName(), request.semester());
         timeTableRepository.save(timeTable);
         return TimeTableResponse.from(timeTable);
     }
@@ -48,8 +48,7 @@ public class TimeTableService {
         timeTableRepository.delete(timeTable);
     }
 
-    public TimeTablesResponse getTimetables(String token, String semesterCode) {
-        Semester semester = Semester.fromCode(semesterCode);
+    public TimeTablesResponse getTimetables(String token, Semester semester) {
         List<TimeTable> timeTables = timeTableRepository.findAllByTokenAndSemester(token, semester);
 
         return new TimeTablesResponse(

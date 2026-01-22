@@ -51,11 +51,4 @@ public enum Semester {
             .findFirst()
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.SEMESTER_NOT_FOUND));
     }
-
-    public static Semester fromCode(String code) {
-        return Arrays.stream(Semester.values())
-            .filter(s -> s.name().equals(code))
-            .findFirst()
-            .orElseThrow(() -> new AllcllException(AllcllErrorCode.INVALID_SEMESTER));
-    }
 }
