@@ -87,16 +87,14 @@ class TimeTableApiTest {
         {
           "timeTableId": 1,
           "timeTableName": "새로운 시간표 제목",
-          "semesterCode": "FALL_25",
-          "semesterValue": "2025-2"
+          "semesterCode": "FALL_25"
         }
         """;
 
         TimeTableResponse mockResponse = new TimeTableResponse(
             timetableId,
             "새로운 시간표 제목",
-            "FALL_25",
-            "2025-2"
+            "FALL_25"
         );
         when(timeTableService.updateTimeTable(timetableId, "새로운 시간표 제목", TOKEN))
             .thenReturn(mockResponse);
@@ -136,22 +134,20 @@ class TimeTableApiTest {
                     {
                       "timeTableId": 1,
                       "timeTableName": "시간표1",
-                      "semesterCode": "FALL_25",
-                      "semesterValue": "2025-2"
+                      "semesterCode": "FALL_25"
                     },
                     {
                       "timeTableId": 2,
                       "timeTableName": "시간표2",
-                      "semesterCode": "FALL_25",
-                      "semesterValue": "2025-2"
+                      "semesterCode": "FALL_25"
                     }
                 ]
             }
             """;
 
         List<TimeTableResponse> list = List.of(
-            new TimeTableResponse(1L, "시간표1", "FALL_25", "2025-2"),
-            new TimeTableResponse(2L, "시간표2", "FALL_25", "2025-2")
+            new TimeTableResponse(1L, "시간표1", "FALL_25"),
+            new TimeTableResponse(2L, "시간표2", "FALL_25")
         );
         when(timeTableService.getTimetables(TOKEN, Semester.FALL_25)).thenReturn(new TimeTablesResponse(list));
 
