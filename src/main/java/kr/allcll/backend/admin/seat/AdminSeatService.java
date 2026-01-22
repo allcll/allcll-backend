@@ -5,8 +5,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-import kr.allcll.backend.admin.seat.dto.ChangeSubjectsResponse;
 import kr.allcll.backend.admin.seat.dto.SeatStatusResponse;
+import kr.allcll.backend.admin.seat.dto.CrawledSubjectRemainingSeat;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import kr.allcll.backend.support.web.PrefixParser;
@@ -35,9 +35,7 @@ public class AdminSeatService {
     private final Credentials credentials;
     private final TargetSubjectStorage targetSubjectStorage;
     private final CrawlerScheduledTaskHandler seatScheduler;
-    private final SeatPersistenceService seatPersistenceService;
     private final SjptProperties sjptProperties;
-    private final ChangeDetector changeDetector;
     private final AllSeatBuffer allSeatBuffer;
     private final AtomicLong lastSuccessCrawlingTime = new AtomicLong(0);
     private final BatchService batchService;
@@ -148,9 +146,8 @@ public class AdminSeatService {
         CrawlerSeat renewedCrawlerSeat = createSeat(response, crawlerSubject);
 
         allSeatBuffer.add(
-            ChangeSubjectsResponse.of(
+            CrawledSubjectRemainingSeat.of(
                 crawlerSubject.getId(),
-                ChangeStatus.UPDATE, //의미없는 필드
                 SeatUtils.getRemainSeat(renewedCrawlerSeat),
                 LocalDateTime.now()
             )
@@ -172,31 +169,7 @@ public class AdminSeatService {
         return validSeatSchedulerCount && validRecentCrawlingSuccess;
     }
 
-    /**
-     * 변경감지로 정책 변경 시 해당 메서드로 변경
-     */
-    private void sendExternalRequest(CrawlerSubject crawlerSubject, Credential credential) {
-        log.info("[SeatService] [학교 서버] 요청 시도 과목: {}", crawlerSubject);
-        SeatPayload requestPayload = SeatPayload.from(crawlerSubject);
-        SeatResponse response = seatClient.execute(credential, requestPayload);
-        CrawlerSeat renewedCrawlerSeat = createSeat(response, crawlerSubject);
-        detectDifferenceAndSave(crawlerSubject, renewedCrawlerSeat);
-    }
-
-    private void detectDifferenceAndSave(CrawlerSubject crawlerSubject, CrawlerSeat renewedCrawlerSeat) {
-        if (changeDetector.isRemainSeatChanged(crawlerSubject, renewedCrawlerSeat)) {
-            changeDetector.saveChangeToBuffer(crawlerSubject, renewedCrawlerSeat);
-            synchronized (getSubjectLock(crawlerSubject.getId())) {
-                seatPersistenceService.saveSeat(renewedCrawlerSeat);
-            }
-        }
-    }
-
     private CrawlerSeat createSeat(SeatResponse response, CrawlerSubject crawlerSubject) {
         return response.toSeat(crawlerSubject, LocalDate.now());
-    }
-
-    private Object getSubjectLock(Long subjectId) {
-        return ("LOCK_" + subjectId).intern();
     }
 }
