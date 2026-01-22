@@ -14,6 +14,7 @@ import java.util.List;
 import kr.allcll.backend.domain.timetable.dto.TimeTableResponse;
 import kr.allcll.backend.domain.timetable.dto.TimeTablesResponse;
 import kr.allcll.backend.support.exception.GlobalExceptionHandler;
+import kr.allcll.backend.support.semester.Semester;
 import kr.allcll.backend.support.web.ThreadLocalHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,7 +45,7 @@ class TimeTableApiTest {
         String json = """
             {
                 "timetableName": "시간표 1",
-                "semesterCode": "FALL_25"
+                "semester": "FALL_25"
             }
             """;
 
@@ -53,6 +54,23 @@ class TimeTableApiTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
             .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("시간표 생성 시 존재하지 않는 학기 코드를 입력할 경우 400 반환을 검증한다.")
+    void createTimeTable_invalidSemester_returns400() throws Exception {
+        String json = """
+        {
+          "timeTableName": "시간표1",
+          "semester": "FALL_99"
+        }
+        """;
+
+        mockMvc.perform(post("/api/timetables")
+                .cookie(TOKEN_COOKIE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -135,11 +153,11 @@ class TimeTableApiTest {
             new TimeTableResponse(1L, "시간표1", "FALL_25", "2025-2"),
             new TimeTableResponse(2L, "시간표2", "FALL_25", "2025-2")
         );
-        when(timeTableService.getTimetables(TOKEN, "FALL_25")).thenReturn(new TimeTablesResponse(list));
+        when(timeTableService.getTimetables(TOKEN, Semester.FALL_25)).thenReturn(new TimeTablesResponse(list));
 
         MvcResult result = mockMvc.perform(get("/api/timetables")
                 .cookie(TOKEN_COOKIE)
-                .param("semesterCode", "FALL_25")
+                .param("semester", "FALL_25")
             )
             .andExpect(status().isOk())
             .andReturn();
@@ -148,5 +166,13 @@ class TimeTableApiTest {
 
         assertThat(result.getResponse().getContentAsString())
             .isEqualToIgnoringWhitespace(expected);
+    }
+
+    @Test
+    @DisplayName("시간표 조회 시 학기 파라미터를 누락할 경우 404 반환을 검증한다.")
+    void getTimetables_missingSemester_returns404() throws Exception {
+        mockMvc.perform(get("/api/timetables")
+                .cookie(TOKEN_COOKIE))
+            .andExpect(status().isNotFound());
     }
 }
