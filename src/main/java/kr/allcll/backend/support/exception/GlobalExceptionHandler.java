@@ -6,7 +6,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -25,40 +24,52 @@ public class GlobalExceptionHandler {
         """;
 
     @ExceptionHandler
-    public ResponseEntity<ErrorResponse> handleAllcllException(HttpServletRequest request, AllcllException e) {
-        log.warn(LOG_FORMAT, request.getMethod(), request.getRequestURI(), getRequestBody(request), e.getMessage());
-        return ResponseEntity.badRequest()
-            .body(new ErrorResponse(e.getErrorCode(),
-                e.getMessage(),
-                HttpStatus.BAD_REQUEST.toString()));
+    public ResponseEntity<ErrorResponse> handleAllcllException(HttpServletRequest request, AllcllException exception) {
+        final AllcllErrorCode errorCode = exception.getErrorCode();
+        final String code = errorCode.name();
+        final String message = errorCode.getMessage();
+
+        log.warn(LOG_FORMAT, request.getMethod(), request.getRequestURI(), getRequestBody(request),
+            exception.getMessage());
+        return ErrorResponse.of(errorCode.getHttpStatus(), code, message);
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorResponse> handleServletException(HttpServletRequest request, ServletException e) {
-        log.warn(LOG_FORMAT, request.getMethod(), request.getRequestURI(), getRequestBody(request), e.getMessage());
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<ErrorResponse> handleServletException(HttpServletRequest request,
+        ServletException exception) {
+        final AllcllErrorCode errorCode = AllcllErrorCode.NOT_FOUND_API;
+        final String code = errorCode.name();
+        final String message = errorCode.getMessage();
+
+        log.info(LOG_FORMAT, request.getMethod(), request.getRequestURI(), getRequestBody(request),
+            exception.getMessage());
+        return ErrorResponse.of(errorCode.getHttpStatus(), code, message);
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorResponse> handleAsyncRequestTimeoutException(
-        HttpServletRequest request,
-        AsyncRequestTimeoutException e
+    public ResponseEntity<ErrorResponse> handleAsyncRequestTimeoutException(HttpServletRequest request,
+        AsyncRequestTimeoutException exception
     ) {
+        final AllcllErrorCode errorCode = AllcllErrorCode.ASYNC_REQUEST_TIMEOUT;
+        final String code = errorCode.name();
+        final String message = errorCode.getMessage();
+
         if (request.getHeader("ALLCLL-SSE-CONNECT") != null) {
-            log.info(LOG_FORMAT, request.getMethod(), request.getRequestURI(), e.getMessage(),
-                "SSE connection timed out");
+            log.info("SSE connection timed out (normal close) - {} {}", request.getMethod(), request.getRequestURI());
             return ResponseEntity.noContent().build();
         }
-        return handleException(request, e);
+        return ErrorResponse.of(errorCode.getHttpStatus(), code, message);
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorResponse> handleException(HttpServletRequest request, Exception e) {
-        log.error(LOG_FORMAT, request.getMethod(), request.getRequestURI(), getRequestBody(request), e.getMessage(), e);
-        return ResponseEntity.internalServerError()
-            .body(new ErrorResponse("SERVER_ERROR",
-                "서버 에러가 발생하였습니다.",
-                HttpStatus.INTERNAL_SERVER_ERROR.toString()));
+    public ResponseEntity<ErrorResponse> handleException(HttpServletRequest request, Exception exception) {
+        final AllcllErrorCode errorCode = AllcllErrorCode.SERVER_ERROR;
+        final String code = errorCode.name();
+        final String message = errorCode.getMessage();
+
+        log.error(LOG_FORMAT, request.getMethod(), request.getRequestURI(), getRequestBody(request),
+            exception.getMessage(), exception);
+        return ErrorResponse.of(errorCode.getHttpStatus(), code, message);
     }
 
     private String getRequestBody(HttpServletRequest request) {
