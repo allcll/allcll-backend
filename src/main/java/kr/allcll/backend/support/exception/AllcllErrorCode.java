@@ -3,7 +3,7 @@ package kr.allcll.backend.support.exception;
 import org.springframework.http.HttpStatus;
 
 public enum AllcllErrorCode {
-
+    /* ================= 비즈니스 에러 ================= */
     //400
     INVALID_SEMESTER(HttpStatus.BAD_REQUEST, "유효하지 않은 학기입니다."),
     INVALID_SCHEDULE_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 일정 타입입니다."),
@@ -40,7 +40,11 @@ public enum AllcllErrorCode {
 
     //502
     EXTERNAL_CONNECTION_TERMINATED(HttpStatus.BAD_GATEWAY, "외부 서버와의 연결이 종료되었습니다."),
-    ;
+
+    /* ================= 시스템 / 인프라 에러 ================= */
+    NOT_FOUND_API(HttpStatus.NOT_FOUND, "요청한 API를 찾을 수 없습니다."),
+    ASYNC_REQUEST_TIMEOUT(HttpStatus.INTERNAL_SERVER_ERROR, "요청 처리 중 시간이 초과되었습니다."),
+    SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 에러가 발생하였습니다.");;
 
     private final HttpStatus httpStatus;
     private final String message;
