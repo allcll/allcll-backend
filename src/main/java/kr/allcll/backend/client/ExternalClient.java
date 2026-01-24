@@ -3,8 +3,8 @@ package kr.allcll.backend.client;
 import java.util.List;
 import kr.allcll.backend.admin.seat.AllSeatBuffer;
 import kr.allcll.backend.admin.seat.TargetSubjectService;
-import kr.allcll.backend.admin.seat.dto.ChangeSubjectsResponse;
 import kr.allcll.backend.admin.seat.dto.PinSubjectUpdateRequest;
+import kr.allcll.backend.admin.seat.dto.CrawledSubjectRemainingSeat;
 import kr.allcll.backend.domain.seat.SeatStorage;
 import kr.allcll.backend.domain.seat.dto.SeatDto;
 import kr.allcll.backend.domain.subject.Subject;
@@ -25,7 +25,6 @@ public class ExternalClient {
 
     // 외부 의존성
     private final TargetSubjectService targetSubjectService;
-    //    private final ChangedSubjectBuffer changedSubjectBuffer;
     private final AllSeatBuffer allSeatBuffer;
 
     private final SeatStorage seatStorage;
@@ -36,8 +35,8 @@ public class ExternalClient {
     }
 
     public void getAllTargetSubjects() {
-        List<ChangeSubjectsResponse> allChangedSubject = allSeatBuffer.getAllAndFlush();
-        for (ChangeSubjectsResponse eachChange : allChangedSubject) {
+        List<CrawledSubjectRemainingSeat> allChangedSubject = allSeatBuffer.getAllAndFlush();
+        for (CrawledSubjectRemainingSeat eachChange : allChangedSubject) {
             Long subjectId = eachChange.subjectId();
             Subject subject = subjectRepository.findById(subjectId, Semester.now())
                 .orElseThrow(() -> new AllcllException(AllcllErrorCode.SUBJECT_NOT_FOUND, subjectId));
@@ -45,7 +44,6 @@ public class ExternalClient {
                 new SeatDto(subject,
                     eachChange.remainSeat(),
                     eachChange.createdAt()
-//                    eachChange.changeStatus()
                 )
             );
         }
