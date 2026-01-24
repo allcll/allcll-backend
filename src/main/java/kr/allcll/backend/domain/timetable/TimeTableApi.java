@@ -4,6 +4,7 @@ import kr.allcll.backend.domain.timetable.dto.TimeTableCreateRequest;
 import kr.allcll.backend.domain.timetable.dto.TimeTableResponse;
 import kr.allcll.backend.domain.timetable.dto.TimeTableUpdateRequest;
 import kr.allcll.backend.domain.timetable.dto.TimeTablesResponse;
+import kr.allcll.backend.support.semester.Semester;
 import kr.allcll.backend.support.web.ThreadLocalHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -47,8 +49,8 @@ public class TimeTableApi {
     }
 
     @GetMapping("/api/timetables")
-    public ResponseEntity<TimeTablesResponse> getTimeTables() {
-        TimeTablesResponse timeTablesResponse = timeTableService.getTimetables(ThreadLocalHolder.SHARED_TOKEN.get());
+    public ResponseEntity<TimeTablesResponse> getTimeTables(@RequestParam("semesterCode") Semester semester) {
+        TimeTablesResponse timeTablesResponse = timeTableService.getTimetables(ThreadLocalHolder.SHARED_TOKEN.get(), semester);
         return ResponseEntity.ok(timeTablesResponse);
     }
 }
