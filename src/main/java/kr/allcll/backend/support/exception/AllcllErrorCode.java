@@ -22,7 +22,6 @@ public enum AllcllErrorCode {
     SUBJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 과목 입니다. (subjectId: %d)"),
     TIMETABLE_NOT_FOUND(HttpStatus.NOT_FOUND, "시간표를 찾을 수 없습니다."),
     CUSTOM_SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "커스텀 일정을 찾을 수 없습니다."),
-    PREFIX_NOT_FOUND(HttpStatus.NOT_FOUND, "prefix가 존재하지 않습니다."),
     BASKET_NOT_FOUND(HttpStatus.NOT_FOUND, "관심과목 정보가 존재하지 않습니다."),
 
     //409
@@ -37,6 +36,7 @@ public enum AllcllErrorCode {
     //500
     SEMESTER_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "현재 학기 정보가 없습니다. 관리자에게 문의해주세요."),
     JSON_CONVERT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "TimeSlot JSON 변환 중 오류가 발생했습니다."),
+    PREFIX_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "prefix가 존재하지 않습니다."),
 
     //502
     EXTERNAL_CONNECTION_TERMINATED(HttpStatus.BAD_GATEWAY, "외부 서버와의 연결이 종료되었습니다."),
