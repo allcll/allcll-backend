@@ -2,10 +2,10 @@ package kr.allcll.backend.domain.period.dto;
 
 
 import java.time.LocalDateTime;
-import kr.allcll.backend.domain.period.ServiceType;
+import kr.allcll.backend.domain.period.OperationType;
 
 public record PeriodDetailResponse(
-    ServiceType serviceType,
+    OperationType operationType,
     LocalDateTime startDate,
     LocalDateTime endDate,
     String message

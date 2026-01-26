@@ -3,7 +3,7 @@ package kr.allcll.backend.domain.period;
 import lombok.Getter;
 
 @Getter
-public enum ServiceType {
+public enum OperationType {
     TIMETABLE("timetable"),
     BASKETS("baskets"),
     SIMULATION("simulation"),
@@ -12,7 +12,7 @@ public enum ServiceType {
 
     private final String value;
 
-    ServiceType(String value) {
+    OperationType(String value) {
         this.value = value;
     }
 }

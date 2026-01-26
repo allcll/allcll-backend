@@ -3,7 +3,7 @@ package kr.allcll.backend.admin.period;
 import jakarta.servlet.http.HttpServletRequest;
 import kr.allcll.backend.admin.AdminRequestValidator;
 import kr.allcll.backend.admin.period.dto.PeriodRequest;
-import kr.allcll.backend.domain.period.ServiceType;
+import kr.allcll.backend.domain.period.OperationType;
 import kr.allcll.backend.support.semester.Semester;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -35,12 +35,12 @@ public class AdminPeriodApi {
     @DeleteMapping("/api/admin/service-period")
     public ResponseEntity<Void> deletePeriod(HttpServletRequest request,
         @RequestParam Semester semester,
-        @RequestParam ServiceType serviceType
+        @RequestParam OperationType operationType
     ) {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
         }
-        periodService.deletePeriod(semester, serviceType);
+        periodService.deletePeriod(semester, operationType);
         return ResponseEntity.ok().build();
     }
 }
