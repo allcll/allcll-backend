@@ -19,7 +19,7 @@ public class AdminPeriodService {
 
     @Transactional
     public void savePeriod(Semester semester, PeriodRequest periodRequest) {
-        Optional<OperationPeriod> foundPeriod = periodRepository.findBySemesterAndServiceType(semester,
+        Optional<OperationPeriod> foundPeriod = periodRepository.findBySemesterAndOperationType(semester,
             periodRequest.operationType());
 
         if (foundPeriod.isPresent()) {
@@ -37,6 +37,6 @@ public class AdminPeriodService {
 
     @Transactional
     public void deletePeriod(Semester semester, OperationType operationType) {
-        periodRepository.deleteBySemesterAndServiceType(semester, operationType);
+        periodRepository.deleteBySemesterAndOperationType(semester, operationType);
     }
 }

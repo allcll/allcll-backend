@@ -25,7 +25,7 @@ public class PeriodService {
     }
 
     private List<OperationPeriod> fetchLatestPeriodsForCurrentSemester(Semester semester) {
-        List<OperationPeriod> allPeriods = periodRepository.findAllBySemesterOrderByServiceTypeAndStartDateDesc(semester);
+        List<OperationPeriod> allPeriods = periodRepository.findAllBySemesterOrderByOperationTypeAndStartDateDesc(semester);
 
         Map<OperationType, OperationPeriod> latestByType = new LinkedHashMap<>();
         for (OperationPeriod period : allPeriods) {
