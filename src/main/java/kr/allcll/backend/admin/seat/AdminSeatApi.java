@@ -3,6 +3,7 @@ package kr.allcll.backend.admin.seat;
 import jakarta.servlet.http.HttpServletRequest;
 import kr.allcll.backend.admin.AdminRequestValidator;
 import kr.allcll.backend.admin.seat.dto.SeatStatusResponse;
+import kr.allcll.backend.support.batch.BatchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

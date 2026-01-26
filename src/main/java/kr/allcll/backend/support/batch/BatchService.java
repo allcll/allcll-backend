@@ -1,5 +1,7 @@
-package kr.allcll.backend.admin.seat;
+package kr.allcll.backend.support.batch;
 
+import kr.allcll.backend.admin.seat.GeneralSeatBatch;
+import kr.allcll.backend.admin.seat.PinSeatBatch;
 import kr.allcll.crawler.seat.CrawlerSeat;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

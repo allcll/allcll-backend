@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import kr.allcll.backend.admin.seat.dto.ChangeSubjectsResponse;
 import kr.allcll.backend.admin.seat.dto.SeatStatusResponse;
+import kr.allcll.backend.support.batch.BatchService;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import kr.allcll.backend.support.web.PrefixParser;
