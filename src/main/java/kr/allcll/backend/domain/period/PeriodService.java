@@ -26,12 +26,13 @@ public class PeriodService {
     }
 
     private List<OperationPeriod> fetchLatestPeriodsForCurrentSemester(Semester semester) {
-        List<OperationPeriod> allPeriods = periodRepository.findAllBySemesterOrderByOperationTypeAndStartDateDesc(semester);
+        List<OperationPeriod> operationPeriods = periodRepository.findAllBySemesterOrderByOperationTypeAndStartDateDesc(
+            semester);
 
         Map<OperationType, OperationPeriod> latestByType = new LinkedHashMap<>();
-        for (OperationPeriod period : allPeriods) {
-            if (!latestByType.containsKey(period.getOperationType())) {
-                latestByType.put(period.getOperationType(), period);
+        for (OperationPeriod operationPeriod : operationPeriods) {
+            if (!latestByType.containsKey(operationPeriod.getOperationType())) {
+                latestByType.put(operationPeriod.getOperationType(), operationPeriod);
             }
         }
         return latestByType.values().stream().toList();
