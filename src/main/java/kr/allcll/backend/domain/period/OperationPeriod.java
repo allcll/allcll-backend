@@ -57,7 +57,7 @@ public class OperationPeriod extends BaseEntity {
         return new OperationPeriod(semester, operationType, startDate, endDate, message);
     }
 
-    public String getSemesterValue() {
+    public String getSemesterKoreanName() {
         return semester.getKoreanName();
     }
 

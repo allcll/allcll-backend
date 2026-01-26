@@ -1,7 +1,7 @@
 package kr.allcll.backend.domain.period;
 
 import java.time.LocalDate;
-import kr.allcll.backend.domain.period.dto.PeriodsResponse;
+import kr.allcll.backend.domain.period.dto.OperationPeriodsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,8 +15,8 @@ public class PeriodApi {
     private final PeriodService periodService;
 
     @GetMapping("/api/service-period")
-    public ResponseEntity<PeriodsResponse> findAll(@RequestParam LocalDate date) {
-        PeriodsResponse periodsResponse = periodService.findAll(date);
-        return ResponseEntity.ok(periodsResponse);
+    public ResponseEntity<OperationPeriodsResponse> findAll(@RequestParam LocalDate date) {
+        OperationPeriodsResponse operationPeriodsResponse = periodService.findAll(date);
+        return ResponseEntity.ok(operationPeriodsResponse);
     }
 }

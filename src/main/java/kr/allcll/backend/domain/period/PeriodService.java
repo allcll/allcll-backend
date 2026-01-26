@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import kr.allcll.backend.domain.period.dto.PeriodsResponse;
+import kr.allcll.backend.domain.period.dto.OperationPeriodsResponse;
 import kr.allcll.backend.support.semester.Semester;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,22 +19,9 @@ public class PeriodService {
 
     private final PeriodRepository periodRepository;
 
-    public PeriodsResponse findAll(LocalDate date) {
+    public OperationPeriodsResponse findAll(LocalDate date) {
         Semester semester = Semester.findByDate(date);
-        List<OperationPeriod> result = fetchLatestPeriodsForCurrentSemester(semester);
-        return PeriodsResponse.from(result);
-    }
-
-    private List<OperationPeriod> fetchLatestPeriodsForCurrentSemester(Semester semester) {
-        List<OperationPeriod> operationPeriods = periodRepository.findAllBySemesterOrderByOperationTypeAndStartDateDesc(
-            semester);
-
-        Map<OperationType, OperationPeriod> latestByType = new LinkedHashMap<>();
-        for (OperationPeriod operationPeriod : operationPeriods) {
-            if (!latestByType.containsKey(operationPeriod.getOperationType())) {
-                latestByType.put(operationPeriod.getOperationType(), operationPeriod);
-            }
-        }
-        return latestByType.values().stream().toList();
+        List<OperationPeriod> operationPeriods = periodRepository.findAllBySemester(semester);
+        return OperationPeriodsResponse.from(operationPeriods);
     }
 }

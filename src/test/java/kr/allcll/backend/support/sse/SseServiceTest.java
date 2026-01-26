@@ -78,7 +78,7 @@ class SseServiceTest {
             .response();
 
         // when
-        sseService.propagate("message", "Hello, SSE!");
+        sseService.propagate("operationPeriodMessage", "Hello, SSE!");
 
         // then
         String expected = "retry:1000\n"
@@ -86,7 +86,7 @@ class SseServiceTest {
             + "data:success\n"
             + "\n"
             + "retry:1000\n"
-            + "event:message\n"
+            + "event:operationPeriodMessage\n"
             + "data:\"Hello, SSE!\"\n"
             + "\n";
         SseTestHelper.assertResponseIsEqualsToMessage(response1, expected);
