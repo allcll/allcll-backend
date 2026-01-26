@@ -7,7 +7,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import kr.allcll.backend.support.entity.BaseEntity;
 import kr.allcll.backend.support.semester.Semester;
@@ -21,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Period extends BaseEntity {
+public class OperationPeriod extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +30,7 @@ public class Period extends BaseEntity {
     Semester semester;
 
     @Enumerated(EnumType.STRING)
-    ServiceType serviceType;
+    OperationType operationType;
 
     LocalDateTime startDate;
 
@@ -39,23 +38,23 @@ public class Period extends BaseEntity {
 
     String message;
 
-    private Period(Semester semester, ServiceType serviceType,
+    private OperationPeriod(Semester semester, OperationType operationType,
         LocalDateTime startDate, LocalDateTime endDate, String message) {
         this.semester = semester;
-        this.serviceType = serviceType;
+        this.operationType = operationType;
         this.startDate = startDate;
         this.endDate = endDate;
         this.message = message;
     }
 
-    public static Period create(
+    public static OperationPeriod create(
         Semester semester,
-        ServiceType serviceType,
+        OperationType operationType,
         LocalDateTime startDate,
         LocalDateTime endDate,
         String message
     ) {
-        return new Period(semester, serviceType, startDate, endDate, message);
+        return new OperationPeriod(semester, operationType, startDate, endDate, message);
     }
 
     public String getSemesterValue() {

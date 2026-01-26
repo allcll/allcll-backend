@@ -2,7 +2,7 @@ package kr.allcll.backend.domain.period.dto;
 
 import java.util.List;
 import kr.allcll.backend.admin.period.dto.PeriodDetailResponse;
-import kr.allcll.backend.domain.period.Period;
+import kr.allcll.backend.domain.period.OperationPeriod;
 import kr.allcll.backend.support.semester.Semester;
 
 public record PeriodsResponse(
@@ -11,7 +11,7 @@ public record PeriodsResponse(
         List<PeriodDetailResponse> periodDetailResponses
 ) {
 
-    public static PeriodsResponse from(List<Period> periods) {
+    public static PeriodsResponse from(List<OperationPeriod> periods) {
         if (periods.isEmpty()) {
             return new PeriodsResponse(null, null, List.of());
         }

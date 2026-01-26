@@ -1,18 +1,18 @@
 package kr.allcll.backend.admin.period.dto;
 
 import java.time.LocalDateTime;
-import kr.allcll.backend.domain.period.Period;
-import kr.allcll.backend.domain.period.ServiceType;
+import kr.allcll.backend.domain.period.OperationPeriod;
+import kr.allcll.backend.domain.period.OperationType;
 import kr.allcll.backend.support.semester.Semester;
 
 public record PeriodRequest(
-        ServiceType serviceType,
+        OperationType operationType,
         LocalDateTime startDate,
         LocalDateTime endDate,
         String message
 ) {
 
-    public Period toPeriod(Semester semester) {
-        return Period.create(semester, serviceType, startDate, endDate, message);
+    public OperationPeriod toPeriod(Semester semester) {
+        return OperationPeriod.create(semester, operationType, startDate, endDate, message);
     }
 }
