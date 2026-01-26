@@ -10,19 +10,39 @@ import org.springframework.stereotype.Component;
 @Component
 public class GeneralSeatBatch {
 
-    private final BlockingQueue<CrawlerSeat> generalSeatBatch;
+    private static final int FLUSH_LIMIT = 15;
 
-    public GeneralSeatBatch() {
+    private final BlockingQueue<CrawlerSeat> generalSeatBatch;
+    private final SeatPersistenceService seatPersistenceService;
+    private final Object lock;
+
+    public GeneralSeatBatch(SeatPersistenceService seatPersistenceService) {
         this.generalSeatBatch = new LinkedBlockingQueue<>();
+        this.seatPersistenceService = seatPersistenceService;
+        this.lock = new Object();
     }
 
     public void saveGeneralSeatToBatch(CrawlerSeat crawlerSeat) {
         generalSeatBatch.add(crawlerSeat);
+        if (generalSeatBatch.size() >= FLUSH_LIMIT) {
+            saveAll();
+        }
     }
 
     public List<CrawlerSeat> getAll() {
         List<CrawlerSeat> flushResult = new ArrayList<>();
         generalSeatBatch.drainTo(flushResult);
         return flushResult;
+    }
+
+    private void saveAll() {
+        List<CrawlerSeat> crawlerSeats;
+        synchronized (lock) {
+            crawlerSeats = getAll();
+            if (crawlerSeats.isEmpty()) {
+                return;
+            }
+        }
+        seatPersistenceService.saveAllSeat(crawlerSeats);
     }
 }
