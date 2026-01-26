@@ -1,5 +1,6 @@
 package kr.allcll.backend.domain.period;
 
+import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,8 +19,8 @@ public class PeriodService {
 
     private final PeriodRepository periodRepository;
 
-    public PeriodsResponse findAll() {
-        Semester semester = Semester.fromValue(Semester.now());
+    public PeriodsResponse findAll(LocalDate date) {
+        Semester semester = Semester.findByDate(date);
         List<OperationPeriod> result = fetchLatestPeriodsForCurrentSemester(semester);
         return PeriodsResponse.from(result);
     }
