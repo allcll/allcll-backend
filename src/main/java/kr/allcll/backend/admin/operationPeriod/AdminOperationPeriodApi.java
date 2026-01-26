@@ -1,8 +1,8 @@
-package kr.allcll.backend.admin.period;
+package kr.allcll.backend.admin.operationPeriod;
 
 import jakarta.servlet.http.HttpServletRequest;
 import kr.allcll.backend.admin.AdminRequestValidator;
-import kr.allcll.backend.admin.period.dto.OperationPeriodRequest;
+import kr.allcll.backend.admin.operationPeriod.dto.OperationPeriodRequest;
 import kr.allcll.backend.domain.operationPeriod.OperationType;
 import kr.allcll.backend.support.semester.Semester;
 import lombok.RequiredArgsConstructor;
@@ -10,17 +10,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/api/admin/operation-period")
 @RequiredArgsConstructor
 public class AdminOperationPeriodApi {
 
     private final AdminOperationPeriodService operationPeriodService;
     private final AdminRequestValidator validator;
 
-    @PostMapping("/api/admin/operation-period")
+    @PostMapping
     public ResponseEntity<Void> saveOperationPeriod(HttpServletRequest request,
         @RequestParam Semester semester,
         @RequestBody OperationPeriodRequest operationPeriodRequest
@@ -32,7 +34,7 @@ public class AdminOperationPeriodApi {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/api/admin/operation-period")
+    @DeleteMapping
     public ResponseEntity<Void> deleteOperationPeriod(HttpServletRequest request,
         @RequestParam Semester semester,
         @RequestParam OperationType operationType
