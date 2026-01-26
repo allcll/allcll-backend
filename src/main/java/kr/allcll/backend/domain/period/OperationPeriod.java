@@ -58,7 +58,7 @@ public class OperationPeriod extends BaseEntity {
     }
 
     public String getSemesterValue() {
-        return semester.getValue();
+        return semester.getKoreanName();
     }
 
     public void update(LocalDateTime startDate, LocalDateTime endDate, String message) {

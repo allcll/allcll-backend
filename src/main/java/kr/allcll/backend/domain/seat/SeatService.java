@@ -17,7 +17,7 @@ public class SeatService {
     private final SeatStorage seatStorage;
 
     public List<SeatDto> getPinSeats(String token) {
-        List<Pin> pins = pinRepository.findAllByToken(token, Semester.now());
+        List<Pin> pins = pinRepository.findAllByToken(token, Semester.getCurrentSemester());
         List<Subject> subjects = pins.stream()
             .map(Pin::getSubject)
             .toList();

@@ -18,10 +18,10 @@ class SemesterTest {
         LocalDate winterStart = LocalDate.of(2025, 12, 1);
 
         assertAll(
-            () -> assertThat(Semester.getCode(springStart)).isEqualTo(Semester.SPRING_25),
-            () -> assertThat(Semester.getCode(summerStart)).isEqualTo(Semester.SUMMER_25),
-            () -> assertThat(Semester.getCode(fallStart)).isEqualTo(Semester.FALL_25),
-            () -> assertThat(Semester.getCode(winterStart)).isEqualTo(Semester.WINTER_25)
+            () -> assertThat(Semester.findByDate(springStart)).isEqualTo(Semester.SPRING_25),
+            () -> assertThat(Semester.findByDate(summerStart)).isEqualTo(Semester.SUMMER_25),
+            () -> assertThat(Semester.findByDate(fallStart)).isEqualTo(Semester.FALL_25),
+            () -> assertThat(Semester.findByDate(winterStart)).isEqualTo(Semester.WINTER_25)
         );
     }
 
@@ -34,10 +34,10 @@ class SemesterTest {
         LocalDate winterEnd = LocalDate.of(2025, 12, 31);
 
         assertAll(
-            () -> assertThat(Semester.getCode(springEnd)).isEqualTo(Semester.SPRING_25),
-            () -> assertThat(Semester.getCode(summerEnd)).isEqualTo(Semester.SUMMER_25),
-            () -> assertThat(Semester.getCode(fallEnd)).isEqualTo(Semester.FALL_25),
-            () -> assertThat(Semester.getCode(winterEnd)).isEqualTo(Semester.WINTER_25)
+            () -> assertThat(Semester.findByDate(springEnd)).isEqualTo(Semester.SPRING_25),
+            () -> assertThat(Semester.findByDate(summerEnd)).isEqualTo(Semester.SUMMER_25),
+            () -> assertThat(Semester.findByDate(fallEnd)).isEqualTo(Semester.FALL_25),
+            () -> assertThat(Semester.findByDate(winterEnd)).isEqualTo(Semester.WINTER_25)
         );
     }
 
@@ -50,10 +50,10 @@ class SemesterTest {
         LocalDate winterMiddle = LocalDate.of(2025, 12, 15);
 
         assertAll(
-            () -> assertThat(Semester.getCode(springMiddle)).isEqualTo(Semester.SPRING_25),
-            () -> assertThat(Semester.getCode(summerMiddle)).isEqualTo(Semester.SUMMER_25),
-            () -> assertThat(Semester.getCode(fallMiddle)).isEqualTo(Semester.FALL_25),
-            () -> assertThat(Semester.getCode(winterMiddle)).isEqualTo(Semester.WINTER_25)
+            () -> assertThat(Semester.findByDate(springMiddle)).isEqualTo(Semester.SPRING_25),
+            () -> assertThat(Semester.findByDate(summerMiddle)).isEqualTo(Semester.SUMMER_25),
+            () -> assertThat(Semester.findByDate(fallMiddle)).isEqualTo(Semester.FALL_25),
+            () -> assertThat(Semester.findByDate(winterMiddle)).isEqualTo(Semester.WINTER_25)
         );
     }
 
@@ -82,9 +82,9 @@ class SemesterTest {
         LocalDate afterWinter = LocalDate.of(2026, 1, 1);
 
         assertAll(
-            () -> assertThat(Semester.getCode(afterSpring)).isEqualTo(Semester.SUMMER_25),
-            () -> assertThat(Semester.getCode(afterSummer)).isEqualTo(Semester.FALL_25),
-            () -> assertThat(Semester.getCode(afterFall)).isEqualTo(Semester.WINTER_25)
+            () -> assertThat(Semester.findByDate(afterSpring)).isEqualTo(Semester.SUMMER_25),
+            () -> assertThat(Semester.findByDate(afterSummer)).isEqualTo(Semester.FALL_25),
+            () -> assertThat(Semester.findByDate(afterFall)).isEqualTo(Semester.WINTER_25)
             //() -> assertThat(Semester.getCode(afterWinter)).isEqualTo(Semester.SPRING_26)
         );
     }

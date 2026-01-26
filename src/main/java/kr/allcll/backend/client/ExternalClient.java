@@ -39,7 +39,7 @@ public class ExternalClient {
         List<ChangeSubjectsResponse> allChangedSubject = allSeatBuffer.getAllAndFlush();
         for (ChangeSubjectsResponse eachChange : allChangedSubject) {
             Long subjectId = eachChange.subjectId();
-            Subject subject = subjectRepository.findById(subjectId, Semester.now())
+            Subject subject = subjectRepository.findById(subjectId, Semester.getCurrentSemester())
                 .orElseThrow(() -> new AllcllException(AllcllErrorCode.SUBJECT_NOT_FOUND, subjectId));
             seatStorage.add(
                 new SeatDto(subject,
