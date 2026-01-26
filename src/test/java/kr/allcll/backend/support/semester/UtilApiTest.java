@@ -29,8 +29,8 @@ class UtilApiTest {
         // given
         String expected = """
             {
-                "code": "SPRING_25",
-                "semester": "2025-1",
+                "semesterCode": "SPRING_25",
+                "semesterValue": "2025-1",
                 "period": {
                     "startDate": "2025-02-01",
                     "endDate": "2025-03-31"

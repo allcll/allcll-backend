@@ -36,8 +36,8 @@ class TimeTableServiceTest {
     @DisplayName("시간표 정상 생성을 검증한다.")
     void createTimeTable() {
         // given
-        TimeTableCreateRequest request1 = new TimeTableCreateRequest("새 시간표1", "2025-2");
-        TimeTableCreateRequest request2 = new TimeTableCreateRequest("새 시간표2", "2025-2");
+        TimeTableCreateRequest request1 = new TimeTableCreateRequest("새 시간표1", Semester.FALL_25);
+        TimeTableCreateRequest request2 = new TimeTableCreateRequest("새 시간표2", Semester.FALL_25);
 
         // when
         TimeTableResponse timeTableResponse1 = timeTableService.createTimeTable(TOKEN1, request1);
@@ -54,20 +54,6 @@ class TimeTableServiceTest {
         assertThat(saved2.getToken()).isEqualTo(TOKEN2);
         assertThat(saved2.getTimeTableName()).isEqualTo("새 시간표2");
         assertThat(saved2.getSemester()).isEqualTo(Semester.FALL_25);
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 학기 코드가 들어오면 AllcllException이 발생한다")
-    void createTimeTable_invalidSemester_throwsException() {
-        // given
-        String invalidSemester = "1999-2";
-        TimeTableCreateRequest request = new TimeTableCreateRequest("시간표1", invalidSemester);
-        String token = "token";
-
-        // when & then
-        assertThatThrownBy(() -> timeTableService.createTimeTable(token, request))
-            .isInstanceOf(AllcllException.class)
-            .hasMessage("유효하지 않은 학기입니다.");
     }
 
     @Test
@@ -136,40 +122,22 @@ class TimeTableServiceTest {
     void getTimetables() {
         // given
         Semester semester = Semester.FALL_25;
+        Semester otherSemester = Semester.SPRING_26;
 
         TimeTable timeTable1 = new TimeTable(TOKEN1, "내 시간표1", semester);
         TimeTable timeTable2 = new TimeTable(TOKEN1, "내 시간표2", semester);
-        TimeTable otherSemester = new TimeTable(TOKEN1, "다른 학기 시간표", Semester.SPRING_26);
-        TimeTable otherToken = new TimeTable(TOKEN2, "다른 사람 시간표", semester);
+        TimeTable otherSemesterTimeTable = new TimeTable(TOKEN1, "다른 학기 시간표", otherSemester);
+        TimeTable otherTokenTimeTable = new TimeTable(TOKEN2, "다른 사람 시간표", semester);
 
-        timeTableRepository.saveAll(List.of(timeTable1, timeTable2, otherSemester, otherToken));
+        timeTableRepository.saveAll(List.of(timeTable1, timeTable2, otherSemesterTimeTable, otherTokenTimeTable));
 
         // when
-        TimeTablesResponse timeTablesResponse = timeTableService.getTimetables(TOKEN1, semester.getValue());
+        TimeTablesResponse timeTablesResponse = timeTableService.getTimetables(TOKEN1, semester);
 
         // then
         assertThat(timeTablesResponse.timeTables()).hasSize(2);
         assertThat(timeTablesResponse.timeTables())
             .extracting("timeTableName")
             .containsExactlyInAnyOrder("내 시간표1", "내 시간표2");
-    }
-
-    @Test
-    @DisplayName("시간표 조회 시 학기 값이 없으면 예외가 발생한다.")
-    void getTimetables_whenSemesterIsNull_throwsException() {
-        // given
-        Semester semester = Semester.FALL_25;
-
-        TimeTable timeTable1 = new TimeTable(TOKEN1, "내 시간표1", semester);
-        TimeTable timeTable2 = new TimeTable(TOKEN1, "내 시간표2", semester);
-        TimeTable otherSemester = new TimeTable(TOKEN1, "다른 학기 시간표", Semester.SPRING_26);
-        TimeTable otherToken = new TimeTable(TOKEN2, "다른 사람 시간표", semester);
-
-        timeTableRepository.saveAll(List.of(timeTable1, timeTable2, otherSemester, otherToken));
-
-        // when & then
-        assertThatThrownBy(() -> timeTableService.getTimetables(TOKEN1, null))
-            .isInstanceOf(AllcllException.class)
-            .hasMessageContaining(AllcllErrorCode.INVALID_SEMESTER.getMessage());
     }
 }
