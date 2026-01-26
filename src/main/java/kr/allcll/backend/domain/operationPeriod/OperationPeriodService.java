@@ -13,13 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class PeriodService {
+public class OperationPeriodService {
 
-    private final PeriodRepository periodRepository;
+    private final OperationPeriodRepository operationPeriodRepository;
 
     public OperationPeriodsResponse findAll(LocalDate date) {
         Semester semester = Semester.findByDate(date);
-        List<OperationPeriod> operationPeriods = periodRepository.findAllBySemester(semester);
+        List<OperationPeriod> operationPeriods = operationPeriodRepository.findAllBySemester(semester);
         return OperationPeriodsResponse.from(operationPeriods);
     }
 }

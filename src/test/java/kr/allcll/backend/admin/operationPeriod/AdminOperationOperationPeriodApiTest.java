@@ -22,7 +22,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(AdminOperationPeriodApi.class)
-class AdminOperationPeriodApiTest {
+class AdminOperationOperationPeriodApiTest {
 
     @Autowired
     private MockMvc mockMvc;

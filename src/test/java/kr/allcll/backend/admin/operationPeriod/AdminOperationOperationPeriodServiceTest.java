@@ -9,7 +9,7 @@ import java.util.Optional;
 import kr.allcll.backend.admin.operationPeriod.dto.OperationPeriodRequest;
 import kr.allcll.backend.domain.operationPeriod.OperationPeriod;
 import kr.allcll.backend.domain.operationPeriod.OperationType;
-import kr.allcll.backend.domain.operationPeriod.PeriodRepository;
+import kr.allcll.backend.domain.operationPeriod.OperationPeriodRepository;
 import kr.allcll.backend.support.semester.Semester;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,17 +19,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
-class AdminOperationPeriodServiceTest {
+class AdminOperationOperationPeriodServiceTest {
 
     @Autowired
     private AdminOperationPeriodService adminOperationPeriodService;
 
     @Autowired
-    private PeriodRepository periodRepository;
+    private OperationPeriodRepository operationPeriodRepository;
 
     @AfterEach
     void tearDown() {
-        periodRepository.deleteAll();
+        operationPeriodRepository.deleteAll();
     }
 
     @Test
@@ -47,7 +47,7 @@ class AdminOperationPeriodServiceTest {
         adminOperationPeriodService.saveOperationPeriod(Semester.SPRING_25, request);
 
         // then
-        Optional<OperationPeriod> foundPeriod = periodRepository.findBySemesterAndOperationType(
+        Optional<OperationPeriod> foundPeriod = operationPeriodRepository.findBySemesterAndOperationType(
             Semester.SPRING_25,
             OperationType.TIMETABLE
         );
@@ -71,7 +71,7 @@ class AdminOperationPeriodServiceTest {
             LocalDateTime.of(2025, 2, 7, 18, 0),
             "기존 메시지"
         );
-        periodRepository.save(existingPeriod);
+        operationPeriodRepository.save(existingPeriod);
 
         OperationPeriodRequest updateRequest = new OperationPeriodRequest(
             OperationType.TIMETABLE,
@@ -84,7 +84,7 @@ class AdminOperationPeriodServiceTest {
         adminOperationPeriodService.saveOperationPeriod(Semester.SPRING_25, updateRequest);
 
         // then
-        Optional<OperationPeriod> foundPeriod = periodRepository.findBySemesterAndOperationType(
+        Optional<OperationPeriod> foundPeriod = operationPeriodRepository.findBySemesterAndOperationType(
             Semester.SPRING_25,
             OperationType.TIMETABLE
         );
@@ -119,11 +119,11 @@ class AdminOperationPeriodServiceTest {
         adminOperationPeriodService.saveOperationPeriod(Semester.SUMMER_25, summer25Request);
 
         // then
-        Optional<OperationPeriod> spring25Period = periodRepository.findBySemesterAndOperationType(
+        Optional<OperationPeriod> spring25Period = operationPeriodRepository.findBySemesterAndOperationType(
             Semester.SPRING_25,
             OperationType.TIMETABLE
         );
-        Optional<OperationPeriod> summer25Period = periodRepository.findBySemesterAndOperationType(
+        Optional<OperationPeriod> summer25Period = operationPeriodRepository.findBySemesterAndOperationType(
             Semester.SUMMER_25,
             OperationType.TIMETABLE
         );
@@ -144,13 +144,13 @@ class AdminOperationPeriodServiceTest {
             LocalDateTime.of(2025, 2, 7, 18, 0),
             "2025-1학기 수강신청 기간"
         );
-        periodRepository.save(period);
+        operationPeriodRepository.save(period);
 
         // when
         adminOperationPeriodService.deleteOperationPeriod(Semester.SPRING_25, OperationType.TIMETABLE);
 
         // then
-        Optional<OperationPeriod> foundPeriod = periodRepository.findBySemesterAndOperationType(
+        Optional<OperationPeriod> foundPeriod = operationPeriodRepository.findBySemesterAndOperationType(
             Semester.SPRING_25,
             OperationType.TIMETABLE
         );
@@ -194,25 +194,25 @@ class AdminOperationPeriodServiceTest {
             "여름학기 수강신청"
         );
 
-        periodRepository.save(targetPeriod);
-        periodRepository.save(otherTypePeriod);
-        periodRepository.save(otherSemesterPeriod);
+        operationPeriodRepository.save(targetPeriod);
+        operationPeriodRepository.save(otherTypePeriod);
+        operationPeriodRepository.save(otherSemesterPeriod);
 
         // when
         adminOperationPeriodService.deleteOperationPeriod(Semester.SPRING_25, OperationType.TIMETABLE);
 
         // then
-        assertThat(periodRepository.findBySemesterAndOperationType(
+        assertThat(operationPeriodRepository.findBySemesterAndOperationType(
             Semester.SPRING_25,
             OperationType.TIMETABLE
         )).isEmpty();
 
-        assertThat(periodRepository.findBySemesterAndOperationType(
+        assertThat(operationPeriodRepository.findBySemesterAndOperationType(
             Semester.SPRING_25,
             OperationType.BASKETS
         )).isPresent();
 
-        assertThat(periodRepository.findBySemesterAndOperationType(
+        assertThat(operationPeriodRepository.findBySemesterAndOperationType(
             Semester.SUMMER_25,
             OperationType.TIMETABLE
         )).isPresent();

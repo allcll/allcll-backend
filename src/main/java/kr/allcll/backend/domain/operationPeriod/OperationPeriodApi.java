@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class PeriodApi {
+public class OperationPeriodApi {
 
-    private final PeriodService periodService;
+    private final OperationPeriodService operationPeriodService;
 
-    @GetMapping("/api/service-period")
+    @GetMapping("/api/operation-period")
     public ResponseEntity<OperationPeriodsResponse> findAll(@RequestParam LocalDate date) {
-        OperationPeriodsResponse operationPeriodsResponse = periodService.findAll(date);
+        OperationPeriodsResponse operationPeriodsResponse = operationPeriodService.findAll(date);
         return ResponseEntity.ok(operationPeriodsResponse);
     }
 }

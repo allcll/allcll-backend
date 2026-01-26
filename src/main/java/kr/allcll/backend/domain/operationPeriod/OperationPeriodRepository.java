@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface PeriodRepository extends JpaRepository<OperationPeriod, Long> {
+public interface OperationPeriodRepository extends JpaRepository<OperationPeriod, Long> {
 
     @Query("""
           SELECT p
