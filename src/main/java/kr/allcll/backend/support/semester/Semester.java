@@ -28,6 +28,7 @@ public enum Semester {
         this.endDate = endDate;
     }
 
+    // TODO: 분기 규칙 책임 과다 -> Service 코드 분리 필요
     public static Semester findByDate(LocalDate date) {
         return Arrays.stream(values())
             .filter(semester -> isDateInRange(semester, date))
