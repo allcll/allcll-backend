@@ -1,4 +1,4 @@
-package kr.allcll.backend.domain.period;
+package kr.allcll.backend.domain.operationPeriod;
 
 import lombok.Getter;
 

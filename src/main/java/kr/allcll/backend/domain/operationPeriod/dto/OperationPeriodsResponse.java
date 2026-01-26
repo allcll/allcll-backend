@@ -1,7 +1,7 @@
-package kr.allcll.backend.domain.period.dto;
+package kr.allcll.backend.domain.operationPeriod.dto;
 
 import java.util.List;
-import kr.allcll.backend.domain.period.OperationPeriod;
+import kr.allcll.backend.domain.operationPeriod.OperationPeriod;
 import kr.allcll.backend.support.semester.Semester;
 
 public record OperationPeriodsResponse(

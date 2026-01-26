@@ -2,8 +2,8 @@ package kr.allcll.backend.admin.period;
 
 import jakarta.servlet.http.HttpServletRequest;
 import kr.allcll.backend.admin.AdminRequestValidator;
-import kr.allcll.backend.admin.period.dto.PeriodRequest;
-import kr.allcll.backend.domain.period.OperationType;
+import kr.allcll.backend.admin.period.dto.OperationPeriodRequest;
+import kr.allcll.backend.domain.operationPeriod.OperationType;
 import kr.allcll.backend.support.semester.Semester;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,32 +15,32 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class AdminPeriodApi {
+public class AdminOperationPeriodApi {
 
-    private final AdminPeriodService periodService;
+    private final AdminOperationPeriodService operationPeriodService;
     private final AdminRequestValidator validator;
 
-    @PostMapping("/api/admin/service-period")
-    public ResponseEntity<Void> savePeriod(HttpServletRequest request,
+    @PostMapping("/api/admin/operation-period")
+    public ResponseEntity<Void> saveOperationPeriod(HttpServletRequest request,
         @RequestParam Semester semester,
-        @RequestBody PeriodRequest periodRequest
+        @RequestBody OperationPeriodRequest operationPeriodRequest
     ) {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
         }
-        periodService.savePeriod(semester, periodRequest);
+        operationPeriodService.saveOperationPeriod(semester, operationPeriodRequest);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/api/admin/service-period")
-    public ResponseEntity<Void> deletePeriod(HttpServletRequest request,
+    @DeleteMapping("/api/admin/operation-period")
+    public ResponseEntity<Void> deleteOperationPeriod(HttpServletRequest request,
         @RequestParam Semester semester,
         @RequestParam OperationType operationType
     ) {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
         }
-        periodService.deletePeriod(semester, operationType);
+        operationPeriodService.deleteOperationPeriod(semester, operationType);
         return ResponseEntity.ok().build();
     }
 }

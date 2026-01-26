@@ -1,7 +1,7 @@
-package kr.allcll.backend.domain.period;
+package kr.allcll.backend.domain.operationPeriod;
 
 import java.time.LocalDate;
-import kr.allcll.backend.domain.period.dto.OperationPeriodsResponse;
+import kr.allcll.backend.domain.operationPeriod.dto.OperationPeriodsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

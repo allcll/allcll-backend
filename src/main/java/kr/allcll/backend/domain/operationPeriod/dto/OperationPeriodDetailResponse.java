@@ -1,9 +1,9 @@
-package kr.allcll.backend.domain.period.dto;
+package kr.allcll.backend.domain.operationPeriod.dto;
 
 
 import java.time.LocalDateTime;
-import kr.allcll.backend.domain.period.OperationPeriod;
-import kr.allcll.backend.domain.period.OperationType;
+import kr.allcll.backend.domain.operationPeriod.OperationPeriod;
+import kr.allcll.backend.domain.operationPeriod.OperationType;
 
 public record OperationPeriodDetailResponse(
     OperationType operationType,

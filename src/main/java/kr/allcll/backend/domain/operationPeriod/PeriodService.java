@@ -1,10 +1,8 @@
-package kr.allcll.backend.domain.period;
+package kr.allcll.backend.domain.operationPeriod;
 
 import java.time.LocalDate;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import kr.allcll.backend.domain.period.dto.OperationPeriodsResponse;
+import kr.allcll.backend.domain.operationPeriod.dto.OperationPeriodsResponse;
 import kr.allcll.backend.support.semester.Semester;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
