@@ -32,22 +32,22 @@ public class StarService {
     }
 
     private void validateCanAddStar(Subject subject, String token) {
-        Long starCount = starRepository.countAllByToken(token, Semester.now());
+        Long starCount = starRepository.countAllByToken(token, Semester.getCurrentSemester());
         if (starCount >= MAX_STAR_NUMBER) {
             throw new AllcllException(AllcllErrorCode.STAR_LIMIT_EXCEEDED, MAX_STAR_NUMBER);
         }
-        if (starRepository.existsBySubjectAndToken(subject, token, Semester.now())) {
+        if (starRepository.existsBySubjectAndToken(subject, token, Semester.getCurrentSemester())) {
             throw new AllcllException(AllcllErrorCode.DUPLICATE_STAR, subject.getCuriNm());
         }
     }
 
     @Transactional
     public void deleteStarOnSubject(Long subjectId, String token) {
-        starRepository.deleteStarBySubjectIdAndToken(subjectId, token, Semester.now());
+        starRepository.deleteStarBySubjectIdAndToken(subjectId, token, Semester.getCurrentSemester());
     }
 
     public StarredSubjectIdsResponse retrieveStars(String token) {
-        List<Star> stars = starRepository.findAllByToken(token, Semester.now());
+        List<Star> stars = starRepository.findAllByToken(token, Semester.getCurrentSemester());
         return new StarredSubjectIdsResponse(stars.stream()
             .map(star -> new StarredSubjectIdResponse(star.getSubject().getId()))
             .toList());

@@ -11,7 +11,7 @@ public record SemesterResponse(
     public static SemesterResponse from(Semester semester) {
         return new SemesterResponse(
             semester.name(),
-            semester.getValue(),
+            semester.getKoreanName(),
             new Period(semester.getStartDate(), semester.getEndDate())
         );
     }

@@ -13,7 +13,7 @@ public class UtilService {
 
     public SemesterResponse getSemester() {
         LocalDate now = LocalDate.now(clock);
-        Semester currentSemester = Semester.getCode(now);
+        Semester currentSemester = Semester.findByDate(now);
         return SemesterResponse.from(currentSemester);
     }
 

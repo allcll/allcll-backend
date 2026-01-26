@@ -29,7 +29,7 @@ public class SubjectReportService {
     private final EmailProperties emailProperties;
 
     public void generateSubjectSyncReport(SubjectSyncResult syncResult, CrawlingMetaData metaData) {
-        List<CrawlerSubject> allSubjects = crawlerSubjectRepository.findAllBySemesterAt(Semester.now());
+        List<CrawlerSubject> allSubjects = crawlerSubjectRepository.findAllBySemesterAt(Semester.getCurrentSemester());
         int totalSubjectsCount = allSubjects.size();
 
         sendSubjectReportToEmail(syncResult, metaData, totalSubjectsCount);

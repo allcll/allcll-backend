@@ -31,11 +31,11 @@ public class PinService {
     }
 
     private void validateCanAddPin(Subject subject, String token) {
-        Long pinCount = pinRepository.countAllByToken(token, Semester.now());
+        Long pinCount = pinRepository.countAllByToken(token, Semester.getCurrentSemester());
         if (pinCount >= MAX_PIN_NUMBER) {
             throw new AllcllException(AllcllErrorCode.PIN_LIMIT_EXCEEDED, MAX_PIN_NUMBER);
         }
-        if (pinRepository.existsBySubjectAndToken(subject, token, Semester.now())) {
+        if (pinRepository.existsBySubjectAndToken(subject, token, Semester.getCurrentSemester())) {
             throw new AllcllException(AllcllErrorCode.DUPLICATE_PIN, subject.getCuriNm());
         }
     }
@@ -44,13 +44,13 @@ public class PinService {
     public void deletePinOnSubject(Long subjectId, String token) {
         Subject subject = subjectRepository.findById(subjectId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.SUBJECT_NOT_FOUND, subjectId));
-        Pin pin = pinRepository.findBySubjectAndToken(subject, token, Semester.now())
+        Pin pin = pinRepository.findBySubjectAndToken(subject, token, Semester.getCurrentSemester())
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.PIN_SUBJECT_MISMATCH));
         pinRepository.deleteById(pin.getId());
     }
 
     public SubjectIdsResponse retrievePins(String token) {
-        List<Pin> pins = pinRepository.findAllByToken(token, Semester.now());
+        List<Pin> pins = pinRepository.findAllByToken(token, Semester.getCurrentSemester());
         return new SubjectIdsResponse(pins.stream()
             .map(pin -> new SubjectIdResponse(pin.getSubject().getId()))
             .toList());

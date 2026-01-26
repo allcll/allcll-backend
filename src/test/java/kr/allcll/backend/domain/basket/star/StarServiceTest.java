@@ -60,7 +60,7 @@ class StarServiceTest {
         starService.addStarOnSubject(starSubject.getId(), TOKEN);
 
         // when
-        List<Star> result = starRepository.findAllByToken(TOKEN, Semester.now());
+        List<Star> result = starRepository.findAllByToken(TOKEN, Semester.getCurrentSemester());
 
         // then
         assertThat(result).hasSize(expected);
@@ -125,7 +125,7 @@ class StarServiceTest {
         starService.deleteStarOnSubject(subject.getId(), TOKEN);
 
         // then
-        assertThat(starRepository.findAllByToken(TOKEN, Semester.now())).hasSize(0);
+        assertThat(starRepository.findAllByToken(TOKEN, Semester.getCurrentSemester())).hasSize(0);
     }
 
     @Test

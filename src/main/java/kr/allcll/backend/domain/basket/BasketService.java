@@ -27,7 +27,7 @@ public class BasketService {
         String professorName,
         String subjectName
     ) {
-        Specification<Subject> condition = getCondition(departmentCode, professorName, subjectName, Semester.now());
+        Specification<Subject> condition = getCondition(departmentCode, professorName, subjectName, Semester.getCurrentSemester());
         List<Subject> subjects = subjectRepository.findAll(condition);
         List<BasketsEachSubject> result = getBasketsEachSubject(subjects);
         return new BasketsResponse(result);
@@ -38,7 +38,7 @@ public class BasketService {
         for (Subject subject : subjects) {
             List<Basket> baskets = basketRepository.findBySubjectId(
                 subject.getId(),
-                Semester.now()
+                Semester.getCurrentSemester()
             );
             result.add(BasketsEachSubject.from(subject, baskets));
         }
@@ -70,7 +70,7 @@ public class BasketService {
     private List<Basket> getBaskets(Subject subject) {
         return basketRepository.findBySubjectId(
                 subject.getId(),
-                Semester.now()
+                Semester.getCurrentSemester()
             ).stream()
             .filter(Basket::isNotEmpty)
             .toList();

@@ -14,7 +14,7 @@ public class BaseEntityListener {
     }
 
     private String getCurrentSemester() {
-        Semester semester = Semester.getCode(LocalDate.now());
-        return semester.getValue();
+        Semester semester = Semester.findByDate(LocalDate.now());
+        return semester.getKoreanName();
     }
 }

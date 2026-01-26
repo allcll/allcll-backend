@@ -35,7 +35,7 @@ public class ExternalService {
 
     private PinSubjectUpdateRequest getPinSubjects() {
         List<String> activeSseTokens = sseEmitterStorage.getUserTokens();
-        List<Pin> currentSemesterPins = pinRepository.findAllBySemesterAt(Semester.now());
+        List<Pin> currentSemesterPins = pinRepository.findAllBySemesterAt(Semester.getCurrentSemester());
 
         List<Pin> activePins = currentSemesterPins.stream()
             .filter(pin -> activeSseTokens.contains(pin.getToken()))

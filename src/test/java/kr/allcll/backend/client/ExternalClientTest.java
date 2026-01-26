@@ -26,9 +26,6 @@ class ExternalClientTest {
     private ExternalClient externalClient;
 
     @Autowired
-    private ChangedSubjectBuffer changedSubjectBuffer;
-
-    @Autowired
     private SubjectRepository subjectRepository;
 
     @Autowired
