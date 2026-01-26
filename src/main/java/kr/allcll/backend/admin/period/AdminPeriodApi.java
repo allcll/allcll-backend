@@ -22,8 +22,8 @@ public class AdminPeriodApi {
 
     @PostMapping("/api/admin/service-period")
     public ResponseEntity<Void> savePeriod(HttpServletRequest request,
-                                           @RequestParam Semester semester,
-                                           @RequestBody PeriodRequest periodRequest
+        @RequestParam Semester semester,
+        @RequestBody PeriodRequest periodRequest
     ) {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
@@ -34,8 +34,8 @@ public class AdminPeriodApi {
 
     @DeleteMapping("/api/admin/service-period")
     public ResponseEntity<Void> deletePeriod(HttpServletRequest request,
-                                             @RequestParam Semester semester,
-                                             @RequestParam ServiceType serviceType
+        @RequestParam Semester semester,
+        @RequestParam ServiceType serviceType
     ) {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();

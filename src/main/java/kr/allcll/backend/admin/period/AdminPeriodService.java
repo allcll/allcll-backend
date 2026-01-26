@@ -19,7 +19,8 @@ public class AdminPeriodService {
 
     @Transactional
     public void savePeriod(Semester semester, PeriodRequest periodRequest) {
-        Optional<Period> foundPeriod = periodRepository.findBySemesterAndServiceType(semester, periodRequest.serviceType());
+        Optional<Period> foundPeriod = periodRepository.findBySemesterAndServiceType(semester,
+            periodRequest.serviceType());
 
         if (foundPeriod.isPresent()) {
             foundPeriod.get().update(
