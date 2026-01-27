@@ -30,4 +30,8 @@ public class LoginApi {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/api/auth/logout")
+    public void logout(HttpSession session) {
+        session.invalidate();
+    }
 }
