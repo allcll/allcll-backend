@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 
 @Slf4j
 @RestControllerAdvice
@@ -43,9 +42,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorResponse> handleAsyncRequestTimeoutException(HttpServletRequest request,
-        AsyncRequestTimeoutException exception
-    ) {
+    public ResponseEntity<ErrorResponse> handleAsyncRequestTimeoutException(HttpServletRequest request) {
         final AllcllErrorCode errorCode = AllcllErrorCode.ASYNC_REQUEST_TIMEOUT;
 
         if (request.getHeader("ALLCLL-SSE-CONNECT") != null) {
