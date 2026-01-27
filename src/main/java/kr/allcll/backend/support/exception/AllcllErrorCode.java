@@ -33,8 +33,12 @@ public enum AllcllErrorCode {
     SEAT_CRAWLING_ALREADY_IN_PROGRESS("이미 다른 계정으로 여석 크롤링이 진행중입니다."),
     SEAT_CRAWLING_IN_MULTIPLE_ACCOUNTS("두 개 이상의 계정으로 여석 크롤링이 진행중입니다."),
     PREFIX_NOT_FOUND("prefix가 존재하지 않습니다."),
-    ;
 
+    SEJONG_LOGIN_FAIL("세종포털 로그인에 실패하였습니다"),
+    USER_INFO_FETCH_FAIL("사용자 정보를 불러오지 못했습니다."),
+    STUDENT_ID_FETCH_FAIL("잘못된 학번 정보입니다: $s"),
+    USER_NOT_FOUND("사용자 정보를 찾을 수 없습니다."),
+    ;
 
     private String message;
 
