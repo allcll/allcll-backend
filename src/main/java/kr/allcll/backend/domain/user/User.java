@@ -30,9 +30,7 @@ public class User extends BaseEntity {
 
     private int admissionYear;
 
-    //private String college;
-
-    //private ProgramType program_type;
+    //private ProgramType program_type; // 전공 형태
 
     private User(String studentId, String name, String deptNm, int admissionYear) {
         this.studentId = studentId;
