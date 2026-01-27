@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import kr.allcll.backend.support.entity.BaseEntity;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import lombok.AccessLevel;
@@ -12,8 +14,9 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User {
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,10 +42,11 @@ public class User {
     }
 
     public static User create(String studentId, String name, String dept_nm) {
-        return new User(studentId,
+        return new User(
+            studentId,
             name,
             dept_nm,
-            extractAdmissionYear(dept_nm));
+            extractAdmissionYear(studentId));
     }
 
     private static int extractAdmissionYear(String studentId) {
