@@ -41,8 +41,10 @@ public enum AllcllErrorCode {
     //502
     EXTERNAL_CONNECTION_TERMINATED(HttpStatus.BAD_GATEWAY, "외부 서버와의 연결이 종료되었습니다."),
 
-    /* ================= 시스템 / 인프라 에러 ================= */
+    /* ================= 클라이언트 에러 ================= */
     NOT_FOUND_API(HttpStatus.NOT_FOUND, "요청한 API를 찾을 수 없습니다."),
+
+    /* ================= 시스템 / 인프라 에러 ================= */
     ASYNC_REQUEST_TIMEOUT(HttpStatus.INTERNAL_SERVER_ERROR, "요청 처리 중 시간이 초과되었습니다."),
     SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 에러가 발생하였습니다."),
     ;
