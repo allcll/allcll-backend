@@ -5,7 +5,7 @@ import kr.allcll.backend.domain.operationPeriod.OperationPeriod;
 import kr.allcll.backend.support.semester.Semester;
 
 public record OperationPeriodsResponse(
-    Semester semesterName,
+    Semester semesterCode,
     String semesterKoreanName,
     List<OperationPeriodDetailResponse> operationPeriodDetailResponses
 ) {

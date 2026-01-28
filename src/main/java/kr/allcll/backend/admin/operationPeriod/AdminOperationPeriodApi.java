@@ -24,7 +24,7 @@ public class AdminOperationPeriodApi {
 
     @PostMapping
     public ResponseEntity<Void> saveOperationPeriod(HttpServletRequest request,
-        @RequestParam Semester semester,
+        @RequestParam("semesterCode") Semester semester,
         @RequestBody OperationPeriodRequest operationPeriodRequest
     ) {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
@@ -36,7 +36,7 @@ public class AdminOperationPeriodApi {
 
     @DeleteMapping
     public ResponseEntity<Void> deleteOperationPeriod(HttpServletRequest request,
-        @RequestParam Semester semester,
+        @RequestParam("semesterCode") Semester semester,
         @RequestParam OperationType operationType
     ) {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
