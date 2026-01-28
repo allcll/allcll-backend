@@ -3,6 +3,7 @@ package kr.allcll.backend.admin.seat;
 import jakarta.servlet.http.HttpServletRequest;
 import kr.allcll.backend.admin.AdminRequestValidator;
 import kr.allcll.backend.admin.seat.dto.SeatStatusResponse;
+import kr.allcll.backend.support.batch.BatchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminSeatApi {
 
     private final AdminSeatService adminSeatService;
+    private final BatchService batchService;
     private final TargetSubjectService targetSubjectService;
     private final AdminRequestValidator validator;
 
@@ -59,6 +61,7 @@ public class AdminSeatApi {
             return ResponseEntity.status(401).build();
         }
         adminSeatService.cancelSeatScheduling();
+        batchService.flushAllBatch();
 
         return ResponseEntity.ok().build();
     }
