@@ -1,0 +1,13 @@
+package kr.allcll.backend.client;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@ConfigurationProperties(prefix = "spring.login")
+public record LoginProperties(
+    String portalLoginUrl,
+    String portalLoginRedirectUrl,
+    String portalLoginReferer,
+    String studentInfoPageUrl
+) {
+
+}

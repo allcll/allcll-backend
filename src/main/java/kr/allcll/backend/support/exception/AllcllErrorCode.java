@@ -23,6 +23,7 @@ public enum AllcllErrorCode {
     TIMETABLE_NOT_FOUND(HttpStatus.NOT_FOUND, "시간표를 찾을 수 없습니다."),
     CUSTOM_SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "커스텀 일정을 찾을 수 없습니다."),
     BASKET_NOT_FOUND(HttpStatus.NOT_FOUND, "관심과목 정보가 존재하지 않습니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자 정보를 찾을 수 없습니다."),
 
     //409
     PIN_LIMIT_EXCEEDED(HttpStatus.CONFLICT, "이미 %d개의 핀을 등록했습니다."),
@@ -40,6 +41,9 @@ public enum AllcllErrorCode {
 
     //502
     EXTERNAL_CONNECTION_TERMINATED(HttpStatus.BAD_GATEWAY, "외부 서버와의 연결이 종료되었습니다."),
+    SEJONG_LOGIN_FAIL(HttpStatus.BAD_GATEWAY, "세종포털 로그인에 실패하였습니다"),
+    USER_INFO_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "사용자 정보를 불러오지 못했습니다."),
+    STUDENT_ID_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "잘못된 학번 정보입니다: $s"),
 
     /* ================= 클라이언트 에러 ================= */
     NOT_FOUND_API(HttpStatus.NOT_FOUND, "요청한 API를 찾을 수 없습니다."),
@@ -51,6 +55,7 @@ public enum AllcllErrorCode {
 
     private final HttpStatus httpStatus;
     private final String message;
+
 
     AllcllErrorCode(HttpStatus httpStatus, String message) {
         this.httpStatus = httpStatus;

@@ -31,6 +31,9 @@ dependencies {
 //    implementation 'io.micrometer:micrometer-registry-datadog'
     implementation 'org.springframework.retry:spring-retry'
     implementation 'org.springframework:spring-aspects'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.squareup.okhttp3:okhttp-urlconnection:4.12.0'
+    implementation 'org.jsoup:jsoup:1.17.2'
     implementation(project(":crawler"))
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
