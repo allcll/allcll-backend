@@ -9,7 +9,7 @@ public record OperationPeriodDetailResponse(
     OperationType operationType,
     LocalDateTime startDate,
     LocalDateTime endDate,
-    String operationPeriodMessage
+    String message
 ) {
 
     public static OperationPeriodDetailResponse from(OperationPeriod operationPeriod) {
