@@ -6,10 +6,10 @@ import kr.allcll.backend.domain.operationPeriod.OperationType;
 import kr.allcll.backend.support.semester.Semester;
 
 public record OperationPeriodRequest(
-        OperationType operationType,
-        LocalDateTime startDate,
-        LocalDateTime endDate,
-        String message
+    OperationType operationType,
+    LocalDateTime startDate,
+    LocalDateTime endDate,
+    String message
 ) {
 
     public OperationPeriod toPeriod(Semester semester) {
