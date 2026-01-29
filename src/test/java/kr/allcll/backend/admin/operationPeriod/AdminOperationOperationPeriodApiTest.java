@@ -56,7 +56,7 @@ class AdminOperationOperationPeriodApiTest {
 
         // when, then
         mockMvc.perform(post("/api/admin/operation-period")
-                .param("semester", "SPRING_25")
+                .param("semesterCode", "SPRING_25")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk());
@@ -80,7 +80,7 @@ class AdminOperationOperationPeriodApiTest {
 
         // when, then
         mockMvc.perform(post("/api/admin/operation-period")
-                .param("semester", "SPRING_25")
+                .param("semesterCode", "SPRING_25")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isUnauthorized());
@@ -104,7 +104,7 @@ class AdminOperationOperationPeriodApiTest {
 
         // when, then
         mockMvc.perform(post("/api/admin/operation-period")
-                .param("semester", "SPRING_25")
+                .param("semesterCode", "SPRING_25")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isUnauthorized());
@@ -123,7 +123,7 @@ class AdminOperationOperationPeriodApiTest {
 
         // when, then
         mockMvc.perform(delete("/api/admin/operation-period")
-                .param("semester", "SPRING_25")
+                .param("semesterCode", "SPRING_25")
                 .param("operationType", "TIMETABLE"))
             .andExpect(status().isOk());
     }
@@ -139,7 +139,7 @@ class AdminOperationOperationPeriodApiTest {
 
         // when, then
         mockMvc.perform(delete("/api/admin/operation-period")
-                .param("semester", "SPRING_25")
+                .param("semesterCode", "SPRING_25")
                 .param("operationType", "TIMETABLE"))
             .andExpect(status().isUnauthorized());
     }
@@ -155,7 +155,7 @@ class AdminOperationOperationPeriodApiTest {
 
         // when, then
         mockMvc.perform(delete("/api/admin/operation-period")
-                .param("semester", "SPRING_25")
+                .param("semesterCode", "SPRING_25")
                 .param("operationType", "TIMETABLE"))
             .andExpect(status().isUnauthorized());
     }
