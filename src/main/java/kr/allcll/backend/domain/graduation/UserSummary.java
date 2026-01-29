@@ -6,7 +6,10 @@ public record UserSummary(
     Long id,
     String studentId,
     String name,
-    String dept
+    //String collegeNm,
+    String deptNm,
+    //String deptCd,
+    int admissionYear
 ) {
 
     public static UserSummary from(User user) {
@@ -14,7 +17,8 @@ public record UserSummary(
             user.getId(),
             user.getStudentId(),
             user.getName(),
-            user.getDeptNm()
+            user.getDeptNm(),
+            user.getAdmissionYear()
         );
     }
 }

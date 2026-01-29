@@ -9,5 +9,4 @@ public record GraduationResponse(
     public static GraduationResponse from(User user) {
         return new GraduationResponse(UserSummary.from(user));
     }
-
 }
