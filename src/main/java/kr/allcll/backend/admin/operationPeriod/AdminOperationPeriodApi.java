@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/admin/operation-period")
+@RequestMapping
 @RequiredArgsConstructor
 public class AdminOperationPeriodApi {
 
     private final AdminOperationPeriodService operationPeriodService;
     private final AdminRequestValidator validator;
 
-    @PostMapping
+    @PostMapping("/api/admin/operation-period")
     public ResponseEntity<Void> saveOperationPeriod(HttpServletRequest request,
         @RequestParam("semesterCode") Semester semester,
         @RequestBody OperationPeriodRequest operationPeriodRequest
@@ -34,7 +34,7 @@ public class AdminOperationPeriodApi {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping
+    @DeleteMapping("/api/admin/operation-period")
     public ResponseEntity<Void> deleteOperationPeriod(HttpServletRequest request,
         @RequestParam("semesterCode") Semester semester,
         @RequestParam OperationType operationType
