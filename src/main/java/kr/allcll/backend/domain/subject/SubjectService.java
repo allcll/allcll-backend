@@ -23,7 +23,7 @@ public class SubjectService {
         String professorName
     ) {
         Specification<Subject> condition = getCondition(subjectId, subjectName, subjectCode, classCode, professorName,
-            Semester.now());
+            Semester.getCurrentSemester());
         List<Subject> subjects = subjectRepository.findAll(condition);
         return SubjectsResponse.from(subjects);
     }

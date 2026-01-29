@@ -51,7 +51,7 @@ class PinServiceTest {
         pinService.addPinOnSubject(subjectA.getId(), TOKEN);
 
         // when
-        List<Pin> result = pinRepository.findAllByToken(TOKEN, Semester.now());
+        List<Pin> result = pinRepository.findAllByToken(TOKEN, Semester.getCurrentSemester());
 
         // then
         assertThat(result).hasSize(1);
@@ -111,7 +111,7 @@ class PinServiceTest {
         pinService.deletePinOnSubject(subject.getId(), TOKEN);
 
         // then
-        assertThat(pinRepository.findAllByToken(TOKEN, Semester.now())).hasSize(0);
+        assertThat(pinRepository.findAllByToken(TOKEN, Semester.getCurrentSemester())).hasSize(0);
     }
 
     @Test
