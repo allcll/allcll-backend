@@ -1,5 +1,6 @@
 package kr.allcll.backend.domain.user;
 
+import kr.allcll.backend.domain.user.dto.UserResponse;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,14 @@ public class UserService {
             info.deptNm()
         );
         return repository.save(user);
+    }
+
+    public UserResponse getResult(Long userId) {
+        if (userId == null) {
+            throw new AllcllException(AllcllErrorCode.UNAUTHORIZED_ACCESS);
+        }
+        User user = findById(userId);
+        return UserResponse.from(user);
     }
 
     public User findById(Long userId) {
