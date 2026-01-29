@@ -24,13 +24,19 @@ public class User extends BaseEntity {
 
     private String studentId;
 
-    private String name;
-
-    private String deptNm;
-
     private int admissionYear;
 
+    private String name;
+
     //private ProgramType program_type; // 전공 형태
+
+    private String deptNm;
+    //private String deptCd;
+    //private String collegeNm;
+
+    //private String doubleCollegeNm;
+    //private String doubleDeptCd;
+    //private String doubleDeptNm;
 
     private User(String studentId, String name, String deptNm, int admissionYear) {
         this.studentId = studentId;
