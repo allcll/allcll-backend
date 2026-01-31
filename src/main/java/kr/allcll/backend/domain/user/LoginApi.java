@@ -1,11 +1,14 @@
 package kr.allcll.backend.domain.user;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import kr.allcll.backend.domain.user.dto.LoginRequest;
 import kr.allcll.backend.domain.user.dto.LoginResult;
 import kr.allcll.backend.domain.user.dto.UserResponse;
+import kr.allcll.backend.support.web.LoginUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -34,16 +37,21 @@ public class LoginApi {
     }
 
     @PostMapping("/api/auth/logout")
-    public ResponseEntity<Void> logout(HttpSession session) {
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+        HttpSession session = request.getSession(false);
         if (session != null) {
             session.invalidate();
         }
+        Cookie sessionCookie = new Cookie("JSESSIONID", "");
+        sessionCookie.setMaxAge(0);
+        sessionCookie.setPath("/");
+        response.addCookie(sessionCookie);
+
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/api/auth/me")
-    public ResponseEntity<UserResponse> check(HttpSession session) {
-        Long userId = (Long) session.getAttribute(LoginApi.LOGIN_SESSION);
+    public ResponseEntity<UserResponse> check(@LoginUser Long userId) {
         UserResponse response = userService.getResult(userId);
         return ResponseEntity.ok(response);
     }
