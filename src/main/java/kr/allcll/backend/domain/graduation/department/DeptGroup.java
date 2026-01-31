@@ -12,5 +12,6 @@ public enum DeptGroup { // 계열
     AI_CONVERGENCE_COLLEGE,                           // 인공지능융합대학
     ENGINEERING_COLLEGE,                              // 공과대학
     ARTS_AND_PHYSICAL_EDUCATION_COLLEGE,              // 예체능대학
-    INTERDISCIPLINARY_CONVERGENCE_MAJOR               // 연계융합전공
+    INTERDISCIPLINARY_CONVERGENCE_MAJOR,              // 연계융합전공
+    ;
 }
