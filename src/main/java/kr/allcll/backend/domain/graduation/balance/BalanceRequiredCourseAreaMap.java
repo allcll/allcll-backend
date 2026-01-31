@@ -29,7 +29,7 @@ public class BalanceRequiredCourseAreaMap extends BaseEntity {
     private String curiNm; // 과목명
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "domain_type", nullable = false)
+    @Column(name = "balance_required_area", nullable = false)
     private BalanceRequiredArea balanceRequiredArea; // 균형교양 영역
 
     public BalanceRequiredCourseAreaMap(
