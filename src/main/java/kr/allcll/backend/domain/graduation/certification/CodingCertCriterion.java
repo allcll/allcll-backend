@@ -23,7 +23,7 @@ public class CodingCertCriterion extends BaseEntity {
     private Integer admissionYearShort;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "target_type", nullable = false)
+    @Column(name = "coding_target_type", nullable = false)
     private CodingTargetType codingTargetType; // 전공자 구분
 
     @Column(name = "tosc_min_level", nullable = false)
