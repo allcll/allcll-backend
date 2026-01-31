@@ -30,11 +30,11 @@ public class UserService {
         if (userId == null) {
             throw new AllcllException(AllcllErrorCode.UNAUTHORIZED_ACCESS);
         }
-        User user = findById(userId);
+        User user = getById(userId);
         return UserResponse.from(user);
     }
 
-    public User findById(Long userId) {
+    public User getById(Long userId) {
         return repository.findById(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
     }

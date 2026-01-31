@@ -17,7 +17,7 @@ public class GraduationService {
         if (userId == null) {
             throw new AllcllException(AllcllErrorCode.UNAUTHORIZED_ACCESS);
         }
-        User user = userService.findById(userId);
+        User user = userService.getById(userId);
 
         return GraduationResponse.from(user);
     }
