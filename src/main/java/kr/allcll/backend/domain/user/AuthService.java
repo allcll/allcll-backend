@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import kr.allcll.backend.client.LoginProperties;
+import kr.allcll.backend.domain.user.dto.LoginRequest;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,10 @@ public class AuthService {
 
     private final LoginProperties properties;
 
-    public OkHttpClient login(String id, String pw) throws IOException {
+    public OkHttpClient login(LoginRequest loginRequest) throws IOException {
+        String studentId = loginRequest.studentId();
+        String password = loginRequest.password();
+
         CookieManager cookieManager = new CookieManager();
         cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
 
@@ -30,8 +34,8 @@ public class AuthService {
             .build();
 
         RequestBody body = new FormBody.Builder()
-            .add("id", id)
-            .add("password", pw)
+            .add("id", studentId)
+            .add("password", password)
             .add("rtUrl", properties.portalLoginRedirectUrl())
             .build();
 

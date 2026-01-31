@@ -25,7 +25,7 @@ public class LoginApi {
     @PostMapping("/api/auth/login")
     public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest,
         HttpServletRequest httpRequest) throws IOException {
-        LoginResult result = loginFacade.login(loginRequest.studentId(), loginRequest.password());
+        LoginResult result = loginFacade.login(loginRequest);
 
         HttpSession session = httpRequest.getSession(true);
         session.setAttribute(LOGIN_SESSION, result.userId());
