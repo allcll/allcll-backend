@@ -18,6 +18,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
 
+    private static final int YEAR_PREFIX = 2000;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -58,6 +60,6 @@ public class User extends BaseEntity {
             throw new AllcllException(AllcllErrorCode.STUDENT_ID_FETCH_FAIL, studentId);
         }
         int year = Integer.parseInt(studentId.substring(0, 2));
-        return 2000 + year;
+        return YEAR_PREFIX + year;
     }
 }
