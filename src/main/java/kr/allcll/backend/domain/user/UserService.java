@@ -10,20 +10,20 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository repository;
+    private final UserRepository userRepository;
 
     public User findOrCreate(UserInfo info) {
-        return repository.findByStudentId(info.studentId())
+        return userRepository.findByStudentId(info.studentId())
             .orElseGet(() -> save(info));
     }
 
     private User save(UserInfo info) {
-        User user = User.create(
+        User user = User.of(
             info.studentId(),
             info.name(),
             info.deptNm()
         );
-        return repository.save(user);
+        return userRepository.save(user);
     }
 
     public UserResponse getResult(Long userId) {
@@ -35,7 +35,7 @@ public class UserService {
     }
 
     public User getById(Long userId) {
-        return repository.findById(userId)
+        return userRepository.findById(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
     }
 }
