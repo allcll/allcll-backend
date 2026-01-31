@@ -30,7 +30,7 @@ public class User extends BaseEntity {
 
     private String name;
 
-    //private ProgramType program_type; // 전공 형태
+    //private ProgramType programType; // 전공 형태
 
     private String deptNm;
     //private String deptCd;

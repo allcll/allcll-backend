@@ -10,6 +10,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -35,7 +36,7 @@ public class UserFetcher {
         }
     }
 
-    private UserInfo parseUserInfo(Document doc) {
+    private UserInfo parseUserInfo(Document document) {
         String selector =
             ".b-con-box:has(h4.b-h4-tit01:contains(사용자 정보)) table.b-board-table tbody tr";
 
@@ -43,14 +44,14 @@ public class UserFetcher {
         String name = null;
         String dept = null;
 
-        for (var row : doc.select(selector)) {
-            String th = row.select("th").text().trim();
-            String td = row.select("td").text().trim();
+        for (Element element : document.select(selector)) {
+            String label = element.select("th").text().trim();
+            String value = element.select("td").text().trim();
 
-            switch (th) {
-                case "학번" -> studentId = td;
-                case "이름" -> name = td;
-                case "학과명" -> dept = td;
+            switch (label) {
+                case "학번" -> studentId = value;
+                case "이름" -> name = value;
+                case "학과명" -> dept = value;
             }
         }
 
