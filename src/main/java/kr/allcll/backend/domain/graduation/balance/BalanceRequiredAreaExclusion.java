@@ -29,18 +29,18 @@ public class BalanceRequiredAreaExclusion extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "balance_required_area", nullable = false)
-    private BalanceRequiredArea excludedBalanceRequiredArea; // 제외 영역
+    private BalanceRequiredArea balanceRequiredArea; // 제외 영역
 
     public BalanceRequiredAreaExclusion(
         Integer admissionYear,
         Integer admissionYearShort,
         DeptGroup deptGroup,
-        BalanceRequiredArea excludedBalanceRequiredArea
+        BalanceRequiredArea balanceRequiredArea
     ) {
         this.admissionYear = admissionYear;
         this.admissionYearShort = admissionYearShort;
         this.deptGroup = deptGroup;
-        this.excludedBalanceRequiredArea = excludedBalanceRequiredArea;
+        this.balanceRequiredArea = balanceRequiredArea;
     }
 }
 
