@@ -34,8 +34,11 @@ public class LoginApi {
     }
 
     @PostMapping("/api/auth/logout")
-    public void logout(HttpSession session) {
-        session.invalidate();
+    public ResponseEntity<Void> logout(HttpSession session) {
+        if (session != null) {
+            session.invalidate();
+        }
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/api/auth/me")
