@@ -29,7 +29,7 @@ public class BalanceRequiredRule extends BaseEntity {
     private Integer requiredCredits; // 요구 총 학점
 
     @Column(name = "note")
-    private String note; // 비고(
+    private String note; // 비고
 
     public BalanceRequiredRule(
         Integer admissionYear,
