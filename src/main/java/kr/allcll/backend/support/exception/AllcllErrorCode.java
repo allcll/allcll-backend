@@ -14,6 +14,7 @@ public enum AllcllErrorCode {
     //401
     TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "쿠키에 토큰이 존재하지 않습니다."),
     TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
+    SEJONG_LOGIN_FAIL(HttpStatus.UNAUTHORIZED, "학번 또는 비밀번호가 올바르지 않습니다."),
 
     //403
     UNAUTHORIZED_ACCESS(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
@@ -41,9 +42,9 @@ public enum AllcllErrorCode {
 
     //502
     EXTERNAL_CONNECTION_TERMINATED(HttpStatus.BAD_GATEWAY, "외부 서버와의 연결이 종료되었습니다."),
-    SEJONG_LOGIN_FAIL(HttpStatus.BAD_GATEWAY, "세종포털 로그인에 실패하였습니다"),
     USER_INFO_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "사용자 정보를 불러오지 못했습니다."),
-    STUDENT_ID_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "잘못된 학번 정보입니다: $s"),
+    STUDENT_ID_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "잘못된 학번 정보입니다: %s"),
+    SEJONG_LOGIN_IO_ERROR(HttpStatus.BAD_GATEWAY, "세종포털 로그인 서버와 통신 중 오류가 발생했습니다."),
 
     /* ================= 클라이언트 에러 ================= */
     NOT_FOUND_API(HttpStatus.NOT_FOUND, "요청한 API를 찾을 수 없습니다."),

@@ -22,35 +22,38 @@ public class AuthService {
 
     private final LoginProperties properties;
 
-    public OkHttpClient login(LoginRequest loginRequest) throws IOException {
-        String studentId = loginRequest.studentId();
-        String password = loginRequest.password();
+    public OkHttpClient login(LoginRequest loginRequest) {
+        try {
+            String studentId = loginRequest.studentId();
+            String password = loginRequest.password();
 
-        CookieManager cookieManager = new CookieManager();
-        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+            CookieManager cookieManager = new CookieManager();
+            cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
 
-        OkHttpClient client = new OkHttpClient().newBuilder()
-            .cookieJar(new JavaNetCookieJar(cookieManager))
-            .build();
+            OkHttpClient client = new OkHttpClient().newBuilder()
+                .cookieJar(new JavaNetCookieJar(cookieManager))
+                .build();
 
-        RequestBody body = new FormBody.Builder()
-            .add("id", studentId)
-            .add("password", password)
-            .add("rtUrl", properties.portalLoginRedirectUrl())
-            .build();
+            RequestBody body = new FormBody.Builder()
+                .add("id", studentId)
+                .add("password", password)
+                .add("rtUrl", properties.portalLoginRedirectUrl())
+                .build();
 
-        Request request = new Request.Builder()
-            .url(properties.portalLoginUrl())
-            .post(body)
-            .header("Referer", properties.portalLoginReferer())
-            .build();
+            Request request = new Request.Builder()
+                .url(properties.portalLoginUrl())
+                .post(body)
+                .header("Referer", properties.portalLoginReferer())
+                .build();
 
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                throw new AllcllException(AllcllErrorCode.SEJONG_LOGIN_FAIL);
+            try (Response response = client.newCall(request).execute()) {
+                if (!response.isSuccessful()) {
+                    throw new AllcllException(AllcllErrorCode.SEJONG_LOGIN_FAIL);
+                }
+                return client;
             }
+        } catch (IOException exception) {
+            throw new AllcllException(AllcllErrorCode.SEJONG_LOGIN_IO_ERROR, exception);
         }
-
-        return client;
     }
 }
