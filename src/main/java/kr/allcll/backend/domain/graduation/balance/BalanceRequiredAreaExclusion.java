@@ -28,7 +28,7 @@ public class BalanceRequiredAreaExclusion extends BaseEntity {
     private DeptGroup deptGroup; // 계열
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "excluded_domain_type", nullable = false)
+    @Column(name = "balance_required_area", nullable = false)
     private BalanceRequiredArea excludedBalanceRequiredArea; // 제외 영역
 
     public BalanceRequiredAreaExclusion(
