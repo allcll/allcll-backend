@@ -9,11 +9,11 @@ public record UserInfo(
     String deptNm
 ) {
 
-    public static UserInfo of(String studentId, String name, String dept_nm) {
-        return UserInfo.builder()
-            .studentId(studentId)
-            .name(name)
-            .deptNm(dept_nm)
-            .build();
+    public static UserInfo of(String studentId, String name, String deptNm) {
+        return new UserInfo(
+            studentId,
+            name,
+            deptNm
+        );
     }
 }
