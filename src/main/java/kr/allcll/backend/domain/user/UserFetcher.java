@@ -19,20 +19,24 @@ public class UserFetcher {
 
     private final LoginProperties properties;
 
-    public UserInfo fetch(OkHttpClient client) throws IOException {
-        Request request = new Request.Builder()
-            .url(properties.studentInfoPageUrl())
-            .get()
-            .build();
+    public UserInfo fetch(OkHttpClient client) {
+        try {
+            Request request = new Request.Builder()
+                .url(properties.studentInfoPageUrl())
+                .get()
+                .build();
 
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                throw new AllcllException(AllcllErrorCode.USER_INFO_FETCH_FAIL);
+            try (Response response = client.newCall(request).execute()) {
+                if (!response.isSuccessful()) {
+                    throw new AllcllException(AllcllErrorCode.USER_INFO_FETCH_FAIL);
+                }
+
+                Document doc = Jsoup.parse(response.body().string());
+
+                return parseUserInfo(doc);
             }
-
-            Document doc = Jsoup.parse(response.body().string());
-
-            return parseUserInfo(doc);
+        } catch (IOException exception) {
+            throw new AllcllException(AllcllErrorCode.USER_INFO_FETCH_IO_ERROR);
         }
     }
 
