@@ -47,11 +47,11 @@ public class User extends BaseEntity {
         this.admissionYear = admissionYear;
     }
 
-    public static User create(String studentId, String name, String dept_nm) {
+    public static User create(String studentId, String name, String deptNm) {
         return new User(
             studentId,
             name,
-            dept_nm,
+            deptNm,
             extractAdmissionYear(studentId));
     }
 
