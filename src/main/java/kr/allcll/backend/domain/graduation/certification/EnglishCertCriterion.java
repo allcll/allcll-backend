@@ -23,7 +23,7 @@ public class EnglishCertCriterion extends BaseEntity {
     private Integer admissionYearShort;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "target_type", nullable = false)
+    @Column(name = "english_target_type", nullable = false)
     private EnglishTargetType englishTargetType; // 전공자 구분
 
     @Column(name = "toeic_min_score", nullable = false)
