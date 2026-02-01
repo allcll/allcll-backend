@@ -34,9 +34,11 @@ import kr.allcll.backend.support.sheet.GraduationSheetTable;
 import kr.allcll.backend.support.sheet.GraduationSheetsFetcher;
 import kr.allcll.backend.support.sheet.GraduationSheetsProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminGraduationSyncService {
@@ -56,6 +58,7 @@ public class AdminGraduationSyncService {
 
     @Transactional
     public void syncGraduationRules() {
+        log.info("[졸업요건 데이터 동기화] 시작");
         syncCreditCriteria();
         syncRequiredCourses();
 
@@ -69,6 +72,7 @@ public class AdminGraduationSyncService {
         syncClassicCertCriteria();
 
         syncGraduationDepartmentInfo();
+        log.info("[졸업요건 데이터 동기화] 완료");
     }
 
     private void syncCreditCriteria() {
@@ -93,6 +97,8 @@ public class AdminGraduationSyncService {
 
         creditCriterionRepository.deleteAllInBatch();
         creditCriterionRepository.saveAll(creditCriterionList);
+
+        log.info("[졸업요건 데이터 동기화] 탭 이름={} 저장 완료 count={}", tabName, creditCriterionList.size());
     }
 
     private void syncRequiredCourses() {
@@ -117,6 +123,8 @@ public class AdminGraduationSyncService {
 
         requiredCourseRepository.deleteAllInBatch();
         requiredCourseRepository.saveAll(requiredCourseList);
+
+        log.info("[졸업요건 데이터 동기화] 탭 이름={} 저장 완료 count={}", tabName, requiredCourseList.size());
     }
 
     private void syncBalanceRequiredRule() {
@@ -137,6 +145,8 @@ public class AdminGraduationSyncService {
 
         balanceRequiredRuleRepository.deleteAllInBatch();
         balanceRequiredRuleRepository.saveAll(balanceRequiredRuleList);
+
+        log.info("[졸업요건 데이터 동기화] 탭 이름={} 저장 완료 count={}", tabName, balanceRequiredRuleList.size());
     }
 
     private void syncBalanceRequiredCourseAreaMap() {
@@ -157,6 +167,8 @@ public class AdminGraduationSyncService {
 
         balanceRequiredCourseAreaMapRepository.deleteAllInBatch();
         balanceRequiredCourseAreaMapRepository.saveAll(balanceRequiredCourseAreaMapList);
+
+        log.info("[졸업요건 데이터 동기화] 탭 이름={} 저장 완료 count={}", tabName, balanceRequiredCourseAreaMapList.size());
     }
 
     private void syncBalanceRequiredAreaExclusion() {
@@ -176,6 +188,8 @@ public class AdminGraduationSyncService {
 
         balanceRequiredAreaExclusionRepository.deleteAllInBatch();
         balanceRequiredAreaExclusionRepository.saveAll(balanceRequiredAreaExclusionList);
+
+        log.info("[졸업요건 데이터 동기화] 탭 이름={} 저장 완료 count={}", tabName, balanceRequiredAreaExclusionList.size());
     }
 
     private void syncGraduationCertRule() {
@@ -199,6 +213,8 @@ public class AdminGraduationSyncService {
 
         graduationCertRuleRepository.deleteAllInBatch();
         graduationCertRuleRepository.saveAll(graduationCertRuleList);
+
+        log.info("[졸업요건 데이터 동기화] 탭 이름={} 저장 완료 count={}", tabName, graduationCertRuleList.size());
     }
 
     private void syncEnglishCertCriteria() {
@@ -229,6 +245,8 @@ public class AdminGraduationSyncService {
 
         englishCertCriterionRepository.deleteAllInBatch();
         englishCertCriterionRepository.saveAll(englishCertCriterionList);
+
+        log.info("[졸업요건 데이터 동기화] 탭 이름={} 저장 완료 count={}", tabName, englishCertCriterionList.size());
     }
 
     private void syncCodingCertCriteria() {
@@ -253,6 +271,8 @@ public class AdminGraduationSyncService {
 
         codingCertCriterionRepository.deleteAllInBatch();
         codingCertCriterionRepository.saveAll(codingCertCriterionList);
+
+        log.info("[졸업요건 데이터 동기화] 탭 이름={} 저장 완료 count={}", tabName, codingCertCriterionList.size());
     }
 
     private void syncClassicCertCriteria() {
@@ -276,6 +296,8 @@ public class AdminGraduationSyncService {
 
         classicCertCriterionRepository.deleteAllInBatch();
         classicCertCriterionRepository.saveAll(classicCertCriterionList);
+
+        log.info("[졸업요건 데이터 동기화] 탭 이름={} 저장 완료 count={}", tabName, classicCertCriterionList.size());
     }
 
     private void syncGraduationDepartmentInfo() {
@@ -300,5 +322,7 @@ public class AdminGraduationSyncService {
 
         graduationDepartmentInfoRepository.deleteAllInBatch();
         graduationDepartmentInfoRepository.saveAll(graduationDepartmentInfoList);
+
+        log.info("[졸업요건 데이터 동기화] 탭 이름={} 저장 완료 count={}", tabName, graduationDepartmentInfoList.size());
     }
 }
