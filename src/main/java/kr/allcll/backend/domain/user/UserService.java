@@ -45,7 +45,7 @@ public class UserService {
     public void update(Long userId, UpdateUserRequest updateUserRequest) {
         validateUserId(userId);
         User user = getById(userId);
-        user.updateUser(updateUserRequest);
+        user.updateUser(updateUserRequest.deptNm());
     }
 
     @Transactional
