@@ -17,6 +17,9 @@ jobs:
     env:
       DEV_URL: ${{ secrets.DEV_URL }}
       ADMIN_URL: ${{ secrets.ADMIN_URL }}
+      GOOGLE_ACCOUNT_JSON: ${{ secrets.GOOGLE_ACCOUNT_JSON }}
+      GOOGLE_SHEETS_CREDENTIALS_LOCATION: file:${{ github.workspace }}/secrets/google-service-account.json
+
 
     steps:
       - name: SSH 설정
@@ -34,6 +37,12 @@ jobs:
           submodules: recursive
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Google Service Account 파일 생성
+        run: |
+          mkdir -p ${{ github.workspace }}/secrets
+          echo '${{ secrets.GOOGLE_ACCOUNT_JSON }}' > ${{ github.workspace }}/secrets/google-service-account.json
+          ls -al ${{ github.workspace }}/secrets
+          
       - name: 서브모듈 최신 커밋으로 업데이트
         run: |
           git submodule update --init --remote --checkout
