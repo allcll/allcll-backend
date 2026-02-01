@@ -23,7 +23,7 @@ public class GraduationCertRule extends BaseEntity {
     private Integer admissionYearShort;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "certification_rule_type", nullable = false)
+    @Column(name = "graduation_cert_rule_type", nullable = false)
     private GraduationCertRuleType graduationCertRuleType; // 인증 검사 방식
 
     @Column(name = "required_pass_count", nullable = false)
