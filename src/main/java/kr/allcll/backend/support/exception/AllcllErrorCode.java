@@ -16,9 +16,7 @@ public enum AllcllErrorCode {
     TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
     SEJONG_LOGIN_FAIL(HttpStatus.UNAUTHORIZED, "학번 또는 비밀번호가 올바르지 않습니다."),
     SESSION_NOT_FOUND(HttpStatus.UNAUTHORIZED, "로그인이 필요한 서비스입니다."),
-
-    //403
-    UNAUTHORIZED_ACCESS(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
+    UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "접근 권한이 없습니다."),
 
     //404
     SUBJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 과목 입니다. (subjectId: %d)"),
