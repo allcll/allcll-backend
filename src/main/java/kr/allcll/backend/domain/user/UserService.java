@@ -6,13 +6,16 @@ import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
 
+    @Transactional
     public User findOrCreate(UserInfo info) {
         return userRepository.findByStudentId(info.studentId())
             .orElseGet(() -> save(info));
@@ -38,13 +41,14 @@ public class UserService {
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
     }
 
-
+    @Transactional
     public void update(Long userId, UpdateUserRequest updateUserRequest) {
         validateUserId(userId);
         User user = getById(userId);
         user.updateUser(updateUserRequest);
     }
 
+    @Transactional
     public void delete(Long userId) {
         validateUserId(userId);
         User user = getById(userId);
