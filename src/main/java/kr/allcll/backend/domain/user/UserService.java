@@ -1,5 +1,6 @@
 package kr.allcll.backend.domain.user;
 
+import kr.allcll.backend.domain.user.dto.LoginPatchRequest;
 import kr.allcll.backend.domain.user.dto.UserResponse;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
@@ -27,9 +28,7 @@ public class UserService {
     }
 
     public UserResponse getResult(Long userId) {
-        if (userId == null) {
-            throw new AllcllException(AllcllErrorCode.UNAUTHORIZED_ACCESS);
-        }
+        validateAuthenticatedUser(userId);
         User user = getById(userId);
         return UserResponse.from(user);
     }
@@ -37,5 +36,16 @@ public class UserService {
     public User getById(Long userId) {
         return userRepository.findById(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
+    }
+
+
+    public void update(Long userId, LoginPatchRequest loginPatchRequest) {
+        validateAuthenticatedUser(userId);
+    }
+
+    private void validateAuthenticatedUser(Long userId) {
+        if (userId == null) {
+            throw new AllcllException(AllcllErrorCode.UNAUTHORIZED_ACCESS);
+        }
     }
 }
