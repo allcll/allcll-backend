@@ -1,6 +1,6 @@
 package kr.allcll.backend.support.web;
 
-import static kr.allcll.backend.domain.user.LoginApi.LOGIN_SESSION;
+import static kr.allcll.backend.domain.user.AuthApi.LOGIN_SESSION;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -14,11 +14,11 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Component
-public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver {
+public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.hasParameterAnnotation(LoginUser.class)
+        return parameter.hasParameterAnnotation(Auth.class)
             && parameter.getParameterType().equals(Long.class);
     }
 

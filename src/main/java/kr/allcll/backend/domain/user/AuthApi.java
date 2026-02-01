@@ -8,7 +8,7 @@ import java.io.IOException;
 import kr.allcll.backend.domain.user.dto.LoginRequest;
 import kr.allcll.backend.domain.user.dto.LoginResult;
 import kr.allcll.backend.domain.user.dto.UserResponse;
-import kr.allcll.backend.support.web.LoginUser;
+import kr.allcll.backend.support.web.Auth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -18,17 +18,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 @RequiredArgsConstructor
-public class LoginApi {
+public class AuthApi {
 
     public static final String LOGIN_SESSION = "ALLCLL_LOGIN_SESSION";
 
-    public final LoginFacade loginFacade;
+    public final AuthFacade authFacade;
     public final UserService userService;
 
     @PostMapping("/api/auth/login")
     public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest,
         HttpServletRequest httpRequest) throws IOException {
-        LoginResult result = loginFacade.login(loginRequest);
+        LoginResult result = authFacade.login(loginRequest);
 
         HttpSession session = httpRequest.getSession(true);
         session.setAttribute(LOGIN_SESSION, result.userId());
@@ -51,7 +51,7 @@ public class LoginApi {
     }
 
     @GetMapping("/api/auth/me")
-    public ResponseEntity<UserResponse> check(@LoginUser Long userId) {
+    public ResponseEntity<UserResponse> check(@Auth Long userId) {
         UserResponse response = userService.getResult(userId);
         return ResponseEntity.ok(response);
     }

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class LoginFacade {
+public class AuthFacade {
 
     private final AuthService authService;
     private final UserFetcher userFetcher;

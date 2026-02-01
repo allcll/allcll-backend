@@ -1,8 +1,8 @@
 package kr.allcll.backend.config;
 
 import java.util.List;
+import kr.allcll.backend.support.web.AuthArgumentResolver;
 import kr.allcll.backend.support.web.AuthInterceptor;
-import kr.allcll.backend.support.web.LoginUserArgumentResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +18,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebMvcConfig implements WebMvcConfigurer {
 
     private final AuthInterceptor authInterceptor;
-    private final LoginUserArgumentResolver loginUserArgumentResolver;
+    private final AuthArgumentResolver authArgumentResolver;
 
     @Value("${cors.dev}")
     private String devUrl;
@@ -51,6 +51,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(loginUserArgumentResolver);
+        resolvers.add(authArgumentResolver);
     }
 }
