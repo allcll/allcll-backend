@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import kr.allcll.backend.domain.user.dto.UpdateUserRequest;
 import kr.allcll.backend.support.entity.BaseEntity;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
@@ -53,6 +54,12 @@ public class User extends BaseEntity {
             name,
             deptNm,
             extractAdmissionYear(studentId));
+    }
+
+    public void updateUser(UpdateUserRequest request) {
+        if (request.deptNm() != null && !request.deptNm().isBlank()) {
+            this.deptNm = request.deptNm();
+        }
     }
 
     private static int extractAdmissionYear(String studentId) {
