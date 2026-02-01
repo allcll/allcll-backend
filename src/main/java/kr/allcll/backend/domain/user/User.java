@@ -57,8 +57,8 @@ public class User extends BaseEntity {
         this.doubleDeptCd = doubleDeptCd;
     }
 
-    public void updateUser(UpdateUserRequest request) {
-        this.deptNm = request.deptNm();
+    public void updateUser(String deptNm) {
+        this.deptNm = deptNm;
     }
 
     private static int extractAdmissionYear(String studentId) {
