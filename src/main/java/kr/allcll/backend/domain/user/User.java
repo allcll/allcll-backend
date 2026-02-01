@@ -57,9 +57,7 @@ public class User extends BaseEntity {
     }
 
     public void updateUser(UpdateUserRequest request) {
-        if (request.deptNm() != null && !request.deptNm().isBlank()) {
-            this.deptNm = request.deptNm();
-        }
+        this.deptNm = request.deptNm();
     }
 
     private static int extractAdmissionYear(String studentId) {
