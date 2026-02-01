@@ -1,6 +1,5 @@
 package kr.allcll.backend.domain.user;
 
-import java.io.IOException;
 import kr.allcll.backend.domain.user.dto.LoginRequest;
 import kr.allcll.backend.domain.user.dto.LoginResult;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,7 @@ public class AuthFacade {
     private final UserFetcher userFetcher;
     private final UserService userService;
 
-    public LoginResult login(LoginRequest loginRequest) throws IOException {
+    public LoginResult login(LoginRequest loginRequest) {
         OkHttpClient client = authService.login(loginRequest);
 
         UserInfo info = userFetcher.fetch(client);

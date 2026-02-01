@@ -4,7 +4,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.io.IOException;
 import kr.allcll.backend.domain.user.dto.LoginRequest;
 import kr.allcll.backend.domain.user.dto.LoginResult;
 import kr.allcll.backend.domain.user.dto.UserResponse;
@@ -27,7 +26,7 @@ public class AuthApi {
 
     @PostMapping("/api/auth/login")
     public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest,
-        HttpServletRequest httpRequest) throws IOException {
+        HttpServletRequest httpRequest) {
         LoginResult result = authFacade.login(loginRequest);
 
         HttpSession session = httpRequest.getSession(true);
