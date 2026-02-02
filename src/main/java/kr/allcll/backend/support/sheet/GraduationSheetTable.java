@@ -16,13 +16,13 @@ public class GraduationSheetTable {
         this.dataRows = dataRows;
     }
 
-    public static GraduationSheetTable from(List<List<Object>> values) {
-        if (values == null || values.isEmpty()) {
+    public static GraduationSheetTable from(List<List<Object>> tableValues) {
+        if (tableValues == null || tableValues.isEmpty()) {
             return new GraduationSheetTable(Map.of(), List.of());
         }
 
-        Map<String, Integer> headerToIndex = buildHeaderIndex(values.get(0));
-        List<List<Object>> dataRows = extractDataRows(values);
+        Map<String, Integer> headerToIndex = buildHeaderIndex(tableValues.get(0));
+        List<List<Object>> dataRows = extractDataRows(tableValues);
 
         return new GraduationSheetTable(headerToIndex, dataRows);
     }

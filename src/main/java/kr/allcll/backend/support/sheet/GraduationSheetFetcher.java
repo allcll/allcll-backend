@@ -20,12 +20,12 @@ public class GraduationSheetFetcher {
     public GraduationSheetTable fetchAsTable(String tabName) {
         try {
             String sheetRange = tabName + TAB_RANGE_SUFFIX;
-            ValueRange response = sheets.spreadsheets().values()
+            ValueRange valueRange = sheets.spreadsheets().values()
                 .get(graduationSheetProperties.spreadsheetId(), sheetRange)
                 .execute();
 
-            List<List<Object>> values = response.getValues();
-            return GraduationSheetTable.from(values);
+            List<List<Object>> tableValues = valueRange.getValues();
+            return GraduationSheetTable.from(tableValues);
         } catch (Exception e) {
             throw new AllcllException(AllcllErrorCode.GOOGLE_SHEET_TAP_NOT_FOUND);
         }
