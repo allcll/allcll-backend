@@ -19,9 +19,9 @@ public class GraduationSheetsFetcher {
 
     public GraduationSheetTable fetchAsTable(String tabName) {
         try {
-            String range = tabName + TAB_RANGE_SUFFIX;
+            String sheetRange = tabName + TAB_RANGE_SUFFIX;
             ValueRange response = sheets.spreadsheets().values()
-                .get(graduationSheetsProperties.spreadsheetId(), range)
+                .get(graduationSheetsProperties.spreadsheetId(), sheetRange)
                 .execute();
 
             List<List<Object>> values = response.getValues();
