@@ -31,9 +31,9 @@ public class UserFetcher {
                     throw new AllcllException(AllcllErrorCode.USER_INFO_FETCH_FAIL);
                 }
 
-                Document doc = Jsoup.parse(response.body().string());
+                Document document = Jsoup.parse(response.body().string());
 
-                return parseUserInfo(doc);
+                return parseUserInfo(document);
             }
         } catch (IOException exception) {
             throw new AllcllException(AllcllErrorCode.USER_INFO_FETCH_IO_ERROR);
