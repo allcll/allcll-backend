@@ -31,8 +31,8 @@ import kr.allcll.backend.domain.graduation.department.DeptGroup;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfoRepository;
 import kr.allcll.backend.support.sheet.GraduationSheetTable;
-import kr.allcll.backend.support.sheet.GraduationSheetsFetcher;
-import kr.allcll.backend.support.sheet.GraduationSheetsProperties;
+import kr.allcll.backend.support.sheet.GraduationSheetFetcher;
+import kr.allcll.backend.support.sheet.GraduationSheetProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,10 +43,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AdminGraduationSyncService {
 
-    private final GraduationSheetsFetcher graduationSheetsFetcher;
+    private final GraduationSheetFetcher graduationSheetFetcher;
     private final RequiredCourseRepository requiredCourseRepository;
     private final CreditCriterionRepository creditCriterionRepository;
-    private final GraduationSheetsProperties graduationSheetsProperties;
+    private final GraduationSheetProperties graduationSheetProperties;
     private final GraduationCertRuleRepository graduationCertRuleRepository;
     private final BalanceRequiredRuleRepository balanceRequiredRuleRepository;
     private final CodingCertCriterionRepository codingCertCriterionRepository;
@@ -76,8 +76,8 @@ public class AdminGraduationSyncService {
     }
 
     private void syncCreditCriteria() {
-        String tabName = graduationSheetsProperties.tabs().get("credit-criteria");
-        GraduationSheetTable graduationSheetTable = graduationSheetsFetcher.fetchAsTable(tabName);
+        String tabName = graduationSheetProperties.tabs().get("credit-criteria");
+        GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
 
         List<CreditCriterion> creditCriterionList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
@@ -102,8 +102,8 @@ public class AdminGraduationSyncService {
     }
 
     private void syncRequiredCourses() {
-        String tabName = graduationSheetsProperties.tabs().get("required-courses");
-        GraduationSheetTable graduationSheetTable = graduationSheetsFetcher.fetchAsTable(tabName);
+        String tabName = graduationSheetProperties.tabs().get("required-courses");
+        GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
 
         List<RequiredCourse> requiredCourseList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
@@ -128,8 +128,8 @@ public class AdminGraduationSyncService {
     }
 
     private void syncBalanceRequiredRule() {
-        String tabName = graduationSheetsProperties.tabs().get("balance-required-rules");
-        GraduationSheetTable graduationSheetTable = graduationSheetsFetcher.fetchAsTable(tabName);
+        String tabName = graduationSheetProperties.tabs().get("balance-required-rules");
+        GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
 
         List<BalanceRequiredRule> balanceRequiredRuleList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
@@ -150,8 +150,8 @@ public class AdminGraduationSyncService {
     }
 
     private void syncBalanceRequiredCourseAreaMap() {
-        String tabName = graduationSheetsProperties.tabs().get("balance-required-course-area-map");
-        GraduationSheetTable graduationSheetTable = graduationSheetsFetcher.fetchAsTable(tabName);
+        String tabName = graduationSheetProperties.tabs().get("balance-required-course-area-map");
+        GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
 
         List<BalanceRequiredCourseAreaMap> balanceRequiredCourseAreaMapList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
@@ -172,8 +172,8 @@ public class AdminGraduationSyncService {
     }
 
     private void syncBalanceRequiredAreaExclusion() {
-        String tabName = graduationSheetsProperties.tabs().get("balance-required-area-exclusions");
-        GraduationSheetTable graduationSheetTable = graduationSheetsFetcher.fetchAsTable(tabName);
+        String tabName = graduationSheetProperties.tabs().get("balance-required-area-exclusions");
+        GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
 
         List<BalanceRequiredAreaExclusion> balanceRequiredAreaExclusionList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
@@ -193,8 +193,8 @@ public class AdminGraduationSyncService {
     }
 
     private void syncGraduationCertRule() {
-        String tabName = graduationSheetsProperties.tabs().get("graduation-cert-rules");
-        GraduationSheetTable graduationSheetTable = graduationSheetsFetcher.fetchAsTable(tabName);
+        String tabName = graduationSheetProperties.tabs().get("graduation-cert-rules");
+        GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
 
         List<GraduationCertRule> graduationCertRuleList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
@@ -218,8 +218,8 @@ public class AdminGraduationSyncService {
     }
 
     private void syncEnglishCertCriteria() {
-        String tabName = graduationSheetsProperties.tabs().get("english-cert-criteria");
-        GraduationSheetTable graduationSheetTable = graduationSheetsFetcher.fetchAsTable(tabName);
+        String tabName = graduationSheetProperties.tabs().get("english-cert-criteria");
+        GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
 
         List<EnglishCertCriterion> englishCertCriterionList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
@@ -250,8 +250,8 @@ public class AdminGraduationSyncService {
     }
 
     private void syncCodingCertCriteria() {
-        String tabName = graduationSheetsProperties.tabs().get("coding-cert-criteria");
-        GraduationSheetTable graduationSheetTable = graduationSheetsFetcher.fetchAsTable(tabName);
+        String tabName = graduationSheetProperties.tabs().get("coding-cert-criteria");
+        GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
 
         List<CodingCertCriterion> codingCertCriterionList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
@@ -276,8 +276,8 @@ public class AdminGraduationSyncService {
     }
 
     private void syncClassicCertCriteria() {
-        String tabName = graduationSheetsProperties.tabs().get("classic-cert-criteria");
-        GraduationSheetTable graduationSheetTable = graduationSheetsFetcher.fetchAsTable(tabName);
+        String tabName = graduationSheetProperties.tabs().get("classic-cert-criteria");
+        GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
 
         List<ClassicCertCriterion> classicCertCriterionList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
@@ -301,8 +301,8 @@ public class AdminGraduationSyncService {
     }
 
     private void syncGraduationDepartmentInfo() {
-        String tabName = graduationSheetsProperties.tabs().get("graduation-department-info");
-        GraduationSheetTable graduationSheetTable = graduationSheetsFetcher.fetchAsTable(tabName);
+        String tabName = graduationSheetProperties.tabs().get("graduation-department-info");
+        GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
 
         List<GraduationDepartmentInfo> graduationDepartmentInfoList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {

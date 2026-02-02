@@ -4,7 +4,7 @@ import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "google.sheets")
-public record GraduationSheetsProperties(
+public record GraduationSheetProperties(
     String applicationName,
     String credentialsLocation,
     String spreadsheetId,

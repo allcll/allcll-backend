@@ -10,18 +10,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class GraduationSheetsFetcher {
+public class GraduationSheetFetcher {
 
     public static final String TAB_RANGE_SUFFIX = "!A:Z";
 
     private final Sheets sheets;
-    private final GraduationSheetsProperties graduationSheetsProperties;
+    private final GraduationSheetProperties graduationSheetProperties;
 
     public GraduationSheetTable fetchAsTable(String tabName) {
         try {
             String sheetRange = tabName + TAB_RANGE_SUFFIX;
             ValueRange response = sheets.spreadsheets().values()
-                .get(graduationSheetsProperties.spreadsheetId(), sheetRange)
+                .get(graduationSheetProperties.spreadsheetId(), sheetRange)
                 .execute();
 
             List<List<Object>> values = response.getValues();
