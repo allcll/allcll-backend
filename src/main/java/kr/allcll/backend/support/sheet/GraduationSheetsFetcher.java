@@ -12,14 +12,14 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class GraduationSheetsFetcher {
 
-    public static final String SHEETRANGE = "!A:Z";
+    public static final String TAB_RANGE_SUFFIX = "!A:Z";
 
     private final Sheets sheets;
     private final GraduationSheetsProperties graduationSheetsProperties;
 
     public GraduationSheetTable fetchAsTable(String tabName) {
         try {
-            String range = tabName + SHEETRANGE;
+            String range = tabName + TAB_RANGE_SUFFIX;
             ValueRange response = sheets.spreadsheets().values()
                 .get(graduationSheetsProperties.spreadsheetId(), range)
                 .execute();
