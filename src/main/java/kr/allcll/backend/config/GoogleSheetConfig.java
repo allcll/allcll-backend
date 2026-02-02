@@ -6,6 +6,7 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
@@ -33,7 +34,10 @@ public class GoogleSheetConfig {
             throw new AllcllException(AllcllErrorCode.GOOGLE_KEY_NOT_FOUND);
         }
 
-        GoogleCredentials googleCredentials = GoogleCredentials.fromStream(key.getInputStream());
+        GoogleCredentials googleCredentials;
+        try (InputStream is = key.getInputStream()) {
+            googleCredentials = GoogleCredentials.fromStream(is);
+        }
 
         return new Sheets.Builder(
             GoogleNetHttpTransport.newTrustedTransport(),
