@@ -6,9 +6,9 @@ public record UserResponse(
     Long id,
     String studentId,
     String name,
-    //String collegeNm,
+    String collegeNm,
     String deptNm,
-    //String deptCd,
+    String deptCd,
     int admissionYear
 ) {
 
@@ -17,7 +17,9 @@ public record UserResponse(
             user.getId(),
             user.getStudentId(),
             user.getName(),
+            user.getCollegeNm(),
             user.getDeptNm(),
+            user.getDeptCd(),
             user.getAdmissionYear()
         );
     }
