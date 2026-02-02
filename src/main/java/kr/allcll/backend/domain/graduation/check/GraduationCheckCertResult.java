@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "graduation_check_cert_result")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class GraduationCheckCertificationResult {
+public class GraduationCheckCertResult {
 
     @Id
     @Column(name = "user_id", nullable = false)
@@ -82,7 +82,8 @@ public class GraduationCheckCertificationResult {
     @Column(name = "classics_domain4_satisfied", nullable = false)
     private Boolean classicsDomain4Satisfied;  // 과학 사상 통과 여부 (선택)
 
-    public GraduationCheckCertificationResult(Long userId, GraduationCertRuleType graduationCertRuleType,
+    public GraduationCheckCertResult(
+        Long userId, GraduationCertRuleType graduationCertRuleType,
         Integer passedCount, Integer requiredPassCount, Boolean isSatisfied, Boolean englishPass, Boolean codingPass,
         Boolean classicsPass, Integer classicsTotalRequiredCount, Integer classicsTotalMyCount,
         Integer classicsDomain1RequiredCount, Integer classicsDomain1MyCount, Boolean classicsDomain1Satisfied,
