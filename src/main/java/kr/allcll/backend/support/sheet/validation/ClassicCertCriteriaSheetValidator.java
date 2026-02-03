@@ -1,22 +1,24 @@
-package kr.allcll.backend.support.sheet;
+package kr.allcll.backend.support.sheet.validation;
 
 import java.util.List;
-import kr.allcll.backend.domain.graduation.balance.BalanceRequiredArea;
-import kr.allcll.backend.domain.graduation.department.DeptGroup;
+import kr.allcll.backend.support.sheet.GraduationSheetTable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class BalanceRequiredAreaExclusionsSheetValidator implements GraduationSheetValidator {
+public class ClassicCertCriteriaSheetValidator implements GraduationSheetValidator {
 
-    private static final String TAB_NAME = "balance-required-area-exclusions";
+    private static final String TAB_NAME = "classic-cert-criteria";
 
     private static final List<String> REQUIRED_HEADERS = List.of(
         "admission_year",
         "admission_year_short",
-        "dept_group",
-        "balance_required_area"
+        "total_required_count",
+        "required_count_western",
+        "required_count_eastern",
+        "required_count_eastern_and_western",
+        "required_count_science"
     );
 
     private final GraduationSheetValidationSupport graduationSheetValidationSupport;
@@ -37,9 +39,11 @@ public class BalanceRequiredAreaExclusionsSheetValidator implements GraduationSh
 
             graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "admission_year");
             graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "admission_year_short");
-            graduationSheetValidationSupport.requireEnum(TAB_NAME, sheetTable, dataRow, rowIndex, "dept_group", DeptGroup.class);
-            graduationSheetValidationSupport.requireEnum(TAB_NAME, sheetTable, dataRow, rowIndex, "balance_required_area", BalanceRequiredArea.class);
+            graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "total_required_count");
+            graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "required_count_western");
+            graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "required_count_eastern");
+            graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "required_count_eastern_and_western");
+            graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "required_count_science");
         }
     }
 }
-

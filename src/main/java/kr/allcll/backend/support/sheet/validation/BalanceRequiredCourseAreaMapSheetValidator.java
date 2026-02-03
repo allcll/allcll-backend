@@ -1,24 +1,23 @@
-package kr.allcll.backend.support.sheet;
+package kr.allcll.backend.support.sheet.validation;
 
 import java.util.List;
-import kr.allcll.backend.domain.graduation.credit.CategoryType;
+import kr.allcll.backend.domain.graduation.balance.BalanceRequiredArea;
+import kr.allcll.backend.support.sheet.GraduationSheetTable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class RequiredCoursesSheetValidator implements GraduationSheetValidator {
+public class BalanceRequiredCourseAreaMapSheetValidator implements GraduationSheetValidator {
 
-    private static final String TAB_NAME = "required-courses";
+    private static final String TAB_NAME = "balance-required-course-area-map";
 
     private static final List<String> REQUIRED_HEADERS = List.of(
         "admission_year",
         "admission_year_short",
-        "dept_cd",
-        "category_type",
         "curi_no",
         "curi_nm",
-        "required"
+        "balance_required_area"
     );
 
     private final GraduationSheetValidationSupport graduationSheetValidationSupport;
@@ -39,11 +38,10 @@ public class RequiredCoursesSheetValidator implements GraduationSheetValidator {
 
             graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "admission_year");
             graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "admission_year_short");
-            graduationSheetValidationSupport.requireString(TAB_NAME, sheetTable, dataRow, rowIndex, "dept_cd");
-            graduationSheetValidationSupport.requireEnum(TAB_NAME, sheetTable, dataRow, rowIndex, "category_type", CategoryType.class);
             graduationSheetValidationSupport.requireString(TAB_NAME, sheetTable, dataRow, rowIndex, "curi_no");
             graduationSheetValidationSupport.requireString(TAB_NAME, sheetTable, dataRow, rowIndex, "curi_nm");
-            graduationSheetValidationSupport.requireBoolean(TAB_NAME, sheetTable, dataRow, rowIndex, "required");
+            graduationSheetValidationSupport.requireEnum(TAB_NAME, sheetTable, dataRow, rowIndex,
+                "balance_required_area", BalanceRequiredArea.class);
         }
     }
 }

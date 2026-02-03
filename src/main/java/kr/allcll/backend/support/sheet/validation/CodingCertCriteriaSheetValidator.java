@@ -1,22 +1,23 @@
-package kr.allcll.backend.support.sheet;
+package kr.allcll.backend.support.sheet.validation;
+
 
 import java.util.List;
-import kr.allcll.backend.domain.graduation.balance.BalanceRequiredArea;
+import kr.allcll.backend.domain.graduation.certification.CodingTargetType;
+import kr.allcll.backend.support.sheet.GraduationSheetTable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class BalanceRequiredCourseAreaMapSheetValidator implements GraduationSheetValidator {
+public class CodingCertCriteriaSheetValidator implements GraduationSheetValidator {
 
-    private static final String TAB_NAME = "balance-required-course-area-map";
+    private static final String TAB_NAME = "coding-cert-criteria";
 
     private static final List<String> REQUIRED_HEADERS = List.of(
         "admission_year",
         "admission_year_short",
-        "curi_no",
-        "curi_nm",
-        "balance_required_area"
+        "coding_target_type",
+        "tosc_min_level"
     );
 
     private final GraduationSheetValidationSupport graduationSheetValidationSupport;
@@ -37,10 +38,8 @@ public class BalanceRequiredCourseAreaMapSheetValidator implements GraduationShe
 
             graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "admission_year");
             graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "admission_year_short");
-            graduationSheetValidationSupport.requireString(TAB_NAME, sheetTable, dataRow, rowIndex, "curi_no");
-            graduationSheetValidationSupport.requireString(TAB_NAME, sheetTable, dataRow, rowIndex, "curi_nm");
-            graduationSheetValidationSupport.requireEnum(TAB_NAME, sheetTable, dataRow, rowIndex,
-                "balance_required_area", BalanceRequiredArea.class);
+            graduationSheetValidationSupport.requireEnum(TAB_NAME, sheetTable, dataRow, rowIndex, "coding_target_type", CodingTargetType.class);
+            graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "tosc_min_level");
         }
     }
 }

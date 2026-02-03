@@ -1,22 +1,21 @@
-package kr.allcll.backend.support.sheet;
-
+package kr.allcll.backend.support.sheet.validation;
 
 import java.util.List;
-import kr.allcll.backend.domain.graduation.certification.CodingTargetType;
+import kr.allcll.backend.support.sheet.GraduationSheetTable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class CodingCertCriteriaSheetValidator implements GraduationSheetValidator {
+public class BalanceRequiredRulesSheetValidator implements GraduationSheetValidator {
 
-    private static final String TAB_NAME = "coding-cert-criteria";
+    private static final String TAB_NAME = "balance-required-rules";
 
     private static final List<String> REQUIRED_HEADERS = List.of(
         "admission_year",
         "admission_year_short",
-        "coding_target_type",
-        "tosc_min_level"
+        "required_areas_cnt",
+        "required_credits"
     );
 
     private final GraduationSheetValidationSupport graduationSheetValidationSupport;
@@ -37,8 +36,8 @@ public class CodingCertCriteriaSheetValidator implements GraduationSheetValidato
 
             graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "admission_year");
             graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "admission_year_short");
-            graduationSheetValidationSupport.requireEnum(TAB_NAME, sheetTable, dataRow, rowIndex, "coding_target_type", CodingTargetType.class);
-            graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "tosc_min_level");
+            graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "required_areas_cnt");
+            graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "required_credits");
         }
     }
 }

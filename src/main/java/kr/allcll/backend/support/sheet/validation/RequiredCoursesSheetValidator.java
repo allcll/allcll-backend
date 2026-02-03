@@ -1,25 +1,25 @@
-package kr.allcll.backend.support.sheet;
-
+package kr.allcll.backend.support.sheet.validation;
 
 import java.util.List;
-import kr.allcll.backend.domain.graduation.certification.GraduationCertRuleType;
+import kr.allcll.backend.domain.graduation.credit.CategoryType;
+import kr.allcll.backend.support.sheet.GraduationSheetTable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class GraduationCertRulesSheetValidator implements GraduationSheetValidator {
+public class RequiredCoursesSheetValidator implements GraduationSheetValidator {
 
-    private static final String TAB_NAME = "graduation-cert-rules";
+    private static final String TAB_NAME = "required-courses";
 
     private static final List<String> REQUIRED_HEADERS = List.of(
         "admission_year",
         "admission_year_short",
-        "graduation_cert_rule_type",
-        "required_pass_count",
-        "enable_english",
-        "enable_classic",
-        "enable_coding"
+        "dept_cd",
+        "category_type",
+        "curi_no",
+        "curi_nm",
+        "required"
     );
 
     private final GraduationSheetValidationSupport graduationSheetValidationSupport;
@@ -40,11 +40,11 @@ public class GraduationCertRulesSheetValidator implements GraduationSheetValidat
 
             graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "admission_year");
             graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "admission_year_short");
-            graduationSheetValidationSupport.requireEnum(TAB_NAME, sheetTable, dataRow, rowIndex, "graduation_cert_rule_type", GraduationCertRuleType.class);
-            graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "required_pass_count");
-            graduationSheetValidationSupport.requireBoolean(TAB_NAME, sheetTable, dataRow, rowIndex, "enable_english");
-            graduationSheetValidationSupport.requireBoolean(TAB_NAME, sheetTable, dataRow, rowIndex, "enable_classic");
-            graduationSheetValidationSupport.requireBoolean(TAB_NAME, sheetTable, dataRow, rowIndex, "enable_coding");
+            graduationSheetValidationSupport.requireString(TAB_NAME, sheetTable, dataRow, rowIndex, "dept_cd");
+            graduationSheetValidationSupport.requireEnum(TAB_NAME, sheetTable, dataRow, rowIndex, "category_type", CategoryType.class);
+            graduationSheetValidationSupport.requireString(TAB_NAME, sheetTable, dataRow, rowIndex, "curi_no");
+            graduationSheetValidationSupport.requireString(TAB_NAME, sheetTable, dataRow, rowIndex, "curi_nm");
+            graduationSheetValidationSupport.requireBoolean(TAB_NAME, sheetTable, dataRow, rowIndex, "required");
         }
     }
 }

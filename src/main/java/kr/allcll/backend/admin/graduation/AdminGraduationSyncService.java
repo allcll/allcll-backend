@@ -33,7 +33,7 @@ import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfoRe
 import kr.allcll.backend.support.sheet.GraduationSheetTable;
 import kr.allcll.backend.support.sheet.GraduationSheetFetcher;
 import kr.allcll.backend.support.sheet.GraduationSheetProperties;
-import kr.allcll.backend.support.sheet.GraduationSheetValidatorRegistry;
+import kr.allcll.backend.support.sheet.validation.GraduationSheetValidatorRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,6 @@
-package kr.allcll.backend.support.sheet;
+package kr.allcll.backend.support.sheet.validation;
+
+import kr.allcll.backend.support.sheet.GraduationSheetTable;
 
 public interface GraduationSheetValidator {
 

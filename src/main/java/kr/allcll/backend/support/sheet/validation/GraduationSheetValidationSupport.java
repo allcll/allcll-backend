@@ -1,8 +1,9 @@
-package kr.allcll.backend.support.sheet;
+package kr.allcll.backend.support.sheet.validation;
 
 import java.util.List;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
+import kr.allcll.backend.support.sheet.GraduationSheetTable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

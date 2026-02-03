@@ -1,20 +1,23 @@
-package kr.allcll.backend.support.sheet;
+package kr.allcll.backend.support.sheet.validation;
 
 import java.util.List;
+import kr.allcll.backend.domain.graduation.balance.BalanceRequiredArea;
+import kr.allcll.backend.domain.graduation.department.DeptGroup;
+import kr.allcll.backend.support.sheet.GraduationSheetTable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class BalanceRequiredRulesSheetValidator implements GraduationSheetValidator {
+public class BalanceRequiredAreaExclusionsSheetValidator implements GraduationSheetValidator {
 
-    private static final String TAB_NAME = "balance-required-rules";
+    private static final String TAB_NAME = "balance-required-area-exclusions";
 
     private static final List<String> REQUIRED_HEADERS = List.of(
         "admission_year",
         "admission_year_short",
-        "required_areas_cnt",
-        "required_credits"
+        "dept_group",
+        "balance_required_area"
     );
 
     private final GraduationSheetValidationSupport graduationSheetValidationSupport;
@@ -35,8 +38,8 @@ public class BalanceRequiredRulesSheetValidator implements GraduationSheetValida
 
             graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "admission_year");
             graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "admission_year_short");
-            graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "required_areas_cnt");
-            graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "required_credits");
+            graduationSheetValidationSupport.requireEnum(TAB_NAME, sheetTable, dataRow, rowIndex, "dept_group", DeptGroup.class);
+            graduationSheetValidationSupport.requireEnum(TAB_NAME, sheetTable, dataRow, rowIndex, "balance_required_area", BalanceRequiredArea.class);
         }
     }
 }
