@@ -4,5 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface GraduationDepartmentInfoRepository extends JpaRepository<GraduationDepartmentInfo, Long> {
 
-    GraduationDepartmentInfo findByDeptNm(String s);
+    GraduationDepartmentInfo findByDeptNm(String deptNm);
 }
