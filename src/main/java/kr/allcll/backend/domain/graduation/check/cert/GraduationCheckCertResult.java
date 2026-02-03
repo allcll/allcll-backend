@@ -34,14 +34,14 @@ public class GraduationCheckCertResult {
     @Column(name = "is_satisfied", nullable = false)
     private Boolean isSatisfied;  // 최종 졸업인증제도 통과 여부
 
-    @Column(name = "english_pass", nullable = false)
-    private Boolean englishPass;  // 영어 인증 통과 여부
+    @Column(name = "english_passed", nullable = false)
+    private Boolean englishPassed;  // 영어 인증 통과 여부
 
-    @Column(name = "coding_pass", nullable = false)
-    private Boolean codingPass;  // 코딩 인증 통과 여부
+    @Column(name = "coding_passed", nullable = false)
+    private Boolean codingPassed;  // 코딩 인증 통과 여부
 
-    @Column(name = "classics_pass", nullable = false)
-    private Boolean classicsPass;  // 고전독서 인증 통과 여부
+    @Column(name = "classics_passed", nullable = false)
+    private Boolean classicsPassed;  // 고전독서 인증 통과 여부
 
     @Column(name = "classics_total_required_count", nullable = false)
     private Integer classicsTotalRequiredCount;  // 전체 요구 권수
@@ -87,8 +87,9 @@ public class GraduationCheckCertResult {
 
     public GraduationCheckCertResult(
         Long userId, GraduationCertRuleType graduationCertRuleType,
-        Integer passedCount, Integer requiredPassCount, Boolean isSatisfied, Boolean englishPass, Boolean codingPass,
-        Boolean classicsPass, Integer classicsTotalRequiredCount, Integer classicsTotalMyCount,
+        Integer passedCount, Integer requiredPassCount, Boolean isSatisfied, Boolean englishPassed,
+        Boolean codingPassed,
+        Boolean classicsPassed, Integer classicsTotalRequiredCount, Integer classicsTotalMyCount,
         Integer classicsDomain1RequiredCount, Integer classicsDomain1MyCount, Boolean classicsDomain1Satisfied,
         Integer classicsDomain2RequiredCount, Integer classicsDomain2MyCount, Boolean classicsDomain2Satisfied,
         Integer classicsDomain3RequiredCount, Integer classicsDomain3MyCount, Boolean classicsDomain3Satisfied,
@@ -98,9 +99,9 @@ public class GraduationCheckCertResult {
         this.passedCount = passedCount;
         this.requiredPassCount = requiredPassCount;
         this.isSatisfied = isSatisfied;
-        this.englishPass = englishPass;
-        this.codingPass = codingPass;
-        this.classicsPass = classicsPass;
+        this.englishPassed = englishPassed;
+        this.codingPassed = codingPassed;
+        this.classicsPassed = classicsPassed;
         this.classicsTotalRequiredCount = classicsTotalRequiredCount;
         this.classicsTotalMyCount = classicsTotalMyCount;
         this.classicsDomain1RequiredCount = classicsDomain1RequiredCount;

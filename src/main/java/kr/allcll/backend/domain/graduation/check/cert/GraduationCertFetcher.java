@@ -145,10 +145,14 @@ public class GraduationCertFetcher {
         return new ClassicsCounts(
             totalRequired,
             totalCompleted,
-            westernCertRequired, westernCompleted,
-            easternCertRequired, easternCompleted,
-            literatureCertRequired, literatureCompleted,
-            scienceCertRequired, scienceCompleted
+            westernCertRequired,
+            westernCompleted,
+            easternCertRequired,
+            easternCompleted,
+            literatureCertRequired,
+            literatureCompleted,
+            scienceCertRequired,
+            scienceCompleted
         );
     }
 
