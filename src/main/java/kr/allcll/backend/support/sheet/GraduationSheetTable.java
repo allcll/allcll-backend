@@ -8,6 +8,8 @@ import lombok.Getter;
 @Getter
 public class GraduationSheetTable {
 
+    private static final String TRUE_FLAG = "1";
+
     private final Map<String, Integer> headerToIndex;
     private final List<List<Object>> dataRows;
 
@@ -55,7 +57,7 @@ public class GraduationSheetTable {
             return null;
         }
 
-        if ("1".equals(value)) {
+        if (TRUE_FLAG.equals(value)) {
             return true;
         }
         return false;
