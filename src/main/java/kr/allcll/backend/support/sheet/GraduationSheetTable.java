@@ -21,7 +21,7 @@ public class GraduationSheetTable {
             return new GraduationSheetTable(Map.of(), List.of());
         }
 
-        Map<String, Integer> headerToIndex = buildHeaderIndex(tableValues.get(0));
+        Map<String, Integer> headerToIndex = buildHeaderIndex(tableValues.getFirst());
         List<List<Object>> dataRows = extractDataRows(tableValues);
 
         return new GraduationSheetTable(headerToIndex, dataRows);
