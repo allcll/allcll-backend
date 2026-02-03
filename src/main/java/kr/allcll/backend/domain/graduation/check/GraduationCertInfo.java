@@ -1,9 +1,9 @@
 package kr.allcll.backend.domain.graduation.check;
 
 public record GraduationCertInfo(
-    Boolean englishPass,   // 영어 인증 통과 여부
-    Boolean codingPass,  // 코딩 인증 통과 여부
-    Boolean classicsPass,  // 고전독서 인증 통과 여부
+    boolean englishPass,   // 영어 인증 통과 여부
+    boolean codingPass,  // 코딩 인증 통과 여부
+    boolean classicsPass,  // 고전독서 인증 통과 여부
     int classicsTotalRequiredCount,  // 전체 요구 권수
     int classicsTotalMyCount,  // 내 총 인증 권수
     int classicsDomain1RequiredCount,  // 서양의 역사와 사상 요구 권수

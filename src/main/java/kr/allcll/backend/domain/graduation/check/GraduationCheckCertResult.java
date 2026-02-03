@@ -2,6 +2,8 @@ package kr.allcll.backend.domain.graduation.check;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import kr.allcll.backend.domain.graduation.certification.GraduationCertRuleType;
@@ -19,6 +21,7 @@ public class GraduationCheckCertResult {
     @Column(name = "user_id", nullable = false)
     private Long userId;  // 사용자 id
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "graduation_cert_rule_type", nullable = false)
     private GraduationCertRuleType graduationCertRuleType;  // 인증 정책 타입
 

@@ -2,6 +2,8 @@ package kr.allcll.backend.domain.graduation.check;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,6 +32,7 @@ public class GraduationCheckCategoryResult {
     @Column(name = "user_id", nullable = false)
     private Long userId;  // 사용자 id
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "category_type", nullable = false)
     private CategoryType categoryType;  // 이수구분
 
