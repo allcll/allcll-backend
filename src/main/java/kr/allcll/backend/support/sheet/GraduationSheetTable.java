@@ -42,7 +42,6 @@ public class GraduationSheetTable {
         if (value.isBlank()) {
             return null;
         }
-
         return value;
     }
 
@@ -59,11 +58,7 @@ public class GraduationSheetTable {
         if (value == null) {
             return null;
         }
-
-        if (TRUE_FLAG.equals(value)) {
-            return true;
-        }
-        return false;
+        return TRUE_FLAG.equals(value);
     }
 
     public <T extends Enum<T>> T getEnum(List<Object> row, String sheetHeader, Class<T> type) {
@@ -87,7 +82,6 @@ public class GraduationSheetTable {
         if (index < 0 || index >= row.size()) {
             return null;
         }
-
         return row.get(index);
     }
 
@@ -104,7 +98,6 @@ public class GraduationSheetTable {
             }
             headerToIndex.put(sheetHeader, i);
         }
-
         return headerToIndex;
     }
 
