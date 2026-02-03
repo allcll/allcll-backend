@@ -47,6 +47,10 @@ public enum AllcllErrorCode {
     STUDENT_ID_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "잘못된 학번 정보입니다: %s"),
     SEJONG_LOGIN_IO_ERROR(HttpStatus.BAD_GATEWAY, "세종포털 로그인 서버와 통신 중 오류가 발생했습니다."),
     USER_INFO_FETCH_IO_ERROR(HttpStatus.BAD_GATEWAY, "세종포털 사용자 정보 조회에 실패하였습니다."),
+    ENGLISH_INFO_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "영어 인증 정보를 불러오지 못했습니다."),
+    CODING_INFO_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "코딩 인증 정보를 불러오지 못했습니다."),
+    CLASSIC_INFO_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "고전독서 인증 정보를 불러오지 못했습니다."),
+    CLASSIC_DETAIL_INFO_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "고전독서 인증 영역 별 상세 정보를 불러오지 못했습니다."),
 
     /* ================= 클라이언트 에러 ================= */
     NOT_FOUND_API(HttpStatus.NOT_FOUND, "요청한 API를 찾을 수 없습니다."),
