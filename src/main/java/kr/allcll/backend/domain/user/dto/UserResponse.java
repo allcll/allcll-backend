@@ -1,15 +1,15 @@
 package kr.allcll.backend.domain.user.dto;
 
+import kr.allcll.backend.domain.graduation.MajorType;
 import kr.allcll.backend.domain.user.User;
 
 public record UserResponse(
     Long id,
     String studentId,
-    String name,
-    String collegeNm,
-    String deptNm,
+    String studentName,
+    String deptName,
     String deptCd,
-    int admissionYear
+    MajorType majorType
 ) {
 
     public static UserResponse from(User user) {
@@ -17,10 +17,9 @@ public record UserResponse(
             user.getId(),
             user.getStudentId(),
             user.getName(),
-            user.getCollegeNm(),
             user.getDeptNm(),
             user.getDeptCd(),
-            user.getAdmissionYear()
+            user.getMajorType()
         );
     }
 }
