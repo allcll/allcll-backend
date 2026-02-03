@@ -17,7 +17,8 @@ public class GraduationCertService {
     public void createOrUpdate(User user, GraduationCertInfo certInfo) {
         int admissionYear = user.getAdmissionYear();
         GraduationCertRule certRule = graduationCertRuleRepository.findByAdmissionYear(admissionYear);
-        int passedCount = getPassedCount(certInfo.englishPass(), certInfo.classicsPass(), certInfo.codingPass());
+        int passedCount = getPassedCount(certInfo.isEnglishCertPassed(), certInfo.isClassicCertPassed(),
+            certInfo.isCodingCertPassed());
         int requiredPassCount = certRule.getRequiredPassCount();
 
         boolean isTotalSatisfied = isSatisfied(passedCount, requiredPassCount);
@@ -37,9 +38,9 @@ public class GraduationCertService {
                 passedCount,
                 requiredPassCount,
                 isTotalSatisfied,
-                certInfo.englishPass(),
-                certInfo.codingPass(),
-                certInfo.classicsPass(),
+                certInfo.isEnglishCertPassed(),
+                certInfo.isCodingCertPassed(),
+                certInfo.isClassicCertPassed(),
                 certInfo.classicsTotalRequiredCount(),
                 certInfo.classicsTotalMyCount(),
                 certInfo.classicsDomain1RequiredCount(),
