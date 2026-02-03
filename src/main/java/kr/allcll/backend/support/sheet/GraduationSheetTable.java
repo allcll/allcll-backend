@@ -9,6 +9,9 @@ import lombok.Getter;
 public class GraduationSheetTable {
 
     private static final String TRUE_FLAG = "1";
+    private static final int HEADER_ROW_INDEX = 0;
+    private static final int FIRST_DATA_ROW_INDEX = HEADER_ROW_INDEX + 1;
+
 
     private final Map<String, Integer> headerToIndex;
     private final List<List<Object>> dataRows;
@@ -106,9 +109,9 @@ public class GraduationSheetTable {
     }
 
     private static List<List<Object>> extractDataRows(List<List<Object>> values) {
-        if (values.size() <= 1) {
+        if (values.size() <= FIRST_DATA_ROW_INDEX) {
             return List.of();
         }
-        return values.subList(1, values.size());
+        return values.subList(FIRST_DATA_ROW_INDEX, values.size());
     }
 }
