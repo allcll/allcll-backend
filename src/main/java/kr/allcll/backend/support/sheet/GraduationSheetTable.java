@@ -108,10 +108,10 @@ public class GraduationSheetTable {
         return headerToIndex;
     }
 
-    private static List<List<Object>> extractDataRows(List<List<Object>> values) {
-        if (values.size() <= FIRST_DATA_ROW_INDEX) {
+    private static List<List<Object>> extractDataRows(List<List<Object>> tableValues) {
+        if (tableValues.size() <= FIRST_DATA_ROW_INDEX) {
             return List.of();
         }
-        return values.subList(FIRST_DATA_ROW_INDEX, values.size());
+        return tableValues.subList(FIRST_DATA_ROW_INDEX, tableValues.size());
     }
 }
