@@ -8,8 +8,8 @@ import lombok.Getter;
 @Getter
 public class GraduationSheetTable {
 
-    private final List<List<Object>> dataRows;
     private final Map<String, Integer> headerToIndex;
+    private final List<List<Object>> dataRows;
 
     private GraduationSheetTable(Map<String, Integer> headerToIndex, List<List<Object>> dataRows) {
         this.headerToIndex = headerToIndex;
