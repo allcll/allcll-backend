@@ -33,6 +33,7 @@ import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfoRe
 import kr.allcll.backend.support.sheet.GraduationSheetTable;
 import kr.allcll.backend.support.sheet.GraduationSheetFetcher;
 import kr.allcll.backend.support.sheet.GraduationSheetProperties;
+import kr.allcll.backend.support.sheet.GraduationSheetValidatorRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -52,6 +53,7 @@ public class AdminGraduationSyncService {
     private final CodingCertCriterionRepository codingCertCriterionRepository;
     private final ClassicCertCriterionRepository classicCertCriterionRepository;
     private final EnglishCertCriterionRepository englishCertCriterionRepository;
+    private final GraduationSheetValidatorRegistry graduationSheetValidatorRegistry;
     private final GraduationDepartmentInfoRepository graduationDepartmentInfoRepository;
     private final BalanceRequiredCourseAreaMapRepository balanceRequiredCourseAreaMapRepository;
     private final BalanceRequiredAreaExclusionRepository balanceRequiredAreaExclusionRepository;
@@ -79,6 +81,8 @@ public class AdminGraduationSyncService {
         String tabName = graduationSheetProperties.tabs().get("credit-criteria");
         GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
 
+        graduationSheetValidatorRegistry.get(tabName).validate(graduationSheetTable);
+
         List<CreditCriterion> creditCriterionList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
             CreditCriterion creditCriterion = new CreditCriterion(
@@ -104,6 +108,8 @@ public class AdminGraduationSyncService {
     private void syncRequiredCourses() {
         String tabName = graduationSheetProperties.tabs().get("required-courses");
         GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
+
+        graduationSheetValidatorRegistry.get(tabName).validate(graduationSheetTable);
 
         List<RequiredCourse> requiredCourseList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
@@ -131,6 +137,8 @@ public class AdminGraduationSyncService {
         String tabName = graduationSheetProperties.tabs().get("balance-required-rules");
         GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
 
+        graduationSheetValidatorRegistry.get(tabName).validate(graduationSheetTable);
+
         List<BalanceRequiredRule> balanceRequiredRuleList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
             BalanceRequiredRule balanceRequiredRule = new BalanceRequiredRule(
@@ -152,6 +160,8 @@ public class AdminGraduationSyncService {
     private void syncBalanceRequiredCourseAreaMap() {
         String tabName = graduationSheetProperties.tabs().get("balance-required-course-area-map");
         GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
+
+        graduationSheetValidatorRegistry.get(tabName).validate(graduationSheetTable);
 
         List<BalanceRequiredCourseAreaMap> balanceRequiredCourseAreaMapList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
@@ -175,6 +185,8 @@ public class AdminGraduationSyncService {
         String tabName = graduationSheetProperties.tabs().get("balance-required-area-exclusions");
         GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
 
+        graduationSheetValidatorRegistry.get(tabName).validate(graduationSheetTable);
+
         List<BalanceRequiredAreaExclusion> balanceRequiredAreaExclusionList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
             BalanceRequiredAreaExclusion balanceRequiredAreaExclusion = new BalanceRequiredAreaExclusion(
@@ -195,6 +207,8 @@ public class AdminGraduationSyncService {
     private void syncGraduationCertRule() {
         String tabName = graduationSheetProperties.tabs().get("graduation-cert-rules");
         GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
+
+        graduationSheetValidatorRegistry.get(tabName).validate(graduationSheetTable);
 
         List<GraduationCertRule> graduationCertRuleList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
@@ -220,6 +234,8 @@ public class AdminGraduationSyncService {
     private void syncEnglishCertCriteria() {
         String tabName = graduationSheetProperties.tabs().get("english-cert-criteria");
         GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
+
+        graduationSheetValidatorRegistry.get(tabName).validate(graduationSheetTable);
 
         List<EnglishCertCriterion> englishCertCriterionList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
@@ -253,6 +269,8 @@ public class AdminGraduationSyncService {
         String tabName = graduationSheetProperties.tabs().get("coding-cert-criteria");
         GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
 
+        graduationSheetValidatorRegistry.get(tabName).validate(graduationSheetTable);
+
         List<CodingCertCriterion> codingCertCriterionList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
             CodingCertCriterion codingCertCriterion = new CodingCertCriterion(
@@ -279,6 +297,8 @@ public class AdminGraduationSyncService {
         String tabName = graduationSheetProperties.tabs().get("classic-cert-criteria");
         GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
 
+        graduationSheetValidatorRegistry.get(tabName).validate(graduationSheetTable);
+
         List<ClassicCertCriterion> classicCertCriterionList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
             ClassicCertCriterion classicCertCriterion = new ClassicCertCriterion(
@@ -303,6 +323,8 @@ public class AdminGraduationSyncService {
     private void syncGraduationDepartmentInfo() {
         String tabName = graduationSheetProperties.tabs().get("graduation-department-info");
         GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
+
+        graduationSheetValidatorRegistry.get(tabName).validate(graduationSheetTable);
 
         List<GraduationDepartmentInfo> graduationDepartmentInfoList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {

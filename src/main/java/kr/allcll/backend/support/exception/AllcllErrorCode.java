@@ -10,6 +10,9 @@ public enum AllcllErrorCode {
     INVALID_TIME(HttpStatus.BAD_REQUEST, "시작 시간이 종료 시간과 같거나 늦습니다."),
     PIN_SUBJECT_MISMATCH(HttpStatus.BAD_REQUEST, "핀에 등록된 과목이 아닙니다."),
     STAR_SUBJECT_MISMATCH(HttpStatus.BAD_REQUEST, "즐겨찾기에 등록된 과목이 아닙니다."),
+    GOOGLE_SHEET_EMPTY(HttpStatus.BAD_REQUEST, "구글 시트 데이터가 비어 있습니다."),
+    GOOGLE_SHEET_INVALID_HEADER(HttpStatus.BAD_REQUEST, "구글 시트 헤더가 올바르지 않습니다."),
+    GOOGLE_SHEET_INVALID_ROW(HttpStatus.BAD_REQUEST, "구글 시트 데이터 형식이 올바르지 않습니다."),
 
     //401
     TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "쿠키에 토큰이 존재하지 않습니다."),

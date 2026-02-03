@@ -32,8 +32,8 @@ public class GraduationSheetTable {
         return new GraduationSheetTable(headerToIndex, dataRows);
     }
 
-    public String getString(List<Object> row, String header) {
-        Object cell = getCell(row, header);
+    public String getString(List<Object> row, String sheetHeader) {
+        Object cell = getCell(row, sheetHeader);
         if (cell == null) {
             return null;
         }
@@ -46,16 +46,16 @@ public class GraduationSheetTable {
         return value;
     }
 
-    public Integer getInt(List<Object> row, String header) {
-        String value = getString(row, header);
+    public Integer getInt(List<Object> row, String sheetHeader) {
+        String value = getString(row, sheetHeader);
         if (value == null) {
             return null;
         }
         return Integer.valueOf(value);
     }
 
-    public Boolean getBoolean(List<Object> row, String header) {
-        String value = getString(row, header);
+    public Boolean getBoolean(List<Object> row, String sheetHeader) {
+        String value = getString(row, sheetHeader);
         if (value == null) {
             return null;
         }
@@ -66,20 +66,20 @@ public class GraduationSheetTable {
         return false;
     }
 
-    public <T extends Enum<T>> T getEnum(List<Object> row, String header, Class<T> type) {
-        String value = getString(row, header);
+    public <T extends Enum<T>> T getEnum(List<Object> row, String sheetHeader, Class<T> type) {
+        String value = getString(row, sheetHeader);
         if (value == null) {
             return null;
         }
         return Enum.valueOf(type, value.trim().toUpperCase());
     }
 
-    private Object getCell(List<Object> row, String header) {
-        if (row == null || header == null) {
+    private Object getCell(List<Object> row, String sheetHeader) {
+        if (row == null || sheetHeader == null) {
             return null;
         }
 
-        Integer index = headerToIndex.get(header.trim());
+        Integer index = headerToIndex.get(sheetHeader.trim());
         if (index == null) {
             return null;
         }
@@ -98,11 +98,11 @@ public class GraduationSheetTable {
         }
 
         for (int i = 0; i < headerRow.size(); i++) {
-            String header = String.valueOf(headerRow.get(i)).trim();
-            if (header.isBlank()) {
+            String sheetHeader = String.valueOf(headerRow.get(i)).trim();
+            if (sheetHeader.isBlank()) {
                 continue;
             }
-            headerToIndex.put(header, i);
+            headerToIndex.put(sheetHeader, i);
         }
 
         return headerToIndex;
