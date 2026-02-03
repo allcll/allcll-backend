@@ -55,6 +55,10 @@ public class User extends BaseEntity {
             extractAdmissionYear(studentId));
     }
 
+    public void updateUser(String deptNm) {
+        this.deptNm = deptNm;
+    }
+
     private static int extractAdmissionYear(String studentId) {
         if (studentId == null) {
             throw new AllcllException(AllcllErrorCode.STUDENT_ID_FETCH_FAIL, studentId);
