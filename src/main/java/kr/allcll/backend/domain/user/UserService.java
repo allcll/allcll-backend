@@ -33,8 +33,7 @@ public class UserService {
         User user = new User(
             info.studentId(),
             info.name(),
-            
-          (info.studentId()),
+            extractAdmissionYear(info.studentId()),
             MajorType.SINGLE,
             departmentInfo.getCollegeNm(),
             departmentInfo.getDeptNm(),

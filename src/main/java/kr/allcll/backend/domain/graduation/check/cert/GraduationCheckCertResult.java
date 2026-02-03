@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import kr.allcll.backend.domain.graduation.certification.GraduationCertRuleType;
@@ -22,9 +23,13 @@ import lombok.NoArgsConstructor;
 public class GraduationCheckCertResult {
 
     @Id
+    @Column(name = "user_id")
+    private Long userId;
+
+    @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user; // 사용자 id
+    private User user;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "graduation_cert_rule_type", nullable = false)
@@ -99,6 +104,7 @@ public class GraduationCheckCertResult {
         Integer classicsDomain3MyCount, Boolean classicsDomain3Satisfied, Integer classicsDomain4RequiredCount,
         Integer classicsDomain4MyCount, Boolean classicsDomain4Satisfied) {
         this.user = user;
+        this.userId = user.getId();
         this.graduationCertRuleType = graduationCertRuleType;
         this.passedCount = passedCount;
         this.requiredPassCount = requiredPassCount;
