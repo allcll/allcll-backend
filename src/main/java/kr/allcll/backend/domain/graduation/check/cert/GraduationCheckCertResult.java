@@ -4,9 +4,13 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import kr.allcll.backend.domain.graduation.certification.GraduationCertRuleType;
+import kr.allcll.backend.domain.user.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,8 +22,9 @@ import lombok.NoArgsConstructor;
 public class GraduationCheckCertResult {
 
     @Id
-    @Column(name = "user_id", nullable = false)
-    private Long userId;  // 사용자 id
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user; // 사용자 id
 
     @Enumerated(EnumType.STRING)
     @Column(name = "graduation_cert_rule_type", nullable = false)
@@ -85,16 +90,15 @@ public class GraduationCheckCertResult {
     @Column(name = "classics_domain4_satisfied", nullable = false)
     private Boolean classicsDomain4Satisfied;  // 과학 사상 통과 여부 (선택)
 
-    public GraduationCheckCertResult(
-        Long userId, GraduationCertRuleType graduationCertRuleType,
-        Integer passedCount, Integer requiredPassCount, Boolean isSatisfied, Boolean englishPassed,
-        Boolean codingPassed,
-        Boolean classicsPassed, Integer classicsTotalRequiredCount, Integer classicsTotalMyCount,
-        Integer classicsDomain1RequiredCount, Integer classicsDomain1MyCount, Boolean classicsDomain1Satisfied,
-        Integer classicsDomain2RequiredCount, Integer classicsDomain2MyCount, Boolean classicsDomain2Satisfied,
-        Integer classicsDomain3RequiredCount, Integer classicsDomain3MyCount, Boolean classicsDomain3Satisfied,
-        Integer classicsDomain4RequiredCount, Integer classicsDomain4MyCount, Boolean classicsDomain4Satisfied) {
-        this.userId = userId;
+    public GraduationCheckCertResult(User user, GraduationCertRuleType graduationCertRuleType, Integer passedCount,
+        Integer requiredPassCount, Boolean isSatisfied, Boolean englishPassed, Boolean codingPassed,
+        Boolean classicsPassed,
+        Integer classicsTotalRequiredCount, Integer classicsTotalMyCount, Integer classicsDomain1RequiredCount,
+        Integer classicsDomain1MyCount, Boolean classicsDomain1Satisfied, Integer classicsDomain2RequiredCount,
+        Integer classicsDomain2MyCount, Boolean classicsDomain2Satisfied, Integer classicsDomain3RequiredCount,
+        Integer classicsDomain3MyCount, Boolean classicsDomain3Satisfied, Integer classicsDomain4RequiredCount,
+        Integer classicsDomain4MyCount, Boolean classicsDomain4Satisfied) {
+        this.user = user;
         this.graduationCertRuleType = graduationCertRuleType;
         this.passedCount = passedCount;
         this.requiredPassCount = requiredPassCount;
