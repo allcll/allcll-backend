@@ -2,6 +2,7 @@ package kr.allcll.backend.domain.user;
 
 import java.io.IOException;
 import kr.allcll.backend.client.LoginProperties;
+import kr.allcll.backend.domain.user.dto.UserInfo;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package kr.allcll.backend.domain.user;
+package kr.allcll.backend.domain.user.dto;
 
 import lombok.Builder;
 

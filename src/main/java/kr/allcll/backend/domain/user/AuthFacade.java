@@ -1,10 +1,11 @@
 package kr.allcll.backend.domain.user;
 
-import kr.allcll.backend.domain.graduation.check.GraduationCertFetcher;
-import kr.allcll.backend.domain.graduation.check.GraduationCertInfo;
-import kr.allcll.backend.domain.graduation.check.GraduationCertService;
+import kr.allcll.backend.domain.graduation.check.cert.GraduationCertFetcher;
+import kr.allcll.backend.domain.graduation.check.cert.GraduationCertService;
+import kr.allcll.backend.domain.graduation.check.cert.dto.GraduationCertInfo;
 import kr.allcll.backend.domain.user.dto.LoginRequest;
 import kr.allcll.backend.domain.user.dto.LoginResult;
+import kr.allcll.backend.domain.user.dto.UserInfo;
 import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package kr.allcll.backend.domain.graduation.check;
+package kr.allcll.backend.domain.graduation.check.cert.dto;
 
 public record ClassicsCounts(
     int classicsTotalRequiredCount,  // 전체 요구 권수

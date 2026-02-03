@@ -1,4 +1,4 @@
-package kr.allcll.backend.domain.graduation.check;
+package kr.allcll.backend.domain.graduation.check.cert.dto;
 
 public record GraduationCertInfo(
     boolean englishPass,   // 영어 인증 통과 여부

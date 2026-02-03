@@ -1,7 +1,8 @@
-package kr.allcll.backend.domain.graduation.check;
+package kr.allcll.backend.domain.graduation.check.cert;
 
 import kr.allcll.backend.domain.graduation.certification.GraduationCertRule;
 import kr.allcll.backend.domain.graduation.certification.GraduationCertRuleRepository;
+import kr.allcll.backend.domain.graduation.check.cert.dto.GraduationCertInfo;
 import kr.allcll.backend.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

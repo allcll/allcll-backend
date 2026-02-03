@@ -1,4 +1,4 @@
-package kr.allcll.backend.domain.graduation.check;
+package kr.allcll.backend.domain.graduation.check.cert;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

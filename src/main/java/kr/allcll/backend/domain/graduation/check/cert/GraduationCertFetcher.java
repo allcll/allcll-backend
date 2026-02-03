@@ -1,6 +1,8 @@
-package kr.allcll.backend.domain.graduation.check;
+package kr.allcll.backend.domain.graduation.check.cert;
 
 import java.io.IOException;
+import kr.allcll.backend.domain.graduation.check.cert.dto.ClassicsCounts;
+import kr.allcll.backend.domain.graduation.check.cert.dto.GraduationCertInfo;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import lombok.RequiredArgsConstructor;
