@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class BalanceRequiredAreaExclusionsSheetValidator implements GraduationSheetValidator {
 
-    private static final String TAB_NAME = "balance-required-area-exclusions";
+    private static final String TAB_NAME = "balance_required_area_exclusions";
 
     private static final List<String> REQUIRED_HEADERS = List.of(
         "admission_year",
@@ -43,4 +43,3 @@ public class BalanceRequiredAreaExclusionsSheetValidator implements GraduationSh
         }
     }
 }
-

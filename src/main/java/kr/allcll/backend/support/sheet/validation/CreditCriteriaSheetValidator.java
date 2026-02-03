@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CreditCriteriaSheetValidator implements GraduationSheetValidator {
 
-    private static final String TAB_NAME = "credit-criteria";
+    private static final String TAB_NAME = "credit_criteria";
 
     private static final List<String> REQUIRED_HEADERS = List.of(
         "admission_year",

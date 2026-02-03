@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CodingCertCriteriaSheetValidator implements GraduationSheetValidator {
 
-    private static final String TAB_NAME = "coding-cert-criteria";
+    private static final String TAB_NAME = "coding_cert_criteria";
 
     private static final List<String> REQUIRED_HEADERS = List.of(
         "admission_year",
@@ -43,4 +43,3 @@ public class CodingCertCriteriaSheetValidator implements GraduationSheetValidato
         }
     }
 }
-

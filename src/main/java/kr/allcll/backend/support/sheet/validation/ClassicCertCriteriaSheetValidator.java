@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ClassicCertCriteriaSheetValidator implements GraduationSheetValidator {
 
-    private static final String TAB_NAME = "classic-cert-criteria";
+    private static final String TAB_NAME = "classic_cert_criteria";
 
     private static final List<String> REQUIRED_HEADERS = List.of(
         "admission_year",

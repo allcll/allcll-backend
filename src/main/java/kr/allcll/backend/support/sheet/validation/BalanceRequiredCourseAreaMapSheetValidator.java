@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class BalanceRequiredCourseAreaMapSheetValidator implements GraduationSheetValidator {
 
-    private static final String TAB_NAME = "balance-required-course-area-map";
+    private static final String TAB_NAME = "balance_required_course_area_map";
 
     private static final List<String> REQUIRED_HEADERS = List.of(
         "admission_year",
@@ -45,4 +45,3 @@ public class BalanceRequiredCourseAreaMapSheetValidator implements GraduationShe
         }
     }
 }
-

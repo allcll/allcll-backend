@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class GraduationCertRulesSheetValidator implements GraduationSheetValidator {
 
-    private static final String TAB_NAME = "graduation-cert-rules";
+    private static final String TAB_NAME = "graduation_cert_rules";
 
     private static final List<String> REQUIRED_HEADERS = List.of(
         "admission_year",
@@ -49,4 +49,3 @@ public class GraduationCertRulesSheetValidator implements GraduationSheetValidat
         }
     }
 }
-

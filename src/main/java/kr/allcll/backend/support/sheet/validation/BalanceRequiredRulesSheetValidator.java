@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class BalanceRequiredRulesSheetValidator implements GraduationSheetValidator {
 
-    private static final String TAB_NAME = "balance-required-rules";
+    private static final String TAB_NAME = "balance_required_rules";
 
     private static final List<String> REQUIRED_HEADERS = List.of(
         "admission_year",
@@ -41,4 +41,3 @@ public class BalanceRequiredRulesSheetValidator implements GraduationSheetValida
         }
     }
 }
-
