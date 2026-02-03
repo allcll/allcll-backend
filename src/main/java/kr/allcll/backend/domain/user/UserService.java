@@ -3,10 +3,6 @@ package kr.allcll.backend.domain.user;
 import kr.allcll.backend.domain.graduation.MajorType;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfoRepository;
-import kr.allcll.backend.domain.user.dto.LoginPatchRequest;
-import kr.allcll.backend.domain.graduation.MajorType;
-import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
-import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfoRepository;
 import kr.allcll.backend.domain.user.dto.UpdateUserRequest;
 import kr.allcll.backend.domain.user.dto.UserInfo;
 import kr.allcll.backend.domain.user.dto.UserResponse;
@@ -50,7 +46,7 @@ public class UserService {
     }
 
     public UserResponse getResult(Long userId) {
-        validateAuthenticatedUser(userId);
+        validateUserId(userId);
         User user = getById(userId);
         return UserResponse.from(user);
     }
