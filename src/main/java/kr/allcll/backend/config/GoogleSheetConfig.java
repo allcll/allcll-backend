@@ -1,7 +1,7 @@
 package kr.allcll.backend.config;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -41,7 +41,7 @@ public class GoogleSheetConfig {
 
         return new Sheets.Builder(
             GoogleNetHttpTransport.newTrustedTransport(),
-            JacksonFactory.getDefaultInstance(),
+            GsonFactory.getDefaultInstance(),
             new HttpCredentialsAdapter(googleCredentials)
         ).setApplicationName(graduationSheetProperties.applicationName()).build();
     }
