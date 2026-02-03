@@ -7,7 +7,9 @@ public record LoginProperties(
     String portalLoginUrl,
     String portalLoginRedirectUrl,
     String portalLoginReferer,
-    String studentInfoPageUrl
+    String studentInfoPageUrl,
+    String englishInfoPageUrl,
+    String codingInfoPageUrl
 ) {
 
 }

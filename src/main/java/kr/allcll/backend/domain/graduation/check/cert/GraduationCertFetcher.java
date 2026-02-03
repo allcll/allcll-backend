@@ -1,6 +1,7 @@
 package kr.allcll.backend.domain.graduation.check.cert;
 
 import java.io.IOException;
+import kr.allcll.backend.client.LoginProperties;
 import kr.allcll.backend.domain.graduation.check.cert.dto.ClassicsCounts;
 import kr.allcll.backend.domain.graduation.check.cert.dto.GraduationCertInfo;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class GraduationCertFetcher {
+
+    private final LoginProperties properties;
 
     public GraduationCertInfo fetch(OkHttpClient client) {
         boolean englishPass = fetchEnglish(client);
@@ -37,7 +40,7 @@ public class GraduationCertFetcher {
     private boolean fetchEnglish(OkHttpClient client) { // 영어 인증
         try {
             Request request = new Request.Builder()
-                .url("https://classic.sejong.ac.kr/classic/english/certification-status.do")
+                .url(properties.englishInfoPageUrl())
                 .get()
                 .build();
 
@@ -67,7 +70,7 @@ public class GraduationCertFetcher {
     private boolean fetchCoding(OkHttpClient client) {
         try {
             Request request = new Request.Builder()
-                .url("https://tosc.sejong.ac.kr/ko/module/tosc/@exam/list")
+                .url(properties.codingInfoPageUrl())
                 .get()
                 .build();
 
@@ -99,7 +102,7 @@ public class GraduationCertFetcher {
     private boolean fetchClassicsPass(OkHttpClient client) { // 고전독서 인증
         try {
             Request request = new Request.Builder()
-                .url("https://classic.sejong.ac.kr/classic/reading/status.do")
+                .url(properties.studentInfoPageUrl())
                 .get()
                 .build();
 
@@ -125,7 +128,7 @@ public class GraduationCertFetcher {
     private ClassicsCounts fetchClassicsCounts(OkHttpClient client) {
         try {
             Request request = new Request.Builder()
-                .url("https://classic.sejong.ac.kr/classic/reading/status.do")
+                .url(properties.studentInfoPageUrl())
                 .get()
                 .build();
 
