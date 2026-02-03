@@ -44,14 +44,14 @@ public class GraduationCheckCertResult {
     @Column(name = "is_satisfied", nullable = false)
     private Boolean isSatisfied;  // 최종 졸업인증제도 통과 여부
 
-    @Column(name = "english_passed", nullable = false)
-    private Boolean englishPassed;  // 영어 인증 통과 여부
+    @Column(name = "is_english_cert_passed", nullable = false)
+    private Boolean isEnglishCertPassed;  // 영어 인증 통과 여부
 
-    @Column(name = "coding_passed", nullable = false)
-    private Boolean codingPassed;  // 코딩 인증 통과 여부
+    @Column(name = "is_coding_cert_passed", nullable = false)
+    private Boolean isCodingCertPassed;  // 코딩 인증 통과 여부
 
-    @Column(name = "classics_passed", nullable = false)
-    private Boolean classicsPassed;  // 고전독서 인증 통과 여부
+    @Column(name = "is_classics_cert_passed", nullable = false)
+    private Boolean isClassicsCertPassed;  // 고전독서 인증 통과 여부
 
     @Column(name = "classics_total_required_count", nullable = false)
     private Integer classicsTotalRequiredCount;  // 전체 요구 권수
@@ -59,72 +59,73 @@ public class GraduationCheckCertResult {
     @Column(name = "classics_total_my_count", nullable = false)
     private Integer classicsTotalMyCount;  // 내 총 인증 권수
 
-    @Column(name = "classics_domain1_required_count", nullable = false)
-    private Integer classicsDomain1RequiredCount;  // 서양의 역사와 사상 요구 권수
+    @Column(name = "required_count_western", nullable = false)
+    private Integer requiredCountWestern;  // 서양의 역사와 사상 요구 권수
 
-    @Column(name = "classics_domain1_my_count", nullable = false)
-    private Integer classicsDomain1MyCount;  // 서양의 역사와 사상 내 인증 권수
+    @Column(name = "my_count_western", nullable = false)
+    private Integer myCountWestern;  // 서양의 역사와 사상 내 인증 권수
 
-    @Column(name = "classics_domain1_satisfied", nullable = false)
-    private Boolean classicsDomain1Satisfied;  // 서양의 역사와 사상 통과 여부 (선택)
+    @Column(name = "is_classics_western_cert_passed", nullable = false)
+    private Boolean isClassicsWesternCertPassed;  // 서양의 역사와 사상 통과 여부 (선택)
 
-    @Column(name = "classics_domain2_required_count", nullable = false)
-    private Integer classicsDomain2RequiredCount;  // 동양의 역사와 사상 요구 권수
+    @Column(name = "required_count_eastern", nullable = false)
+    private Integer requiredCountEastern;  // 동양의 역사와 사상 요구 권수
 
-    @Column(name = "classics_domain2_my_count", nullable = false)
-    private Integer classicsDomain2MyCount;  // 동양의 역사와 사상 내 인증 권수
+    @Column(name = "my_count_eastern", nullable = false)
+    private Integer myCountEastern;  // 동양의 역사와 사상 내 인증 권수
 
-    @Column(name = "classics_domain2_satisfied", nullable = false)
-    private Boolean classicsDomain2Satisfied;  // 동양의 역사와 사상 통과 여부 (선택)
+    @Column(name = "is_classics_eastern_cert_passed", nullable = false)
+    private Boolean isClassicsEasternCertPassed;  // 동양의 역사와 사상 통과 여부 (선택)
 
-    @Column(name = "classics_domain3_required_count", nullable = false)
-    private Integer classicsDomain3RequiredCount;  // 동서양의 문학 요구 권수
+    @Column(name = "required_count_eastern_and_western", nullable = false)
+    private Integer requiredCountEasternAndWestern;  // 동서양의 문학 요구 권수
 
-    @Column(name = "classics_domain3_my_count", nullable = false)
-    private Integer classicsDomain3MyCount;  // 동서양의 문학 내 인증 권수
+    @Column(name = "my_count_eastern_and_western", nullable = false)
+    private Integer myCountEasternAndWestern;  // 동서양의 문학 내 인증 권수
 
-    @Column(name = "classics_domain3_satisfied", nullable = false)
-    private Boolean classicsDomain3Satisfied;  // 동서양의 문학 통과 여부 (선택)
+    @Column(name = "is_classics_eastern_and_western_cert_passed", nullable = false)
+    private Boolean isClassicsEasternAndWesternCertPassed;  // 동서양의 문학 통과 여부 (선택)
 
-    @Column(name = "classics_domain4_required_count", nullable = false)
-    private Integer classicsDomain4RequiredCount;  // 과학 사상 요구 권수
+    @Column(name = "required_count_science", nullable = false)
+    private Integer requiredCountScience;  // 과학 사상 요구 권수
 
-    @Column(name = "classics_domain4_my_count", nullable = false)
-    private Integer classicsDomain4MyCount;  // 과학 사상 내 인증 권수
+    @Column(name = "my_count_science", nullable = false)
+    private Integer myCountScience;  // 과학 사상 내 인증 권수
 
-    @Column(name = "classics_domain4_satisfied", nullable = false)
-    private Boolean classicsDomain4Satisfied;  // 과학 사상 통과 여부 (선택)
+    @Column(name = "is_classics_science_cert_passed", nullable = false)
+    private Boolean isClassicsScienceCertPassed;  // 과학 사상 통과 여부 (선택)
 
     public GraduationCheckCertResult(User user, GraduationCertRuleType graduationCertRuleType, Integer passedCount,
-        Integer requiredPassCount, Boolean isSatisfied, Boolean englishPassed, Boolean codingPassed,
-        Boolean classicsPassed,
-        Integer classicsTotalRequiredCount, Integer classicsTotalMyCount, Integer classicsDomain1RequiredCount,
-        Integer classicsDomain1MyCount, Boolean classicsDomain1Satisfied, Integer classicsDomain2RequiredCount,
-        Integer classicsDomain2MyCount, Boolean classicsDomain2Satisfied, Integer classicsDomain3RequiredCount,
-        Integer classicsDomain3MyCount, Boolean classicsDomain3Satisfied, Integer classicsDomain4RequiredCount,
-        Integer classicsDomain4MyCount, Boolean classicsDomain4Satisfied) {
+        Integer requiredPassCount, Boolean isSatisfied, Boolean isEnglishCertPassed, Boolean isCodingCertPassed,
+        Boolean isClassicsCertPassed,
+        Integer classicsTotalRequiredCount, Integer classicsTotalMyCount, Integer requiredCountWestern,
+        Integer myCountWestern, Boolean isClassicsWesternCertPassed, Integer requiredCountEastern,
+        Integer myCountEastern, Boolean isClassicsEasternCertPassed, Integer requiredCountEasternAndWestern,
+        Integer myCountEasternAndWestern, Boolean isClassicsEasternAndWesternCertPassed,
+        Integer requiredCountScience,
+        Integer myCountScience, Boolean isClassicsScienceCertPassed) {
         this.user = user;
         this.userId = user.getId();
         this.graduationCertRuleType = graduationCertRuleType;
         this.passedCount = passedCount;
         this.requiredPassCount = requiredPassCount;
         this.isSatisfied = isSatisfied;
-        this.englishPassed = englishPassed;
-        this.codingPassed = codingPassed;
-        this.classicsPassed = classicsPassed;
+        this.isEnglishCertPassed = isEnglishCertPassed;
+        this.isCodingCertPassed = isCodingCertPassed;
+        this.isClassicsCertPassed = isClassicsCertPassed;
         this.classicsTotalRequiredCount = classicsTotalRequiredCount;
         this.classicsTotalMyCount = classicsTotalMyCount;
-        this.classicsDomain1RequiredCount = classicsDomain1RequiredCount;
-        this.classicsDomain1MyCount = classicsDomain1MyCount;
-        this.classicsDomain1Satisfied = classicsDomain1Satisfied;
-        this.classicsDomain2RequiredCount = classicsDomain2RequiredCount;
-        this.classicsDomain2MyCount = classicsDomain2MyCount;
-        this.classicsDomain2Satisfied = classicsDomain2Satisfied;
-        this.classicsDomain3RequiredCount = classicsDomain3RequiredCount;
-        this.classicsDomain3MyCount = classicsDomain3MyCount;
-        this.classicsDomain3Satisfied = classicsDomain3Satisfied;
-        this.classicsDomain4RequiredCount = classicsDomain4RequiredCount;
-        this.classicsDomain4MyCount = classicsDomain4MyCount;
-        this.classicsDomain4Satisfied = classicsDomain4Satisfied;
+        this.requiredCountWestern = requiredCountWestern;
+        this.myCountWestern = myCountWestern;
+        this.isClassicsWesternCertPassed = isClassicsWesternCertPassed;
+        this.requiredCountEastern = requiredCountEastern;
+        this.myCountEastern = myCountEastern;
+        this.isClassicsEasternCertPassed = isClassicsEasternCertPassed;
+        this.requiredCountEasternAndWestern = requiredCountEasternAndWestern;
+        this.myCountEasternAndWestern = myCountEasternAndWestern;
+        this.isClassicsEasternAndWesternCertPassed = isClassicsEasternAndWesternCertPassed;
+        this.requiredCountScience = requiredCountScience;
+        this.myCountScience = myCountScience;
+        this.isClassicsScienceCertPassed = isClassicsScienceCertPassed;
     }
 }
