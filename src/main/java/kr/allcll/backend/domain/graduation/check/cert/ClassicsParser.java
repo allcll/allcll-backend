@@ -18,10 +18,14 @@ public class ClassicsParser {
             throw new AllcllException(AllcllErrorCode.CLASSIC_DETAIL_INFO_FETCH_FAIL);
         }
 
-        int westernCertRequired = 0, westernCompleted = 0;
-        int easternCertRequired = 0, easternCompleted = 0;
-        int literatureCertRequired = 0, literatureCompleted = 0;
-        int scienceCertRequired = 0, scienceCompleted = 0;
+        int westernCertRequired = 0;
+        int westernCompleted = 0;
+        int easternCertRequired = 0;
+        int easternCompleted = 0;
+        int literatureCertRequired = 0;
+        int literatureCompleted = 0;
+        int scienceCertRequired = 0;
+        int scienceCompleted = 0;
 
         for (Element row : table.select("tbody tr")) {
             String label = row.selectFirst("th").text();
@@ -48,7 +52,7 @@ public class ClassicsParser {
                 scienceCertRequired = certRequiredCount;
             }
         }
-        return ClassicsCounts.from(
+        return ClassicsCounts.of(
             westernCertRequired, westernCompleted,
             easternCertRequired, easternCompleted,
             literatureCertRequired, literatureCompleted,
