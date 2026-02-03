@@ -1,14 +1,14 @@
 package kr.allcll.backend.domain.user;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import kr.allcll.backend.domain.graduation.MajorType;
 import kr.allcll.backend.support.entity.BaseEntity;
-import kr.allcll.backend.support.exception.AllcllErrorCode;
-import kr.allcll.backend.support.exception.AllcllException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,8 +18,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
-
-    private static final int YEAR_PREFIX = 2000;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +29,7 @@ public class User extends BaseEntity {
 
     private int admissionYear;
 
+    @Enumerated(EnumType.STRING)
     private MajorType majorType;
 
     private String collegeNm;
@@ -41,26 +40,18 @@ public class User extends BaseEntity {
     private String doubleDeptNm;
     private String doubleDeptCd;
 
-    private User(String studentId, String name, String deptNm, int admissionYear) {
+    public User(String studentId, String name, int admissionYear, MajorType majorType, String collegeNm, String deptNm,
+        String deptCd, String doubleCollegeNm, String doubleDeptNm, String doubleDeptCd) {
         this.studentId = studentId;
         this.name = name;
-        this.deptNm = deptNm;
         this.admissionYear = admissionYear;
+        this.majorType = majorType;
+        this.collegeNm = collegeNm;
+        this.deptNm = deptNm;
+        this.deptCd = deptCd;
+        this.doubleCollegeNm = doubleCollegeNm;
+        this.doubleDeptNm = doubleDeptNm;
+        this.doubleDeptCd = doubleDeptCd;
     }
 
-    public static User of(String studentId, String name, String deptNm) {
-        return new User(
-            studentId,
-            name,
-            deptNm,
-            extractAdmissionYear(studentId));
-    }
-
-    private static int extractAdmissionYear(String studentId) {
-        if (studentId == null) {
-            throw new AllcllException(AllcllErrorCode.STUDENT_ID_FETCH_FAIL, studentId);
-        }
-        int year = Integer.parseInt(studentId.substring(0, 2));
-        return YEAR_PREFIX + year;
-    }
 }
