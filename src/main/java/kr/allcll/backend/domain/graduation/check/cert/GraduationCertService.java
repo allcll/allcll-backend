@@ -32,7 +32,7 @@ public class GraduationCertService {
 
         GraduationCheckCertResult result =
             new GraduationCheckCertResult(
-                user.getId(),
+                user,
                 certRule.getGraduationCertRuleType(),
                 passedCount,
                 requiredPassCount,
