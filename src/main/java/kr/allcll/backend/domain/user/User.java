@@ -10,8 +10,6 @@ import jakarta.persistence.Table;
 import kr.allcll.backend.domain.user.dto.UpdateUserRequest;
 import kr.allcll.backend.domain.graduation.MajorType;
 import kr.allcll.backend.support.entity.BaseEntity;
-import kr.allcll.backend.support.exception.AllcllErrorCode;
-import kr.allcll.backend.support.exception.AllcllException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -59,13 +57,5 @@ public class User extends BaseEntity {
 
     public void updateUser(String deptNm) {
         this.deptNm = deptNm;
-    }
-
-    private static int extractAdmissionYear(String studentId) {
-        if (studentId == null) {
-            throw new AllcllException(AllcllErrorCode.STUDENT_ID_FETCH_FAIL, studentId);
-        }
-        int year = Integer.parseInt(studentId.substring(0, 2));
-        return YEAR_PREFIX + year;
     }
 }
