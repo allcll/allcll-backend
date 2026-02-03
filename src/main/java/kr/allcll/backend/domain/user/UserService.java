@@ -1,6 +1,5 @@
 package kr.allcll.backend.domain.user;
 
-import kr.allcll.backend.domain.user.dto.UpdateUserRequest;
 import kr.allcll.backend.domain.graduation.MajorType;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfoRepository;
@@ -8,6 +7,7 @@ import kr.allcll.backend.domain.user.dto.LoginPatchRequest;
 import kr.allcll.backend.domain.graduation.MajorType;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfoRepository;
+import kr.allcll.backend.domain.user.dto.UpdateUserRequest;
 import kr.allcll.backend.domain.user.dto.UserInfo;
 import kr.allcll.backend.domain.user.dto.UserResponse;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
