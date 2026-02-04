@@ -29,7 +29,7 @@ public class GraduationSheetFetcher {
             return GraduationSheetTable.from(tableValues);
         } catch (GoogleJsonResponseException e) {
             if (e.getStatusCode() == 404) {
-                throw new AllcllException(AllcllErrorCode.GOOGLE_SHEET_TAP_NOT_FOUND, e);
+                throw new AllcllException(AllcllErrorCode.GOOGLE_SHEET_TAB_NOT_FOUND, e);
             }
             throw new AllcllException(AllcllErrorCode.GOOGLE_SHEET_ERROR, e);
         }  catch (Exception e) {

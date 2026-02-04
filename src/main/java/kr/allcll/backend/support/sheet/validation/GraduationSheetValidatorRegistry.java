@@ -20,7 +20,7 @@ public class GraduationSheetValidatorRegistry {
     public GraduationSheetValidator get(String tabName) {
         GraduationSheetValidator graduationSheetValidator = validators.get(tabName);
         if (graduationSheetValidator == null) {
-            throw new AllcllException(AllcllErrorCode.GOOGLE_SHEET_TAP_NOT_FOUND);
+            throw new AllcllException(AllcllErrorCode.GOOGLE_SHEET_TAB_NOT_FOUND);
         }
         return graduationSheetValidator;
     }

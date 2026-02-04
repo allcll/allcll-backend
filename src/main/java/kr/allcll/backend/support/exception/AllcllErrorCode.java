@@ -30,7 +30,7 @@ public enum AllcllErrorCode {
     BASKET_NOT_FOUND(HttpStatus.NOT_FOUND, "관심과목 정보가 존재하지 않습니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자 정보를 찾을 수 없습니다."),
     GOOGLE_KEY_NOT_FOUND(HttpStatus.NOT_FOUND, "구글 서비스 계정 키 파일을 찾을 수 없습니다."),
-    GOOGLE_SHEET_TAP_NOT_FOUND(HttpStatus.NOT_FOUND,"구글 시트가 존재하지 않습니다."),
+    GOOGLE_SHEET_TAB_NOT_FOUND(HttpStatus.NOT_FOUND,"구글 시트가 존재하지 않습니다."),
 
     //409
     PIN_LIMIT_EXCEEDED(HttpStatus.CONFLICT, "이미 %d개의 핀을 등록했습니다."),
