@@ -38,4 +38,20 @@ public record GraduationCertInfo(
             classics.myCountScience()
         );
     }
+
+    public boolean isWesternSatisfied() {
+        return myCountWestern >= requiredCountWestern;
+    }
+
+    public boolean isEasternSatisfied() {
+        return myCountEastern >= requiredCountEastern;
+    }
+
+    public boolean isEasternAndWesternSatisfied() {
+        return myCountEasternAndWestern >= requiredCountEasternAndWestern;
+    }
+
+    public boolean isScienceSatisfied() {
+        return myCountScience >= requiredCountScience;
+    }
 }
