@@ -7,9 +7,12 @@ import kr.allcll.backend.domain.user.dto.LoginRequest;
 import kr.allcll.backend.domain.user.dto.LoginResult;
 import kr.allcll.backend.domain.user.dto.UserInfo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthFacade {
@@ -20,14 +23,19 @@ public class AuthFacade {
     private final UserService userService;
     private final GraduationCertService graduationCertService;
 
+    @Transactional
     public LoginResult login(LoginRequest loginRequest) {
         OkHttpClient client = authService.login(loginRequest);
 
         UserInfo userInfo = userFetcher.fetch(client);
         User user = userService.findOrCreate(userInfo);
 
-        GraduationCertInfo certInfo = graduationCertFetcher.fetch(client);
-        graduationCertService.createOrUpdate(user, certInfo);
+        try {
+            GraduationCertInfo certInfo = graduationCertFetcher.fetch(client);
+            graduationCertService.createOrUpdate(user, certInfo);
+        } catch (Exception exception) {
+            log.error("[GraduationCert] 인증 정보 저장 중 오류 발생 (유저 ID: {}): {}", user.getId(), exception.getMessage());
+        }
 
         return new LoginResult(user.getId());
     }
