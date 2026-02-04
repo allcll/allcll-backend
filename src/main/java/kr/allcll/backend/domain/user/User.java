@@ -1,14 +1,16 @@
 package kr.allcll.backend.domain.user;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import kr.allcll.backend.domain.user.dto.UpdateUserRequest;
 import kr.allcll.backend.domain.graduation.MajorType;
+import kr.allcll.backend.domain.graduation.check.cert.GraduationCheckCertResult;
 import kr.allcll.backend.support.entity.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -40,6 +42,9 @@ public class User extends BaseEntity {
     private String doubleCollegeNm;
     private String doubleDeptNm;
     private String doubleDeptCd;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private GraduationCheckCertResult graduationCheckCertResult;
 
     public User(String studentId, String name, int admissionYear, MajorType majorType, String collegeNm, String deptNm,
         String deptCd, String doubleCollegeNm, String doubleDeptNm, String doubleDeptCd) {

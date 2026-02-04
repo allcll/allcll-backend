@@ -11,6 +11,7 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import kr.allcll.backend.domain.graduation.certification.GraduationCertRuleType;
+import kr.allcll.backend.domain.graduation.check.cert.dto.GraduationCertInfo;
 import kr.allcll.backend.domain.user.User;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -95,17 +96,31 @@ public class GraduationCheckCertResult {
     @Column(name = "is_classics_science_cert_passed", nullable = false)
     private Boolean isClassicsScienceCertPassed;  // 과학 사상 통과 여부 (선택)
 
-    public GraduationCheckCertResult(User user, GraduationCertRuleType graduationCertRuleType, Integer passedCount,
-        Integer requiredPassCount, Boolean isSatisfied, Boolean isEnglishCertPassed, Boolean isCodingCertPassed,
+    public GraduationCheckCertResult(
+        User user,
+        GraduationCertRuleType graduationCertRuleType,
+        Integer passedCount,
+        Integer requiredPassCount,
+        Boolean isSatisfied,
+        Boolean isEnglishCertPassed,
+        Boolean isCodingCertPassed,
         Boolean isClassicsCertPassed,
-        Integer classicsTotalRequiredCount, Integer classicsTotalMyCount, Integer requiredCountWestern,
-        Integer myCountWestern, Boolean isClassicsWesternCertPassed, Integer requiredCountEastern,
-        Integer myCountEastern, Boolean isClassicsEasternCertPassed, Integer requiredCountEasternAndWestern,
-        Integer myCountEasternAndWestern, Boolean isClassicsEasternAndWesternCertPassed,
+        Integer classicsTotalRequiredCount,
+        Integer classicsTotalMyCount,
+        Integer requiredCountWestern,
+        Integer myCountWestern,
+        Boolean isClassicsWesternCertPassed,
+        Integer requiredCountEastern,
+        Integer myCountEastern,
+        Boolean isClassicsEasternCertPassed,
+        Integer requiredCountEasternAndWestern,
+        Integer myCountEasternAndWestern,
+        Boolean isClassicsEasternAndWesternCertPassed,
         Integer requiredCountScience,
-        Integer myCountScience, Boolean isClassicsScienceCertPassed) {
+        Integer myCountScience,
+        Boolean isClassicsScienceCertPassed
+    ) {
         this.user = user;
-        this.userId = user.getId();
         this.graduationCertRuleType = graduationCertRuleType;
         this.passedCount = passedCount;
         this.requiredPassCount = requiredPassCount;
@@ -127,5 +142,35 @@ public class GraduationCheckCertResult {
         this.requiredCountScience = requiredCountScience;
         this.myCountScience = myCountScience;
         this.isClassicsScienceCertPassed = isClassicsScienceCertPassed;
+    }
+
+    public void update(
+        GraduationCertRuleType certRuleType,
+        int passedCount,
+        int requiredPassCount,
+        boolean isSatisfied,
+        GraduationCertInfo certInfo
+    ) {
+        this.graduationCertRuleType = certRuleType;
+        this.passedCount = passedCount;
+        this.requiredPassCount = requiredPassCount;
+        this.isSatisfied = isSatisfied;
+        this.isEnglishCertPassed = certInfo.isEnglishCertPassed();
+        this.isCodingCertPassed = certInfo.isCodingCertPassed();
+        this.isClassicsCertPassed = certInfo.isClassicCertPassed();
+        this.classicsTotalRequiredCount = certInfo.classicsTotalRequiredCount();
+        this.classicsTotalMyCount = certInfo.classicsTotalMyCount();
+        this.requiredCountWestern = certInfo.requiredCountWestern();
+        this.myCountWestern = certInfo.myCountWestern();
+        this.isClassicsWesternCertPassed = certInfo.isWesternSatisfied();
+        this.requiredCountEastern = certInfo.requiredCountEastern();
+        this.myCountEastern = certInfo.myCountEastern();
+        this.isClassicsEasternCertPassed = certInfo.isEasternSatisfied();
+        this.requiredCountEasternAndWestern = certInfo.requiredCountEasternAndWestern();
+        this.myCountEasternAndWestern = certInfo.myCountEasternAndWestern();
+        this.isClassicsEasternAndWesternCertPassed = certInfo.isEasternAndWesternSatisfied();
+        this.requiredCountScience = certInfo.requiredCountScience();
+        this.myCountScience = certInfo.myCountScience();
+        this.isClassicsScienceCertPassed = certInfo.isScienceSatisfied();
     }
 }
