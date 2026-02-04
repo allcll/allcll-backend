@@ -11,6 +11,8 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import kr.allcll.backend.domain.graduation.MajorType;
 import kr.allcll.backend.domain.graduation.check.cert.GraduationCheckCertResult;
+import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
+import kr.allcll.backend.domain.user.dto.UpdateUserRequest;
 import kr.allcll.backend.support.entity.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -60,7 +62,18 @@ public class User extends BaseEntity {
         this.doubleDeptCd = doubleDeptCd;
     }
 
-    public void updateUser(String deptNm) {
-        this.deptNm = deptNm;
+    public void updateSingleMajorUser(UpdateUserRequest updateUserRequest) {
+        this.majorType = updateUserRequest.majorType();
+        this.deptNm = updateUserRequest.deptNm();
+        this.doubleCollegeNm = null;
+        this.doubleDeptNm = null;
+        this.doubleDeptCd = null;
+    }
+
+    public void updateDoubleMajorUser(UpdateUserRequest updateUserRequest, GraduationDepartmentInfo doubleDept) {
+        this.majorType = updateUserRequest.majorType();
+        this.doubleCollegeNm = doubleDept.getCollegeNm();
+        this.doubleDeptNm = doubleDept.getDeptNm();
+        this.doubleDeptCd = doubleDept.getDeptCd();
     }
 }

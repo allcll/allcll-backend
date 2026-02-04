@@ -1,9 +1,11 @@
 package kr.allcll.backend.domain.user.dto;
 
+import kr.allcll.backend.domain.graduation.MajorType;
+
 public record UpdateUserRequest(
-    String deptNm
-    //MajorType majorType,
-    //String doubleDeptNm
+    MajorType majorType,
+    String deptNm,
+    String doubleDeptNm
 ) {
 
 }

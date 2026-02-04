@@ -60,7 +60,12 @@ public class UserService {
     public void update(Long userId, UpdateUserRequest updateUserRequest) {
         validateUserId(userId);
         User user = getById(userId);
-        user.updateUser(updateUserRequest.deptNm());
+        if (updateUserRequest.majorType() == MajorType.SINGLE) {
+            user.updateSingleMajorUser(updateUserRequest);
+            return;
+        }
+        GraduationDepartmentInfo doubleDept = departmentInfoRepository.findByDeptNm(updateUserRequest.doubleDeptNm());
+        user.updateDoubleMajorUser(updateUserRequest, doubleDept);
     }
 
     @Transactional
