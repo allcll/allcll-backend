@@ -1,6 +1,5 @@
 package kr.allcll.backend.support.sheet.validation;
 
-
 import java.util.List;
 import kr.allcll.backend.domain.graduation.certification.CodingTargetType;
 import kr.allcll.backend.support.sheet.GraduationSheetTable;
@@ -11,7 +10,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CodingCertCriteriaSheetValidator implements GraduationSheetValidator {
 
-    private static final String TAB_NAME = "coding_cert_criteria";
+    public static final String TAB_KEY = "coding-cert-criteria";
 
     private static final List<String> REQUIRED_HEADERS = List.of(
         "admission_year",
@@ -23,23 +22,23 @@ public class CodingCertCriteriaSheetValidator implements GraduationSheetValidato
     private final GraduationSheetValidationSupport graduationSheetValidationSupport;
 
     @Override
-    public String tabName() {
-        return TAB_NAME;
+    public String tabKey() {
+        return TAB_KEY;
     }
 
     @Override
     public void validate(GraduationSheetTable sheetTable) {
-        graduationSheetValidationSupport.validateNotEmpty(TAB_NAME, sheetTable);
-        graduationSheetValidationSupport.validateRequiredHeaders(TAB_NAME, sheetTable, REQUIRED_HEADERS);
+        graduationSheetValidationSupport.validateNotEmpty(TAB_KEY, sheetTable);
+        graduationSheetValidationSupport.validateRequiredHeaders(TAB_KEY, sheetTable, REQUIRED_HEADERS);
 
         List<List<Object>> dataRows = sheetTable.getDataRows();
         for (int rowIndex = 0; rowIndex < dataRows.size(); rowIndex++) {
             List<Object> dataRow = dataRows.get(rowIndex);
 
-            graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "admission_year");
-            graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "admission_year_short");
-            graduationSheetValidationSupport.requireEnum(TAB_NAME, sheetTable, dataRow, rowIndex, "coding_target_type", CodingTargetType.class);
-            graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "tosc_min_level");
+            graduationSheetValidationSupport.requireInt(TAB_KEY, sheetTable, dataRow, rowIndex, "admission_year");
+            graduationSheetValidationSupport.requireInt(TAB_KEY, sheetTable, dataRow, rowIndex, "admission_year_short");
+            graduationSheetValidationSupport.requireEnum(TAB_KEY, sheetTable, dataRow, rowIndex, "coding_target_type", CodingTargetType.class);
+            graduationSheetValidationSupport.requireInt(TAB_KEY, sheetTable, dataRow, rowIndex, "tosc_min_level");
         }
     }
 }

@@ -33,7 +33,17 @@ import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfoRe
 import kr.allcll.backend.support.sheet.GraduationSheetTable;
 import kr.allcll.backend.support.sheet.GraduationSheetFetcher;
 import kr.allcll.backend.support.sheet.GraduationSheetProperties;
+import kr.allcll.backend.support.sheet.validation.BalanceRequiredAreaExclusionsSheetValidator;
+import kr.allcll.backend.support.sheet.validation.BalanceRequiredCourseAreaMapSheetValidator;
+import kr.allcll.backend.support.sheet.validation.BalanceRequiredRulesSheetValidator;
+import kr.allcll.backend.support.sheet.validation.ClassicCertCriteriaSheetValidator;
+import kr.allcll.backend.support.sheet.validation.CodingCertCriteriaSheetValidator;
+import kr.allcll.backend.support.sheet.validation.CreditCriteriaSheetValidator;
+import kr.allcll.backend.support.sheet.validation.EnglishCertCriteriaSheetValidator;
+import kr.allcll.backend.support.sheet.validation.GraduationCertRulesSheetValidator;
+import kr.allcll.backend.support.sheet.validation.GraduationDepartmentInfoSheetValidator;
 import kr.allcll.backend.support.sheet.validation.GraduationSheetValidatorRegistry;
+import kr.allcll.backend.support.sheet.validation.RequiredCoursesSheetValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -77,11 +87,20 @@ public class AdminGraduationSyncService {
         log.info("[졸업요건 데이터 동기화] 완료");
     }
 
-    private void syncCreditCriteria() {
-        String tabName = graduationSheetProperties.tabs().get("credit-criteria");
-        GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
+    private GraduationSheetTable fetchAndValidate(final String tabKey) {
+        String tabName = graduationSheetProperties.tabName(tabKey);
+        GraduationSheetTable sheetTable = graduationSheetFetcher.fetchAsTable(tabName);
 
-        graduationSheetValidatorRegistry.get(tabName).validate(graduationSheetTable);
+        log.info("[졸업요건 시트 검증 시작] tabKey={}", tabKey);
+        graduationSheetValidatorRegistry.get(tabKey).validate(sheetTable);
+        log.info("[졸업요건 시트 검증 완료] tabKey={}", tabKey);
+
+        return sheetTable;
+    }
+
+    private void syncCreditCriteria() {
+        String tabKey = CreditCriteriaSheetValidator.TAB_KEY;
+        GraduationSheetTable graduationSheetTable = fetchAndValidate(tabKey);
 
         List<CreditCriterion> creditCriterionList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
@@ -102,14 +121,12 @@ public class AdminGraduationSyncService {
         creditCriterionRepository.deleteAllInBatch();
         creditCriterionRepository.saveAll(creditCriterionList);
 
-        log.info("[졸업요건 데이터 동기화] 탭 이름={} 저장 완료 count={}", tabName, creditCriterionList.size());
+        log.info("[졸업요건 데이터 동기화] 탭 이름={}, {}개 저장 완료", tabKey, creditCriterionList.size());
     }
 
     private void syncRequiredCourses() {
-        String tabName = graduationSheetProperties.tabs().get("required-courses");
-        GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
-
-        graduationSheetValidatorRegistry.get(tabName).validate(graduationSheetTable);
+        String tabKey = RequiredCoursesSheetValidator.TAB_KEY;
+        GraduationSheetTable graduationSheetTable = fetchAndValidate(tabKey);
 
         List<RequiredCourse> requiredCourseList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
@@ -130,14 +147,12 @@ public class AdminGraduationSyncService {
         requiredCourseRepository.deleteAllInBatch();
         requiredCourseRepository.saveAll(requiredCourseList);
 
-        log.info("[졸업요건 데이터 동기화] 탭 이름={} 저장 완료 count={}", tabName, requiredCourseList.size());
+        log.info("[졸업요건 데이터 동기화] 탭 이름={}, {}개 저장 완료", tabKey, requiredCourseList.size());
     }
 
     private void syncBalanceRequiredRule() {
-        String tabName = graduationSheetProperties.tabs().get("balance-required-rules");
-        GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
-
-        graduationSheetValidatorRegistry.get(tabName).validate(graduationSheetTable);
+        String tabKey = BalanceRequiredRulesSheetValidator.TAB_KEY;
+        GraduationSheetTable graduationSheetTable = fetchAndValidate(tabKey);
 
         List<BalanceRequiredRule> balanceRequiredRuleList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
@@ -154,14 +169,12 @@ public class AdminGraduationSyncService {
         balanceRequiredRuleRepository.deleteAllInBatch();
         balanceRequiredRuleRepository.saveAll(balanceRequiredRuleList);
 
-        log.info("[졸업요건 데이터 동기화] 탭 이름={} 저장 완료 count={}", tabName, balanceRequiredRuleList.size());
+        log.info("[졸업요건 데이터 동기화] 탭 이름={}, {}개 저장 완료", tabKey, balanceRequiredRuleList.size());
     }
 
     private void syncBalanceRequiredCourseAreaMap() {
-        String tabName = graduationSheetProperties.tabs().get("balance-required-course-area-map");
-        GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
-
-        graduationSheetValidatorRegistry.get(tabName).validate(graduationSheetTable);
+        String tabKey = BalanceRequiredCourseAreaMapSheetValidator.TAB_KEY;
+        GraduationSheetTable graduationSheetTable = fetchAndValidate(tabKey);
 
         List<BalanceRequiredCourseAreaMap> balanceRequiredCourseAreaMapList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
@@ -178,14 +191,12 @@ public class AdminGraduationSyncService {
         balanceRequiredCourseAreaMapRepository.deleteAllInBatch();
         balanceRequiredCourseAreaMapRepository.saveAll(balanceRequiredCourseAreaMapList);
 
-        log.info("[졸업요건 데이터 동기화] 탭 이름={} 저장 완료 count={}", tabName, balanceRequiredCourseAreaMapList.size());
+        log.info("[졸업요건 데이터 동기화] 탭 이름={}, {}개 저장 완료", tabKey, balanceRequiredCourseAreaMapList.size());
     }
 
     private void syncBalanceRequiredAreaExclusion() {
-        String tabName = graduationSheetProperties.tabs().get("balance-required-area-exclusions");
-        GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
-
-        graduationSheetValidatorRegistry.get(tabName).validate(graduationSheetTable);
+        String tabKey = BalanceRequiredAreaExclusionsSheetValidator.TAB_KEY;
+        GraduationSheetTable graduationSheetTable = fetchAndValidate(tabKey);
 
         List<BalanceRequiredAreaExclusion> balanceRequiredAreaExclusionList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
@@ -201,14 +212,12 @@ public class AdminGraduationSyncService {
         balanceRequiredAreaExclusionRepository.deleteAllInBatch();
         balanceRequiredAreaExclusionRepository.saveAll(balanceRequiredAreaExclusionList);
 
-        log.info("[졸업요건 데이터 동기화] 탭 이름={} 저장 완료 count={}", tabName, balanceRequiredAreaExclusionList.size());
+        log.info("[졸업요건 데이터 동기화] 탭 이름={}, {}개 저장 완료", tabKey, balanceRequiredAreaExclusionList.size());
     }
 
     private void syncGraduationCertRule() {
-        String tabName = graduationSheetProperties.tabs().get("graduation-cert-rules");
-        GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
-
-        graduationSheetValidatorRegistry.get(tabName).validate(graduationSheetTable);
+        String tabKey = GraduationCertRulesSheetValidator.TAB_KEY;
+        GraduationSheetTable graduationSheetTable = fetchAndValidate(tabKey);
 
         List<GraduationCertRule> graduationCertRuleList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
@@ -228,14 +237,12 @@ public class AdminGraduationSyncService {
         graduationCertRuleRepository.deleteAllInBatch();
         graduationCertRuleRepository.saveAll(graduationCertRuleList);
 
-        log.info("[졸업요건 데이터 동기화] 탭 이름={} 저장 완료 count={}", tabName, graduationCertRuleList.size());
+        log.info("[졸업요건 데이터 동기화] 탭 이름={}, {}개 저장 완료}", tabKey, graduationCertRuleList.size());
     }
 
     private void syncEnglishCertCriteria() {
-        String tabName = graduationSheetProperties.tabs().get("english-cert-criteria");
-        GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
-
-        graduationSheetValidatorRegistry.get(tabName).validate(graduationSheetTable);
+        String tabKey = EnglishCertCriteriaSheetValidator.TAB_KEY;
+        GraduationSheetTable graduationSheetTable = fetchAndValidate(tabKey);
 
         List<EnglishCertCriterion> englishCertCriterionList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
@@ -262,14 +269,12 @@ public class AdminGraduationSyncService {
         englishCertCriterionRepository.deleteAllInBatch();
         englishCertCriterionRepository.saveAll(englishCertCriterionList);
 
-        log.info("[졸업요건 데이터 동기화] 탭 이름={} 저장 완료 count={}", tabName, englishCertCriterionList.size());
+        log.info("[졸업요건 데이터 동기화] 탭 이름={}, {}개 저장 완료", tabKey, englishCertCriterionList.size());
     }
 
     private void syncCodingCertCriteria() {
-        String tabName = graduationSheetProperties.tabs().get("coding-cert-criteria");
-        GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
-
-        graduationSheetValidatorRegistry.get(tabName).validate(graduationSheetTable);
+        String tabKey = CodingCertCriteriaSheetValidator.TAB_KEY;
+        GraduationSheetTable graduationSheetTable = fetchAndValidate(tabKey);
 
         List<CodingCertCriterion> codingCertCriterionList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
@@ -290,14 +295,12 @@ public class AdminGraduationSyncService {
         codingCertCriterionRepository.deleteAllInBatch();
         codingCertCriterionRepository.saveAll(codingCertCriterionList);
 
-        log.info("[졸업요건 데이터 동기화] 탭 이름={} 저장 완료 count={}", tabName, codingCertCriterionList.size());
+        log.info("[졸업요건 데이터 동기화] 탭 이름={}, {}개 저장 완료", tabKey, codingCertCriterionList.size());
     }
 
     private void syncClassicCertCriteria() {
-        String tabName = graduationSheetProperties.tabs().get("classic-cert-criteria");
-        GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
-
-        graduationSheetValidatorRegistry.get(tabName).validate(graduationSheetTable);
+        String tabKey = ClassicCertCriteriaSheetValidator.TAB_KEY;
+        GraduationSheetTable graduationSheetTable = fetchAndValidate(tabKey);
 
         List<ClassicCertCriterion> classicCertCriterionList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
@@ -317,14 +320,12 @@ public class AdminGraduationSyncService {
         classicCertCriterionRepository.deleteAllInBatch();
         classicCertCriterionRepository.saveAll(classicCertCriterionList);
 
-        log.info("[졸업요건 데이터 동기화] 탭 이름={} 저장 완료 count={}", tabName, classicCertCriterionList.size());
+        log.info("[졸업요건 데이터 동기화] 탭 이름={}, {}개 저장 완료", tabKey, classicCertCriterionList.size());
     }
 
     private void syncGraduationDepartmentInfo() {
-        String tabName = graduationSheetProperties.tabs().get("graduation-department-info");
-        GraduationSheetTable graduationSheetTable = graduationSheetFetcher.fetchAsTable(tabName);
-
-        graduationSheetValidatorRegistry.get(tabName).validate(graduationSheetTable);
+        String tabKey = GraduationDepartmentInfoSheetValidator.TAB_KEY;
+        GraduationSheetTable graduationSheetTable = fetchAndValidate(tabKey);
 
         List<GraduationDepartmentInfo> graduationDepartmentInfoList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
@@ -345,6 +346,6 @@ public class AdminGraduationSyncService {
         graduationDepartmentInfoRepository.deleteAllInBatch();
         graduationDepartmentInfoRepository.saveAll(graduationDepartmentInfoList);
 
-        log.info("[졸업요건 데이터 동기화] 탭 이름={} 저장 완료 count={}", tabName, graduationDepartmentInfoList.size());
+        log.info("[졸업요건 데이터 동기화] 탭 이름={}, {}개 저장 완료", tabKey, graduationDepartmentInfoList.size());
     }
 }

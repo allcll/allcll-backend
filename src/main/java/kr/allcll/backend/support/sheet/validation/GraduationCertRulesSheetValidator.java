@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class GraduationCertRulesSheetValidator implements GraduationSheetValidator {
 
-    private static final String TAB_NAME = "graduation_cert_rules";
+    public static final String TAB_KEY = "graduation-cert-rules";
 
     private static final List<String> REQUIRED_HEADERS = List.of(
         "admission_year",
@@ -26,26 +26,26 @@ public class GraduationCertRulesSheetValidator implements GraduationSheetValidat
     private final GraduationSheetValidationSupport graduationSheetValidationSupport;
 
     @Override
-    public String tabName() {
-        return TAB_NAME;
+    public String tabKey() {
+        return TAB_KEY;
     }
 
     @Override
     public void validate(GraduationSheetTable sheetTable) {
-        graduationSheetValidationSupport.validateNotEmpty(TAB_NAME, sheetTable);
-        graduationSheetValidationSupport.validateRequiredHeaders(TAB_NAME, sheetTable, REQUIRED_HEADERS);
+        graduationSheetValidationSupport.validateNotEmpty(TAB_KEY, sheetTable);
+        graduationSheetValidationSupport.validateRequiredHeaders(TAB_KEY, sheetTable, REQUIRED_HEADERS);
 
         List<List<Object>> dataRows = sheetTable.getDataRows();
         for (int rowIndex = 0; rowIndex < dataRows.size(); rowIndex++) {
             List<Object> dataRow = dataRows.get(rowIndex);
 
-            graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "admission_year");
-            graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "admission_year_short");
-            graduationSheetValidationSupport.requireEnum(TAB_NAME, sheetTable, dataRow, rowIndex, "graduation_cert_rule_type", GraduationCertRuleType.class);
-            graduationSheetValidationSupport.requireInt(TAB_NAME, sheetTable, dataRow, rowIndex, "required_pass_count");
-            graduationSheetValidationSupport.requireBoolean(TAB_NAME, sheetTable, dataRow, rowIndex, "enable_english");
-            graduationSheetValidationSupport.requireBoolean(TAB_NAME, sheetTable, dataRow, rowIndex, "enable_classic");
-            graduationSheetValidationSupport.requireBoolean(TAB_NAME, sheetTable, dataRow, rowIndex, "enable_coding");
+            graduationSheetValidationSupport.requireInt(TAB_KEY, sheetTable, dataRow, rowIndex, "admission_year");
+            graduationSheetValidationSupport.requireInt(TAB_KEY, sheetTable, dataRow, rowIndex, "admission_year_short");
+            graduationSheetValidationSupport.requireEnum(TAB_KEY, sheetTable, dataRow, rowIndex, "graduation_cert_rule_type", GraduationCertRuleType.class);
+            graduationSheetValidationSupport.requireInt(TAB_KEY, sheetTable, dataRow, rowIndex, "required_pass_count");
+            graduationSheetValidationSupport.requireBoolean(TAB_KEY, sheetTable, dataRow, rowIndex, "enable_english");
+            graduationSheetValidationSupport.requireBoolean(TAB_KEY, sheetTable, dataRow, rowIndex, "enable_classic");
+            graduationSheetValidationSupport.requireBoolean(TAB_KEY, sheetTable, dataRow, rowIndex, "enable_coding");
         }
     }
 }

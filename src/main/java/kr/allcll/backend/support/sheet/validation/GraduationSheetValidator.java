@@ -4,7 +4,7 @@ import kr.allcll.backend.support.sheet.GraduationSheetTable;
 
 public interface GraduationSheetValidator {
 
-    String tabName();
+    String tabKey();
 
     void validate(GraduationSheetTable sheetTable);
 }

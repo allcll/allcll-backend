@@ -14,14 +14,14 @@ public class GraduationSheetValidatorRegistry {
 
     public GraduationSheetValidatorRegistry(List<GraduationSheetValidator> validators) {
         this.validators = validators.stream()
-            .collect(Collectors.toMap(GraduationSheetValidator::tabName, graduationSheetValidator -> graduationSheetValidator));
+            .collect(Collectors.toMap(GraduationSheetValidator::tabKey, graduationSheetValidator -> graduationSheetValidator));
     }
 
-    public GraduationSheetValidator get(String tabName) {
-        GraduationSheetValidator graduationSheetValidator = validators.get(tabName);
-        if (graduationSheetValidator == null) {
+    public GraduationSheetValidator get(String tabKey) {
+        GraduationSheetValidator validator = validators.get(tabKey);
+        if (validator == null) {
             throw new AllcllException(AllcllErrorCode.GOOGLE_SHEET_TAB_NOT_FOUND);
         }
-        return graduationSheetValidator;
+        return validator;
     }
 }
