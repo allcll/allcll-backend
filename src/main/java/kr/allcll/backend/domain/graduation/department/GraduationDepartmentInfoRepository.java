@@ -1,8 +1,9 @@
 package kr.allcll.backend.domain.graduation.department;
 
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface GraduationDepartmentInfoRepository extends JpaRepository<GraduationDepartmentInfo, Long> {
 
-    GraduationDepartmentInfo findByDeptNm(String deptNm);
+    Optional<GraduationDepartmentInfo> findByDeptNm(String deptNm);
 }

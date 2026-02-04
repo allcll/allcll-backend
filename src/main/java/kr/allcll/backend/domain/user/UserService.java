@@ -29,7 +29,8 @@ public class UserService {
     }
 
     private User save(UserInfo info) {
-        GraduationDepartmentInfo departmentInfo = departmentInfoRepository.findByDeptNm(info.deptNm());
+        GraduationDepartmentInfo departmentInfo = departmentInfoRepository.findByDeptNm(info.deptNm())
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND, info.deptNm()));
         User user = new User(
             info.studentId(),
             info.name(),
@@ -61,10 +62,15 @@ public class UserService {
         validateUserId(userId);
         User user = getById(userId);
         if (updateUserRequest.majorType() == MajorType.SINGLE) {
-            user.updateSingleMajorUser(updateUserRequest);
+            GraduationDepartmentInfo dept = departmentInfoRepository.findByDeptNm(updateUserRequest.deptNm())
+                .orElseThrow(
+                    () -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND, updateUserRequest.deptNm()));
+            user.updateSingleMajorUser(updateUserRequest, dept);
             return;
         }
-        GraduationDepartmentInfo doubleDept = departmentInfoRepository.findByDeptNm(updateUserRequest.doubleDeptNm());
+        GraduationDepartmentInfo doubleDept = departmentInfoRepository.findByDeptNm(updateUserRequest.doubleDeptNm())
+            .orElseThrow(
+                () -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND, updateUserRequest.doubleDeptNm()));
         user.updateDoubleMajorUser(updateUserRequest, doubleDept);
     }
 

@@ -25,6 +25,7 @@ public enum AllcllErrorCode {
     BASKET_NOT_FOUND(HttpStatus.NOT_FOUND, "관심과목 정보가 존재하지 않습니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자 정보를 찾을 수 없습니다."),
     GRADUATION_CERT_RULE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 연도의 졸업인증기준 규칙을 찾을 수 없습니다: %d"),
+    DEPARTMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 이름의 학과 정보를 찾을 수 없습니다: %s"),
 
     //409
     PIN_LIMIT_EXCEEDED(HttpStatus.CONFLICT, "이미 %d개의 핀을 등록했습니다."),
