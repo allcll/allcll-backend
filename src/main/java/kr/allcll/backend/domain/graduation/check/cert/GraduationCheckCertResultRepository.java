@@ -4,4 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface GraduationCheckCertResultRepository extends JpaRepository<GraduationCheckCertResult, Long> {
 
+    void deleteByUserId(Long userId);
 }

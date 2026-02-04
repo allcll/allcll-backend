@@ -23,9 +23,9 @@ public class UserService {
     private final GraduationDepartmentInfoRepository departmentInfoRepository;
 
     @Transactional
-    public User findOrCreate(UserInfo info) {
-        return userRepository.findByStudentId(info.studentId())
-            .orElseGet(() -> save(info));
+    public User findOrCreate(UserInfo userInfo) {
+        return userRepository.findByStudentId(userInfo.studentId())
+            .orElseGet(() -> save(userInfo));
     }
 
     private User save(UserInfo info) {
@@ -66,6 +66,7 @@ public class UserService {
     @Transactional
     public void delete(Long userId) {
         validateUserId(userId);
+        departmentInfoRepository.deleteById(userId);
         User user = getById(userId);
         userRepository.delete(user);
     }
