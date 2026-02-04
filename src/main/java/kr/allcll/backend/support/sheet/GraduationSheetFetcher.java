@@ -1,5 +1,6 @@
 package kr.allcll.backend.support.sheet;
 
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import java.util.List;
@@ -26,9 +27,13 @@ public class GraduationSheetFetcher {
 
             List<List<Object>> tableValues = valueRange.getValues();
             return GraduationSheetTable.from(tableValues);
-        } catch (Exception e) {
-            throw new AllcllException(AllcllErrorCode.GOOGLE_SHEET_TAP_NOT_FOUND);
+        } catch (GoogleJsonResponseException e) {
+            if (e.getStatusCode() == 404) {
+                throw new AllcllException(AllcllErrorCode.GOOGLE_SHEET_TAP_NOT_FOUND, e);
+            }
+            throw new AllcllException(AllcllErrorCode.GOOGLE_SHEET_ERROR, e);
+        }  catch (Exception e) {
+            throw new AllcllException(AllcllErrorCode.GOOGLE_SHEET_ERROR);
         }
     }
 }
-
