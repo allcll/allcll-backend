@@ -37,7 +37,7 @@ class UtilServiceTest {
 
         // then
         assertAll(
-            () -> assertThat(semesterResponse.semester()).isEqualTo("2025/1학기"),
+            () -> assertThat(semesterResponse.semesterValue()).isEqualTo("2025/1학기"),
             () -> assertThat(semesterResponse.period().startDate()).isEqualTo(LocalDate.of(2025, 2, 1)),
             () -> assertThat(semesterResponse.period().endDate()).isEqualTo(LocalDate.of(2025, 3, 31))
         );
@@ -56,8 +56,8 @@ class UtilServiceTest {
 
         // then
         assertAll(
-            () -> assertThat(semesterResponse.code()).isEqualTo("SUMMER_25"),
-            () -> assertThat(semesterResponse.semester()).isEqualTo("2025-여름"),
+            () -> assertThat(semesterResponse.semesterCode()).isEqualTo("SUMMER_25"),
+            () -> assertThat(semesterResponse.semesterValue()).isEqualTo("2025-여름"),
             () -> assertThat(semesterResponse.period().startDate()).isEqualTo(LocalDate.of(2025, 6, 1)),
             () -> assertThat(semesterResponse.period().endDate()).isEqualTo(LocalDate.of(2025, 6, 30))
         );

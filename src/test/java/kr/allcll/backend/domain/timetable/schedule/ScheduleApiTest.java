@@ -175,7 +175,7 @@ class ScheduleApiTest {
         TimeTableDetailResponse response = new TimeTableDetailResponse(
             1L,
             "테스트 시간표",
-            "2025-2",
+            "FALL_25",
             scheduleResponses
         );
 
@@ -186,7 +186,7 @@ class ScheduleApiTest {
             {
                 "timetableId": 1,
                 "timetableName": "테스트 시간표",
-                "semester": "2025-2",
+                "semesterCode": "FALL_25",
                 "schedules": [
                     {
                         "scheduleId": 1,

@@ -6,7 +6,7 @@ import kr.allcll.backend.domain.timetable.TimeTable;
 public record TimeTableDetailResponse(
     Long timetableId,
     String timetableName,
-    String semester,
+    String semesterCode,
     List<ScheduleResponse> schedules
 ) {
 
@@ -14,7 +14,7 @@ public record TimeTableDetailResponse(
         return new TimeTableDetailResponse(
             timeTable.getId(),
             timeTable.getTimeTableName(),
-            timeTable.getSemester().getValue(),
+            timeTable.getSemester().name(),
             schedules
         );
     }
