@@ -1,12 +1,19 @@
 package kr.allcll.backend.domain.graduation.credit;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import kr.allcll.backend.domain.graduation.MajorScope;
 import kr.allcll.backend.domain.graduation.MajorType;
 import kr.allcll.backend.support.entity.BaseEntity;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.AccessLevel;
 
 @Table(name = "credit_criteria")
 @Entity
@@ -30,6 +37,9 @@ public class CreditCriterion extends BaseEntity {
 
     @Column(name = "dept_cd", nullable = false)
     private String deptCd; // 학과 코드
+
+    @Column(name = "dept_nm", nullable = false)
+    private String deptNm; // 학과 이름
 
     @Enumerated(EnumType.STRING)
     @Column(name = "major_scope", nullable = false)
