@@ -33,7 +33,7 @@ public class GraduationCertFetcher {
         boolean englishPass = parseEnglish(englishDoc);
         boolean codingPass = parseCoding(codingDoc);
         boolean classicsPass = parsePass(studentDoc);
-        ClassicsCounts classicsCounts = ClassicsParser.parseCounts(studentDoc);
+        ClassicsCounts classicsCounts = parseClassicsCounts(studentDoc);
 
         return GraduationCertInfo.of(
             englishPass,
@@ -93,10 +93,67 @@ public class GraduationCertFetcher {
                 "table tbody tr:has(th:contains(인증여부)) td"
         ).text().trim();
 
-        if (approvalText.equals("아니오")) {
-            return false;
-        }
-        return true;
+        return !approvalText.equals("아니오");
     }
 
+    private ClassicsCounts parseClassicsCounts(Document document) {
+        Element table = document.selectFirst(
+            ".b-con-box:has(h4.b-h4-tit01:contains(영역별 인증현황)) table.b-board-table"
+        );
+
+        if (table == null) {
+            throw new AllcllException(AllcllErrorCode.CLASSIC_DETAIL_INFO_FETCH_FAIL);
+        }
+
+        int westernCertRequired = 0, westernCompleted = 0;
+        int easternCertRequired = 0, easternCompleted = 0;
+        int literatureCertRequired = 0, literatureCompleted = 0;
+        int scienceCertRequired = 0, scienceCompleted = 0;
+
+        for (Element row : table.select("tbody tr")) {
+            Element th = row.selectFirst("th");
+            if (th == null) {
+                continue;
+            }
+
+            String label = th.text();
+            Elements tds = row.select("td");
+
+            if (tds.size() < 2) {
+                continue;
+            }
+
+            int completedCount = extractCount(tds.get(0));
+            int certRequiredCount = extractCount(tds.get(1));
+
+            if (label.contains("서양의 역사와 사상")) {
+                westernCompleted = completedCount;
+                westernCertRequired = certRequiredCount;
+            } else if (label.contains("동양의 역사와 사상")) {
+                easternCompleted = completedCount;
+                easternCertRequired = certRequiredCount;
+            } else if (label.contains("동·서양의 문학")) {
+                literatureCompleted = completedCount;
+                literatureCertRequired = certRequiredCount;
+            } else if (label.contains("과학 사상")) {
+                scienceCompleted = completedCount;
+                scienceCertRequired = certRequiredCount;
+            }
+        }
+
+        return ClassicsCounts.of(
+            westernCertRequired, westernCompleted,
+            easternCertRequired, easternCompleted,
+            literatureCertRequired, literatureCompleted,
+            scienceCertRequired, scienceCompleted
+        );
+    }
+
+    private int extractCount(Element value) {
+        try {
+            return Integer.parseInt(value.text().replace("권", "").trim());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
 }
