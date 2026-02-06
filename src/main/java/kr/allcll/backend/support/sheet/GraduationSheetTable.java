@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 public class GraduationSheetTable {
 
-    private static final String TRUE_FLAG = "1";
+    private static final String TRUE_FLAG = "TRUE";
     private static final int HEADER_ROW_INDEX = 0;
     private static final int FIRST_DATA_ROW_INDEX = HEADER_ROW_INDEX + 1;
 
