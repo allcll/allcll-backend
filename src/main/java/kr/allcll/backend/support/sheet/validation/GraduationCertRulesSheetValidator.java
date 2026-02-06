@@ -16,11 +16,7 @@ public class GraduationCertRulesSheetValidator implements GraduationSheetValidat
     private static final List<String> REQUIRED_HEADERS = List.of(
         "admission_year",
         "admission_year_short",
-        "graduation_cert_rule_type",
-        "required_pass_count",
-        "enable_english",
-        "enable_classic",
-        "enable_coding"
+        "graduation_cert_rule_type"
     );
 
     private final GraduationSheetValidationSupport graduationSheetValidationSupport;
@@ -42,10 +38,6 @@ public class GraduationCertRulesSheetValidator implements GraduationSheetValidat
             graduationSheetValidationSupport.requireInt(TAB_KEY, sheetTable, dataRow, rowIndex, "admission_year");
             graduationSheetValidationSupport.requireInt(TAB_KEY, sheetTable, dataRow, rowIndex, "admission_year_short");
             graduationSheetValidationSupport.requireEnum(TAB_KEY, sheetTable, dataRow, rowIndex, "graduation_cert_rule_type", GraduationCertRuleType.class);
-            graduationSheetValidationSupport.requireInt(TAB_KEY, sheetTable, dataRow, rowIndex, "required_pass_count");
-            graduationSheetValidationSupport.requireBoolean(TAB_KEY, sheetTable, dataRow, rowIndex, "enable_english");
-            graduationSheetValidationSupport.requireBoolean(TAB_KEY, sheetTable, dataRow, rowIndex, "enable_classic");
-            graduationSheetValidationSupport.requireBoolean(TAB_KEY, sheetTable, dataRow, rowIndex, "enable_coding");
         }
     }
 }

@@ -23,8 +23,12 @@ import kr.allcll.backend.domain.graduation.certification.GraduationCertRule;
 import kr.allcll.backend.domain.graduation.certification.GraduationCertRuleRepository;
 import kr.allcll.backend.domain.graduation.certification.GraduationCertRuleType;
 import kr.allcll.backend.domain.graduation.credit.CategoryType;
+import kr.allcll.backend.domain.graduation.credit.CourseReplacement;
+import kr.allcll.backend.domain.graduation.credit.CourseReplacementRepository;
 import kr.allcll.backend.domain.graduation.credit.CreditCriterion;
 import kr.allcll.backend.domain.graduation.credit.CreditCriterionRepository;
+import kr.allcll.backend.domain.graduation.credit.DoubleCreditCriterion;
+import kr.allcll.backend.domain.graduation.credit.DoubleCreditCriterionRepository;
 import kr.allcll.backend.domain.graduation.credit.RequiredCourse;
 import kr.allcll.backend.domain.graduation.credit.RequiredCourseRepository;
 import kr.allcll.backend.domain.graduation.department.DeptGroup;
@@ -38,7 +42,9 @@ import kr.allcll.backend.support.sheet.validation.BalanceRequiredCourseAreaMapSh
 import kr.allcll.backend.support.sheet.validation.BalanceRequiredRulesSheetValidator;
 import kr.allcll.backend.support.sheet.validation.ClassicCertCriteriaSheetValidator;
 import kr.allcll.backend.support.sheet.validation.CodingCertCriteriaSheetValidator;
+import kr.allcll.backend.support.sheet.validation.CourseReplacementsSheetValidator;
 import kr.allcll.backend.support.sheet.validation.CreditCriteriaSheetValidator;
+import kr.allcll.backend.support.sheet.validation.DoubleCreditCriteriaSheetValidator;
 import kr.allcll.backend.support.sheet.validation.EnglishCertCriteriaSheetValidator;
 import kr.allcll.backend.support.sheet.validation.GraduationCertRulesSheetValidator;
 import kr.allcll.backend.support.sheet.validation.GraduationDepartmentInfoSheetValidator;
@@ -58,11 +64,13 @@ public class AdminGraduationSyncService {
     private final RequiredCourseRepository requiredCourseRepository;
     private final CreditCriterionRepository creditCriterionRepository;
     private final GraduationSheetProperties graduationSheetProperties;
+    private final CourseReplacementRepository courseReplacementRepository;
     private final GraduationCertRuleRepository graduationCertRuleRepository;
     private final BalanceRequiredRuleRepository balanceRequiredRuleRepository;
     private final CodingCertCriterionRepository codingCertCriterionRepository;
     private final ClassicCertCriterionRepository classicCertCriterionRepository;
     private final EnglishCertCriterionRepository englishCertCriterionRepository;
+    private final DoubleCreditCriterionRepository doubleCreditCriterionRepository;
     private final GraduationSheetValidatorRegistry graduationSheetValidatorRegistry;
     private final GraduationDepartmentInfoRepository graduationDepartmentInfoRepository;
     private final BalanceRequiredCourseAreaMapRepository balanceRequiredCourseAreaMapRepository;
@@ -72,7 +80,9 @@ public class AdminGraduationSyncService {
     public void syncGraduationRules() {
         log.info("[졸업요건 데이터 동기화] 시작");
         syncCreditCriteria();
+        syncDoubleCreditCriteria();
         syncRequiredCourses();
+        syncCourseReplacements();
 
         syncBalanceRequiredRule();
         syncBalanceRequiredCourseAreaMap();
@@ -109,6 +119,7 @@ public class AdminGraduationSyncService {
                 graduationSheetTable.getInt(row, "admission_year_short"),
                 graduationSheetTable.getEnum(row, "major_type", MajorType.class),
                 graduationSheetTable.getString(row, "dept_cd"),
+                graduationSheetTable.getString(row, "dept_nm"),
                 graduationSheetTable.getEnum(row, "major_scope", MajorScope.class),
                 graduationSheetTable.getEnum(row, "category_type", CategoryType.class),
                 graduationSheetTable.getInt(row, "required_credits"),
@@ -122,6 +133,35 @@ public class AdminGraduationSyncService {
         creditCriterionRepository.saveAll(creditCriterionList);
 
         log.info("[졸업요건 데이터 동기화] 탭 이름={}, {}개 저장 완료", tabKey, creditCriterionList.size());
+    }
+
+    private void syncDoubleCreditCriteria() {
+        String tabKey = DoubleCreditCriteriaSheetValidator.TAB_KEY;
+        GraduationSheetTable graduationSheetTable = fetchAndValidate(tabKey);
+
+        List<DoubleCreditCriterion> doubleCreditCriterionList = new ArrayList<>();
+        for (List<Object> row : graduationSheetTable.getDataRows()) {
+            DoubleCreditCriterion doubleCreditCriterion = new DoubleCreditCriterion(
+                graduationSheetTable.getInt(row, "admission_year"),
+                graduationSheetTable.getInt(row, "admission_year_short"),
+                graduationSheetTable.getEnum(row, "major_type", MajorType.class),
+                graduationSheetTable.getString(row, "primary_dept_cd"),
+                graduationSheetTable.getString(row, "primary_dept_nm"),
+                graduationSheetTable.getString(row, "secondary_dept_cd"),
+                graduationSheetTable.getString(row, "secondary_dept_nm"),
+                graduationSheetTable.getEnum(row, "major_scope", MajorScope.class),
+                graduationSheetTable.getEnum(row, "category_type", CategoryType.class),
+                graduationSheetTable.getInt(row, "required_credits"),
+                graduationSheetTable.getBoolean(row, "enabled"),
+                graduationSheetTable.getString(row, "note")
+            );
+            doubleCreditCriterionList.add(doubleCreditCriterion);
+        }
+
+        doubleCreditCriterionRepository.deleteAllInBatch();
+        doubleCreditCriterionRepository.saveAll(doubleCreditCriterionList);
+
+        log.info("[졸업요건 데이터 동기화] 탭 이름={}, {}개 저장 완료", tabKey, doubleCreditCriterionList.size());
     }
 
     private void syncRequiredCourses() {
@@ -150,6 +190,31 @@ public class AdminGraduationSyncService {
         log.info("[졸업요건 데이터 동기화] 탭 이름={}, {}개 저장 완료", tabKey, requiredCourseList.size());
     }
 
+    private void syncCourseReplacements() {
+        String tabKey = CourseReplacementsSheetValidator.TAB_KEY;
+        GraduationSheetTable graduationSheetTable = fetchAndValidate(tabKey);
+
+        List<CourseReplacement> courseReplacementList = new ArrayList<>();
+        for (List<Object> row : graduationSheetTable.getDataRows()) {
+            CourseReplacement courseReplacement = new CourseReplacement(
+                graduationSheetTable.getInt(row, "admission_year"),
+                graduationSheetTable.getInt(row, "admission_year_short"),
+                graduationSheetTable.getString(row, "legacy_curi_nm"),
+                graduationSheetTable.getString(row, "current_curi_no"),
+                graduationSheetTable.getString(row, "current_curi_nm"),
+                graduationSheetTable.getBoolean(row, "enabled"),
+                graduationSheetTable.getString(row, "note")
+            );
+            courseReplacementList.add(courseReplacement);
+        }
+
+        courseReplacementRepository.deleteAllInBatch();
+        courseReplacementRepository.saveAll(courseReplacementList);
+
+        log.info("[졸업요건 데이터 동기화] 탭 이름={}, {}개 저장 완료", tabKey, courseReplacementList.size());
+    }
+
+
     private void syncBalanceRequiredRule() {
         String tabKey = BalanceRequiredRulesSheetValidator.TAB_KEY;
         GraduationSheetTable graduationSheetTable = fetchAndValidate(tabKey);
@@ -159,6 +224,9 @@ public class AdminGraduationSyncService {
             BalanceRequiredRule balanceRequiredRule = new BalanceRequiredRule(
                 graduationSheetTable.getInt(row, "admission_year"),
                 graduationSheetTable.getInt(row, "admission_year_short"),
+                graduationSheetTable.getString(row, "dept_cd"),
+                graduationSheetTable.getString(row, "dept_nm"),
+                graduationSheetTable.getBoolean(row, "required"),
                 graduationSheetTable.getInt(row, "required_areas_cnt"),
                 graduationSheetTable.getInt(row, "required_credits"),
                 graduationSheetTable.getString(row, "note")
@@ -224,12 +292,7 @@ public class AdminGraduationSyncService {
             GraduationCertRule graduationCertRule = new GraduationCertRule(
                 graduationSheetTable.getInt(row, "admission_year"),
                 graduationSheetTable.getInt(row, "admission_year_short"),
-                graduationSheetTable.getEnum(row, "graduation_cert_rule_type", GraduationCertRuleType.class),
-                graduationSheetTable.getInt(row, "required_pass_count"),
-                graduationSheetTable.getBoolean(row, "enable_english"),
-                graduationSheetTable.getBoolean(row, "enable_classic"),
-                graduationSheetTable.getBoolean(row, "enable_coding"),
-                graduationSheetTable.getString(row, "note")
+                graduationSheetTable.getEnum(row, "graduation_cert_rule_type", GraduationCertRuleType.class)
             );
             graduationCertRuleList.add(graduationCertRule);
         }
@@ -283,10 +346,8 @@ public class AdminGraduationSyncService {
                 graduationSheetTable.getInt(row, "admission_year_short"),
                 graduationSheetTable.getEnum(row, "coding_target_type", CodingTargetType.class),
                 graduationSheetTable.getInt(row, "tosc_min_level"),
-                graduationSheetTable.getString(row, "alt1_curi_no"),
-                graduationSheetTable.getString(row, "alt1_min_grade"),
-                graduationSheetTable.getString(row, "alt2_curi_no"),
-                graduationSheetTable.getString(row, "alt2_min_grade"),
+                graduationSheetTable.getString(row, "alt_curi_no"),
+                graduationSheetTable.getString(row, "alt_min_grade"),
                 graduationSheetTable.getString(row, "note")
             );
             codingCertCriterionList.add(codingCertCriterion);

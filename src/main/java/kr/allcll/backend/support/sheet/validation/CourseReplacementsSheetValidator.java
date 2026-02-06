@@ -1,28 +1,22 @@
 package kr.allcll.backend.support.sheet.validation;
 
 import java.util.List;
-import kr.allcll.backend.domain.graduation.MajorScope;
-import kr.allcll.backend.domain.graduation.MajorType;
-import kr.allcll.backend.domain.graduation.credit.CategoryType;
 import kr.allcll.backend.support.sheet.GraduationSheetTable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class CreditCriteriaSheetValidator implements GraduationSheetValidator {
+public class CourseReplacementsSheetValidator implements GraduationSheetValidator {
 
-    public static final String TAB_KEY = "credit-criteria";
+    public static final String TAB_KEY = "course-replacements";
 
     private static final List<String> REQUIRED_HEADERS = List.of(
         "admission_year",
         "admission_year_short",
-        "major_type",
-        "dept_cd",
-        "dept_nm",
-        "major_scope",
-        "category_type",
-        "required_credits",
+        "legacy_curi_nm",
+        "current_curi_no",
+        "current_curi_nm",
         "enabled"
     );
 
@@ -44,12 +38,9 @@ public class CreditCriteriaSheetValidator implements GraduationSheetValidator {
 
             graduationSheetValidationSupport.requireInt(TAB_KEY, sheetTable, dataRow, rowIndex, "admission_year");
             graduationSheetValidationSupport.requireInt(TAB_KEY, sheetTable, dataRow, rowIndex, "admission_year_short");
-            graduationSheetValidationSupport.requireEnum(TAB_KEY, sheetTable, dataRow, rowIndex, "major_type", MajorType.class);
-            graduationSheetValidationSupport.requireString(TAB_KEY, sheetTable, dataRow, rowIndex, "dept_cd");
-            graduationSheetValidationSupport.requireString(TAB_KEY, sheetTable, dataRow, rowIndex, "dept_nm");
-            graduationSheetValidationSupport.requireEnum(TAB_KEY, sheetTable, dataRow, rowIndex, "major_scope", MajorScope.class);
-            graduationSheetValidationSupport.requireEnum(TAB_KEY, sheetTable, dataRow, rowIndex, "category_type", CategoryType.class);
-            graduationSheetValidationSupport.requireInt(TAB_KEY, sheetTable, dataRow, rowIndex, "required_credits");
+            graduationSheetValidationSupport.requireString(TAB_KEY, sheetTable, dataRow, rowIndex, "legacy_curi_nm");
+            graduationSheetValidationSupport.requireString(TAB_KEY, sheetTable, dataRow, rowIndex, "current_curi_no");
+            graduationSheetValidationSupport.requireString(TAB_KEY, sheetTable, dataRow, rowIndex, "current_curi_nm");
             graduationSheetValidationSupport.requireBoolean(TAB_KEY, sheetTable, dataRow, rowIndex, "enabled");
         }
     }
