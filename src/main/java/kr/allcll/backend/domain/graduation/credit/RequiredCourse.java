@@ -36,7 +36,7 @@ public class RequiredCourse extends BaseEntity {
     private String curiNm; // 과목명
 
     @Column(name = "alt_group")
-    private String altGroup; // 대체/선택 과목 그룹 키
+    private String altGroup; // 선택 과목 그룹 키
 
     @Column(name = "required", nullable = false)
     private Boolean required; // 검사 대상 여부

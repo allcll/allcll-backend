@@ -31,6 +31,9 @@ public class CreditCriterion extends BaseEntity {
     @Column(name = "dept_cd", nullable = false)
     private String deptCd; // 학과 코드
 
+    @Column(name = "dept_nm", nullable = false)
+    private String deptNm; // 학과명
+
     @Enumerated(EnumType.STRING)
     @Column(name = "major_scope", nullable = false)
     private MajorScope majorScope; // 기준이 적용되는 전공 형태
@@ -53,6 +56,7 @@ public class CreditCriterion extends BaseEntity {
         Integer admissionYearShort,
         MajorType majorType,
         String deptCd,
+        String deptNm,
         MajorScope majorScope,
         CategoryType categoryType,
         Integer requiredCredits,
@@ -63,6 +67,7 @@ public class CreditCriterion extends BaseEntity {
         this.admissionYearShort = admissionYearShort;
         this.majorType = majorType;
         this.deptCd = deptCd;
+        this.deptNm = deptNm;
         this.majorScope = majorScope;
         this.categoryType = categoryType;
         this.requiredCredits = requiredCredits;
