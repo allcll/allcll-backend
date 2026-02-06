@@ -2,6 +2,7 @@ package kr.allcll.backend.domain.user;
 
 import java.io.IOException;
 import kr.allcll.backend.client.LoginProperties;
+import kr.allcll.backend.domain.user.dto.UserInfo;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import lombok.RequiredArgsConstructor;
@@ -31,9 +32,9 @@ public class UserFetcher {
                     throw new AllcllException(AllcllErrorCode.USER_INFO_FETCH_FAIL);
                 }
 
-                Document doc = Jsoup.parse(response.body().string());
+                Document document = Jsoup.parse(response.body().string());
 
-                return parseUserInfo(doc);
+                return parseUserInfo(document);
             }
         } catch (IOException exception) {
             throw new AllcllException(AllcllErrorCode.USER_INFO_FETCH_IO_ERROR);
