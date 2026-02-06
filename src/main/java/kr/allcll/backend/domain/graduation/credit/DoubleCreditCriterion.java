@@ -1,13 +1,6 @@
 package kr.allcll.backend.domain.graduation.credit;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import kr.allcll.backend.domain.graduation.MajorScope;
 import kr.allcll.backend.domain.graduation.MajorType;
 import kr.allcll.backend.support.entity.BaseEntity;
@@ -15,11 +8,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Table(name = "credit_criteria")
+@Table(name = "double_credit_criteria")
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CreditCriterion extends BaseEntity {
+public class DoubleCreditCriterion extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,12 +28,17 @@ public class CreditCriterion extends BaseEntity {
     @Column(name = "major_type", nullable = false)
     private MajorType majorType; // 전공 이수 형태
 
-    @Column(name = "dept_cd", nullable = false)
-    private String deptCd; // 학과 코드
+    @Column(name = "primary_dept_cd", nullable = false)
+    private String primaryDeptCd; // 주전공 학과 코드
 
-    @Column(name = "dept_nm", nullable = false)
-    private String deptNm; // 학과명
+    @Column(name = "primary_dept_nm", nullable = false)
+    private String primaryDeptNm; // 주전공 학과명
 
+    @Column(name = "secondary_dept_cd", nullable = false)
+    private String secondaryDeptCd; // 복수전공 학과 코드
+
+    @Column(name = "secondary_dept_nm", nullable = false)
+    private String secondaryDeptNm; // 복수전공 학과명
 
     @Enumerated(EnumType.STRING)
     @Column(name = "major_scope", nullable = false)
@@ -59,12 +57,14 @@ public class CreditCriterion extends BaseEntity {
     @Column(name = "note")
     private String note; // 비고
 
-    public CreditCriterion(
+    public DoubleCreditCriterion(
         Integer admissionYear,
         Integer admissionYearShort,
         MajorType majorType,
-        String deptCd,
-        String deptNm,
+        String primaryDeptCd,
+        String primaryDeptNm,
+        String secondaryDeptCd,
+        String secondaryDeptNm,
         MajorScope majorScope,
         CategoryType categoryType,
         Integer requiredCredits,
@@ -74,8 +74,10 @@ public class CreditCriterion extends BaseEntity {
         this.admissionYear = admissionYear;
         this.admissionYearShort = admissionYearShort;
         this.majorType = majorType;
-        this.deptCd = deptCd;
-        this.deptNm = deptNm;
+        this.primaryDeptCd = primaryDeptCd;
+        this.primaryDeptNm = primaryDeptNm;
+        this.secondaryDeptCd = secondaryDeptCd;
+        this.secondaryDeptNm = secondaryDeptNm;
         this.majorScope = majorScope;
         this.categoryType = categoryType;
         this.requiredCredits = requiredCredits;

@@ -1,6 +1,13 @@
 package kr.allcll.backend.domain.graduation.certification;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import kr.allcll.backend.support.entity.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -26,38 +33,10 @@ public class GraduationCertRule extends BaseEntity {
     @Column(name = "graduation_cert_rule_type", nullable = false)
     private GraduationCertRuleType graduationCertRuleType; // 인증 검사 방식
 
-    @Column(name = "required_pass_count", nullable = false)
-    private Integer requiredPassCount; // 최소 통과 개수
-
-    @Column(name = "enable_english", nullable = false)
-    private Boolean enableEnglish; // 영어인증 검사 포함 여부
-
-    @Column(name = "enable_classic", nullable = false)
-    private Boolean enableClassic; // 고전독서인증 검사 포함 여부
-
-    @Column(name = "enable_coding", nullable = false)
-    private Boolean enableCoding; // 코딩인증 검사 포함 여부
-
-    @Column(name = "note")
-    private String note; // 비고
-
-    public GraduationCertRule(
-        Integer admissionYear,
-        Integer admissionYearShort,
-        GraduationCertRuleType graduationCertRuleType,
-        Integer requiredPassCount,
-        Boolean enableEnglish,
-        Boolean enableClassic,
-        Boolean enableCoding,
-        String note
-    ) {
+    public GraduationCertRule(Integer admissionYear, Integer admissionYearShort,
+        GraduationCertRuleType graduationCertRuleType) {
         this.admissionYear = admissionYear;
         this.admissionYearShort = admissionYearShort;
         this.graduationCertRuleType = graduationCertRuleType;
-        this.requiredPassCount = requiredPassCount;
-        this.enableEnglish = enableEnglish;
-        this.enableClassic = enableClassic;
-        this.enableCoding = enableCoding;
-        this.note = note;
     }
 }
