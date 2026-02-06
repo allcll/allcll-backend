@@ -41,7 +41,6 @@ public class CreditCriterion extends BaseEntity {
     @Column(name = "dept_nm", nullable = false)
     private String deptNm; // 학과명
 
-
     @Enumerated(EnumType.STRING)
     @Column(name = "major_scope", nullable = false)
     private MajorScope majorScope; // 기준이 적용되는 전공 형태

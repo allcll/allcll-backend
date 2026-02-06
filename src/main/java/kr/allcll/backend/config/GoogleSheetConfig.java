@@ -1,0 +1,48 @@
+package kr.allcll.backend.config;
+
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.sheets.v4.Sheets;
+import com.google.auth.http.HttpCredentialsAdapter;
+import com.google.auth.oauth2.GoogleCredentials;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.GeneralSecurityException;
+import kr.allcll.backend.support.exception.AllcllErrorCode;
+import kr.allcll.backend.support.exception.AllcllException;
+import kr.allcll.backend.support.sheet.GraduationSheetProperties;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+
+@Configuration
+@RequiredArgsConstructor
+@EnableConfigurationProperties(GraduationSheetProperties.class)
+public class GoogleSheetConfig {
+
+    private final GraduationSheetProperties graduationSheetProperties;
+    private final ResourceLoader resourceLoader;
+
+    @Bean
+    public Sheets sheets() throws IOException, GeneralSecurityException {
+        Resource key = resourceLoader.getResource(graduationSheetProperties.credentialsLocation());
+
+        if (!key.exists() || !key.isReadable()) {
+            throw new AllcllException(AllcllErrorCode.GOOGLE_KEY_NOT_FOUND);
+        }
+
+        GoogleCredentials googleCredentials;
+        try (InputStream is = key.getInputStream()) {
+            googleCredentials = GoogleCredentials.fromStream(is);
+        }
+
+        return new Sheets.Builder(
+            GoogleNetHttpTransport.newTrustedTransport(),
+            GsonFactory.getDefaultInstance(),
+            new HttpCredentialsAdapter(googleCredentials)
+        ).setApplicationName(graduationSheetProperties.applicationName()).build();
+    }
+}
