@@ -6,6 +6,7 @@ import kr.allcll.backend.domain.graduation.check.cert.dto.ClassicsCounts;
 import kr.allcll.backend.domain.graduation.check.cert.dto.GraduationCertInfo;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
+import kr.allcll.backend.support.graduation.GraduationHtmlParser;
 import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 public class GraduationCertFetcher {
 
     private final LoginProperties properties;
+    private final GraduationHtmlParser parser;
 
     public GraduationCertInfo fetch(OkHttpClient client) {
         Document englishDoc = fetchDocument(client, properties.englishInfoPageUrl(),
@@ -60,7 +62,7 @@ public class GraduationCertFetcher {
     }
 
     private boolean parseEnglish(Document document) {
-        Elements resultElements = document.select("tbody tr");
+        Elements resultElements = parser.selectEnglishResultRows(document);
         if (resultElements.isEmpty()) {
             return false;
         }
@@ -74,7 +76,7 @@ public class GraduationCertFetcher {
     }
 
     private boolean parseCoding(Document document) {
-        Elements resultElements = document.select("span.certificate");
+        Elements resultElements = parser.selectCodingResultElements(document);
         if (resultElements.isEmpty()) {
             return false;
         }
@@ -88,27 +90,24 @@ public class GraduationCertFetcher {
     }
 
     private boolean parsePass(Document document) {
-        String approvalText = document.select(
-            ".b-con-box:has(h4.b-h4-tit01:contains(사용자 정보)) " +
-                "table tbody tr:has(th:contains(인증여부)) td"
-        ).text().trim();
-
+        String approvalText = parser.selectClassicsPassText(document).trim();
         return !approvalText.equals("아니오");
     }
 
     private ClassicsCounts parseClassicsCounts(Document document) {
-        Element table = document.selectFirst(
-            ".b-con-box:has(h4.b-h4-tit01:contains(영역별 인증현황)) table.b-board-table"
-        );
-
+        Element table = parser.selectClassicsDetailTable(document);
         if (table == null) {
             throw new AllcllException(AllcllErrorCode.CLASSIC_DETAIL_INFO_FETCH_FAIL);
         }
 
-        int westernCertRequired = 0, westernCompleted = 0;
-        int easternCertRequired = 0, easternCompleted = 0;
-        int literatureCertRequired = 0, literatureCompleted = 0;
-        int scienceCertRequired = 0, scienceCompleted = 0;
+        int westernCertRequired = 0;
+        int westernCompleted = 0;
+        int easternCertRequired = 0;
+        int easternCompleted = 0;
+        int literatureCertRequired = 0;
+        int literatureCompleted = 0;
+        int scienceCertRequired = 0;
+        int scienceCompleted = 0;
 
         for (Element row : table.select("tbody tr")) {
             Element th = row.selectFirst("th");
@@ -118,7 +117,6 @@ public class GraduationCertFetcher {
 
             String label = th.text();
             Elements tds = row.select("td");
-
             if (tds.size() < 2) {
                 continue;
             }
