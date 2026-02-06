@@ -43,12 +43,18 @@ public class BalanceRequiredRule extends BaseEntity {
     public BalanceRequiredRule(
         Integer admissionYear,
         Integer admissionYearShort,
+        String deptCd,
+        String deptNm,
+        Boolean isRequired,
         Integer requiredAreasCnt,
         Integer requiredCredits,
         String note
     ) {
         this.admissionYear = admissionYear;
         this.admissionYearShort = admissionYearShort;
+        this.deptCd = deptCd;
+        this.deptNm = deptNm;
+        this.required = isRequired;
         this.requiredAreasCnt = requiredAreasCnt;
         this.requiredCredits = requiredCredits;
         this.note = note;
