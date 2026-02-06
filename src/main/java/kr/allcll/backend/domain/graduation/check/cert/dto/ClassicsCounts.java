@@ -13,13 +13,18 @@ public record ClassicsCounts(
     int myCountScience  // 과학 사상 내 인증 권수
 ) {
 
-    public static ClassicsCounts of(int westernCertRequired, int westernCompleted, int easternCertRequired,
-        int easternCompleted, int literatureCertRequired, int literatureCompleted, int scienceCertRequired,
-        int scienceCompleted) {
-        int totalRequired = westernCertRequired + easternCertRequired +
-            literatureCertRequired + scienceCertRequired;
-        int totalCompleted = westernCompleted + easternCompleted +
-            literatureCompleted + scienceCompleted;
+    public static ClassicsCounts of(
+        int westernCertRequired,
+        int westernCompleted,
+        int easternCertRequired,
+        int easternCompleted,
+        int literatureCertRequired,
+        int literatureCompleted,
+        int scienceCertRequired,
+        int scienceCompleted
+    ) {
+        int totalRequired = westernCertRequired + easternCertRequired + literatureCertRequired + scienceCertRequired;
+        int totalCompleted = westernCompleted + easternCompleted + literatureCompleted + scienceCompleted;
         return new ClassicsCounts(
             totalRequired,
             totalCompleted,
