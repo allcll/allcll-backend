@@ -43,8 +43,7 @@ public class GraduationCertCriteriaService {
         CodingTargetType resolvedCodingTargetType = MajorTargetTypeResolver.resolveCodingTargetType(primaryDeptInfo, doubleDeptInfo);
 
         GraduationCertRule graduationCertRule = graduationCertRuleRepository.findByAdmissionYear(admissionYear)
-            .orElseThrow(() -> new AllcllException(AllcllErrorCode.GRADUATION_CERT_RULE_NOT_FOUND,
-                String.valueOf(admissionYear)));
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.GRADUATION_CERT_RULE_NOT_FOUND, String.valueOf(admissionYear)));
 
         GraduationCertCriteriaTargetResponse criteriaTarget = buildCriteriaTarget(resolvedEnglishTargetType, resolvedCodingTargetType);
         GraduationCertPolicyResponse certPolicy = buildCertPolicy(graduationCertRule.getGraduationCertRuleType(), resolvedEnglishTargetType, resolvedCodingTargetType);
