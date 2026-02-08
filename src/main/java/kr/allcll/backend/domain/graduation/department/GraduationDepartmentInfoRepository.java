@@ -6,6 +6,17 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface GraduationDepartmentInfoRepository extends JpaRepository<GraduationDepartmentInfo, Long> {
 
-    @Query("SELECT g FROM GraduationDepartmentInfo g WHERE g.admissionYear = :admissionYear AND g.deptNm = :deptNm")
+    @Query("""
+        select d FROM GraduationDepartmentInfo d 
+        where d.admissionYear = :admissionYear 
+        and d.deptNm = :deptNm
+        """)
     Optional<GraduationDepartmentInfo> findByAdmissionYearAndDeptNm(int admissionYear, String deptNm);
+
+    @Query("""
+        select g from GraduationDepartmentInfo g
+        where g.admissionYear = :admissionYear
+        and g.deptCd = :deptCd
+        """)
+    Optional<GraduationDepartmentInfo> findByAdmissionYearAndDeptCd(int admissionYear, String deptCd);
 }
