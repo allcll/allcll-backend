@@ -10,7 +10,7 @@ public abstract class AbstractBatch<T> {
     private final BlockingQueue<T> queue;
     private final Object lock;
 
-    protected abstract int flushLimit();
+    protected abstract int getFlushLimit();
 
     protected abstract void saveAll(List<T> batch);
 
@@ -21,7 +21,7 @@ public abstract class AbstractBatch<T> {
 
     public void add(T item) {
         queue.add(item);
-        if (queue.size() >= flushLimit()) {
+        if (queue.size() >= getFlushLimit()) {
             flush();
         }
     }

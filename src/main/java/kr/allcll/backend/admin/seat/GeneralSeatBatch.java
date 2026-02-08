@@ -15,7 +15,7 @@ public class GeneralSeatBatch extends AbstractBatch<CrawlerSeat> {
     private final SeatPersistenceService seatPersistenceService;
 
     @Override
-    protected int flushLimit() {
+    protected int getFlushLimit() {
         return FLUSH_LIMIT;
     }
 
