@@ -322,8 +322,9 @@ public class AdminGraduationSyncService {
                 graduationSheetTable.getInt(row, "gtelp_level"),
                 graduationSheetTable.getInt(row, "gtelp_min_score"),
                 graduationSheetTable.getInt(row, "gtelp_speaking_level"),
-                graduationSheetTable.getString(row, "alt_course_name"),
-                graduationSheetTable.getInt(row, "alt_course_credit"),
+                graduationSheetTable.getString(row, "alt_curi_no"),
+                graduationSheetTable.getString(row, "alt_curi_nm"),
+                graduationSheetTable.getInt(row, "alt_curi_credit"),
                 graduationSheetTable.getString(row, "note")
             );
             englishCertCriterionList.add(englishCertCriterion);
