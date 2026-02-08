@@ -22,6 +22,15 @@ public class BalanceRequiredRule extends BaseEntity {
     @Column(name = "admission_year_short", nullable = false)
     private Integer admissionYearShort;
 
+    @Column(name = "dept_cd", nullable = false)
+    private String deptCd; // 학과 코드
+
+    @Column(name = "dept_nm", nullable = false)
+    private String deptNm; // 학과명
+
+    @Column(name = "required", nullable = false)
+    private Boolean required; // 적용 여부
+
     @Column(name = "required_areas_cnt", nullable = false)
     private Integer requiredAreasCnt; // 요구 영역 개수
 
@@ -34,12 +43,18 @@ public class BalanceRequiredRule extends BaseEntity {
     public BalanceRequiredRule(
         Integer admissionYear,
         Integer admissionYearShort,
+        String deptCd,
+        String deptNm,
+        Boolean required,
         Integer requiredAreasCnt,
         Integer requiredCredits,
         String note
     ) {
         this.admissionYear = admissionYear;
         this.admissionYearShort = admissionYearShort;
+        this.deptCd = deptCd;
+        this.deptNm = deptNm;
+        this.required = required;
         this.requiredAreasCnt = requiredAreasCnt;
         this.requiredCredits = requiredCredits;
         this.note = note;

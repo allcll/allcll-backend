@@ -1,9 +1,11 @@
 package kr.allcll.backend.domain.graduation.department;
 
 public enum DeptGroup { // 계열
-    HUMANITIES_AND_SCIENCES_COLLEGE,                  // 인문과학대학
+    LIBERAL_ARTS_COLLEGE,                             // 인문과학대학
     SOCIAL_SCIENCES_COLLEGE,                          // 사회과학대학
+    LAW,                                              // 법학부
     BUSINESS_AND_ECONOMICS_COLLEGE,                   // 경영경제대학
+    BUSINESS_ADMINISTRATION_COLLEGE,                  // 경영대학
     HOSPITALITY_AND_TOURISM_COLLEGE,                  // 호텔관광대학
     NATURAL_SCIENCES_COLLEGE,                         // 자연과학대학
     LIFE_SCIENCES_COLLEGE,                            // 생명과학대학
@@ -12,6 +14,9 @@ public enum DeptGroup { // 계열
     AI_CONVERGENCE_COLLEGE,                           // 인공지능융합대학
     ENGINEERING_COLLEGE,                              // 공과대학
     ARTS_AND_PHYSICAL_EDUCATION_COLLEGE,              // 예체능대학
-    INTERDISCIPLINARY_CONVERGENCE_MAJOR,              // 연계융합전공
+    INTERDISCIPLINARY_CONVERGENCE_MAJOR,              // 연계전공
+    DAEYANG_HUMANITY_COLLEGE,                         // 대양휴머니티칼리지
+    ACADEMIC_DIVISION_2,                              // 유형2
+    SEJONG_INTERNATIONAL_COLLEGE,                     // 세종국제대학
     ;
 }

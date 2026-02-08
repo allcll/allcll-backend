@@ -54,3 +54,20 @@ cookie:
 
 admin:
   token:
+
+google:
+  sheets:
+    application-name: "test-sync"
+    spreadsheet-id: "test-id"
+    credentials-location: ${GOOGLE_SHEETS_CREDENTIALS_LOCATION}
+    tabs:
+      credit-criteria: "test"
+      required-courses: "test"
+      balance-required-rules: "test"
+      balance-required-course-area-map: "test"
+      balance-required-area-exclusions: "test"
+      graduation-cert-rules: "test"
+      english-cert-criteria: "test"
+      coding-cert-criteria: "test"
+      classic-cert-criteria: "test"
+      graduation-department-info: "test"

@@ -14,6 +14,8 @@ jobs:
       DEV_URL: ${{ secrets.DEV_URL }}
       ADMIN_URL: ${{ secrets.ADMIN_URL }}
       EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+      GOOGLE_ACCOUNT_JSON: ${{ secrets.GOOGLE_ACCOUNT_JSON }}
+      GOOGLE_SHEETS_CREDENTIALS_LOCATION: file:/opt/secrets/google-service-account.json
 
     defaults:
       run:
@@ -43,6 +45,14 @@ jobs:
         run: |
           mkdir -p /home/ubuntu/app
           cp config/application-dev.yml /home/ubuntu/app/application-dev.yml
+
+      - name: Create Google Service Account json on EC2
+        run: |
+          sudo mkdir -p /opt/secrets
+          echo "${GOOGLE_ACCOUNT_JSON}" | sudo tee /opt/secrets/google-service-account.json > /dev/null
+          sudo chmod 600 /opt/secrets/google-service-account.json
+          sudo chown ubuntu:ubuntu /opt/secrets/google-service-account.json
+          ls -al /opt/secrets/google-service-account.json
 
       - name: Checkout Main Repository with Submodules
         uses: actions/checkout@v4

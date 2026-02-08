@@ -10,6 +10,9 @@ public enum AllcllErrorCode {
     INVALID_TIME(HttpStatus.BAD_REQUEST, "시작 시간이 종료 시간과 같거나 늦습니다."),
     PIN_SUBJECT_MISMATCH(HttpStatus.BAD_REQUEST, "핀에 등록된 과목이 아닙니다."),
     STAR_SUBJECT_MISMATCH(HttpStatus.BAD_REQUEST, "즐겨찾기에 등록된 과목이 아닙니다."),
+    GOOGLE_SHEET_EMPTY(HttpStatus.BAD_REQUEST, "구글 시트 데이터가 비어 있습니다."),
+    GOOGLE_SHEET_INVALID_HEADER(HttpStatus.BAD_REQUEST, "구글 시트 헤더가 올바르지 않습니다."),
+    GOOGLE_SHEET_INVALID_ROW(HttpStatus.BAD_REQUEST, "구글 시트 데이터 형식이 올바르지 않습니다."),
 
     //401
     TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "쿠키에 토큰이 존재하지 않습니다."),
@@ -24,6 +27,10 @@ public enum AllcllErrorCode {
     CUSTOM_SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "커스텀 일정을 찾을 수 없습니다."),
     BASKET_NOT_FOUND(HttpStatus.NOT_FOUND, "관심과목 정보가 존재하지 않습니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자 정보를 찾을 수 없습니다."),
+    GOOGLE_KEY_NOT_FOUND(HttpStatus.NOT_FOUND, "구글 서비스 계정 키 파일을 찾을 수 없습니다."),
+    GOOGLE_SHEET_TAB_NOT_FOUND(HttpStatus.NOT_FOUND,"구글 시트가 존재하지 않습니다."),
+    GRADUATION_CERT_RULE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 연도의 졸업인증기준 규칙을 찾을 수 없습니다: %d"),
+    DEPARTMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 이름의 학과 정보를 찾을 수 없습니다: %s"),
 
     //409
     PIN_LIMIT_EXCEEDED(HttpStatus.CONFLICT, "이미 %d개의 핀을 등록했습니다."),
@@ -45,6 +52,11 @@ public enum AllcllErrorCode {
     STUDENT_ID_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "잘못된 학번 정보입니다: %s"),
     SEJONG_LOGIN_IO_ERROR(HttpStatus.BAD_GATEWAY, "세종포털 로그인 서버와 통신 중 오류가 발생했습니다."),
     USER_INFO_FETCH_IO_ERROR(HttpStatus.BAD_GATEWAY, "세종포털 사용자 정보 조회에 실패하였습니다."),
+    ENGLISH_INFO_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "영어 인증 정보를 불러오지 못했습니다."),
+    CODING_INFO_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "코딩 인증 정보를 불러오지 못했습니다."),
+    CLASSIC_INFO_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "고전독서 인증 정보를 불러오지 못했습니다."),
+    CLASSIC_DETAIL_INFO_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "고전독서 인증 영역 별 상세 정보를 불러오지 못했습니다."),
+    GOOGLE_SHEET_ERROR(HttpStatus.BAD_GATEWAY, "구글 시트 API 호출 중 오류가 발생했습니다."),
 
     /* ================= 클라이언트 에러 ================= */
     NOT_FOUND_API(HttpStatus.NOT_FOUND, "요청한 API를 찾을 수 없습니다."),
@@ -56,7 +68,6 @@ public enum AllcllErrorCode {
 
     private final HttpStatus httpStatus;
     private final String message;
-
 
     AllcllErrorCode(HttpStatus httpStatus, String message) {
         this.httpStatus = httpStatus;

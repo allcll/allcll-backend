@@ -1,13 +1,19 @@
 package kr.allcll.backend.domain.user;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import kr.allcll.backend.domain.graduation.MajorType;
+import kr.allcll.backend.domain.graduation.check.cert.GraduationCheckCertResult;
+import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
+import kr.allcll.backend.domain.user.dto.UpdateUserRequest;
 import kr.allcll.backend.support.entity.BaseEntity;
-import kr.allcll.backend.support.exception.AllcllErrorCode;
-import kr.allcll.backend.support.exception.AllcllException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,8 +23,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
-
-    private static final int YEAR_PREFIX = 2000;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,40 +34,48 @@ public class User extends BaseEntity {
 
     private int admissionYear;
 
-    //private MajorType majorType; // 전공 형태
+    @Enumerated(EnumType.STRING)
+    private MajorType majorType;
 
-    //private String collegeNm;
+    private String collegeNm;
     private String deptNm;
-    //private String deptCd;
+    private String deptCd;
 
-    //private String doubleCollegeNm;
-    //private String doubleDeptNm;
-    //private String doubleDeptCd;
+    private String doubleCollegeNm;
+    private String doubleDeptNm;
+    private String doubleDeptCd;
 
-    private User(String studentId, String name, String deptNm, int admissionYear) {
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private GraduationCheckCertResult graduationCheckCertResult;
+
+    public User(String studentId, String name, int admissionYear, MajorType majorType, String collegeNm, String deptNm,
+        String deptCd, String doubleCollegeNm, String doubleDeptNm, String doubleDeptCd) {
         this.studentId = studentId;
         this.name = name;
-        this.deptNm = deptNm;
         this.admissionYear = admissionYear;
-    }
-
-    public static User of(String studentId, String name, String deptNm) {
-        return new User(
-            studentId,
-            name,
-            deptNm,
-            extractAdmissionYear(studentId));
-    }
-
-    public void updateUser(String deptNm) {
+        this.majorType = majorType;
+        this.collegeNm = collegeNm;
         this.deptNm = deptNm;
+        this.deptCd = deptCd;
+        this.doubleCollegeNm = doubleCollegeNm;
+        this.doubleDeptNm = doubleDeptNm;
+        this.doubleDeptCd = doubleDeptCd;
     }
 
-    private static int extractAdmissionYear(String studentId) {
-        if (studentId == null) {
-            throw new AllcllException(AllcllErrorCode.STUDENT_ID_FETCH_FAIL, studentId);
-        }
-        int year = Integer.parseInt(studentId.substring(0, 2));
-        return YEAR_PREFIX + year;
+    public void updateSingleMajorUser(UpdateUserRequest updateUserRequest, GraduationDepartmentInfo dept) {
+        this.majorType = updateUserRequest.majorType();
+        this.collegeNm = dept.getCollegeNm();
+        this.deptNm = dept.getDeptNm();
+        this.deptCd = dept.getDeptCd();
+        this.doubleCollegeNm = null;
+        this.doubleDeptNm = null;
+        this.doubleDeptCd = null;
+    }
+
+    public void updateDoubleMajorUser(UpdateUserRequest updateUserRequest, GraduationDepartmentInfo doubleDept) {
+        this.majorType = updateUserRequest.majorType();
+        this.doubleCollegeNm = doubleDept.getCollegeNm();
+        this.doubleDeptNm = doubleDept.getDeptNm();
+        this.doubleDeptCd = doubleDept.getDeptCd();
     }
 }

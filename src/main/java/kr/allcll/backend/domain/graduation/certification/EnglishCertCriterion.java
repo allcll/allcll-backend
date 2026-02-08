@@ -53,11 +53,14 @@ public class EnglishCertCriterion extends BaseEntity {
     @Column(name = "gtelp_speaking_level", nullable = false)
     private Integer gtelpSpeakingLevel; // G-TELP Speaking 레벨
 
-    @Column(name = "alt_course_name")
-    private String altCourseName; // 대체 과목명
+    @Column(name = "alt_curi_no")
+    private String altCuriNo; // 대체 과목 학수번호
 
-    @Column(name = "alt_course_credit")
-    private Integer altCourseCredit; // 대체 과목 학점
+    @Column(name = "alt_curi_nm")
+    private String altCuriNm; // 대체 과목명
+
+    @Column(name = "alt_curi_credit")
+    private Integer altCuriCredit; // 대체 과목 학점
 
     @Column(name = "note")
     private String note; // 비고
@@ -75,8 +78,9 @@ public class EnglishCertCriterion extends BaseEntity {
         Integer gtelpLevel,
         Integer gtelpMinScore,
         Integer gtelpSpeakingLevel,
-        String altCourseName,
-        Integer altCourseCredit,
+        String altCuriNo,
+        String altCuriNm,
+        Integer altCuriCredit,
         String note
     ) {
         this.admissionYear = admissionYear;
@@ -91,8 +95,9 @@ public class EnglishCertCriterion extends BaseEntity {
         this.gtelpLevel = gtelpLevel;
         this.gtelpMinScore = gtelpMinScore;
         this.gtelpSpeakingLevel = gtelpSpeakingLevel;
-        this.altCourseName = altCourseName;
-        this.altCourseCredit = altCourseCredit;
+        this.altCuriNo = altCuriNo;
+        this.altCuriNm = altCuriNm;
+        this.altCuriCredit = altCuriCredit;
         this.note = note;
     }
 }
