@@ -28,13 +28,14 @@ public class UserService {
             .orElseGet(() -> save(userInfo));
     }
 
-    private User save(UserInfo info) {
-        GraduationDepartmentInfo departmentInfo = departmentInfoRepository.findByDeptNm(info.deptNm())
-            .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND, info.deptNm()));
+    private User save(UserInfo userInfo) {
+        int admissionYear = extractAdmissionYear(userInfo.studentId());
+        GraduationDepartmentInfo departmentInfo = departmentInfoRepository.findByAdmissionYearAndDeptNm(admissionYear, userInfo.deptNm())
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND, userInfo.deptNm()));
         User user = new User(
-            info.studentId(),
-            info.name(),
-            extractAdmissionYear(info.studentId()),
+            userInfo.studentId(),
+            userInfo.name(),
+            extractAdmissionYear(userInfo.studentId()),
             MajorType.SINGLE,
             departmentInfo.getCollegeNm(),
             departmentInfo.getDeptNm(),
@@ -62,13 +63,13 @@ public class UserService {
         validateUserId(userId);
         User user = getById(userId);
         if (updateUserRequest.majorType() == MajorType.SINGLE) {
-            GraduationDepartmentInfo dept = departmentInfoRepository.findByDeptNm(updateUserRequest.deptNm())
+            GraduationDepartmentInfo dept = departmentInfoRepository.findByAdmissionYearAndDeptNm(user.getAdmissionYear(),updateUserRequest.deptNm())
                 .orElseThrow(
                     () -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND, updateUserRequest.deptNm()));
             user.updateSingleMajorUser(updateUserRequest, dept);
             return;
         }
-        GraduationDepartmentInfo doubleDept = departmentInfoRepository.findByDeptNm(updateUserRequest.doubleDeptNm())
+        GraduationDepartmentInfo doubleDept = departmentInfoRepository.findByAdmissionYearAndDeptNm(user.getAdmissionYear(), updateUserRequest.doubleDeptNm())
             .orElseThrow(
                 () -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND, updateUserRequest.doubleDeptNm()));
         user.updateDoubleMajorUser(updateUserRequest, doubleDept);
