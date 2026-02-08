@@ -356,13 +356,13 @@ class GraduationCertCriteriaServiceTest {
     void getGraduationCertCriteria_throwsDepartmentNotFound() {
         // given
         int admissionYear = 2025;
+        String notExistDeptCd = "NOT_EXIST";
 
         certRuleRepository.saveAndFlush(new GraduationCertRule(admissionYear, 25, GraduationCertRuleType.TWO_OF_THREE));
 
         User user = userRepository.saveAndFlush(
-            new User(
-                "20250005", "테스터", admissionYear, MajorType.SINGLE,
-                "자연과학대학", "수학통계학과", "NOT_EXIST",
+            new User("00000000", "테스터", admissionYear, MajorType.SINGLE,
+                "자연과학대학", "수학통계학과", notExistDeptCd,
                 null, null, null
             )
         );
@@ -370,7 +370,7 @@ class GraduationCertCriteriaServiceTest {
         // when & then
         assertThatThrownBy(() -> graduationCertCriteriaService.getGraduationCertCriteria(user.getId()))
             .isInstanceOf(AllcllException.class)
-            .hasMessageContaining(AllcllErrorCode.DEPARTMENT_NOT_FOUND.getMessage());
+            .hasMessageContaining(AllcllErrorCode.DEPARTMENT_NOT_FOUND.getMessage(), notExistDeptCd);
     }
 
     @Test
@@ -382,7 +382,8 @@ class GraduationCertCriteriaServiceTest {
 
         GraduationDepartmentInfo deptInfo = departmentInfoRepository.saveAndFlush(
             new GraduationDepartmentInfo(
-                admissionYear, 25,
+                admissionYear,
+                25,
                 "수학통계학과", deptCd,
                 "자연과학대학",
                 DeptGroup.NATURAL_SCIENCES_COLLEGE,
@@ -397,7 +398,7 @@ class GraduationCertCriteriaServiceTest {
         // when & then
         assertThatThrownBy(() -> graduationCertCriteriaService.getGraduationCertCriteria(user.getId()))
             .isInstanceOf(AllcllException.class)
-            .hasMessageContaining(AllcllErrorCode.GRADUATION_CERT_RULE_NOT_FOUND.getMessage());
+            .hasMessageContaining(AllcllErrorCode.GRADUATION_CERT_RULE_NOT_FOUND.getMessage(), admissionYear);
     }
 
     @Test
@@ -411,8 +412,10 @@ class GraduationCertCriteriaServiceTest {
 
         GraduationDepartmentInfo deptInfo = departmentInfoRepository.saveAndFlush(
             new GraduationDepartmentInfo(
-                admissionYear, 25,
-                "수학통계학과", deptCd,
+                admissionYear,
+                25,
+                "수학통계학과",
+                deptCd,
                 "자연과학대학",
                 DeptGroup.NATURAL_SCIENCES_COLLEGE,
                 EnglishTargetType.NON_MAJOR,
@@ -442,8 +445,10 @@ class GraduationCertCriteriaServiceTest {
 
         GraduationDepartmentInfo deptInfo = departmentInfoRepository.saveAndFlush(
             new GraduationDepartmentInfo(
-                admissionYear, 25,
-                "수학통계학과", "2658",
+                admissionYear,
+                25,
+                "수학통계학과",
+                "2658",
                 "자연과학대학",
                 DeptGroup.NATURAL_SCIENCES_COLLEGE,
                 EnglishTargetType.NON_MAJOR,
@@ -467,7 +472,7 @@ class GraduationCertCriteriaServiceTest {
     }
 
     @Test
-    @DisplayName("해당 입학년도 및 학과에 대한 코딩인증 기준 데이터가 없을 경우 예외 발생을 검증한다.")
+    @DisplayName("해당 입학년도 및 학과에 대한 코딩인증 기준 데이터가 없을 경우 예외를 검증한다.")
     void getGraduationCertCriteria_withoutCodingCriterion_throws() {
         int admissionYear = 2025;
 
@@ -475,8 +480,10 @@ class GraduationCertCriteriaServiceTest {
 
         GraduationDepartmentInfo deptInfo = departmentInfoRepository.saveAndFlush(
             new GraduationDepartmentInfo(
-                admissionYear, 25,
-                "수학통계학과", "2658",
+                admissionYear,
+                25,
+                "수학통계학과",
+                "2658",
                 "자연과학대학",
                 DeptGroup.NATURAL_SCIENCES_COLLEGE,
                 EnglishTargetType.NON_MAJOR,
