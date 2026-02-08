@@ -12,6 +12,7 @@ import kr.allcll.backend.domain.graduation.certification.dto.GraduationCertPolic
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfoRepository;
 import kr.allcll.backend.domain.user.User;
+import kr.allcll.backend.domain.user.UserRepository;
 import kr.allcll.backend.domain.user.UserService;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
@@ -24,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class GraduationCertCriteriaService {
 
-    private final UserService userService;
+    private final UserRepository userRepository;
     private final GraduationCertRuleRepository graduationCertRuleRepository;
     private final CodingCertCriterionRepository codingCertCriterionRepository;
     private final GraduationDepartmentInfoRepository departmentInfoRepository;
@@ -33,7 +34,8 @@ public class GraduationCertCriteriaService {
 
 
     public GraduationCertCriteriaResponse getGraduationCertCriteria(Long userId) {
-        User user = userService.getById(userId);
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
         int admissionYear = user.getAdmissionYear();
 
         GraduationDepartmentInfo primaryDeptInfo = findDepartment(admissionYear, user.getDeptCd());
