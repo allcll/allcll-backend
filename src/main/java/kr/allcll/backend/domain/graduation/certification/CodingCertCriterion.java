@@ -29,11 +29,23 @@ public class CodingCertCriterion extends BaseEntity {
     @Column(name = "tosc_min_level", nullable = false)
     private Integer toscMinLevel; // TOSC 최소 급수
 
-    @Column(name = "alt_curi_no")
-    private String altCuriNo; // 대체 과목 학수번호
+    @Column(name = "alt1_curi_no")
+    private String alt1CuriNo; // 대체 과목1 학수번호
 
-    @Column(name = "alt_min_grade")
-    private String altMinGrade; // 대체 과목 최소 성적
+    @Column(name = "alt1_curi_nm")
+    private String alt1CuriNm; // 대체 과목1 학수번호
+
+    @Column(name = "alt1_min_grade")
+    private String alt1MinGrade; // 대체 과목1 최소 성적
+
+    @Column(name = "alt2_curi_no")
+    private String alt2CuriNo; // 대체 과목2 학수번호
+
+    @Column(name = "alt2_curi_nm")
+    private String alt2CuriNm; // 대체 과목1 학수번호
+
+    @Column(name = "alt2_min_grade")
+    private String alt2MinGrade; // 대체 과목2 최소 성적
 
     @Column(name = "note")
     private String note; // 비고
@@ -43,16 +55,24 @@ public class CodingCertCriterion extends BaseEntity {
         Integer admissionYearShort,
         CodingTargetType codingTargetType,
         Integer toscMinLevel,
-        String altCuriNo,
-        String altMinGrade,
+        String alt1CuriNo,
+        String alt1CuriNm,
+        String alt1MinGrade,
+        String alt2CuriNo,
+        String alt2CuriNm,
+        String alt2MinGrade,
         String note
     ) {
         this.admissionYear = admissionYear;
         this.admissionYearShort = admissionYearShort;
         this.codingTargetType = codingTargetType;
         this.toscMinLevel = toscMinLevel;
-        this.altCuriNo = altCuriNo;
-        this.altMinGrade = altMinGrade;
+        this.alt1CuriNo = alt1CuriNo;
+        this.alt1CuriNm = alt1CuriNm;
+        this.alt1MinGrade = alt1MinGrade;
+        this.alt2CuriNo = alt2CuriNo;
+        this.alt2CuriNm = alt2CuriNm;
+        this.alt2MinGrade = alt2MinGrade;
         this.note = note;
     }
 }
