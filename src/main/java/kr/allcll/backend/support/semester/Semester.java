@@ -18,25 +18,22 @@ public enum Semester {
     SPRING_26("2026-1", LocalDate.of(2026, 1, 23), LocalDate.of(2026, 6, 30)),
     ;
 
-    private final String value;
+    private final String koreanName;
     private final LocalDate startDate;
     private final LocalDate endDate;
 
-    Semester(String value, LocalDate startDate, LocalDate endDate) {
-        this.value = value;
+    Semester(String koreanName, LocalDate startDate, LocalDate endDate) {
+        this.koreanName = koreanName;
         this.startDate = startDate;
         this.endDate = endDate;
     }
 
-    public static Semester getCode(LocalDate date) {
+    // TODO: 분기 규칙 책임 과다 -> Service 코드 분리 필요
+    public static Semester findByDate(LocalDate date) {
         return Arrays.stream(values())
             .filter(semester -> isDateInRange(semester, date))
             .findFirst()
             .orElseGet(() -> getNextSemester(date));
-    }
-
-    public static String now() {
-        return getCode(LocalDate.now()).getValue();
     }
 
     private static boolean isDateInRange(Semester semester, LocalDate date) {
@@ -50,5 +47,9 @@ public enum Semester {
             .filter(semester -> semester.getStartDate().isAfter(date))
             .findFirst()
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.SEMESTER_NOT_FOUND));
+    }
+
+    public static String getCurrentSemester() {
+        return findByDate(LocalDate.now()).getKoreanName();
     }
 }

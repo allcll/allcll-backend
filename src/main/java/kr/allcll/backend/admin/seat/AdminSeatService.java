@@ -5,10 +5,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-import kr.allcll.backend.admin.seat.dto.ChangeSubjectsResponse;
 import kr.allcll.backend.admin.seat.dto.SeatStatusResponse;
+import kr.allcll.backend.domain.seat.SeatStorage;
+import kr.allcll.backend.domain.seat.dto.SeatDto;
+import kr.allcll.backend.domain.subject.Subject;
+import kr.allcll.backend.domain.subject.SubjectRepository;
+import kr.allcll.backend.support.batch.BatchService;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
+import kr.allcll.backend.support.semester.Semester;
 import kr.allcll.backend.support.web.PrefixParser;
 import kr.allcll.backend.support.web.TokenProvider;
 import kr.allcll.crawler.client.SeatClient;
@@ -35,11 +40,11 @@ public class AdminSeatService {
     private final Credentials credentials;
     private final TargetSubjectStorage targetSubjectStorage;
     private final CrawlerScheduledTaskHandler seatScheduler;
-    private final SeatPersistenceService seatPersistenceService;
     private final SjptProperties sjptProperties;
-    private final ChangeDetector changeDetector;
-    private final AllSeatBuffer allSeatBuffer;
+    private final SeatStorage seatStorage;
     private final AtomicLong lastSuccessCrawlingTime = new AtomicLong(0);
+    private final BatchService batchService;
+    private final SubjectRepository subjectRepository;
 
     public void getAllSeatPeriodically(String userId) {
         Credential credential = credentials.findByUserId(userId);
@@ -100,43 +105,63 @@ public class AdminSeatService {
         if (crawlerSubject == null) {
             return;
         }
-        sendExternalRequestWithOutDetect(crawlerSubject, credential);
+        crawlPinSeatAndBuffer(crawlerSubject, credential);
     }
 
     private void sendGeneralSubjectRequest(Credential credential) {
         CrawlerSubject crawlerSubject = targetSubjectStorage.getNextGeneralTarget();
-        sendExternalRequestWithOutDetect(crawlerSubject, credential);
+        crawlGeneralSeatAndBuffer(crawlerSubject, credential);
     }
 
-    private void sendExternalRequestWithOutDetect(CrawlerSubject crawlerSubject, Credential credential) {
+    private void crawlPinSeatAndBuffer(CrawlerSubject pinSubject, Credential credential) {
         try {
-            log.info("[SeatService] [학교 서버] 요청 시도 과목: {}", crawlerSubject);
-            SeatPayload requestPayload = SeatPayload.from(crawlerSubject);
-            SeatResponse response = seatClient.execute(credential, requestPayload);
-            CrawlerSeat renewedCrawlerSeat = createSeat(response, crawlerSubject);
-
-            allSeatBuffer.add(
-                ChangeSubjectsResponse.of(
-                    crawlerSubject.getId(),
-                    ChangeStatus.UPDATE, //의미없는 필드...
-                    SeatUtils.getRemainSeat(renewedCrawlerSeat),
-                    LocalDateTime.now()
-                    //renewedCrawlerSeat.getCreatedAt() //추후 개션 예정
-                )
-            );
-
-            synchronized (getSubjectLock(renewedCrawlerSeat.getId())) {
-                seatPersistenceService.saveSeat(renewedCrawlerSeat);
-            }
+            CrawlerSeat crawlerSeat = sendExternalSeatRequest(pinSubject, credential);
+            batchService.savePinSeatBatch(crawlerSeat);
 
             lastSuccessCrawlingTime.updateAndGet(
                 previousSuccessTime -> Math.max(previousSuccessTime, System.currentTimeMillis())
             );
-
         } catch (CrawlerAllcllException e) {
             log.error(
-                "[여석] 외부 API 호출에 실패했습니다. 과목: " + crawlerSubject.getCuriNo() + "-" + crawlerSubject.getClassName());
+                "[핀 과목 여석] 외부 API 호출에 실패했습니다. 과목: "
+                    + pinSubject.getCuriNo() + "-"
+                    + pinSubject.getClassName());
         }
+    }
+
+    private void crawlGeneralSeatAndBuffer(CrawlerSubject generalSubject, Credential credential) {
+        try {
+            CrawlerSeat crawlerSeat = sendExternalSeatRequest(generalSubject, credential);
+            batchService.saveGeneralSeatBatch(crawlerSeat);
+
+            lastSuccessCrawlingTime.updateAndGet(
+                previousSuccessTime -> Math.max(previousSuccessTime, System.currentTimeMillis())
+            );
+        } catch (CrawlerAllcllException e) {
+            log.error(
+                "[교양 과목 여석] 외부 API 호출에 실패했습니다. 과목: "
+                    + generalSubject.getCuriNo() + "-"
+                    + generalSubject.getClassName());
+        }
+    }
+
+    private CrawlerSeat sendExternalSeatRequest(CrawlerSubject crawlerSubject, Credential credential) {
+        log.info("[AdminSeatService] [학교 서버] 요청 시도 과목: {}", crawlerSubject);
+        SeatPayload requestPayload = SeatPayload.from(crawlerSubject);
+        SeatResponse response = seatClient.execute(credential, requestPayload);
+        CrawlerSeat renewedCrawlerSeat = createSeat(response, crawlerSubject);
+
+        Subject subject = subjectRepository.findById(crawlerSubject.getId(), Semester.getCurrentSemester())
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.SUBJECT_NOT_FOUND, crawlerSubject.getId()));
+
+        seatStorage.add(
+            new SeatDto(
+                subject,
+                SeatUtils.getRemainSeat(renewedCrawlerSeat),
+                LocalDateTime.now()
+            )
+        );
+        return renewedCrawlerSeat;
     }
 
     private boolean isSeatCrawlingActive() {
@@ -153,31 +178,7 @@ public class AdminSeatService {
         return validSeatSchedulerCount && validRecentCrawlingSuccess;
     }
 
-    /**
-     * 변경감지로 정책 변경 시 해당 메서드로 변경
-     */
-    private void sendExternalRequest(CrawlerSubject crawlerSubject, Credential credential) {
-        log.info("[SeatService] [학교 서버] 요청 시도 과목: {}", crawlerSubject);
-        SeatPayload requestPayload = SeatPayload.from(crawlerSubject);
-        SeatResponse response = seatClient.execute(credential, requestPayload);
-        CrawlerSeat renewedCrawlerSeat = createSeat(response, crawlerSubject);
-        detectDifferenceAndSave(crawlerSubject, renewedCrawlerSeat);
-    }
-
-    private void detectDifferenceAndSave(CrawlerSubject crawlerSubject, CrawlerSeat renewedCrawlerSeat) {
-        if (changeDetector.isRemainSeatChanged(crawlerSubject, renewedCrawlerSeat)) {
-            changeDetector.saveChangeToBuffer(crawlerSubject, renewedCrawlerSeat);
-            synchronized (getSubjectLock(crawlerSubject.getId())) {
-                seatPersistenceService.saveSeat(renewedCrawlerSeat);
-            }
-        }
-    }
-
     private CrawlerSeat createSeat(SeatResponse response, CrawlerSubject crawlerSubject) {
         return response.toSeat(crawlerSubject, LocalDate.now());
-    }
-
-    private Object getSubjectLock(Long subjectId) {
-        return ("LOCK_" + subjectId).intern();
     }
 }
