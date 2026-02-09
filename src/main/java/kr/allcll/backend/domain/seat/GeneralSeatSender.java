@@ -37,7 +37,7 @@ public class GeneralSeatSender {
         if (hasActiveSchedule()) {
             return;
         }
-        scheduledTaskHandler.scheduleAtFixedRate(getAllSeatTaskAtSeasonSemester(), SENDING_PERIOD);
+        scheduledTaskHandler.scheduleAtFixedRate(getGeneralSeatTask(), SENDING_PERIOD);
     }
 
     public boolean hasActiveSchedule() {
