@@ -6,10 +6,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import kr.allcll.backend.admin.seat.dto.SeatStatusResponse;
-import kr.allcll.backend.admin.seat.dto.CrawledSubjectRemainingSeat;
+import kr.allcll.backend.domain.seat.SeatStorage;
+import kr.allcll.backend.domain.seat.dto.SeatDto;
+import kr.allcll.backend.domain.subject.Subject;
+import kr.allcll.backend.domain.subject.SubjectRepository;
 import kr.allcll.backend.support.batch.BatchService;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
+import kr.allcll.backend.support.semester.Semester;
 import kr.allcll.backend.support.web.PrefixParser;
 import kr.allcll.backend.support.web.TokenProvider;
 import kr.allcll.crawler.client.SeatClient;
@@ -37,9 +41,10 @@ public class AdminSeatService {
     private final TargetSubjectStorage targetSubjectStorage;
     private final CrawlerScheduledTaskHandler seatScheduler;
     private final SjptProperties sjptProperties;
-    private final AllSeatBuffer allSeatBuffer;
+    private final SeatStorage seatStorage;
     private final AtomicLong lastSuccessCrawlingTime = new AtomicLong(0);
     private final BatchService batchService;
+    private final SubjectRepository subjectRepository;
 
     public void getAllSeatPeriodically(String userId) {
         Credential credential = credentials.findByUserId(userId);
@@ -146,9 +151,12 @@ public class AdminSeatService {
         SeatResponse response = seatClient.execute(credential, requestPayload);
         CrawlerSeat renewedCrawlerSeat = createSeat(response, crawlerSubject);
 
-        allSeatBuffer.add(
-            CrawledSubjectRemainingSeat.of(
-                crawlerSubject.getId(),
+        Subject subject = subjectRepository.findById(crawlerSubject.getId(), Semester.getCurrentSemester())
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.SUBJECT_NOT_FOUND, crawlerSubject.getId()));
+
+        seatStorage.add(
+            new SeatDto(
+                subject,
                 SeatUtils.getRemainSeat(renewedCrawlerSeat),
                 LocalDateTime.now()
             )
