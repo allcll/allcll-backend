@@ -1,28 +1,26 @@
 package kr.allcll.backend.admin.seat;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import kr.allcll.backend.support.batch.AbstractBatch;
 import kr.allcll.crawler.seat.CrawlerSeat;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-public class GeneralSeatBatch {
+@RequiredArgsConstructor
+public class GeneralSeatBatch extends AbstractBatch<CrawlerSeat> {
 
-    private final BlockingQueue<CrawlerSeat> generalSeatBatch;
+    private static final int FLUSH_LIMIT = 15;
 
-    public GeneralSeatBatch() {
-        this.generalSeatBatch = new LinkedBlockingQueue<>();
+    private final SeatPersistenceService seatPersistenceService;
+
+    @Override
+    protected int getFlushLimit() {
+        return FLUSH_LIMIT;
     }
 
-    public void saveGeneralSeatToBatch(CrawlerSeat crawlerSeat) {
-        generalSeatBatch.add(crawlerSeat);
-    }
-
-    public List<CrawlerSeat> getAll() {
-        List<CrawlerSeat> flushResult = new ArrayList<>();
-        generalSeatBatch.drainTo(flushResult);
-        return flushResult;
+    @Override
+    protected void saveAll(List<CrawlerSeat> batch) {
+        seatPersistenceService.saveAllSeat(batch);
     }
 }

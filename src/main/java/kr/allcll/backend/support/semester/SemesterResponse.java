@@ -3,15 +3,15 @@ package kr.allcll.backend.support.semester;
 import java.time.LocalDate;
 
 public record SemesterResponse(
-    String code,
-    String semester,
+    String semesterCode,
+    String semesterValue,
     Period period
 ) {
 
     public static SemesterResponse from(Semester semester) {
         return new SemesterResponse(
             semester.name(),
-            semester.getValue(),
+            semester.getKoreanName(),
             new Period(semester.getStartDate(), semester.getEndDate())
         );
     }

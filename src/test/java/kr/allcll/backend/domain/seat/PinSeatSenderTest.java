@@ -45,7 +45,7 @@ class PinSeatSenderTest {
         // given
         String token = "TEST_TOKEN";
         when(sseService.getConnectedTokens()).thenReturn(List.of(token));
-        when(pinRepository.findAllByToken(token, Semester.now())).thenReturn(List.of());
+        when(pinRepository.findAllByToken(token, Semester.getCurrentSemester())).thenReturn(List.of());
         when(seatStorage.getSeats(any())).thenReturn(List.of());
 
         // when
@@ -62,7 +62,7 @@ class PinSeatSenderTest {
         // given
         String token = "TEST_TOKEN";
         when(sseService.getConnectedTokens()).thenReturn(List.of(token)).thenReturn(List.of());
-        when(pinRepository.findAllByToken(token, Semester.now())).thenReturn(List.of());
+        when(pinRepository.findAllByToken(token, Semester.getCurrentSemester())).thenReturn(List.of());
         when(seatStorage.getSeats(any())).thenReturn(List.of());
 
         // when
