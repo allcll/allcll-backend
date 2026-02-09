@@ -15,11 +15,6 @@ public class SeatPersistenceService {
     private final CrawlerSeatRepository crawlerSeatRepository;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void saveSeat(CrawlerSeat crawlerSeat) {
-        crawlerSeatRepository.save(crawlerSeat);
-    }
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void saveAllSeat(List<CrawlerSeat> crawlerSeats) {
         crawlerSeatRepository.saveAll(crawlerSeats);
     }
