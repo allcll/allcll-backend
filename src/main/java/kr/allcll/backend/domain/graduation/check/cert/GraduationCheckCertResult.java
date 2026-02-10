@@ -149,7 +149,16 @@ public class GraduationCheckCertResult {
         int passedCount,
         int requiredPassCount,
         boolean isSatisfied,
-        GraduationCertInfo certInfo
+        GraduationCertInfo certInfo,
+        int classicsTotalRequiredCount,
+        int requiredCountWestern,
+        boolean isWesternSatisfied,
+        int requiredCountEastern,
+        boolean isEasternSatisfied,
+        int requiredCountEasternAndWestern,
+        boolean isEasternAndWesternSatisfied,
+        int requiredCountScience,
+        boolean isScienceSatisfied
     ) {
         this.graduationCertRuleType = certRuleType;
         this.passedCount = passedCount;
@@ -158,19 +167,19 @@ public class GraduationCheckCertResult {
         this.isEnglishCertPassed = certInfo.isEnglishCertPassed();
         this.isCodingCertPassed = certInfo.isCodingCertPassed();
         this.isClassicsCertPassed = certInfo.isClassicCertPassed();
-        this.classicsTotalRequiredCount = certInfo.classicsTotalRequiredCount();
+        this.classicsTotalRequiredCount = classicsTotalRequiredCount;
         this.classicsTotalMyCount = certInfo.classicsTotalMyCount();
-        this.requiredCountWestern = certInfo.requiredCountWestern();
+        this.requiredCountWestern = requiredCountWestern;
         this.myCountWestern = certInfo.myCountWestern();
-        this.isClassicsWesternCertPassed = certInfo.isWesternSatisfied();
-        this.requiredCountEastern = certInfo.requiredCountEastern();
+        this.isClassicsWesternCertPassed = isWesternSatisfied;
+        this.requiredCountEastern = requiredCountEastern;
         this.myCountEastern = certInfo.myCountEastern();
-        this.isClassicsEasternCertPassed = certInfo.isEasternSatisfied();
-        this.requiredCountEasternAndWestern = certInfo.requiredCountEasternAndWestern();
+        this.isClassicsEasternCertPassed = isEasternSatisfied;
+        this.requiredCountEasternAndWestern = requiredCountEasternAndWestern;
         this.myCountEasternAndWestern = certInfo.myCountEasternAndWestern();
-        this.isClassicsEasternAndWesternCertPassed = certInfo.isEasternAndWesternSatisfied();
-        this.requiredCountScience = certInfo.requiredCountScience();
+        this.isClassicsEasternAndWesternCertPassed = isEasternAndWesternSatisfied;
+        this.requiredCountScience = requiredCountScience;
         this.myCountScience = certInfo.myCountScience();
-        this.isClassicsScienceCertPassed = certInfo.isScienceSatisfied();
+        this.isClassicsScienceCertPassed = isScienceSatisfied;
     }
 }
