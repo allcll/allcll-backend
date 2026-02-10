@@ -3,9 +3,9 @@ package kr.allcll.backend.domain.graduation.check.result.dto;
 import kr.allcll.backend.domain.graduation.check.result.GraduationCheck;
 
 public record GraduationSummary(
-    Integer totalMyCredits,
+    Double totalMyCredits,
     Integer requiredTotalCredits,
-    Integer remainingCredits
+    Double remainingCredits
 ) {
 
     public static GraduationSummary from(GraduationCheck check) {
