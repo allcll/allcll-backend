@@ -1,0 +1,186 @@
+package kr.allcll.backend.domain.graduation.check.result;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import kr.allcll.backend.domain.graduation.MajorType;
+import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseDto;
+import kr.allcll.backend.domain.graduation.check.result.dto.CertResult;
+import kr.allcll.backend.domain.graduation.check.result.dto.CheckResult;
+import kr.allcll.backend.domain.graduation.check.result.dto.CriterionKey;
+import kr.allcll.backend.domain.graduation.check.result.dto.GraduationCategory;
+import kr.allcll.backend.domain.graduation.credit.CategoryType;
+import kr.allcll.backend.domain.graduation.credit.CreditCriterion;
+import kr.allcll.backend.domain.graduation.credit.CreditCriterionRepository;
+import kr.allcll.backend.domain.graduation.credit.DoubleCreditCriterion;
+import kr.allcll.backend.domain.graduation.credit.DoubleCreditCriterionRepository;
+import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
+import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfoRepository;
+import kr.allcll.backend.domain.user.User;
+import kr.allcll.backend.domain.user.UserRepository;
+import kr.allcll.backend.support.exception.AllcllErrorCode;
+import kr.allcll.backend.support.exception.AllcllException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class GraduationCheckCalculator {
+
+    private final CategoryCreditCalculator categoryCalculator;
+    private final CertificationChecker certificationChecker;
+
+    private final UserRepository userRepository;
+    private final GraduationDepartmentInfoRepository departmentInfoRepository;
+    private final CreditCriterionRepository creditCriterionRepository;
+    private final DoubleCreditCriterionRepository doubleCreditCriterionRepository;
+
+    public CheckResult calculate(Long userId, List<CompletedCourseDto> completedCourses) {
+        // 사용자 정보 조회
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
+
+        Integer admissionYear = user.getAdmissionYear();
+        String deptNm = user.getDeptNm();
+        MajorType majorType = user.getMajorType();
+
+        // 학과 정보 조회
+        GraduationDepartmentInfo primaryDeptInfo = departmentInfoRepository
+            .findByAdmissionYearAndDeptNm(admissionYear, deptNm)
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND));
+
+        // 졸업 요건 기준 조회
+        List<CreditCriterion> creditCriteria = new ArrayList<>();
+        GraduationDepartmentInfo secondaryDeptInfo = null;
+
+        if (majorType == MajorType.DOUBLE) {
+            creditCriteria = buildDoubleMajorCriteria(user, admissionYear, deptNm);
+            secondaryDeptInfo = departmentInfoRepository
+                .findByAdmissionYearAndDeptNm(admissionYear, user.getDoubleDeptNm())
+                .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND));
+        } else {
+            creditCriteria = creditCriterionRepository
+                .findByAdmissionYearAndDeptNmAndMajorTypeIn(
+                    admissionYear, deptNm, List.of(MajorType.ALL, MajorType.SINGLE));
+        }
+
+        // 이수구분별 학점 계산
+        List<GraduationCategory> categoryResults = categoryCalculator.calculateCategoryResults(
+            majorType,
+            completedCourses,
+            primaryDeptInfo,
+            secondaryDeptInfo,
+            creditCriteria
+        );
+
+        // 총 학점 정보 추출 (엑셀에서 직접 합산)
+        double totalCredits = calculateTotalCredits(completedCourses);
+        GraduationCategory totalCategory = categoryResults.stream()
+            .filter(category -> category.categoryType() == CategoryType.TOTAL_COMPLETION)
+            .findFirst()
+            .orElse(null);
+        int requiredTotalCredits = totalCategory.requiredCredits();
+        double remainingCredits = Math.max(requiredTotalCredits - totalCredits, 0);
+        boolean totalSatisfied = remainingCredits <= 0;
+
+        categoryResults.remove(totalCategory);
+        categoryResults.add(new GraduationCategory(
+            totalCategory.majorScope(),
+            CategoryType.TOTAL_COMPLETION,
+            totalCredits,
+            requiredTotalCredits,
+            remainingCredits,
+            totalSatisfied
+        ));
+
+        // 졸업인증제도 검사
+        CertResult certResult = certificationChecker.check(userId);
+        boolean isGraduatable = categoryResults.stream()
+            .allMatch(GraduationCategory::satisfied)
+            && certResult.isSatisfied();
+
+        return new CheckResult(
+            isGraduatable,
+            totalCredits,
+            requiredTotalCredits,
+            remainingCredits,
+            categoryResults,
+            certResult
+        );
+    }
+
+    private double calculateTotalCredits(List<CompletedCourseDto> completedCourses) {
+        return completedCourses.stream()
+            .filter(CompletedCourseDto::isCreditEarned)
+            .mapToDouble(CompletedCourseDto::credits)
+            .sum();
+    }
+
+    private List<CreditCriterion> buildDoubleMajorCriteria(
+        User user,
+        Integer admissionYear,
+        String deptNm
+    ) {
+        // 교양 과목 기준 (majorType=ALL)
+        List<CreditCriterion> nonMajorCriteria = creditCriterionRepository
+            .findByAdmissionYearAndDeptNmAndMajorTypeIn(
+                admissionYear, deptNm, List.of(MajorType.ALL));
+
+        // (기본)전공 과목 기준 (majorType=DOUBLE)
+        List<CreditCriterion> defaultDoubleCriteria = creditCriterionRepository
+            .findByAdmissionYearAndMajorType(admissionYear, MajorType.DOUBLE);
+
+        // (예외)전공 과목 기준
+        List<DoubleCreditCriterion> exceptionCriteria = doubleCreditCriterionRepository
+            .findByAdmissionYearAndDeptCds(
+                admissionYear, user.getDeptCd(), user.getDoubleDeptCd());
+
+        // 예외가 있으면 예외 기준으로 (기본)전공 과목 기준 대체
+        List<CreditCriterion> resolvedMajorCriteria = applyExceptionCriteria(defaultDoubleCriteria, exceptionCriteria);
+
+        List<CreditCriterion> allCriteria = new ArrayList<>(nonMajorCriteria);
+        allCriteria.addAll(resolvedMajorCriteria);
+        return allCriteria;
+    }
+
+    private List<CreditCriterion> applyExceptionCriteria(
+        List<CreditCriterion> defaultCriteria,
+        List<DoubleCreditCriterion> exceptionCriteria
+    ) {
+        if (exceptionCriteria.isEmpty()) {
+            return defaultCriteria;
+        }
+
+        Map<CriterionKey, DoubleCreditCriterion> exceptionCriteriaByKey = toExceptionMap(exceptionCriteria);
+        List<CreditCriterion> resolvedCriteria = new ArrayList<>();
+
+        for (CreditCriterion defaultCriterion : defaultCriteria) {
+            CriterionKey criterionKey = CriterionKey.from(defaultCriterion);
+            DoubleCreditCriterion exceptionCriterion = exceptionCriteriaByKey.remove(criterionKey);
+
+            if (exceptionCriterion != null) {
+                resolvedCriteria.add(DoubleCreditCriterion.toCreditCriterion(exceptionCriterion));
+            } else {
+                resolvedCriteria.add(defaultCriterion);
+            }
+        }
+        exceptionCriteriaByKey.values()
+            .forEach(exceptionCriterion ->
+                resolvedCriteria.add(DoubleCreditCriterion.toCreditCriterion(exceptionCriterion))
+            );
+        return resolvedCriteria;
+    }
+
+    private Map<CriterionKey, DoubleCreditCriterion> toExceptionMap(
+        List<DoubleCreditCriterion> exceptionDoubleCriteria
+    ) {
+        Map<CriterionKey, DoubleCreditCriterion> exceptionCriteriaMap = new HashMap<>();
+
+        for (DoubleCreditCriterion exceptionDoubleCriterion : exceptionDoubleCriteria) {
+            CriterionKey key = CriterionKey.from(exceptionDoubleCriterion);
+            exceptionCriteriaMap.put(key, exceptionDoubleCriterion);
+        }
+        return exceptionCriteriaMap;
+    }
+}
