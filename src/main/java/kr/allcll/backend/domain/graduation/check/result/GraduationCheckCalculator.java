@@ -70,7 +70,6 @@ public class GraduationCheckCalculator {
             majorType,
             completedCourses,
             primaryDeptInfo,
-            secondaryDeptInfo,
             creditCriteria
         );
 
