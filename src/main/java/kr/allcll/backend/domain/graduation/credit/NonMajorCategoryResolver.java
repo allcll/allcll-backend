@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import kr.allcll.backend.domain.graduation.MajorScope;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Component;
 public class NonMajorCategoryResolver {
 
     private static final String ALL_DEPT = "0";
+    private static final String KEY_DELIMITER = "|";
 
     private final RequiredCourseResolver requiredCourseResolver;
     private final BalanceRequiredResolver balanceRequiredResolver;
@@ -56,8 +58,8 @@ public class NonMajorCategoryResolver {
         GraduationDepartmentInfo graduationDepartmentInfo = graduationDepartmentInfoRepository
             .findByAdmissionYearAndDeptCd(admissionYear, deptCd)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND));
-        balanceRequiredResolver
-            .resolve(admissionYear, deptCd, graduationDepartmentInfo.getDeptGroup())
+
+        balanceRequiredResolver.resolve(admissionYear, deptCd, graduationDepartmentInfo.getDeptGroup())
             .ifPresent(graduationCategoryResponses::add);
 
         return graduationCategoryResponses;
@@ -67,9 +69,22 @@ public class NonMajorCategoryResolver {
         Integer admissionYear,
         String deptCd
     ) {
-        return requiredCourseRepository
-            .findRequiredByAdmissionYearAndDeptCdIn(admissionYear, List.of(ALL_DEPT, deptCd))
-            .stream()
+        List<RequiredCourse> requiredCourseCandidates =
+            requiredCourseRepository.findByAdmissionYearAndDeptCdIn(admissionYear, List.of(ALL_DEPT, deptCd));
+
+        Map<String, RequiredCourse> selectedByCourseKey = new LinkedHashMap<>();
+        for (RequiredCourse requiredCourse : requiredCourseCandidates) {
+            String courseKey = courseKeyOf(requiredCourse);
+
+            if (isWildcard(requiredCourse)) {
+                selectedByCourseKey.putIfAbsent(courseKey, requiredCourse);
+                continue;
+            }
+            selectedByCourseKey.put(courseKey, requiredCourse);
+        }
+
+        return selectedByCourseKey.values().stream()
+            .filter(RequiredCourse::getRequired)
             .collect(groupingBy(
                 RequiredCourse::getCategoryType,
                 collectingAndThen(
@@ -77,5 +92,13 @@ public class NonMajorCategoryResolver {
                     requiredCourses -> requiredCourseResolver.replaceDeprecatedSubject(admissionYear, requiredCourses)
                 )
             ));
+    }
+
+    private boolean isWildcard(RequiredCourse course) {
+        return ALL_DEPT.equals(course.getDeptCd());
+    }
+
+    private String courseKeyOf(RequiredCourse course) {
+        return course.getCategoryType() + KEY_DELIMITER + course.getCuriNm();
     }
 }
