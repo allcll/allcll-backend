@@ -16,6 +16,7 @@ public class RequiredCoursesSheetValidator implements GraduationSheetValidator {
         "admission_year",
         "admission_year_short",
         "dept_cd",
+        "dept_nm",
         "category_type",
         "curi_no",
         "curi_nm",
@@ -41,7 +42,9 @@ public class RequiredCoursesSheetValidator implements GraduationSheetValidator {
             graduationSheetValidationSupport.requireInt(TAB_KEY, sheetTable, dataRow, rowIndex, "admission_year");
             graduationSheetValidationSupport.requireInt(TAB_KEY, sheetTable, dataRow, rowIndex, "admission_year_short");
             graduationSheetValidationSupport.requireString(TAB_KEY, sheetTable, dataRow, rowIndex, "dept_cd");
-            graduationSheetValidationSupport.requireEnum(TAB_KEY, sheetTable, dataRow, rowIndex, "category_type", CategoryType.class);
+            graduationSheetValidationSupport.requireString(TAB_KEY, sheetTable, dataRow, rowIndex, "dept_nm");
+            graduationSheetValidationSupport.requireEnum(TAB_KEY, sheetTable, dataRow, rowIndex, "category_type",
+                CategoryType.class);
             graduationSheetValidationSupport.requireString(TAB_KEY, sheetTable, dataRow, rowIndex, "curi_no");
             graduationSheetValidationSupport.requireString(TAB_KEY, sheetTable, dataRow, rowIndex, "curi_nm");
             graduationSheetValidationSupport.requireBoolean(TAB_KEY, sheetTable, dataRow, rowIndex, "required");
