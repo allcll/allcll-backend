@@ -1,0 +1,71 @@
+package kr.allcll.backend.domain.graduation.check.result;
+
+import java.util.List;
+import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseDto;
+import kr.allcll.backend.domain.graduation.check.excel.GradeExcelParser;
+import kr.allcll.backend.domain.graduation.check.result.dto.CheckResult;
+import kr.allcll.backend.domain.graduation.check.result.dto.GraduationCheckResponse;
+import kr.allcll.backend.support.exception.AllcllErrorCode;
+import kr.allcll.backend.support.exception.AllcllException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class GraduationCheckService {
+
+    private final GraduationCheckCalculator graduationCheckCalculator;
+    private final GraduationCheckPersistenceService persistenceService;
+    private final GraduationCheckResponseMapper responseMapper;
+    private final GradeExcelParser gradeExcelParser;
+    private final GraduationCheckRepository graduationCheckRepository;
+
+    @Transactional
+    public GraduationCheckResponse checkGraduationRequirements(Long userId, MultipartFile gradeExcel) {
+        validateUserId(userId);
+        validateExcelFile(gradeExcel);
+
+        // 1. 엑셀 파싱
+        List<CompletedCourseDto> completedCourses = gradeExcelParser.parse(gradeExcel);
+        // 2. 졸업 요건 검사 수행
+        CheckResult checkResult = graduationCheckCalculator.calculate(userId, completedCourses);
+        // 3. 검사 결과 저장
+        persistenceService.saveCheckResult(userId, checkResult);
+        // 4. 응답 반환
+        GraduationCheck savedCheck = graduationCheckRepository.findById(userId)
+            .orElseThrow(() ->
+                new AllcllException(AllcllErrorCode.GRADUATION_CHECK_NOT_FOUND)
+            );
+        return responseMapper.toResponseFromEntity(savedCheck);
+    }
+
+    public GraduationCheckResponse getCheckResult(Long userId) {
+        validateUserId(userId);
+
+        GraduationCheck check = graduationCheckRepository
+            .findById(userId)
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.GRADUATION_CHECK_NOT_FOUND));
+
+        return responseMapper.toResponseFromEntity(check);
+    }
+
+    private void validateExcelFile(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new AllcllException(AllcllErrorCode.INVALID_INPUT_VALUE);
+        }
+
+        String filename = file.getOriginalFilename();
+        if (filename == null || !filename.endsWith(".xlsx")) {
+            throw new AllcllException(AllcllErrorCode.INVALID_FILE_TYPE);
+        }
+    }
+
+    private void validateUserId(Long userId) {
+        if (userId == null) {
+            throw new AllcllException(AllcllErrorCode.UNAUTHORIZED_ACCESS);
+        }
+    }
+}
