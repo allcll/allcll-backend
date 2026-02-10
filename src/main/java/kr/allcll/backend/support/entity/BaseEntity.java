@@ -25,6 +25,10 @@ public abstract class BaseEntity {
         }
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
     public boolean isDeleted() {
         return isDeleted;
     }
