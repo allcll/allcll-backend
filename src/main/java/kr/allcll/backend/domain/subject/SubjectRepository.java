@@ -26,4 +26,16 @@ public interface SubjectRepository extends JpaRepository<Subject, Long>, JpaSpec
         and s.semesterAt = :semesterAt
         """)
     Optional<Subject> findById(Long id, String semesterAt);
+
+    @Query("""
+        select s
+        from Subject s
+        where s.deptCd = :deptCd
+          and s.curiTypeCdNm = :curiTypeCdNm
+        order by s.curiNo asc
+    """)
+    List<Subject> findByDeptCdAndCuriTypeCdNm(
+        String deptCd,
+        String curiTypeCdNm
+    );
 }
