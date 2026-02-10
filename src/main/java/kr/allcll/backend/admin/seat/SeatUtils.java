@@ -5,6 +5,6 @@ import kr.allcll.crawler.seat.CrawlerSeat;
 public class SeatUtils {
 
     public static Integer getRemainSeat(CrawlerSeat crawlerSeat) {
-        return Math.max(0, crawlerSeat.getTotLimitRcnt4() - crawlerSeat.getTotRcnt());
+        return Math.max(0, crawlerSeat.getTotLimitRcnt3() - crawlerSeat.getTotRcnt());
     }
 }
