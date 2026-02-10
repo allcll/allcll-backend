@@ -43,14 +43,14 @@ class GeneralSeatSenderTest {
     }
 
     @Test
-    @DisplayName("5초 동안 1초 간격으로 교양 여석을 전송한다.")
+    @DisplayName("6초 동안 3초 간격으로 교양 여석을 전송한다.")
     void sendPeriodicallyTest() throws InterruptedException {
         // given
-        int period = 5;
+        int period = 2;
 
         // when
         generalSeatSender.send();
-        Thread.sleep(period * 1000); // wait for period
+        Thread.sleep(period * 3000); // wait for period
         generalSeatSender.cancel();
         Thread.sleep(1000); // wait for cancel
 

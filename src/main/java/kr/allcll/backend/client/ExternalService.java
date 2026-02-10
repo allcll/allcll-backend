@@ -29,10 +29,6 @@ public class ExternalService {
         externalClient.sendPinSubjects(request);
     }
 
-    public void getTargetSubjectsFromCrawler() {
-        externalClient.getAllTargetSubjects();
-    }
-
     private PinSubjectUpdateRequest getPinSubjects() {
         List<String> activeSseTokens = sseEmitterStorage.getUserTokens();
         List<Pin> currentSemesterPins = pinRepository.findAllBySemesterAt(Semester.getCurrentSemester());
