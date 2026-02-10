@@ -28,25 +28,45 @@ public class BalanceRequiredResolver {
     private final BalanceRequiredCourseAreaMapRepository balanceRequiredCourseAreaMapRepository;
 
     public Optional<GraduationCategoryResponse> resolve(Integer admissionYear, String deptCd, DeptGroup deptGroup) {
-        BalanceRequiredRule balanceRequiredRule =
-            balanceRequiredRuleRepository.findRequiredRuleByAdmissionYearAndDeptCdIn(admissionYear, List.of(deptCd, ALL_DEPT))
-                .orElseThrow(() -> new AllcllException(AllcllErrorCode.BALANCE_REQUIRED_RULE_NOT_FOUND));
+        Optional<BalanceRequiredRule> balanceRequiredRuleOpt =
+            balanceRequiredRuleRepository.findExcludedRuleByAdmissionYearAndDeptCd(admissionYear, deptCd)
+                .or(() -> balanceRequiredRuleRepository.findRequiredRuleByAdmissionYearAndDeptCd(admissionYear, ALL_DEPT));
+
+        if (balanceRequiredRuleOpt.isEmpty()) {
+            return Optional.empty();
+        }
+
+        BalanceRequiredRule balanceRequiredRule = balanceRequiredRuleOpt.get();
+
+        if (Boolean.FALSE.equals(balanceRequiredRule.getRequired())) {
+            return Optional.of(
+                GraduationCategoryResponse.balanceRequiredOf(
+                    CategoryType.BALANCE_REQUIRED,
+                    false,
+                    balanceRequiredRule.getRequiredCredits(),
+                    balanceRequiredRule.getRequiredAreasCnt(),
+                    List.of(),
+                    null
+                )
+            );
+        }
 
         BalanceRequiredAreaExclusion balanceRequiredAreaExclusion =
             balanceRequiredAreaExclusionRepository.findByAdmissionYearAndDeptGroup(admissionYear, deptGroup)
                 .orElseThrow(() -> new AllcllException(AllcllErrorCode.BALANCE_REQUIRED_EXCLUSION_NOT_FOUND));
-        BalanceRequiredArea excludedBalanceRequiredArea = balanceRequiredAreaExclusion.getBalanceRequiredArea();
 
-        List<BalanceAreaCoursesResponse> balanceAreaCoursesResponses = loadAreaToCourses(admissionYear, excludedBalanceRequiredArea);
+        BalanceRequiredArea excludedArea = balanceRequiredAreaExclusion.getBalanceRequiredArea();
+
+        List<BalanceAreaCoursesResponse> balanceAreaCoursesResponses = loadAreaToCourses(admissionYear, excludedArea);
 
         return Optional.of(
             GraduationCategoryResponse.balanceRequiredOf(
                 CategoryType.BALANCE_REQUIRED,
-                balanceRequiredRule.getRequired(),
+                true,
                 balanceRequiredRule.getRequiredCredits(),
                 balanceRequiredRule.getRequiredAreasCnt(),
                 balanceAreaCoursesResponses,
-                excludedBalanceRequiredArea
+                excludedArea
             )
         );
     }
