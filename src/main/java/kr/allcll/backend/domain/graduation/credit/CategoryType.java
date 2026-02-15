@@ -16,8 +16,7 @@ public enum CategoryType { // 이수구분
 
     private static final Set<CategoryType> MAJOR_CATEGORIES = EnumSet.of(
         MAJOR_REQUIRED,
-        MAJOR_ELECTIVE,
-        ACADEMIC_BASIC
+        MAJOR_ELECTIVE
     );
 
     public boolean isMajorCategory() {
