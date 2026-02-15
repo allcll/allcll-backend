@@ -1,6 +1,13 @@
 package kr.allcll.backend.domain.graduation.credit;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import kr.allcll.backend.domain.graduation.MajorScope;
 import kr.allcll.backend.domain.graduation.MajorType;
 import kr.allcll.backend.support.entity.BaseEntity;
@@ -83,5 +90,20 @@ public class DoubleCreditCriterion extends BaseEntity {
         this.requiredCredits = requiredCredits;
         this.enabled = enabled;
         this.note = note;
+    }
+
+    public static CreditCriterion toCreditCriterion(DoubleCreditCriterion doubleCreditCriterion) {
+        return new CreditCriterion(
+            doubleCreditCriterion.getAdmissionYear(),
+            doubleCreditCriterion.getAdmissionYearShort(),
+            doubleCreditCriterion.getMajorType(),
+            doubleCreditCriterion.getPrimaryDeptCd(),
+            doubleCreditCriterion.getPrimaryDeptNm(),
+            doubleCreditCriterion.getMajorScope(),
+            doubleCreditCriterion.getCategoryType(),
+            doubleCreditCriterion.getRequiredCredits(),
+            doubleCreditCriterion.getEnabled(),
+            doubleCreditCriterion.getNote()
+        );
     }
 }

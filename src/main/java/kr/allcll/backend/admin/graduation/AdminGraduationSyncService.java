@@ -34,9 +34,9 @@ import kr.allcll.backend.domain.graduation.credit.RequiredCourseRepository;
 import kr.allcll.backend.domain.graduation.department.DeptGroup;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfoRepository;
-import kr.allcll.backend.support.sheet.GraduationSheetTable;
 import kr.allcll.backend.support.sheet.GraduationSheetFetcher;
 import kr.allcll.backend.support.sheet.GraduationSheetProperties;
+import kr.allcll.backend.support.sheet.GraduationSheetTable;
 import kr.allcll.backend.support.sheet.validation.BalanceRequiredAreaExclusionsSheetValidator;
 import kr.allcll.backend.support.sheet.validation.BalanceRequiredCourseAreaMapSheetValidator;
 import kr.allcll.backend.support.sheet.validation.BalanceRequiredRulesSheetValidator;
@@ -174,6 +174,7 @@ public class AdminGraduationSyncService {
                 graduationSheetTable.getInt(row, "admission_year"),
                 graduationSheetTable.getInt(row, "admission_year_short"),
                 graduationSheetTable.getString(row, "dept_cd"),
+                graduationSheetTable.getString(row, "dept_nm"),
                 graduationSheetTable.getEnum(row, "category_type", CategoryType.class),
                 graduationSheetTable.getString(row, "curi_no"),
                 graduationSheetTable.getString(row, "curi_nm"),

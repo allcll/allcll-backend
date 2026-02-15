@@ -8,4 +8,9 @@ public interface GraduationDepartmentInfoRepository extends JpaRepository<Gradua
 
     @Query("SELECT g FROM GraduationDepartmentInfo g WHERE g.admissionYear = :admissionYear AND g.deptNm = :deptNm")
     Optional<GraduationDepartmentInfo> findByAdmissionYearAndDeptNm(int admissionYear, String deptNm);
+
+    Optional<GraduationDepartmentInfo> findByAdmissionYearAndDeptNm(
+        Integer admissionYear,
+        String deptNm
+    );
 }

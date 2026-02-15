@@ -63,9 +63,13 @@ public class GlobalExceptionHandler {
     }
 
     private String getRequestBody(HttpServletRequest request) {
+        String contentType = request.getContentType();
+        if (contentType != null && contentType.startsWith("multipart/")) {
+            return "[multipart/form-data]";
+        }
         try (BufferedReader reader = request.getReader()) {
             return reader.lines().collect(Collectors.joining(System.lineSeparator() + "\t"));
-        } catch (IOException e) {
+        } catch (IOException | java.io.UncheckedIOException e) {
             log.error("Failed to read request body", e);
             return "";
         }
