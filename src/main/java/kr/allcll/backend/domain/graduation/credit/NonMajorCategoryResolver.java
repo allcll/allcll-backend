@@ -37,7 +37,7 @@ public class NonMajorCategoryResolver {
 
     public List<GraduationCategoryResponse> resolve(Integer admissionYear, String deptCd) {
         List<CreditCriterion> creditCriteria =
-            creditCriterionRepository.findNonMajorCriteria(admissionYear, MajorType.ALL, deptCd);
+            creditCriterionRepository.findByAdmissionYearAndMajorTypeAndDeptCd(admissionYear, MajorType.ALL, deptCd);
 
         Map<CategoryType, List<RequiredCourseResponse>> requiredCoursesByCategory =
             loadRequiredCourses(admissionYear, deptCd);

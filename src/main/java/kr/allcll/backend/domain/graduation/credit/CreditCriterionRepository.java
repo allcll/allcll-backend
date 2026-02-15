@@ -13,21 +13,9 @@ public interface CreditCriterionRepository extends JpaRepository<CreditCriterion
         and c.majorType = :majorType
         and c.deptCd = :deptCd
     """)
-    List<CreditCriterion> findNonMajorCriteria(
+    List<CreditCriterion> findByAdmissionYearAndMajorTypeAndDeptCd(
         Integer admissionYear,
         MajorType majorType,
         String deptCd
-    );
-
-    @Query("""
-        select c from CreditCriterion c
-        where c.admissionYear = :admissionYear
-        and c.majorType = :majorType
-        and c.deptCd in :deptCds
-    """)
-    List<CreditCriterion> findMajorCriteriaCandidates(
-        Integer admissionYear,
-        MajorType majorType,
-        List<String> deptCds
     );
 }

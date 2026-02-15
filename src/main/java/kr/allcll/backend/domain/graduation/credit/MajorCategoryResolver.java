@@ -41,7 +41,7 @@ public class MajorCategoryResolver {
 
     private List<GraduationCategoryResponse> resolveSingleType(Integer admissionYear, String deptCd) {
         List<CreditCriterion> creditCriteria =
-            creditCriterionRepository.findNonMajorCriteria(admissionYear, MajorType.SINGLE, deptCd);
+            creditCriterionRepository.findByAdmissionYearAndMajorTypeAndDeptCd(admissionYear, MajorType.SINGLE, deptCd);
 
         List<GraduationCategoryResponse> graduationCategoryResponses = new ArrayList<>();
         for (CreditCriterion creditCriterion : creditCriteria) {
@@ -71,9 +71,8 @@ public class MajorCategoryResolver {
         if (!doubleCreditCriteria.isEmpty()) {
             return buildFromDoubleCreditCriteria(doubleCreditCriteria, primaryDeptCd, secondaryDeptCd);
         }
-        List<String> searchDeptScope = List.of(ALL_DEPT, primaryDeptCd);
-        List<CreditCriterion> fallbackCriteria = creditCriterionRepository.findMajorCriteriaCandidates(admissionYear,
-            MajorType.DOUBLE, searchDeptScope);
+        List<CreditCriterion> fallbackCriteria =
+            creditCriterionRepository.findByAdmissionYearAndMajorTypeAndDeptCd(admissionYear, MajorType.DOUBLE, ALL_DEPT);
         return buildFromCreditCriteriaFallback(fallbackCriteria, primaryDeptCd, secondaryDeptCd);
     }
 
