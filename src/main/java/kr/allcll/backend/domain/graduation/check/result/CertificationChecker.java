@@ -12,11 +12,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CertificationChecker {
 
-    private final GraduationCheckCertResultRepository certResultRepository;
+    private final GraduationCheckCertResultRepository graduationCheckCertResultRepository;
 
     public CertResult check(Long userId) {
         // 로그인 시 저장된 인증 정보 조회
-        GraduationCheckCertResult certResult = certResultRepository.findByUserId(userId)
+        GraduationCheckCertResult certResult = graduationCheckCertResultRepository.findByUserId(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.GRADUATION_CERT_NOT_FOUND));
 
         // 엔티티를 CertResult로 변환

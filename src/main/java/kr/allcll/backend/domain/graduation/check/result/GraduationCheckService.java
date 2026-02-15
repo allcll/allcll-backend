@@ -18,8 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class GraduationCheckService {
 
     private final GraduationCheckCalculator graduationCheckCalculator;
-    private final GraduationCheckPersistenceService persistenceService;
-    private final GraduationCheckResponseMapper responseMapper;
+    private final GraduationCheckPersistenceService graduationCheckPersistenceService;
+    private final GraduationCheckResponseMapper graduationCheckResponseMapper;
     private final GradeExcelParser gradeExcelParser;
     private final GraduationCheckRepository graduationCheckRepository;
 
@@ -32,13 +32,13 @@ public class GraduationCheckService {
         // 2. 졸업 요건 검사 수행
         CheckResult checkResult = graduationCheckCalculator.calculate(userId, completedCourses);
         // 3. 검사 결과 저장
-        persistenceService.saveCheckResult(userId, checkResult);
+        graduationCheckPersistenceService.saveCheckResult(userId, checkResult);
         // 4. 응답 반환
         GraduationCheck savedCheck = graduationCheckRepository.findById(userId)
             .orElseThrow(() ->
                 new AllcllException(AllcllErrorCode.GRADUATION_CHECK_NOT_FOUND)
             );
-        return responseMapper.toResponseFromEntity(savedCheck);
+        return graduationCheckResponseMapper.toResponseFromEntity(savedCheck);
     }
 
     public GraduationCheckResponse getCheckResult(Long userId) {
@@ -46,7 +46,7 @@ public class GraduationCheckService {
             .findById(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.GRADUATION_CHECK_NOT_FOUND));
 
-        return responseMapper.toResponseFromEntity(check);
+        return graduationCheckResponseMapper.toResponseFromEntity(check);
     }
 
     private void validateExcelFile(MultipartFile file) {
