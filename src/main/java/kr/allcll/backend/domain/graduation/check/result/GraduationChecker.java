@@ -76,7 +76,7 @@ public class GraduationChecker {
     private List<CreditCriterion> resolveCreditCriteria(Long userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
-        if (user.getMajorType() == MajorType.DOUBLE) {
+        if (MajorType.DOUBLE.equals(user.getMajorType())) {
             return buildDoubleMajorCriteria(
                 user,
                 user.getAdmissionYear(),

@@ -30,7 +30,8 @@ public class UserService {
 
     private User save(UserInfo userInfo) {
         int admissionYear = extractAdmissionYear(userInfo.studentId());
-        GraduationDepartmentInfo departmentInfo = departmentInfoRepository.findByAdmissionYearAndDeptNm(admissionYear, userInfo.deptNm())
+        GraduationDepartmentInfo departmentInfo = departmentInfoRepository.findByAdmissionYearAndDeptNm(admissionYear,
+                userInfo.deptNm())
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND, userInfo.deptNm()));
         User user = new User(
             userInfo.studentId(),
@@ -62,14 +63,16 @@ public class UserService {
     public void update(Long userId, UpdateUserRequest updateUserRequest) {
         validateUserId(userId);
         User user = getById(userId);
-        if (updateUserRequest.majorType() == MajorType.SINGLE) {
-            GraduationDepartmentInfo dept = departmentInfoRepository.findByAdmissionYearAndDeptNm(user.getAdmissionYear(),updateUserRequest.deptNm())
+        if (MajorType.SINGLE.equals(updateUserRequest.majorType())) {
+            GraduationDepartmentInfo dept = departmentInfoRepository.findByAdmissionYearAndDeptNm(
+                    user.getAdmissionYear(), updateUserRequest.deptNm())
                 .orElseThrow(
                     () -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND, updateUserRequest.deptNm()));
             user.updateSingleMajorUser(updateUserRequest, dept);
             return;
         }
-        GraduationDepartmentInfo doubleDept = departmentInfoRepository.findByAdmissionYearAndDeptNm(user.getAdmissionYear(), updateUserRequest.doubleDeptNm())
+        GraduationDepartmentInfo doubleDept = departmentInfoRepository.findByAdmissionYearAndDeptNm(
+                user.getAdmissionYear(), updateUserRequest.doubleDeptNm())
             .orElseThrow(
                 () -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND, updateUserRequest.doubleDeptNm()));
         user.updateDoubleMajorUser(updateUserRequest, doubleDept);

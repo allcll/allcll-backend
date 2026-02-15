@@ -121,7 +121,7 @@ public class CategoryCreditCalculator {
 
     private boolean matchesMajorScope(CompletedCourseDto course, MajorScope criterionScope) {
         if (course.majorScope() == null) {
-            return criterionScope == MajorScope.PRIMARY;
+            return MajorScope.PRIMARY.equals(criterionScope);
         }
         return course.majorScope() == criterionScope;
     }
