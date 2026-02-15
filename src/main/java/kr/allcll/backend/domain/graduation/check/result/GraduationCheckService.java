@@ -24,7 +24,7 @@ public class GraduationCheckService {
     private final GraduationCheckRepository graduationCheckRepository;
 
     @Transactional
-    public GraduationCheckResponse checkGraduationRequirements(Long userId, MultipartFile gradeExcel) {
+    public void checkGraduationRequirements(Long userId, MultipartFile gradeExcel) {
         validateExcelFile(gradeExcel);
 
         // 1. 엑셀 파싱
@@ -33,19 +33,12 @@ public class GraduationCheckService {
         CheckResult checkResult = graduationChecker.calculate(userId, completedCourses);
         // 3. 검사 결과 저장
         graduationCheckPersistenceService.saveCheckResult(userId, checkResult);
-        // 4. 응답 반환
-        GraduationCheck savedCheck = graduationCheckRepository.findById(userId)
-            .orElseThrow(() ->
-                new AllcllException(AllcllErrorCode.GRADUATION_CHECK_NOT_FOUND)
-            );
-        return graduationCheckResponseMapper.toResponseFromEntity(savedCheck);
     }
 
     public GraduationCheckResponse getCheckResult(Long userId) {
         GraduationCheck check = graduationCheckRepository
             .findById(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.GRADUATION_CHECK_NOT_FOUND));
-
         return graduationCheckResponseMapper.toResponseFromEntity(check);
     }
 

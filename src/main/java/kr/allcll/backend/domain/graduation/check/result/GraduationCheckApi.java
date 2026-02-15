@@ -17,12 +17,12 @@ public class GraduationCheckApi {
     private final GraduationCheckService graduationCheckService;
 
     @PostMapping("/api/graduation/check")
-    public ResponseEntity<GraduationCheckResponse> checkGraduation(
+    public ResponseEntity<Void> checkGraduation(
         @RequestParam("file") MultipartFile gradeExcel,
         @Auth Long userId
     ) {
-        GraduationCheckResponse response = graduationCheckService.checkGraduationRequirements(userId, gradeExcel);
-        return ResponseEntity.ok(response);
+        graduationCheckService.checkGraduationRequirements(userId, gradeExcel);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/api/graduation/check")
