@@ -6,10 +6,15 @@ import kr.allcll.backend.domain.user.User;
 public record UserResponse(
     Long id,
     String studentId,
-    String studentName,
+    String name,
+    int admissionYear,
+    MajorType majorType,
+    String collegeName,
     String deptName,
-    String deptCd,
-    MajorType majorType
+    String deptCode,
+    String doubleCollegeName,
+    String doubleDeptName,
+    String doubleDeptCode
 ) {
 
     public static UserResponse from(User user) {
@@ -17,9 +22,14 @@ public record UserResponse(
             user.getId(),
             user.getStudentId(),
             user.getName(),
+            user.getAdmissionYear(),
+            user.getMajorType(),
+            user.getCollegeNm(),
             user.getDeptNm(),
             user.getDeptCd(),
-            user.getMajorType()
+            user.getDoubleCollegeNm(),
+            user.getDoubleDeptNm(),
+            user.getDoubleDeptCd()
         );
     }
 }

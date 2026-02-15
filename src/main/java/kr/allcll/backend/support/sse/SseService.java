@@ -1,6 +1,5 @@
 package kr.allcll.backend.support.sse;
 
-import java.io.IOException;
 import java.util.List;
 import kr.allcll.backend.support.sse.dto.SseStatusResponse;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +44,7 @@ public class SseService {
     private void sendEvent(SseEmitter sseEmitter, SseEventBuilder eventBuilder) {
         try {
             sseEmitter.send(eventBuilder);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.warn("전송 실패 - SSE 연결이 끊겼습니다.: {}", e.getMessage());
             SseErrorHandler.handle(e);
         }
