@@ -25,7 +25,6 @@ public class GraduationCheckService {
 
     @Transactional
     public GraduationCheckResponse checkGraduationRequirements(Long userId, MultipartFile gradeExcel) {
-        validateUserId(userId);
         validateExcelFile(gradeExcel);
 
         // 1. 엑셀 파싱
@@ -43,8 +42,6 @@ public class GraduationCheckService {
     }
 
     public GraduationCheckResponse getCheckResult(Long userId) {
-        validateUserId(userId);
-
         GraduationCheck check = graduationCheckRepository
             .findById(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.GRADUATION_CHECK_NOT_FOUND));
@@ -60,12 +57,6 @@ public class GraduationCheckService {
         String filename = file.getOriginalFilename();
         if (filename == null || !filename.endsWith(".xlsx")) {
             throw new AllcllException(AllcllErrorCode.INVALID_FILE_TYPE);
-        }
-    }
-
-    private void validateUserId(Long userId) {
-        if (userId == null) {
-            throw new AllcllException(AllcllErrorCode.UNAUTHORIZED_ACCESS);
         }
     }
 }
