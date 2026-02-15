@@ -172,6 +172,14 @@ public class GraduationCheckResponseMapper {
         }
 
         // scope(주전공/복수전공)별로 전필/전선 찾고 학점 adjust
+        adjustMajorCreditsByScope(majorByScope, result);
+        return result;
+    }
+
+    private void adjustMajorCreditsByScope(
+        Map<MajorScope, List<GraduationCategory>> majorByScope,
+        List<GraduationCategory> result
+    ) {
         for (Map.Entry<MajorScope, List<GraduationCategory>> entry : majorByScope.entrySet()) {
             List<GraduationCategory> majorCategoriesByScope = entry.getValue();
 
@@ -200,7 +208,6 @@ public class GraduationCheckResponseMapper {
             result.add(createAdjustedMajorCategory(majorRequiredCategory, adjustedRequiredCredits));
             result.add(createAdjustedMajorCategory(majorElectiveCategory, adjustedElectiveCredits));
         }
-        return result;
     }
 
     private boolean calculateGraduatable(boolean originalGraduatable, List<GraduationCategory> categories) {
