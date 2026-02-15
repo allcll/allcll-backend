@@ -42,10 +42,12 @@ public class GraduationCertCriteriaService {
         CodingTargetType codingTargetType = primaryDeptInfo.getCodingTargetType();
 
         GraduationCertRule graduationCertRule = graduationCertRuleRepository.findByAdmissionYear(admissionYear)
-            .orElseThrow(() -> new AllcllException(AllcllErrorCode.GRADUATION_CERT_RULE_NOT_FOUND, String.valueOf(admissionYear)));
+            .orElseThrow(() ->
+                new AllcllException(AllcllErrorCode.GRADUATION_CERT_RULE_NOT_FOUND, String.valueOf(admissionYear)));
 
         GraduationCertCriteriaTargetResponse criteriaTarget = buildCriteriaTarget(englishTargetType, codingTargetType);
-        GraduationCertPolicyResponse certPolicy = buildCertPolicy(graduationCertRule.getGraduationCertRuleType(), englishTargetType, codingTargetType);
+        GraduationCertPolicyResponse certPolicy =
+            buildCertPolicy(graduationCertRule.getGraduationCertRuleType(), englishTargetType, codingTargetType);
         EnglishCertCriteriaResponse englishCriteria = buildEnglishCriteria(admissionYear, englishTargetType);
         ClassicCertCriteriaResponse classicCriteria = buildClassicCriteria(admissionYear);
         CodingCertCriteriaResponse codingCriteria = buildCodingCriteria(admissionYear, codingTargetType);
@@ -59,7 +61,10 @@ public class GraduationCertCriteriaService {
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND, deptCd));
     }
 
-    private GraduationCertCriteriaTargetResponse buildCriteriaTarget(EnglishTargetType englishTargetType, CodingTargetType codingTargetType) {
+    private GraduationCertCriteriaTargetResponse buildCriteriaTarget(
+        EnglishTargetType englishTargetType,
+        CodingTargetType codingTargetType
+    ) {
         return GraduationCertCriteriaTargetResponse.of(
             englishTargetType.name(),
             codingTargetType.name()
@@ -121,9 +126,9 @@ public class GraduationCertCriteriaService {
             return null;
         }
 
-        EnglishCertCriterion englishCertCriterion = englishCertCriterionRepository.findByAdmissionYearAndEnglishTargetType(
-                admissionYear, englishTargetType)
-            .orElseThrow(() -> new AllcllException(AllcllErrorCode.ENGLISH_CERT_CRITERIA_NOT_FOUND));
+        EnglishCertCriterion englishCertCriterion =
+            englishCertCriterionRepository.findByAdmissionYearAndEnglishTargetType(admissionYear, englishTargetType)
+                .orElseThrow(() -> new AllcllException(AllcllErrorCode.ENGLISH_CERT_CRITERIA_NOT_FOUND));
 
         EnglishCertAltCourseResponse englishCertAltCourse = EnglishCertAltCourseResponse.of(
             englishCertCriterion.getAltCuriNo(),
