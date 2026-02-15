@@ -70,7 +70,7 @@ public class NonMajorCategoryResolver {
         String deptCd
     ) {
         List<RequiredCourse> requiredCourseCandidates =
-            requiredCourseRepository.findByAdmissionYearAndDeptCdIn(admissionYear, List.of(ALL_DEPT, deptCd));
+            requiredCourseRepository.findByAdmissionYearAndDepts(admissionYear, List.of(ALL_DEPT, deptCd));
 
         Map<String, RequiredCourse> selectedByCourseKey = new LinkedHashMap<>();
         for (RequiredCourse requiredCourse : requiredCourseCandidates) {

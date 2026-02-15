@@ -11,5 +11,5 @@ public interface RequiredCourseRepository extends JpaRepository<RequiredCourse, 
             where r.admissionYear = :admissionYear
             and r.deptCd in :deptCds
         """)
-    List<RequiredCourse> findByAdmissionYearAndDeptCdIn(Integer admissionYear, List<String> deptCds);
+    List<RequiredCourse> findByAdmissionYearAndDepts(Integer admissionYear, List<String> deptCds);
 }
