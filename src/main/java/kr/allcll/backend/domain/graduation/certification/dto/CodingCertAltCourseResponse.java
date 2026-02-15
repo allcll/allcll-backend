@@ -2,11 +2,11 @@ package kr.allcll.backend.domain.graduation.certification.dto;
 
 public record CodingCertAltCourseResponse(
     String alt1CuriNo,
-    String alt1CurieNm,
-    String alt1minGrade,
+    String alt1CuriNm,
+    String alt1MinGrade,
     String alt2CuriNo,
-    String alt2CurieNm,
-    String alt2minGrade
+    String alt2CuriNm,
+    String alt2MinGrade
 ) {
 
     public static CodingCertAltCourseResponse of(
