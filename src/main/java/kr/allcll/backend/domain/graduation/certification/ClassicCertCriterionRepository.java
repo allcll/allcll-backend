@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface ClassicCertCriterionRepository extends JpaRepository<ClassicCertCriterion, Long> {
 
+    Optional<ClassicCertCriterion> findByAdmissionYear(Integer admissionYear);
     @Query("""
         select c from ClassicCertCriterion c
         where c.admissionYear = :admissionYear
