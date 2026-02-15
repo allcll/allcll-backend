@@ -10,6 +10,7 @@ import kr.allcll.backend.domain.graduation.check.result.dto.CertResult;
 import kr.allcll.backend.domain.graduation.check.result.dto.CheckResult;
 import kr.allcll.backend.domain.graduation.check.result.dto.CriterionKey;
 import kr.allcll.backend.domain.graduation.check.result.dto.GraduationCategory;
+import kr.allcll.backend.domain.graduation.check.result.dto.TotalSummary;
 import kr.allcll.backend.domain.graduation.credit.CategoryType;
 import kr.allcll.backend.domain.graduation.credit.CreditCriterion;
 import kr.allcll.backend.domain.graduation.credit.CreditCriterionRepository;
@@ -41,74 +42,60 @@ public class GraduationCheckCalculator {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
 
-        Integer admissionYear = user.getAdmissionYear();
-        String deptNm = user.getDeptNm();
-        MajorType majorType = user.getMajorType();
-
         // 학과 정보 조회
-        GraduationDepartmentInfo primaryDeptInfo = graduationDepartmentInfoRepository
-            .findByAdmissionYearAndDeptNm(admissionYear, deptNm)
-            .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND));
+        GraduationDepartmentInfo primaryDeptInfo = findPrimaryDepartmentInfo(user);
 
         // 졸업 요건 기준 조회
-        List<CreditCriterion> creditCriteria;
-        if (majorType == MajorType.DOUBLE) {
-            creditCriteria = buildDoubleMajorCriteria(user, admissionYear, deptNm);
-        } else {
-            creditCriteria = creditCriterionRepository
-                .findByAdmissionYearAndDeptNmAndMajorTypeIn(
-                    admissionYear, deptNm, List.of(MajorType.ALL, MajorType.SINGLE));
-        }
+        List<CreditCriterion> creditCriteria = resolveCreditCriteria(user);
 
         // 이수구분별 학점 계산
         List<GraduationCategory> categoryResults = categoryCalculator.calculateCategoryResults(
-            majorType,
+            user.getMajorType(),
             completedCourses,
             primaryDeptInfo,
             creditCriteria
         );
 
         // 총 학점 정보 추출 (엑셀에서 직접 합산)
-        double totalCredits = calculateTotalCredits(completedCourses);
-        GraduationCategory totalCategory = categoryResults.stream()
-            .filter(category -> category.categoryType() == CategoryType.TOTAL_COMPLETION)
-            .findFirst()
-            .orElse(null);
-        int requiredTotalCredits = totalCategory.requiredCredits();
-        double remainingCredits = Math.max(requiredTotalCredits - totalCredits, 0);
-        boolean totalSatisfied = remainingCredits <= 0;
-
-        categoryResults.remove(totalCategory);
-        categoryResults.add(new GraduationCategory(
-            totalCategory.majorScope(),
-            CategoryType.TOTAL_COMPLETION,
-            totalCredits,
-            requiredTotalCredits,
-            remainingCredits,
-            totalSatisfied
-        ));
+        TotalSummary totalSummary = summarizeTotalCredits(completedCourses, categoryResults);
 
         // 졸업인증제도 검사
         CertResult certResult = certificationChecker.check(userId);
-        boolean isGraduatable = categoryResults.stream()
-            .allMatch(GraduationCategory::satisfied)
-            && certResult.isSatisfied();
+        boolean isGraduatable = canGraduate(categoryResults, certResult);
 
         return new CheckResult(
             isGraduatable,
-            totalCredits,
-            requiredTotalCredits,
-            remainingCredits,
+            totalSummary.totalCredits(),
+            totalSummary.requiredCredits(),
+            totalSummary.remainingCredits(),
             categoryResults,
             certResult
         );
     }
 
-    private double calculateTotalCredits(List<CompletedCourseDto> completedCourses) {
-        return completedCourses.stream()
-            .filter(CompletedCourseDto::isCreditEarned)
-            .mapToDouble(CompletedCourseDto::credits)
-            .sum();
+    private GraduationDepartmentInfo findPrimaryDepartmentInfo(User user) {
+        Integer admissionYear = user.getAdmissionYear();
+        String deptNm = user.getDeptNm();
+        return graduationDepartmentInfoRepository
+            .findByAdmissionYearAndDeptNm(admissionYear, deptNm)
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND));
+    }
+
+    private List<CreditCriterion> resolveCreditCriteria(User user) {
+
+        if (user.getMajorType() == MajorType.DOUBLE) {
+            return buildDoubleMajorCriteria(
+                user,
+                user.getAdmissionYear(),
+                user.getDeptNm()
+            );
+        }
+        return creditCriterionRepository
+            .findByAdmissionYearAndDeptNmAndMajorTypeIn(
+                user.getAdmissionYear(),
+                user.getDeptNm(),
+                List.of(MajorType.ALL, MajorType.SINGLE)
+            );
     }
 
     private List<CreditCriterion> buildDoubleMajorCriteria(
@@ -176,5 +163,50 @@ public class GraduationCheckCalculator {
             exceptionCriteriaMap.put(key, exceptionDoubleCriterion);
         }
         return exceptionCriteriaMap;
+    }
+
+    private TotalSummary summarizeTotalCredits(
+        List<CompletedCourseDto> completedCourses,
+        List<GraduationCategory> categories
+    ) {
+
+        double totalCredits = calculateTotalCredits(completedCourses);
+
+        GraduationCategory totalCategory = categories.stream()
+            .filter(category -> category.categoryType() == CategoryType.TOTAL_COMPLETION)
+            .findFirst()
+            .orElseThrow();
+
+        categories.remove(totalCategory);
+
+        int requiredCredits = totalCategory.requiredCredits();
+        double remainingCredits = Math.max(requiredCredits - totalCredits, 0);
+        boolean satisfied = remainingCredits <= 0;
+
+        categories.add(new GraduationCategory(
+            totalCategory.majorScope(),
+            CategoryType.TOTAL_COMPLETION,
+            totalCredits,
+            requiredCredits,
+            remainingCredits,
+            satisfied
+        ));
+
+        return new TotalSummary(totalCredits, requiredCredits, remainingCredits);
+    }
+
+    private double calculateTotalCredits(List<CompletedCourseDto> completedCourses) {
+        return completedCourses.stream()
+            .filter(CompletedCourseDto::isCreditEarned)
+            .mapToDouble(CompletedCourseDto::credits)
+            .sum();
+    }
+
+    private boolean canGraduate(
+        List<GraduationCategory> categories,
+        CertResult certResult
+    ) {
+        return categories.stream().allMatch(GraduationCategory::satisfied)
+            && certResult.isSatisfied();
     }
 }
