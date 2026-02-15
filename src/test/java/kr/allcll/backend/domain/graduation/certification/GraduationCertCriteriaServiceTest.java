@@ -288,8 +288,8 @@ class GraduationCertCriteriaServiceTest {
 
         assertThat(response.codingCertCriteria().codingTargetType()).isEqualTo("CODING_MAJOR");
         assertThat(response.codingCertCriteria().altCourse().alt2CuriNo()).isNull();
-        assertThat(response.codingCertCriteria().altCourse().alt2CurieNm()).isNull();
-        assertThat(response.codingCertCriteria().altCourse().alt2minGrade()).isNull();
+        assertThat(response.codingCertCriteria().altCourse().alt2CuriNm()).isNull();
+        assertThat(response.codingCertCriteria().altCourse().alt2MinGrade()).isNull();
     }
 
     @Test
