@@ -1,6 +1,5 @@
 package kr.allcll.backend.domain.graduation.certification;
 
-import kr.allcll.backend.domain.graduation.MajorType;
 import kr.allcll.backend.domain.graduation.certification.dto.ClassicCertCriteriaResponse;
 import kr.allcll.backend.domain.graduation.certification.dto.CodingCertAltCourseResponse;
 import kr.allcll.backend.domain.graduation.certification.dto.CodingCertCriteriaResponse;
@@ -38,16 +37,10 @@ public class GraduationCertCriteriaService {
         int admissionYear = user.getAdmissionYear();
 
         GraduationDepartmentInfo primaryDeptInfo = findDepartment(admissionYear, user.getDeptCd());
-        GraduationDepartmentInfo doubleDeptInfo = findDoubleDepartmentIfExists(admissionYear, user);
 
-        EnglishTargetType englishTargetType = MajorTargetTypeResolver.resolveEnglishTargetType(
-            primaryDeptInfo,
-            doubleDeptInfo
-        );
-        CodingTargetType codingTargetType = MajorTargetTypeResolver.resolveCodingTargetType(
-            primaryDeptInfo,
-            doubleDeptInfo
-        );
+        EnglishTargetType englishTargetType = primaryDeptInfo.getEnglishTargetType();
+        CodingTargetType codingTargetType = primaryDeptInfo.getCodingTargetType();
+
         GraduationCertRule graduationCertRule = graduationCertRuleRepository.findByAdmissionYear(admissionYear)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.GRADUATION_CERT_RULE_NOT_FOUND, String.valueOf(admissionYear)));
 
@@ -64,13 +57,6 @@ public class GraduationCertCriteriaService {
     private GraduationDepartmentInfo findDepartment(int admissionYear, String deptCd) {
         return departmentInfoRepository.findByAdmissionYearAndDeptCd(admissionYear, deptCd)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND, deptCd));
-    }
-
-    private GraduationDepartmentInfo findDoubleDepartmentIfExists(int admissionYear, User user) {
-        if (MajorType.SINGLE.equals(user.getMajorType())) {
-            return null;
-        }
-        return findDepartment(admissionYear, user.getDoubleDeptCd());
     }
 
     private GraduationCertCriteriaTargetResponse buildCriteriaTarget(EnglishTargetType englishTargetType, CodingTargetType codingTargetType) {
