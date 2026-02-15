@@ -46,7 +46,7 @@ public class CategoryCreditCalculator {
     }
 
     private GraduationDepartmentInfo findPrimaryDepartmentInfo(User user) {
-        Integer admissionYear = user.getAdmissionYear();
+        int admissionYear = user.getAdmissionYear();
         String deptNm = user.getDeptNm();
         return graduationDepartmentInfoRepository
             .findByAdmissionYearAndDeptNm(admissionYear, deptNm)
@@ -212,7 +212,7 @@ public class CategoryCreditCalculator {
         DeptGroup deptGroup = deptInfo.getDeptGroup();
 
         return balanceRequiredAreaExclusionRepository
-            .findByAdmissionYearAndDeptGroup(admissionYear, deptGroup)
+            .findAllByAdmissionYearAndDeptGroup(admissionYear, deptGroup)
             .stream()
             .map(BalanceRequiredAreaExclusion::getBalanceRequiredArea)
             .collect(Collectors.toSet());

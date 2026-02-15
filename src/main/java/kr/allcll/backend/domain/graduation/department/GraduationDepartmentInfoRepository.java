@@ -14,11 +14,6 @@ public interface GraduationDepartmentInfoRepository extends JpaRepository<Gradua
         """)
     Optional<GraduationDepartmentInfo> findByAdmissionYearAndDeptNm(int admissionYear, String deptNm);
 
-    Optional<GraduationDepartmentInfo> findByAdmissionYearAndDeptNm(
-        Integer admissionYear,
-        String deptNm
-    );
-
     @Query("""
         select g from GraduationDepartmentInfo g
         where g.admissionYear = :admissionYear
@@ -31,4 +26,11 @@ public interface GraduationDepartmentInfoRepository extends JpaRepository<Gradua
         where g.admissionYear = :admissionYear
         """)
     List<GraduationDepartmentInfo> findAllByAdmissionYear(Integer admissionYear);
+
+    @Query("""
+            select d from GraduationDepartmentInfo d
+            where d.admissionYear = :admissionYear
+            and d.deptCd = :deptCd
+        """)
+    Optional<GraduationDepartmentInfo> findByAdmissionYearAndDeptCd(Integer admissionYear, String deptCd);
 }

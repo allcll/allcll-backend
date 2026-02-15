@@ -41,7 +41,8 @@ public enum AllcllErrorCode {
     CLASSIC_CERT_CRITERIA_NOT_FOUND(HttpStatus.NOT_FOUND, "고전독서 인증 기준을 찾을 수 없습니다."),
     GRADUATION_CERT_NOT_FOUND(HttpStatus.NOT_FOUND, "졸업 인증 정보를 찾을 수 없습니다."),
     GRADUATION_CHECK_NOT_FOUND(HttpStatus.NOT_FOUND, "졸업 요건 검사 결과를 찾을 수 없습니다."),
-    CLASSIC_CERT_CRITERION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 연도의 고전독서인증 기준 데이터를 찾을 수 없습니다."),
+    BALANCE_REQUIRED_RULE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 연도의 균형교양 졸업요건 규칙을 찾을 수 없습니다."),
+    BALANCE_REQUIRED_EXCLUSION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 연도의 균형교양 제외 영역 정보를 찾을 수 없습니다."),
 
     //409
     PIN_LIMIT_EXCEEDED(HttpStatus.CONFLICT, "이미 %d개의 핀을 등록했습니다."),

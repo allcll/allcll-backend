@@ -66,7 +66,7 @@ public class GraduationChecker {
     }
 
     private GraduationDepartmentInfo findPrimaryDepartmentInfo(User user) {
-        Integer admissionYear = user.getAdmissionYear();
+        int admissionYear = user.getAdmissionYear();
         String deptNm = user.getDeptNm();
         return graduationDepartmentInfoRepository
             .findByAdmissionYearAndDeptNm(admissionYear, deptNm)
