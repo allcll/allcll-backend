@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class GradeExcelParser {
 
-    private static final int SHEET_START_ROW = 3;
+    private static final int SHEET_START_ROW = 4;
 
     public List<CompletedCourseDto> parse(MultipartFile file) {
         List<CompletedCourseDto> completedCourses = new ArrayList<>();
