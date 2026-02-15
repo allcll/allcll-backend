@@ -2,7 +2,6 @@ package kr.allcll.backend.domain.graduation.credit;
 
 import java.util.ArrayList;
 import java.util.List;
-import kr.allcll.backend.domain.graduation.MajorType;
 import kr.allcll.backend.domain.graduation.credit.dto.GraduationCategoriesResponse;
 import kr.allcll.backend.domain.graduation.credit.dto.GraduationCategoryResponse;
 import kr.allcll.backend.domain.graduation.credit.dto.GraduationContextResponse;
@@ -50,28 +49,9 @@ public class GraduationCategoryService {
     }
 
     private void addMajorCategories(List<GraduationCategoryResponse> graduationCategoryResponses, User user) {
-        if (user.getMajorType() == MajorType.SINGLE) {
-            addSingleMajorCategories(graduationCategoryResponses, user);
-            return;
-        }
-        addDoubleMajorCategories(graduationCategoryResponses, user);
-    }
-
-    private void addSingleMajorCategories(List<GraduationCategoryResponse> graduationCategoryResponses, User user) {
         List<GraduationCategoryResponse> majorCategories = majorCategoryResolver.resolve(
             user.getAdmissionYear(),
-            MajorType.SINGLE,
-            user.getDeptCd(),
-            null,
-            user
-        );
-        graduationCategoryResponses.addAll(majorCategories);
-    }
-
-    private void addDoubleMajorCategories(List<GraduationCategoryResponse> graduationCategoryResponses, User user) {
-        List<GraduationCategoryResponse> majorCategories = majorCategoryResolver.resolve(
-            user.getAdmissionYear(),
-            MajorType.DOUBLE,
+            user.getMajorType(),
             user.getDeptCd(),
             user.getDoubleDeptCd(),
             user
