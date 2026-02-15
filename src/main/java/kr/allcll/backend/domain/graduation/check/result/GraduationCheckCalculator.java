@@ -52,12 +52,8 @@ public class GraduationCheckCalculator {
 
         // 졸업 요건 기준 조회
         List<CreditCriterion> creditCriteria;
-        GraduationDepartmentInfo secondaryDeptInfo = null;
         if (majorType == MajorType.DOUBLE) {
             creditCriteria = buildDoubleMajorCriteria(user, admissionYear, deptNm);
-            secondaryDeptInfo = departmentInfoRepository
-                .findByAdmissionYearAndDeptNm(admissionYear, user.getDoubleDeptNm())
-                .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND));
         } else {
             creditCriteria = creditCriterionRepository
                 .findByAdmissionYearAndDeptNmAndMajorTypeIn(
