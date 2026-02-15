@@ -7,17 +7,25 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface CreditCriterionRepository extends JpaRepository<CreditCriterion, Long> {
 
-    List<CreditCriterion> findByAdmissionYearAndDeptNm(
-        Integer admissionYear,
-        String deptNm
-    );
-
+    @Query("""
+            select c
+            from CreditCriterion c
+            where c.admissionYear = :admissionYear
+            and c.deptNm = :deptNm
+            and c.majorType in :majorTypes
+        """)
     List<CreditCriterion> findByAdmissionYearAndDeptNmAndMajorTypeIn(
         Integer admissionYear,
         String deptNm,
         List<MajorType> majorTypes
     );
 
+    @Query("""
+            select c
+            from CreditCriterion c
+            where c.admissionYear = :admissionYear
+            and c.majorType = :majorType
+        """)
     List<CreditCriterion> findByAdmissionYearAndMajorType(
         Integer admissionYear,
         MajorType majorType

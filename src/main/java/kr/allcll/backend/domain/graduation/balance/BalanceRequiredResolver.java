@@ -52,7 +52,7 @@ public class BalanceRequiredResolver {
         }
 
         BalanceRequiredAreaExclusion balanceRequiredAreaExclusion =
-            balanceRequiredAreaExclusionRepository.findByAdmissionYearAndDeptGroup(admissionYear, deptGroup)
+            balanceRequiredAreaExclusionRepository.findOneByAdmissionYearAndDeptGroup(admissionYear, deptGroup)
                 .orElseThrow(() -> new AllcllException(AllcllErrorCode.BALANCE_REQUIRED_EXCLUSION_NOT_FOUND));
 
         BalanceRequiredArea excludedArea = balanceRequiredAreaExclusion.getBalanceRequiredArea();
