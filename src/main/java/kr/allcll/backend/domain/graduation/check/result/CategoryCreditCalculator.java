@@ -17,6 +17,11 @@ import kr.allcll.backend.domain.graduation.credit.CategoryType;
 import kr.allcll.backend.domain.graduation.credit.CreditCriterion;
 import kr.allcll.backend.domain.graduation.department.DeptGroup;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
+import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfoRepository;
+import kr.allcll.backend.domain.user.User;
+import kr.allcll.backend.domain.user.UserRepository;
+import kr.allcll.backend.support.exception.AllcllErrorCode;
+import kr.allcll.backend.support.exception.AllcllException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -24,15 +29,28 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CategoryCreditCalculator {
 
+    private final UserRepository userRepository;
+    private final GraduationDepartmentInfoRepository graduationDepartmentInfoRepository;
     private final BalanceRequiredRuleRepository balanceRequiredRuleRepository;
     private final BalanceRequiredAreaExclusionRepository balanceRequiredAreaExclusionRepository;
 
     public List<GraduationCategory> calculateCategoryResults(
+        Long userId,
         List<CompletedCourseDto> completedCourses,
-        GraduationDepartmentInfo primaryDeptInfo,
         List<CreditCriterion> creditCriteria
     ) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
+        GraduationDepartmentInfo primaryDeptInfo = findPrimaryDepartmentInfo(user);
         return calculateMajor(completedCourses, primaryDeptInfo, creditCriteria);
+    }
+
+    private GraduationDepartmentInfo findPrimaryDepartmentInfo(User user) {
+        Integer admissionYear = user.getAdmissionYear();
+        String deptNm = user.getDeptNm();
+        return graduationDepartmentInfoRepository
+            .findByAdmissionYearAndDeptNm(admissionYear, deptNm)
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND));
     }
 
     // 전공 학점 계산
