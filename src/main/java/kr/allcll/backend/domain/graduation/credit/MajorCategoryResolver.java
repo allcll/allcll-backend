@@ -139,13 +139,18 @@ public class MajorCategoryResolver {
     }
 
     private List<RequiredCourseResponse> loadMajorSubjects(String deptCd, CategoryType categoryType) {
-        String curiType = CategoryType.MAJOR_REQUIRED.equals(categoryType)
-            ? SUBJECT_MAJOR_REQUIRED
-            : SUBJECT_MAJOR_ELECTIVE;
+        String curiTypeCdNm = resolveCuriTypeCdNm(categoryType);
 
-        List<Subject> majorSubjects = subjectRepository.findByDeptCdAndCuriTypeCdNm(deptCd, curiType);
+        List<Subject> majorSubjects = subjectRepository.findByDeptCdAndCuriTypeCdNm(deptCd, curiTypeCdNm);
         return majorSubjects.stream()
             .map(majorSubject -> RequiredCourseResponse.of(majorSubject.getCuriNo(), majorSubject.getCuriNm()))
             .toList();
+    }
+
+    private String resolveCuriTypeCdNm(CategoryType categoryType) {
+        if (CategoryType.MAJOR_REQUIRED.equals(categoryType)) {
+            return SUBJECT_MAJOR_REQUIRED;
+        }
+        return SUBJECT_MAJOR_ELECTIVE;
     }
 }
