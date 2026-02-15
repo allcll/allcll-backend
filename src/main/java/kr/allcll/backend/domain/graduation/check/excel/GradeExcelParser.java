@@ -26,15 +26,12 @@ public class GradeExcelParser {
     public List<CompletedCourseDto> parse(MultipartFile file) {
         List<CompletedCourseDto> completedCourses = new ArrayList<>();
 
-        InputStream stream = null;
-        Workbook workbook = null;
-        try {
-            stream = file.getInputStream();
-            workbook = new XSSFWorkbook(stream);
-
+        try (
+            InputStream stream = file.getInputStream();
+            Workbook workbook = new XSSFWorkbook(stream)
+        ) {
             Sheet sheet = workbook.getSheetAt(0);
             parseSheet(sheet, completedCourses);
-
             return completedCourses;
         } catch (IOException exception) {
             throw new AllcllException(AllcllErrorCode.EXCEL_PARSE_ERROR, exception);
