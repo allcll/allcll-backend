@@ -38,20 +38,13 @@ public class GraduationChecker {
     private final DoubleCreditCriterionRepository doubleCreditCriterionRepository;
 
     public CheckResult calculate(Long userId, List<CompletedCourseDto> completedCourses) {
-        // 사용자 정보 조회
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
-
-        // 학과 정보 조회
-        GraduationDepartmentInfo primaryDeptInfo = findPrimaryDepartmentInfo(user);
-
-        // 졸업 요건 기준 조회
-        List<CreditCriterion> creditCriteria = resolveCreditCriteria(user);
+        // 사용자의 졸업 요건 기준 조회
+        List<CreditCriterion> creditCriteria = resolveCreditCriteria(userId);
 
         // 이수구분별 학점 계산
         List<GraduationCategory> categoryResults = categoryCalculator.calculateCategoryResults(
+            userId,
             completedCourses,
-            primaryDeptInfo,
             creditCriteria
         );
 
@@ -80,8 +73,9 @@ public class GraduationChecker {
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND));
     }
 
-    private List<CreditCriterion> resolveCreditCriteria(User user) {
-
+    private List<CreditCriterion> resolveCreditCriteria(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
         if (user.getMajorType() == MajorType.DOUBLE) {
             return buildDoubleMajorCriteria(
                 user,
