@@ -23,12 +23,14 @@ public class DoubleCreditCriterionResolver {
         String primaryDeptCd = user.getDeptCd();
         String secondaryDeptCd = user.getDoubleDeptCd();
 
-        List<DoubleCreditCriterion> bothMatchedDoubleCreditCriteria = doubleCreditCriterionRepository.findByPair(admissionYear, majorType, primaryDeptCd, secondaryDeptCd);
+        List<DoubleCreditCriterion> bothMatchedDoubleCreditCriteria
+            = doubleCreditCriterionRepository.findByPair(admissionYear, majorType, primaryDeptCd, secondaryDeptCd);
         if (!bothMatchedDoubleCreditCriteria.isEmpty()) {
             return bothMatchedDoubleCreditCriteria;
         }
 
-        List<DoubleCreditCriterion> primaryDeptCdMatchedDoubleCreditCriteria = doubleCreditCriterionRepository.findByPair(admissionYear, majorType, primaryDeptCd, ALL_DEPT);
+        List<DoubleCreditCriterion> primaryDeptCdMatchedDoubleCreditCriteria
+            = doubleCreditCriterionRepository.findByPair(admissionYear, majorType, primaryDeptCd, ALL_DEPT);
         if (!primaryDeptCdMatchedDoubleCreditCriteria.isEmpty()) return primaryDeptCdMatchedDoubleCreditCriteria;
 
         return doubleCreditCriterionRepository.findByPair(admissionYear, majorType, ALL_DEPT, secondaryDeptCd);
