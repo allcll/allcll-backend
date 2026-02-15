@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import kr.allcll.backend.domain.graduation.MajorScope;
 import kr.allcll.backend.domain.graduation.MajorType;
 import kr.allcll.backend.domain.graduation.credit.dto.GraduationCategoryResponse;
@@ -74,7 +75,8 @@ public class MajorCategoryResolver {
             return buildFromDoubleCreditCriteria(doubleCreditCriteria, primaryDeptCd, secondaryDeptCd);
         }
         List<CreditCriterion> fallbackCriteria =
-            creditCriterionRepository.findByAdmissionYearAndMajorTypeAndDeptCd(admissionYear, MajorType.DOUBLE, ALL_DEPT);
+            creditCriterionRepository.findByAdmissionYearAndMajorTypeAndDeptCd(admissionYear, MajorType.DOUBLE,
+                ALL_DEPT);
         return buildFromCreditCriteriaFallback(fallbackCriteria, primaryDeptCd, secondaryDeptCd);
     }
 
@@ -159,7 +161,15 @@ public class MajorCategoryResolver {
     private List<RequiredCourseResponse> loadMajorSubjectsByCuriType(String deptCd, String curiTypeCdNm) {
         List<Subject> majorSubjects = subjectRepository.findByDeptCdAndCuriTypeCdNm(deptCd, curiTypeCdNm);
         return majorSubjects.stream()
-            .map(majorSubject -> RequiredCourseResponse.of(majorSubject.getCuriNo(), majorSubject.getCuriNm()))
+            .collect(
+                Collectors.toMap(
+                    Subject::getCuriNo,
+                    subject -> RequiredCourseResponse.of(subject.getCuriNo(), subject.getCuriNm()),
+                    (existing, duplicated) -> existing
+                )
+            )
+            .values()
+            .stream()
             .toList();
     }
 
