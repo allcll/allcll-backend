@@ -40,17 +40,22 @@ public class GraduationCertCriteriaService {
         GraduationDepartmentInfo primaryDeptInfo = findDepartment(admissionYear, user.getDeptCd());
         GraduationDepartmentInfo doubleDeptInfo = findDoubleDepartmentIfExists(admissionYear, user);
 
-        EnglishTargetType resolvedEnglishTargetType = MajorTargetTypeResolver.resolveEnglishTargetType(primaryDeptInfo, doubleDeptInfo);
-        CodingTargetType resolvedCodingTargetType = MajorTargetTypeResolver.resolveCodingTargetType(primaryDeptInfo, doubleDeptInfo);
-
+        EnglishTargetType englishTargetType = MajorTargetTypeResolver.resolveEnglishTargetType(
+            primaryDeptInfo,
+            doubleDeptInfo
+        );
+        CodingTargetType codingTargetType = MajorTargetTypeResolver.resolveCodingTargetType(
+            primaryDeptInfo,
+            doubleDeptInfo
+        );
         GraduationCertRule graduationCertRule = graduationCertRuleRepository.findByAdmissionYear(admissionYear)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.GRADUATION_CERT_RULE_NOT_FOUND, String.valueOf(admissionYear)));
 
-        GraduationCertCriteriaTargetResponse criteriaTarget = buildCriteriaTarget(resolvedEnglishTargetType, resolvedCodingTargetType);
-        GraduationCertPolicyResponse certPolicy = buildCertPolicy(graduationCertRule.getGraduationCertRuleType(), resolvedEnglishTargetType, resolvedCodingTargetType);
-        EnglishCertCriteriaResponse englishCriteria = buildEnglishCriteria(admissionYear, resolvedEnglishTargetType);
+        GraduationCertCriteriaTargetResponse criteriaTarget = buildCriteriaTarget(englishTargetType, codingTargetType);
+        GraduationCertPolicyResponse certPolicy = buildCertPolicy(graduationCertRule.getGraduationCertRuleType(), englishTargetType, codingTargetType);
+        EnglishCertCriteriaResponse englishCriteria = buildEnglishCriteria(admissionYear, englishTargetType);
         ClassicCertCriteriaResponse classicCriteria = buildClassicCriteria(admissionYear);
-        CodingCertCriteriaResponse codingCriteria = buildCodingCriteria(admissionYear, resolvedCodingTargetType);
+        CodingCertCriteriaResponse codingCriteria = buildCodingCriteria(admissionYear, codingTargetType);
 
         return GraduationCertCriteriaResponse.of(criteriaTarget, certPolicy, englishCriteria, classicCriteria,
             codingCriteria);
@@ -75,8 +80,11 @@ public class GraduationCertCriteriaService {
         );
     }
 
-    private GraduationCertPolicyResponse buildCertPolicy(GraduationCertRuleType certRuleType, EnglishTargetType englishTargetType,
-        CodingTargetType codingTargetType) {
+    private GraduationCertPolicyResponse buildCertPolicy(
+        GraduationCertRuleType certRuleType,
+        EnglishTargetType englishTargetType,
+        CodingTargetType codingTargetType
+    ) {
         boolean enableEnglish = isEnabledEnglish(certRuleType, englishTargetType);
         boolean enableClassic = isEnabledClassic(certRuleType);
         boolean enableCoding = isEnabledCoding(certRuleType, codingTargetType);
@@ -91,14 +99,17 @@ public class GraduationCertCriteriaService {
     }
 
     private boolean isEnabledEnglish(GraduationCertRuleType certRuleType, EnglishTargetType englishTargetType) {
-        boolean isRequiredByRule = certRuleType.getGraduationCertTypes().contains(GraduationCertType.CERT_ENGLISH);
+        boolean isRequired = certRuleType.getGraduationCertTypes().contains(GraduationCertType.CERT_ENGLISH);
         boolean isTargetDept = isEnglishTarget(englishTargetType);
-        return isRequiredByRule && isTargetDept;
+        return isRequired && isTargetDept;
     }
 
     private boolean isEnglishTarget(EnglishTargetType englishTargetType) {
-        return EnglishTargetType.NON_MAJOR.equals(englishTargetType)
-            || EnglishTargetType.ENGLISH_MAJOR.equals(englishTargetType);
+        return !isNotEnglishTarget(englishTargetType);
+    }
+
+    private boolean isNotEnglishTarget(EnglishTargetType englishTargetType){
+        return EnglishTargetType.EXEMPT.equals(englishTargetType);
     }
 
     private boolean isEnabledClassic(GraduationCertRuleType certRuleType) {
@@ -106,14 +117,17 @@ public class GraduationCertCriteriaService {
     }
 
     private boolean isEnabledCoding(GraduationCertRuleType certRuleType, CodingTargetType codingTargetType) {
-        boolean isRequiredByRule = certRuleType.getGraduationCertTypes().contains(GraduationCertType.CERT_CODING);
+        boolean isRequired = certRuleType.getGraduationCertTypes().contains(GraduationCertType.CERT_CODING);
         boolean isTargetDept = isCodingTarget(codingTargetType);
-        return isRequiredByRule && isTargetDept;
+        return isRequired && isTargetDept;
     }
 
     private boolean isCodingTarget(CodingTargetType codingTargetType) {
-        return CodingTargetType.NON_MAJOR.equals(codingTargetType)
-            || CodingTargetType.CODING_MAJOR.equals(codingTargetType);
+        return !isNotCodingTarget(codingTargetType);
+    }
+
+    private boolean isNotCodingTarget(CodingTargetType codingTargetType){
+        return CodingTargetType.EXEMPT.equals(codingTargetType);
     }
 
     private EnglishCertCriteriaResponse buildEnglishCriteria(int admissionYear, EnglishTargetType englishTargetType) {
