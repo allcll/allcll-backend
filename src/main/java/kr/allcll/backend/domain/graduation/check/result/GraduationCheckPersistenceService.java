@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class GraduationCheckPersistenceService {
 
     private final GraduationCheckRepository graduationCheckRepository;
-    private final GraduationCheckCategoryResultRepository categoryResultRepository;
+    private final GraduationCheckCategoryResultRepository graduationCheckCategoryResultRepository;
 
     public void saveCheckResult(Long userId, CheckResult checkResult) {
         saveOrUpdateGraduationCheck(userId, checkResult);
@@ -44,9 +44,10 @@ public class GraduationCheckPersistenceService {
     }
 
     private void saveOrUpdateCategoryResults(Long userId, List<GraduationCategory> categories) {
-        List<GraduationCheckCategoryResult> existingCategoryResults = categoryResultRepository.findAllByUserId(userId);
-        categoryResultRepository.deleteAllInBatch(existingCategoryResults);
-        categoryResultRepository.flush();
+        List<GraduationCheckCategoryResult> existingCategoryResults = graduationCheckCategoryResultRepository.findAllByUserId(
+            userId);
+        graduationCheckCategoryResultRepository.deleteAllInBatch(existingCategoryResults);
+        graduationCheckCategoryResultRepository.flush();
 
         List<GraduationCheckCategoryResult> newCategoryResults = categories.stream()
             .map(category ->
@@ -61,6 +62,6 @@ public class GraduationCheckPersistenceService {
                 )
             ).toList();
 
-        categoryResultRepository.saveAll(newCategoryResults);
+        graduationCheckCategoryResultRepository.saveAll(newCategoryResults);
     }
 }

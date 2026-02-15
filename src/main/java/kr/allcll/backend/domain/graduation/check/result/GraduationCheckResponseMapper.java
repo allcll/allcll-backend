@@ -31,14 +31,15 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class GraduationCheckResponseMapper {
 
-    private final GraduationCheckCategoryResultRepository categoryResultRepository;
-    private final GraduationCheckCertResultRepository certResultRepository;
+    private final GraduationCheckCategoryResultRepository graduationCheckCategoryResultRepository;
+    private final GraduationCheckCertResultRepository graduationCheckCertResultRepository;
 
     public GraduationCheckResponse toResponseFromEntity(GraduationCheck check) {
         Long userId = check.getUserId();
 
         // 1. 카테고리 별  결과 조회
-        List<GraduationCheckCategoryResult> categoryResults = categoryResultRepository.findAllByUserId(userId);
+        List<GraduationCheckCategoryResult> categoryResults = graduationCheckCategoryResultRepository.findAllByUserId(
+            userId);
 
         List<GraduationCategory> categories = categoryResults.stream()
             .map(result -> new GraduationCategory(
@@ -60,7 +61,7 @@ public class GraduationCheckResponseMapper {
         );
 
         // 3. 졸업인증 결과 조회
-        GraduationCheckCertResult certResult = certResultRepository
+        GraduationCheckCertResult certResult = graduationCheckCertResultRepository
             .findByUserId(userId)
             .orElseThrow(() ->
                 new AllcllException(AllcllErrorCode.GRADUATION_CERT_NOT_FOUND)

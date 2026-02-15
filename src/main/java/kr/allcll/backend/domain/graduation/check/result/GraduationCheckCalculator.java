@@ -32,7 +32,7 @@ public class GraduationCheckCalculator {
     private final CertificationChecker certificationChecker;
 
     private final UserRepository userRepository;
-    private final GraduationDepartmentInfoRepository departmentInfoRepository;
+    private final GraduationDepartmentInfoRepository graduationDepartmentInfoRepository;
     private final CreditCriterionRepository creditCriterionRepository;
     private final DoubleCreditCriterionRepository doubleCreditCriterionRepository;
 
@@ -46,7 +46,7 @@ public class GraduationCheckCalculator {
         MajorType majorType = user.getMajorType();
 
         // 학과 정보 조회
-        GraduationDepartmentInfo primaryDeptInfo = departmentInfoRepository
+        GraduationDepartmentInfo primaryDeptInfo = graduationDepartmentInfoRepository
             .findByAdmissionYearAndDeptNm(admissionYear, deptNm)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND));
 
