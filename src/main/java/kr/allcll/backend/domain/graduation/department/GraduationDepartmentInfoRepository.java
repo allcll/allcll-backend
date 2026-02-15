@@ -17,6 +17,13 @@ public interface GraduationDepartmentInfoRepository extends JpaRepository<Gradua
     @Query("""
         select g from GraduationDepartmentInfo g
         where g.admissionYear = :admissionYear
+        and g.deptCd = :deptCd
+        """)
+    Optional<GraduationDepartmentInfo> findByAdmissionYearAndDeptCd(int admissionYear, String deptCd);
+
+    @Query("""
+        select g from GraduationDepartmentInfo g
+        where g.admissionYear = :admissionYear
         """)
     List<GraduationDepartmentInfo> findAllByAdmissionYear(Integer admissionYear);
 }

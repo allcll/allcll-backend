@@ -29,8 +29,11 @@ public enum AllcllErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자 정보를 찾을 수 없습니다."),
     GOOGLE_KEY_NOT_FOUND(HttpStatus.NOT_FOUND, "구글 서비스 계정 키 파일을 찾을 수 없습니다."),
     GOOGLE_SHEET_TAB_NOT_FOUND(HttpStatus.NOT_FOUND,"구글 시트가 존재하지 않습니다."),
-    GRADUATION_CERT_RULE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 연도의 졸업인증기준 규칙을 찾을 수 없습니다: %d"),
+    GRADUATION_CERT_RULE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 연도의 졸업인증기준 규칙을 찾을 수 없습니다: %s"),
     DEPARTMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 이름의 학과 정보를 찾을 수 없습니다: %s"),
+    ENGLISH_CERT_CRITERIA_NOT_FOUND(HttpStatus.NOT_FOUND, "영어 인증 기준을 찾을 수 없습니다."),
+    CODING_CERT_CRITERIA_NOT_FOUND(HttpStatus.NOT_FOUND, "코딩 인증 기준을 찾을 수 없습니다."),
+    CLASSIC_CERT_CRITERIA_NOT_FOUND(HttpStatus.NOT_FOUND, "고전독서 인증 기준을 찾을 수 없습니다."),
 
     //409
     PIN_LIMIT_EXCEEDED(HttpStatus.CONFLICT, "이미 %d개의 핀을 등록했습니다."),
