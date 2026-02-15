@@ -43,7 +43,7 @@ public class GraduationCertCriteriaService {
 
         GraduationCertRule graduationCertRule = graduationCertRuleRepository.findByAdmissionYear(admissionYear)
             .orElseThrow(() ->
-                new AllcllException(AllcllErrorCode.GRADUATION_CERT_RULE_NOT_FOUND, String.valueOf(admissionYear)));
+                new AllcllException(AllcllErrorCode.GRADUATION_CERT_RULE_NOT_FOUND, admissionYear));
 
         GraduationCertCriteriaTargetResponse criteriaTarget = buildCriteriaTarget(englishTargetType, codingTargetType);
         GraduationCertPolicyResponse certPolicy =
@@ -99,7 +99,7 @@ public class GraduationCertCriteriaService {
         return !isNotEnglishTarget(englishTargetType);
     }
 
-    private boolean isNotEnglishTarget(EnglishTargetType englishTargetType){
+    private boolean isNotEnglishTarget(EnglishTargetType englishTargetType) {
         return EnglishTargetType.EXEMPT.equals(englishTargetType);
     }
 
@@ -117,7 +117,7 @@ public class GraduationCertCriteriaService {
         return !isNotCodingTarget(codingTargetType);
     }
 
-    private boolean isNotCodingTarget(CodingTargetType codingTargetType){
+    private boolean isNotCodingTarget(CodingTargetType codingTargetType) {
         return CodingTargetType.EXEMPT.equals(codingTargetType);
     }
 
