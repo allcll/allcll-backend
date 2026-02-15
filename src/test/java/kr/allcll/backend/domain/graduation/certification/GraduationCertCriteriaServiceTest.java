@@ -334,7 +334,7 @@ class GraduationCertCriteriaServiceTest {
             ClassicCertCriterionFixture.createClassicCertCriterion(admissionYear)
         );
         codingCertCriterionRepository.saveAndFlush(
-            CodingCertCriterionFixture.createMajorCodingCertCriterion(admissionYear)
+            CodingCertCriterionFixture.createNonMajorCodingCertCriterion(admissionYear)
         );
 
         // when
@@ -346,9 +346,9 @@ class GraduationCertCriteriaServiceTest {
         assertThat(response.certPolicy().enableClassic()).isTrue();
         assertThat(response.certPolicy().enableCoding()).isTrue();
         assertThat(response.criteriaTarget().englishTargetType()).isEqualTo("ENGLISH_MAJOR");
-        assertThat(response.criteriaTarget().codingTargetType()).isEqualTo("CODING_MAJOR");
+        assertThat(response.criteriaTarget().codingTargetType()).isEqualTo("NON_MAJOR");
         assertThat(response.englishCertCriteria().englishTargetType()).isEqualTo("ENGLISH_MAJOR");
-        assertThat(response.codingCertCriteria().codingTargetType()).isEqualTo("CODING_MAJOR");
+        assertThat(response.codingCertCriteria().codingTargetType()).isEqualTo("NON_MAJOR");
     }
 
     @Test
