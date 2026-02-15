@@ -6,7 +6,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import kr.allcll.backend.domain.graduation.MajorScope;
-import kr.allcll.backend.domain.graduation.MajorType;
 import kr.allcll.backend.domain.graduation.balance.BalanceRequiredArea;
 import kr.allcll.backend.domain.graduation.balance.BalanceRequiredAreaExclusion;
 import kr.allcll.backend.domain.graduation.balance.BalanceRequiredAreaExclusionRepository;
@@ -29,58 +28,15 @@ public class CategoryCreditCalculator {
     private final BalanceRequiredAreaExclusionRepository balanceRequiredAreaExclusionRepository;
 
     public List<GraduationCategory> calculateCategoryResults(
-        MajorType majorType,
         List<CompletedCourseDto> completedCourses,
         GraduationDepartmentInfo primaryDeptInfo,
         List<CreditCriterion> creditCriteria
     ) {
-        if (majorType == MajorType.SINGLE) {
-            return calculateSingleMajor(completedCourses, primaryDeptInfo, creditCriteria);
-        }
-        return calculateDoubleMajor(completedCourses, primaryDeptInfo, creditCriteria);
+        return calculateMajor(completedCourses, primaryDeptInfo, creditCriteria);
     }
 
-    // 단일전공 학점 계산
-    private List<GraduationCategory> calculateSingleMajor(
-        List<CompletedCourseDto> completedCourses,
-        GraduationDepartmentInfo deptInfo,
-        List<CreditCriterion> creditCriteria
-    ) {
-        List<GraduationCategory> results = new ArrayList<>();
-
-        // 1. 이수구분별 학점 계산 (균형교양, 전체이수 제외)
-        CreditCriterion totalCriterion = null;
-        for (CreditCriterion criterion : creditCriteria) {
-            if (criterion.getCategoryType() == CategoryType.BALANCE_REQUIRED) {
-                continue;
-            }
-            if (criterion.getCategoryType() == CategoryType.TOTAL_COMPLETION) {
-                totalCriterion = criterion;
-                continue;
-            }
-            GraduationCategory category = calculateCategoryCredits(completedCourses, criterion);
-            results.add(category);
-        }
-
-        // 2. 균형교양 처리
-        addBalanceRequiredIfNeeded(results, completedCourses, deptInfo);
-
-        // 3. 전체 이수 학점
-        if (totalCriterion != null) {
-            results.add(new GraduationCategory(
-                totalCriterion.getMajorScope(),
-                CategoryType.TOTAL_COMPLETION,
-                0.0, // 이수 학점은 외부에서 계산
-                totalCriterion.getRequiredCredits(),
-                (double) totalCriterion.getRequiredCredits(),
-                false
-            ));
-        }
-        return results;
-    }
-
-    // 복수전공 학점 계산
-    private List<GraduationCategory> calculateDoubleMajor(
+    // 전공 학점 계산
+    private List<GraduationCategory> calculateMajor(
         List<CompletedCourseDto> completedCourses,
         GraduationDepartmentInfo primaryDeptInfo,
         List<CreditCriterion> creditCriteria
@@ -101,7 +57,7 @@ public class CategoryCreditCalculator {
             results.add(category);
         }
 
-        // 2. 균형교양 처리(주전공 기준)
+        // 2. 균형교양 처리(복수 전공 시, 주전공 기준)
         addBalanceRequiredIfNeeded(results, completedCourses, primaryDeptInfo);
 
         // 3. 전체 이수 학점
