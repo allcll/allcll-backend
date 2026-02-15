@@ -51,7 +51,7 @@ public class GradeExcelParser {
                     completedCourses.add(course);
                 }
             } catch (Exception exception) {
-                log.warn("엑셀 파싱 실패 - row {}: {}", rowNumber, exception.getMessage());
+                log.warn("엑셀 파싱 실패 - row {}: {}", rowNumber, exception);
             }
         }
     }
