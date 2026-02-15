@@ -6,8 +6,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import kr.allcll.backend.domain.graduation.credit.dto.RequiredCourseResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class RequiredCourseResolver {
@@ -20,7 +22,7 @@ public class RequiredCourseResolver {
         List<RequiredCourse> requiredCourses) {
         Map<String, CourseReplacement> replacementByLegacyName = loadReplacementMap(admissionYear, requiredCourses);
         return requiredCourses.stream()
-            .map(requiredCourse -> toResponse(requiredCourse, replacementByLegacyName))
+            .map(requiredCourse -> toResponse(admissionYear, requiredCourse, replacementByLegacyName))
             .toList();
     }
 
@@ -45,12 +47,24 @@ public class RequiredCourseResolver {
             ));
     }
 
-    private RequiredCourseResponse toResponse(RequiredCourse requiredCourse, Map<String, CourseReplacement> replacementByLegacyName) {
-        if (isDeprecated(requiredCourse)) {
-            CourseReplacement courseReplacement = replacementByLegacyName.get(requiredCourse.getCuriNm());
-            return RequiredCourseResponse.of(courseReplacement.getCurrentCuriNo(), courseReplacement.getCurrentCuriNm());
+    private RequiredCourseResponse toResponse(
+        Integer admissionYear,
+        RequiredCourse requiredCourse,
+        Map<String, CourseReplacement> replacementByLegacyName
+    ) {
+        if (!isDeprecated(requiredCourse)) {
+            return RequiredCourseResponse.of(requiredCourse.getCuriNo(), requiredCourse.getCuriNm());
         }
-        return RequiredCourseResponse.of(requiredCourse.getCuriNo(), requiredCourse.getCuriNm());
+        CourseReplacement courseReplacement = replacementByLegacyName.get(requiredCourse.getCuriNm());
+        if (courseReplacement == null) {
+            log.error(
+                "[졸업요건] 대체 과목 매핑에 실패했습니다. admissionYear={}, legacyCuriNm={}",
+                admissionYear,
+                requiredCourse.getCuriNm()
+            );
+            return RequiredCourseResponse.of(requiredCourse.getCuriNo(), requiredCourse.getCuriNm());
+        }
+        return RequiredCourseResponse.of(courseReplacement.getCurrentCuriNo(), courseReplacement.getCurrentCuriNm());
     }
 
     private boolean isDeprecated(RequiredCourse course) {
