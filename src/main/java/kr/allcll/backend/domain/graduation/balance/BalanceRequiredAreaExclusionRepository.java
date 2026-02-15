@@ -1,11 +1,18 @@
 package kr.allcll.backend.domain.graduation.balance;
 
+import java.util.List;
+import kr.allcll.backend.domain.graduation.department.DeptGroup;
 import java.util.Optional;
 import kr.allcll.backend.domain.graduation.department.DeptGroup;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface BalanceRequiredAreaExclusionRepository extends JpaRepository<BalanceRequiredAreaExclusion, Long> {
+
+    List<BalanceRequiredAreaExclusion> findByAdmissionYearAndDeptGroup(
+        Integer admissionYear,
+        DeptGroup deptGroup
+    );
 
     @Query("""
             select e from BalanceRequiredAreaExclusion e

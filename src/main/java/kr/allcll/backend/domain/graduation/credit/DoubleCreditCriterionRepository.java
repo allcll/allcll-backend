@@ -7,6 +7,14 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface DoubleCreditCriterionRepository extends JpaRepository<DoubleCreditCriterion, Long> {
 
+    @Query("SELECT d FROM DoubleCreditCriterion d WHERE d.admissionYear = :admissionYear "
+        + "AND (d.primaryDeptCd = :primaryDeptCd OR d.secondaryDeptCd = :secondaryDeptCd)")
+    List<DoubleCreditCriterion> findByAdmissionYearAndDeptCds(
+        Integer admissionYear,
+        String primaryDeptCd,
+        String secondaryDeptCd
+    );
+
     @Query("""
             select d from DoubleCreditCriterion d
             where d.admissionYear = :admissionYear

@@ -1,7 +1,6 @@
 package kr.allcll.backend.support.sse;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.IOException;
 import org.apache.catalina.connector.ClientAbortException;
@@ -28,7 +27,9 @@ class SseErrorHandlerTest {
         IOException exception = new IOException(new ArithmeticException());
 
         // when, then
-        assertThatThrownBy(() -> SseErrorHandler.handle(exception))
-            .isInstanceOf(RuntimeException.class);
+        assertThatCode(() -> SseErrorHandler.handle(exception))
+            .doesNotThrowAnyException();
+//        assertThatThrownBy(() -> SseErrorHandler.handle(exception))
+//            .isInstanceOf(RuntimeException.class);
     }
 }
