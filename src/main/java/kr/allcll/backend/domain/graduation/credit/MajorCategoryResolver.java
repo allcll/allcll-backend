@@ -1,7 +1,9 @@
 package kr.allcll.backend.domain.graduation.credit;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import kr.allcll.backend.domain.graduation.MajorScope;
 import kr.allcll.backend.domain.graduation.MajorType;
 import kr.allcll.backend.domain.graduation.credit.dto.GraduationCategoryResponse;
@@ -10,10 +12,8 @@ import kr.allcll.backend.domain.subject.Subject;
 import kr.allcll.backend.domain.subject.SubjectRepository;
 import kr.allcll.backend.domain.user.User;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class MajorCategoryResolver {
@@ -43,6 +43,8 @@ public class MajorCategoryResolver {
         List<CreditCriterion> creditCriteria =
             creditCriterionRepository.findByAdmissionYearAndMajorTypeAndDeptCd(admissionYear, MajorType.SINGLE, deptCd);
 
+        Map<CategoryType, List<RequiredCourseResponse>> subjectsByCategory = loadMajorSubjects(deptCd);
+
         List<GraduationCategoryResponse> graduationCategoryResponses = new ArrayList<>();
         for (CreditCriterion creditCriterion : creditCriteria) {
             CategoryType categoryType = creditCriterion.getCategoryType();
@@ -55,7 +57,7 @@ public class MajorCategoryResolver {
                 creditCriterion.getCategoryType(),
                 creditCriterion.getEnabled(),
                 creditCriterion.getRequiredCredits(),
-                loadMajorSubjects(deptCd, creditCriterion.getCategoryType())
+                subjectsByCategory.getOrDefault(categoryType, List.of())
             ));
         }
         return graduationCategoryResponses;
@@ -83,31 +85,33 @@ public class MajorCategoryResolver {
     ) {
         List<GraduationCategoryResponse> graduationCategoryResponses = new ArrayList<>();
 
+        Map<CategoryType, List<RequiredCourseResponse>> primarySubjectsByCategory =
+            loadMajorSubjects(primaryDeptCd);
+        Map<CategoryType, List<RequiredCourseResponse>> secondarySubjectsByCategory =
+            loadMajorSubjects(secondaryDeptCd);
+
         for (DoubleCreditCriterion doubleCreditCriterion : doubleCreditCriteria) {
             CategoryType categoryType = doubleCreditCriterion.getCategoryType();
             if (categoryType.isNonMajorCategory()) {
                 continue;
             }
 
-            String deptCd = resolveDeptCdByScope(doubleCreditCriterion.getMajorScope(), primaryDeptCd, secondaryDeptCd);
+            Map<CategoryType, List<RequiredCourseResponse>> subjectsByCategory = resolveSubjectsByScope(
+                doubleCreditCriterion.getMajorScope(),
+                primarySubjectsByCategory,
+                secondarySubjectsByCategory
+            );
 
             graduationCategoryResponses.add(GraduationCategoryResponse.of(
                 doubleCreditCriterion.getMajorScope(),
                 categoryType,
                 doubleCreditCriterion.getEnabled(),
                 doubleCreditCriterion.getRequiredCredits(),
-                loadMajorSubjects(deptCd, categoryType)
+                subjectsByCategory.getOrDefault(categoryType, List.of())
             ));
         }
 
         return graduationCategoryResponses;
-    }
-
-    private String resolveDeptCdByScope(MajorScope majorScope, String primaryDeptCd, String secondaryDeptCd) {
-        if (MajorScope.PRIMARY.equals(majorScope)) {
-            return primaryDeptCd;
-        }
-        return secondaryDeptCd;
     }
 
     private List<GraduationCategoryResponse> buildFromCreditCriteriaFallback(
@@ -117,39 +121,56 @@ public class MajorCategoryResolver {
     ) {
         List<GraduationCategoryResponse> graduationCategoryResponses = new ArrayList<>();
 
+        Map<CategoryType, List<RequiredCourseResponse>> primarySubjectsByCategory =
+            loadMajorSubjects(primaryDeptCd);
+        Map<CategoryType, List<RequiredCourseResponse>> secondarySubjectsByCategory =
+            loadMajorSubjects(secondaryDeptCd);
+
         for (CreditCriterion creditCriterion : creditCriteria) {
             CategoryType categoryType = creditCriterion.getCategoryType();
             if (categoryType.isNonMajorCategory()) {
                 continue;
             }
 
-            String deptCd = resolveDeptCdByScope(creditCriterion.getMajorScope(), primaryDeptCd, secondaryDeptCd);
-
+            Map<CategoryType, List<RequiredCourseResponse>> subjectsByCategory = resolveSubjectsByScope(
+                creditCriterion.getMajorScope(),
+                primarySubjectsByCategory,
+                secondarySubjectsByCategory
+            );
             graduationCategoryResponses.add(GraduationCategoryResponse.of(
                 creditCriterion.getMajorScope(),
                 categoryType,
                 creditCriterion.getEnabled(),
                 creditCriterion.getRequiredCredits(),
-                loadMajorSubjects(deptCd, categoryType)
+                subjectsByCategory.getOrDefault(categoryType, List.of())
             ));
         }
 
         return graduationCategoryResponses;
     }
 
-    private List<RequiredCourseResponse> loadMajorSubjects(String deptCd, CategoryType categoryType) {
-        String curiTypeCdNm = resolveCuriTypeCdNm(categoryType);
+    private Map<CategoryType, List<RequiredCourseResponse>> loadMajorSubjects(String deptCd) {
+        Map<CategoryType, List<RequiredCourseResponse>> majorSubjects = new HashMap<>();
+        majorSubjects.put(CategoryType.MAJOR_REQUIRED, loadMajorSubjectsByCuriType(deptCd, SUBJECT_MAJOR_REQUIRED));
+        majorSubjects.put(CategoryType.MAJOR_ELECTIVE, loadMajorSubjectsByCuriType(deptCd, SUBJECT_MAJOR_ELECTIVE));
+        return majorSubjects;
+    }
 
+    private List<RequiredCourseResponse> loadMajorSubjectsByCuriType(String deptCd, String curiTypeCdNm) {
         List<Subject> majorSubjects = subjectRepository.findByDeptCdAndCuriTypeCdNm(deptCd, curiTypeCdNm);
         return majorSubjects.stream()
             .map(majorSubject -> RequiredCourseResponse.of(majorSubject.getCuriNo(), majorSubject.getCuriNm()))
             .toList();
     }
 
-    private String resolveCuriTypeCdNm(CategoryType categoryType) {
-        if (CategoryType.MAJOR_REQUIRED.equals(categoryType)) {
-            return SUBJECT_MAJOR_REQUIRED;
+    private Map<CategoryType, List<RequiredCourseResponse>> resolveSubjectsByScope(
+        MajorScope majorScope,
+        Map<CategoryType, List<RequiredCourseResponse>> primarySubjectsByCategory,
+        Map<CategoryType, List<RequiredCourseResponse>> secondarySubjectsByCategory
+    ) {
+        if (MajorScope.PRIMARY.equals(majorScope)) {
+            return primarySubjectsByCategory;
         }
-        return SUBJECT_MAJOR_ELECTIVE;
+        return secondarySubjectsByCategory;
     }
 }
