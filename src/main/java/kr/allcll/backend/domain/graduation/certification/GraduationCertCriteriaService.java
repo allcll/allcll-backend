@@ -131,7 +131,7 @@ public class GraduationCertCriteriaService {
     }
 
     private EnglishCertCriteriaResponse buildEnglishCriteria(int admissionYear, EnglishTargetType englishTargetType) {
-        if (englishTargetType == EnglishTargetType.EXEMPT) {
+        if (EnglishTargetType.EXEMPT.equals(englishTargetType)) {
             return null;
         }
 
@@ -174,7 +174,7 @@ public class GraduationCertCriteriaService {
     }
 
     private CodingCertCriteriaResponse buildCodingCriteria(int admissionYear, CodingTargetType codingTargetType) {
-        if (codingTargetType == CodingTargetType.EXEMPT) {
+        if (CodingTargetType.EXEMPT.equals(codingTargetType)) {
             return null;
         }
 
