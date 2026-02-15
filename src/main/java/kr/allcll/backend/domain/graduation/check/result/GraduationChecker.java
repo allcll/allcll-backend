@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class GraduationCheckCalculator {
+public class GraduationChecker {
 
     private final CategoryCreditCalculator categoryCalculator;
     private final CertificationChecker certificationChecker;
@@ -50,7 +50,6 @@ public class GraduationCheckCalculator {
 
         // 이수구분별 학점 계산
         List<GraduationCategory> categoryResults = categoryCalculator.calculateCategoryResults(
-            user.getMajorType(),
             completedCourses,
             primaryDeptInfo,
             creditCriteria

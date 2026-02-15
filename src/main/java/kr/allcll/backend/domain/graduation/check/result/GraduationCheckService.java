@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional(readOnly = true)
 public class GraduationCheckService {
 
-    private final GraduationCheckCalculator graduationCheckCalculator;
+    private final GraduationChecker graduationChecker;
     private final GraduationCheckPersistenceService graduationCheckPersistenceService;
     private final GraduationCheckResponseMapper graduationCheckResponseMapper;
     private final GradeExcelParser gradeExcelParser;
@@ -30,7 +30,7 @@ public class GraduationCheckService {
         // 1. 엑셀 파싱
         List<CompletedCourseDto> completedCourses = gradeExcelParser.parse(gradeExcel);
         // 2. 졸업 요건 검사 수행
-        CheckResult checkResult = graduationCheckCalculator.calculate(userId, completedCourses);
+        CheckResult checkResult = graduationChecker.calculate(userId, completedCourses);
         // 3. 검사 결과 저장
         graduationCheckPersistenceService.saveCheckResult(userId, checkResult);
         // 4. 응답 반환
