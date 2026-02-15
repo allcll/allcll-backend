@@ -24,7 +24,8 @@ public class GraduationDepartmentService {
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
         int admissionYear = user.getAdmissionYear();
 
-        List<GraduationDepartmentInfo> graduationDepartmentInfos = graduationDepartmentInfoRepository.findAllByAdmissionYear(admissionYear);
+        List<GraduationDepartmentInfo> graduationDepartmentInfos =
+            graduationDepartmentInfoRepository.findAllByAdmissionYear(admissionYear);
 
         List<GraduationDepartmentResponse> graduationDepartmentResponses = graduationDepartmentInfos.stream()
             .map(graduationDepartmentInfo -> new GraduationDepartmentResponse(

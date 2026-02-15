@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 public interface GraduationDepartmentInfoRepository extends JpaRepository<GraduationDepartmentInfo, Long> {
 
     @Query("""
-        select g FROM GraduationDepartmentInfo g 
-        where g.admissionYear = :admissionYear 
+        select g FROM GraduationDepartmentInfo g
+        where g.admissionYear = :admissionYear
         and g.deptNm = :deptNm
         """)
     Optional<GraduationDepartmentInfo> findByAdmissionYearAndDeptNm(int admissionYear, String deptNm);

@@ -9,14 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class GraduationDepartmentController {
+public class GraduationDepartmentApi {
 
     private final GraduationDepartmentService graduationDepartmentService;
 
     @GetMapping("/api/graduation/departments")
-    public ResponseEntity<GraduationDepartmentsResponse> getAllDepartments(
-        @Auth Long userId
-    ) {
+    public ResponseEntity<GraduationDepartmentsResponse> getAllDepartments(@Auth Long userId) {
         GraduationDepartmentsResponse graduationDepartmentsResponse = graduationDepartmentService.getAllDepartments(
             userId);
         return ResponseEntity.ok(graduationDepartmentsResponse);
