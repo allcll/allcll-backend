@@ -352,6 +352,154 @@ class GraduationCertCriteriaServiceTest {
     }
 
     @Test
+    @DisplayName("단일 전공 영어 면제인 경우 영어 졸업인증 기준 데이터 조회를 검증한다.")
+    void getGraduationCertCriteria_twoOfThree_englishExempt() {
+        // given
+        int admissionYear = 2022;
+        String deptCd = "3220";
+
+        certRuleRepository.saveAndFlush(
+            new GraduationCertRule(admissionYear, 22, GraduationCertRuleType.TWO_OF_THREE)
+        );
+
+        GraduationDepartmentInfo deptInfo = departmentInfoRepository.saveAndFlush(
+            new GraduationDepartmentInfo(
+                admissionYear,
+                22,
+                "소프트웨어학과",
+                deptCd,
+                "소프트웨어융합대학",
+                DeptGroup.SOFTWARE_CONVERGENCE_COLLEGE,
+                EnglishTargetType.EXEMPT,
+                CodingTargetType.NON_MAJOR,
+                null
+            )
+        );
+
+        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, deptInfo));
+
+        classicCertCriterionRepository.saveAndFlush(
+            ClassicCertCriterionFixture.createClassicCertCriterion(admissionYear)
+        );
+        codingCertCriterionRepository.saveAndFlush(
+            CodingCertCriterionFixture.createNonMajorCodingCertCriterion(admissionYear)
+        );
+
+        // when
+        GraduationCertCriteriaResponse response = graduationCertCriteriaService.getGraduationCertCriteria(user.getId());
+
+        // then
+        assertThat(response.certPolicy().graduationCertRuleType()).isEqualTo("TWO_OF_THREE");
+
+        assertThat(response.certPolicy().enableEnglish()).isFalse();
+        assertThat(response.certPolicy().enableClassic()).isTrue();
+        assertThat(response.certPolicy().enableCoding()).isTrue();
+
+        assertThat(response.criteriaTarget().englishTargetType()).isEqualTo("EXEMPT");
+        assertThat(response.englishCertCriteria()).isNull();
+
+        assertThat(response.classicCertCriteria()).isNotNull();
+        assertThat(response.codingCertCriteria()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("단일 전공 코딩 면제인 경우 졸업인증 기준 데이터 조회를 검증한다.")
+    void getGraduationCertCriteria_twoOfThree_codingExempt() {
+        // given
+        int admissionYear = 2022;
+        String deptCd = "2131";
+
+        certRuleRepository.saveAndFlush(
+            new GraduationCertRule(admissionYear, 22, GraduationCertRuleType.TWO_OF_THREE)
+        );
+
+        GraduationDepartmentInfo deptInfo = departmentInfoRepository.saveAndFlush(
+            new GraduationDepartmentInfo(
+                admissionYear,
+                22,
+                "영어영문학전공",
+                deptCd,
+                "인문과학대학",
+                DeptGroup.LIBERAL_ARTS_COLLEGE,
+                EnglishTargetType.ENGLISH_MAJOR,
+                CodingTargetType.EXEMPT,
+                null
+            )
+        );
+
+        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, deptInfo));
+
+        englishCertCriterionRepository.saveAndFlush(
+            EnglishCertCriterionFixture.createMajorEnglishCertCriterion(admissionYear)
+        );
+        classicCertCriterionRepository.saveAndFlush(
+            ClassicCertCriterionFixture.createClassicCertCriterion(admissionYear)
+        );
+
+        // when
+        GraduationCertCriteriaResponse response = graduationCertCriteriaService.getGraduationCertCriteria(user.getId());
+
+        // then
+        assertThat(response.certPolicy().graduationCertRuleType()).isEqualTo("TWO_OF_THREE");
+
+        assertThat(response.certPolicy().enableEnglish()).isTrue();
+        assertThat(response.certPolicy().enableClassic()).isTrue();
+        assertThat(response.certPolicy().enableCoding()).isFalse();
+
+        assertThat(response.criteriaTarget().codingTargetType()).isEqualTo("EXEMPT");
+        assertThat(response.codingCertCriteria()).isNull();
+
+        assertThat(response.englishCertCriteria()).isNotNull();
+        assertThat(response.classicCertCriteria()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("단일 전공 영어/코딩 모두 면제인 경우 졸업인증 기준 데이터 조회를 검증한다.")
+    void getGraduationCertCriteria_twoOfThree_englishAndCodingExempt() {
+        // given
+        int admissionYear = 2022;
+        String deptCd = "2658";
+
+        certRuleRepository.saveAndFlush(
+            new GraduationCertRule(admissionYear, 22, GraduationCertRuleType.TWO_OF_THREE)
+        );
+
+        GraduationDepartmentInfo deptInfo = departmentInfoRepository.saveAndFlush(
+            new GraduationDepartmentInfo(
+                admissionYear,
+                25,
+                "수학통계학과",
+                deptCd,
+                "자연과학대학",
+                DeptGroup.NATURAL_SCIENCES_COLLEGE,
+                EnglishTargetType.EXEMPT,
+                CodingTargetType.EXEMPT,
+                null
+            )
+        );
+
+        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, deptInfo));
+
+        classicCertCriterionRepository.saveAndFlush(
+            ClassicCertCriterionFixture.createClassicCertCriterion(admissionYear)
+        );
+
+        // when
+        GraduationCertCriteriaResponse response = graduationCertCriteriaService.getGraduationCertCriteria(user.getId());
+
+        // then
+        assertThat(response.certPolicy().graduationCertRuleType()).isEqualTo("TWO_OF_THREE");
+
+        assertThat(response.certPolicy().enableEnglish()).isFalse();
+        assertThat(response.certPolicy().enableClassic()).isTrue();
+        assertThat(response.certPolicy().enableCoding()).isFalse();
+
+        assertThat(response.englishCertCriteria()).isNull();
+        assertThat(response.codingCertCriteria()).isNull();
+        assertThat(response.classicCertCriteria()).isNotNull();
+    }
+
+    @Test
     @DisplayName("학과 정보가 존재하지 않는 경우 예외를 검증한다.")
     void getGraduationCertCriteria_throwsDepartmentNotFound() {
         // given
