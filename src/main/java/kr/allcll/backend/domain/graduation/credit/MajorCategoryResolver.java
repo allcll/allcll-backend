@@ -33,7 +33,7 @@ public class MajorCategoryResolver {
         String secondaryDeptCd,
         User user
     ) {
-        if (majorType == MajorType.SINGLE) {
+        if (MajorType.SINGLE.equals(majorType)) {
             return resolveSingleType(admissionYear, primaryDeptCd);
         }
         return resolveDoubleType(admissionYear, primaryDeptCd, secondaryDeptCd, user);
@@ -105,7 +105,7 @@ public class MajorCategoryResolver {
     }
 
     private String resolveDeptCdByScope(MajorScope majorScope, String primaryDeptCd, String secondaryDeptCd) {
-        if (majorScope == MajorScope.PRIMARY) {
+        if (MajorScope.PRIMARY.equals(majorScope)) {
             return primaryDeptCd;
         }
         return secondaryDeptCd;
