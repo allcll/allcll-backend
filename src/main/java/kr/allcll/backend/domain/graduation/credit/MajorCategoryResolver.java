@@ -1,7 +1,6 @@
 package kr.allcll.backend.domain.graduation.credit;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import kr.allcll.backend.domain.graduation.MajorScope;
 import kr.allcll.backend.domain.graduation.MajorType;
@@ -22,9 +21,6 @@ public class MajorCategoryResolver {
     private static final String ALL_DEPT = "0";
     private static final String SUBJECT_MAJOR_REQUIRED = "전필";
     private static final String SUBJECT_MAJOR_ELECTIVE = "전선";
-
-    private static final EnumSet<CategoryType> MAJOR_CATEGORIES = EnumSet.of(CategoryType.MAJOR_REQUIRED,
-        CategoryType.MAJOR_ELECTIVE, CategoryType.ACADEMIC_BASIC);
 
     private final SubjectRepository subjectRepository;
     private final CreditCriterionRepository creditCriterionRepository;
@@ -49,7 +45,8 @@ public class MajorCategoryResolver {
 
         List<GraduationCategoryResponse> graduationCategoryResponses = new ArrayList<>();
         for (CreditCriterion creditCriterion : creditCriteria) {
-            if (!MAJOR_CATEGORIES.contains(creditCriterion.getCategoryType())) {
+            CategoryType categoryType = creditCriterion.getCategoryType();
+            if (categoryType.isNonMajorCategory()) {
                 continue;
             }
 
@@ -74,7 +71,6 @@ public class MajorCategoryResolver {
         if (!doubleCreditCriteria.isEmpty()) {
             return buildFromDoubleCreditCriteria(doubleCreditCriteria, primaryDeptCd, secondaryDeptCd);
         }
-
         List<String> searchDeptScope = List.of(ALL_DEPT, primaryDeptCd);
         List<CreditCriterion> fallbackCriteria = creditCriterionRepository.findMajorCriteriaCandidates(admissionYear,
             MajorType.DOUBLE, searchDeptScope);
@@ -90,7 +86,7 @@ public class MajorCategoryResolver {
 
         for (DoubleCreditCriterion doubleCreditCriterion : doubleCreditCriteria) {
             CategoryType categoryType = doubleCreditCriterion.getCategoryType();
-            if (!MAJOR_CATEGORIES.contains(categoryType)) {
+            if (categoryType.isNonMajorCategory()) {
                 continue;
             }
 
@@ -124,7 +120,7 @@ public class MajorCategoryResolver {
 
         for (CreditCriterion creditCriterion : creditCriteria) {
             CategoryType categoryType = creditCriterion.getCategoryType();
-            if (!MAJOR_CATEGORIES.contains(categoryType)) {
+            if (categoryType.isNonMajorCategory()) {
                 continue;
             }
 

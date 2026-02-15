@@ -40,7 +40,7 @@ public class NonMajorCategoryResolver {
             creditCriterionRepository.findNonMajorCriteria(admissionYear, MajorType.ALL, deptCd);
 
         Map<CategoryType, List<RequiredCourseResponse>> requiredCoursesByCategory =
-            loadRequiredCoursesByCategory(admissionYear, deptCd);
+            loadRequiredCourses(admissionYear, deptCd);
 
         List<GraduationCategoryResponse> graduationCategoryResponses = new ArrayList<>();
         for (CreditCriterion creditCriterion : creditCriteria) {
@@ -65,7 +65,7 @@ public class NonMajorCategoryResolver {
         return graduationCategoryResponses;
     }
 
-    private Map<CategoryType, List<RequiredCourseResponse>> loadRequiredCoursesByCategory(
+    private Map<CategoryType, List<RequiredCourseResponse>> loadRequiredCourses(
         Integer admissionYear,
         String deptCd
     ) {
