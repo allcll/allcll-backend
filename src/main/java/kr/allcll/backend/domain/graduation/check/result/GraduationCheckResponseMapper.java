@@ -152,10 +152,7 @@ public class GraduationCheckResponseMapper {
     private List<GraduationCategory> adjustMajorCategories(List<GraduationCategory> graduationCategories) {
         // MAJOR_REQUIRED/MAJOR_ELECTIVE 별 그룹화
         Map<MajorScope, List<GraduationCategory>> majorByScope = graduationCategories.stream()
-            .filter(
-                category -> category.categoryType() == CategoryType.MAJOR_REQUIRED
-                    || category.categoryType() == CategoryType.MAJOR_ELECTIVE
-            )
+            .filter(this::isMajorCategory)
             .collect(Collectors.groupingBy(GraduationCategory::majorScope));
 
         if (majorByScope.isEmpty()) {
@@ -165,15 +162,20 @@ public class GraduationCheckResponseMapper {
         // 비전공 카테고리 추가
         List<GraduationCategory> result = new ArrayList<>();
         for (GraduationCategory category : graduationCategories) {
-            if (category.categoryType() != CategoryType.MAJOR_REQUIRED
-                && category.categoryType() != CategoryType.MAJOR_ELECTIVE) {
+            if (!isMajorCategory(category)) {
                 result.add(category);
             }
         }
 
         // scope(주전공/복수전공)별로 전필/전선 찾고 학점 adjust
         adjustMajorCreditsByScope(majorByScope, result);
+        
         return result;
+    }
+
+    private boolean isMajorCategory(GraduationCategory category) {
+        return category.categoryType() == CategoryType.MAJOR_REQUIRED
+            || category.categoryType() == CategoryType.MAJOR_ELECTIVE;
     }
 
     private void adjustMajorCreditsByScope(
