@@ -3,8 +3,12 @@ package kr.allcll.backend.domain.graduation.check.result;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import kr.allcll.backend.domain.graduation.MajorScope;
+import kr.allcll.backend.domain.graduation.balance.BalanceRequiredArea;
+import kr.allcll.backend.domain.graduation.balance.BalanceRequiredRule;
+import kr.allcll.backend.domain.graduation.balance.BalanceRequiredRuleRepository;
 import kr.allcll.backend.domain.graduation.certification.CodingTargetType;
 import kr.allcll.backend.domain.graduation.certification.EnglishTargetType;
 import kr.allcll.backend.domain.graduation.certification.GraduationCertRuleType;
@@ -22,6 +26,8 @@ import kr.allcll.backend.domain.graduation.check.result.dto.GraduationCertificat
 import kr.allcll.backend.domain.graduation.check.result.dto.GraduationCheckResponse;
 import kr.allcll.backend.domain.graduation.check.result.dto.GraduationSummary;
 import kr.allcll.backend.domain.graduation.credit.CategoryType;
+import kr.allcll.backend.domain.user.User;
+import kr.allcll.backend.domain.user.UserRepository;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +39,9 @@ public class GraduationCheckResponseMapper {
 
     private final GraduationCheckCategoryResultRepository graduationCheckCategoryResultRepository;
     private final GraduationCheckCertResultRepository graduationCheckCertResultRepository;
+    private final GraduationCheckBalanceAreaResultRepository graduationCheckBalanceAreaResultRepository;
+    private final BalanceRequiredRuleRepository balanceRequiredRuleRepository;
+    private final UserRepository userRepository;
 
     public GraduationCheckResponse toResponseFromEntity(GraduationCheck check) {
         Long userId = check.getUserId();
@@ -41,15 +50,42 @@ public class GraduationCheckResponseMapper {
         List<GraduationCheckCategoryResult> categoryResults = graduationCheckCategoryResultRepository.findAllByUserId(
             userId);
 
+        // 균형교양 이수 영역 조회
+        Set<BalanceRequiredArea> earnedAreas = graduationCheckBalanceAreaResultRepository.findAllByUserId(userId)
+            .stream()
+            .map(kr.allcll.backend.domain.graduation.check.result.GraduationCheckBalanceAreaResult::getArea)
+            .collect(Collectors.toSet());
+
+        // 균형교양 필요 영역 수 조회
+        Integer requiredAreasCnt = findRequiredAreasCnt(userId);
+
         List<GraduationCategory> categories = categoryResults.stream()
-            .map(result -> new GraduationCategory(
-                result.getMajorScope(),
-                result.getCategoryType(),
-                result.getMyCredits(),
-                result.getRequiredCredits(),
-                result.getRemainingCredits(),
-                result.getIsSatisfied()
-            ))
+            .map(result -> {
+                if (result.getCategoryType() == CategoryType.BALANCE_REQUIRED) {
+                    return new GraduationCategory(
+                        result.getMajorScope(),
+                        result.getCategoryType(),
+                        result.getMyCredits(),
+                        result.getRequiredCredits(),
+                        result.getRemainingCredits(),
+                        earnedAreas.size(),
+                        requiredAreasCnt,
+                        earnedAreas,
+                        result.getIsSatisfied()
+                    );
+                }
+                return new GraduationCategory(
+                    result.getMajorScope(),
+                    result.getCategoryType(),
+                    result.getMyCredits(),
+                    result.getRequiredCredits(),
+                    result.getRemainingCredits(),
+                    null,
+                    null,
+                    null,
+                    result.getIsSatisfied()
+                );
+            })
             .toList();
 
         // 2. 전필 초과 시 전선으로 학점 보정
@@ -78,6 +114,28 @@ public class GraduationCheckResponseMapper {
             adjustedCategories,
             certifications
         );
+    }
+
+    private Integer findRequiredAreasCnt(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return null;
+        }
+
+        BalanceRequiredRule rule = balanceRequiredRuleRepository
+            .findByAdmissionYearAndDeptNm(user.getAdmissionYear(), user.getDeptNm())
+            .orElse(null);
+        if (rule == null) {
+            rule = balanceRequiredRuleRepository
+                .findByAdmissionYearAndDeptNm(user.getAdmissionYear(), "ALL")
+                .orElse(null);
+        }
+
+        if (rule == null || !rule.getRequired()) {
+            return null;
+        }
+
+        return rule.getRequiredAreasCnt();
     }
 
     // 졸업인증 전체 기준 정보 생성
@@ -169,7 +227,7 @@ public class GraduationCheckResponseMapper {
 
         // scope(주전공/복수전공)별로 전필/전선 찾고 학점 adjust
         adjustMajorCreditsByScope(majorByScope, result);
-        
+
         return result;
     }
 
@@ -247,6 +305,9 @@ public class GraduationCheckResponseMapper {
             adjustedCredits,
             graduationCategory.requiredCredits(),
             remainingCredits,
+            null,
+            null,
+            null,
             isSatisfied
         );
     }
