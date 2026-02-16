@@ -73,7 +73,6 @@ public class GraduationCheckResponseMapper {
         GraduationCertCriteriaResponse certCriteria = graduationCertCriteriaService.getGraduationCertCriteria(userId);
         EnglishTargetType englishTargetType = parseEnglishTargetType(certCriteria);
         CodingTargetType codingTargetType = parseCodingTargetType(certCriteria);
-
         GraduationCertifications certifications = buildCertifications(cert, englishTargetType, codingTargetType);
 
         return new GraduationCheckResponse(
@@ -111,8 +110,8 @@ public class GraduationCheckResponseMapper {
     }
 
     private boolean isMajorCategory(GraduationCategory category) {
-        return category.categoryType() == CategoryType.MAJOR_REQUIRED
-            || category.categoryType() == CategoryType.MAJOR_ELECTIVE;
+        return CategoryType.MAJOR_REQUIRED.equals(category.categoryType())
+            || CategoryType.MAJOR_ELECTIVE.equals(category.categoryType());
     }
 
     private void adjustMajorCreditsByScope(
@@ -157,7 +156,7 @@ public class GraduationCheckResponseMapper {
 
     private GraduationCategory findMajorRequired(List<GraduationCategory> categories) {
         for (GraduationCategory category : categories) {
-            if (category.categoryType() == CategoryType.MAJOR_REQUIRED) {
+            if (CategoryType.MAJOR_REQUIRED.equals(category.categoryType())) {
                 return category;
             }
         }
@@ -166,7 +165,7 @@ public class GraduationCheckResponseMapper {
 
     private GraduationCategory findMajorElective(List<GraduationCategory> categories) {
         for (GraduationCategory category : categories) {
-            if (category.categoryType() == CategoryType.MAJOR_ELECTIVE) {
+            if (CategoryType.MAJOR_ELECTIVE.equals(category.categoryType())) {
                 return category;
             }
         }
