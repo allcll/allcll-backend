@@ -13,7 +13,7 @@ public class GraduationCategoryApi {
 
     private final GraduationCategoryService graduationCategoryService;
 
-    @GetMapping("/api/graduation/categories")
+    @GetMapping("/api/graduation/criteria/categories")
     public ResponseEntity<GraduationCategoriesResponse> getAllCategories(@Auth Long userId) {
         GraduationCategoriesResponse graduationCategoriesResponse = graduationCategoryService.getAllCategories(userId);
         return ResponseEntity.ok(graduationCategoriesResponse);
