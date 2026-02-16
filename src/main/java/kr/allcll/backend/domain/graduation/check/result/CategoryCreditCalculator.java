@@ -87,6 +87,9 @@ public class CategoryCreditCalculator {
                     0.0, // 이수 학점은 외부에서 계산
                     totalCriterion.getRequiredCredits(),
                     (double) totalCriterion.getRequiredCredits(),
+                    null,
+                    null,
+                    null,
                     false
                 )
             );
@@ -115,6 +118,9 @@ public class CategoryCreditCalculator {
             earnedCredits,
             requiredCredits,
             remainingCredits,
+            null,
+            null,
+            null,
             isSatisfied
         );
     }
@@ -203,6 +209,9 @@ public class CategoryCreditCalculator {
             earnedCredits,
             requiredCredits,
             remainingCredits,
+            completedAreas.size(),
+            requiredAreasCnt,
+            completedAreas,
             isSatisfied
         );
     }

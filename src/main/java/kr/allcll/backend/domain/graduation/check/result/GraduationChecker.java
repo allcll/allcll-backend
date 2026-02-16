@@ -182,6 +182,9 @@ public class GraduationChecker {
             totalCredits,
             requiredCredits,
             remainingCredits,
+            null,
+            null,
+            null,
             satisfied
         ));
 
