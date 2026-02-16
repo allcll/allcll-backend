@@ -7,8 +7,10 @@ import java.util.stream.Collectors;
 import kr.allcll.backend.domain.graduation.MajorScope;
 import kr.allcll.backend.domain.graduation.certification.CodingTargetType;
 import kr.allcll.backend.domain.graduation.certification.EnglishTargetType;
+import kr.allcll.backend.domain.graduation.certification.GraduationCertCriteriaService;
 import kr.allcll.backend.domain.graduation.certification.GraduationCertRuleType;
 import kr.allcll.backend.domain.graduation.certification.GraduationCertType;
+import kr.allcll.backend.domain.graduation.certification.dto.GraduationCertCriteriaResponse;
 import kr.allcll.backend.domain.graduation.check.cert.GraduationCheckCertResult;
 import kr.allcll.backend.domain.graduation.check.cert.GraduationCheckCertResultRepository;
 import kr.allcll.backend.domain.graduation.check.result.dto.CertResult;
@@ -31,8 +33,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class GraduationCheckResponseMapper {
 
-    private final GraduationCheckCategoryResultRepository graduationCheckCategoryResultRepository;
+    private final GraduationCertCriteriaService graduationCertCriteriaService;
     private final GraduationCheckCertResultRepository graduationCheckCertResultRepository;
+    private final GraduationCheckCategoryResultRepository graduationCheckCategoryResultRepository;
 
     public GraduationCheckResponse toResponseFromEntity(GraduationCheck check) {
         Long userId = check.getUserId();
@@ -61,14 +64,17 @@ public class GraduationCheckResponseMapper {
         );
 
         // 3. 졸업인증 결과 조회
-        GraduationCheckCertResult certResult = graduationCheckCertResultRepository
-            .findByUserId(userId)
-            .orElseThrow(() ->
-                new AllcllException(AllcllErrorCode.GRADUATION_CERT_NOT_FOUND)
-            );
-        GraduationSummary summary = GraduationSummary.from(check);
+        GraduationCheckCertResult certResult = graduationCheckCertResultRepository.findByUserId(userId)
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.GRADUATION_CERT_NOT_FOUND));
         CertResult cert = CertResult.from(certResult);
-        GraduationCertifications certifications = toCertifications(cert);
+
+        GraduationSummary summary = GraduationSummary.from(check);
+
+        GraduationCertCriteriaResponse certCriteria = graduationCertCriteriaService.getGraduationCertCriteria(userId);
+        EnglishTargetType englishTargetType = parseEnglishTargetType(certCriteria);
+        CodingTargetType codingTargetType = parseCodingTargetType(certCriteria);
+
+        GraduationCertifications certifications = buildCertifications(cert, englishTargetType, codingTargetType);
 
         return new GraduationCheckResponse(
             userId,
@@ -78,75 +84,6 @@ public class GraduationCheckResponseMapper {
             adjustedCategories,
             certifications
         );
-    }
-
-    // 졸업인증 전체 기준 정보 생성
-    private GraduationCertifications toCertifications(CertResult certResult) {
-        return new GraduationCertifications(
-            new CertificationPolicy(certResult.ruleType(), certResult.requiredPassCount()),
-            certResult.passedCount(),
-            certResult.requiredPassCount(),
-            certResult.isSatisfied(),
-            toEnglishCertification(certResult),
-            toCodingCertification(certResult),
-            toClassicCertification(certResult)
-        );
-    }
-
-    private EnglishCertification toEnglishCertification(CertResult certResult) {
-        return new EnglishCertification(
-            isRequiredByCertRule(certResult.ruleType(), GraduationCertType.CERT_ENGLISH),
-            certResult.isEnglishCertPassed(),
-            EnglishTargetType.NON_MAJOR
-        );
-    }
-
-    private CodingCertification toCodingCertification(CertResult certResult) {
-        return new CodingCertification(
-            isRequiredByCertRule(certResult.ruleType(), GraduationCertType.CERT_CODING),
-            certResult.isCodingCertPassed(),
-            CodingTargetType.CODING_MAJOR
-        );
-    }
-
-    private ClassicCertification toClassicCertification(CertResult certResult) {
-        return new ClassicCertification(
-            isRequiredByCertRule(certResult.ruleType(), GraduationCertType.CERT_CLASSIC),
-            certResult.isClassicsCertPassed(),
-            certResult.classicsTotalRequiredCount(),
-            certResult.classicsTotalMyCount(),
-            List.of(
-                new ClassicDomainRequirement(
-                    "WESTERN_HISTORY_THOUGHT",
-                    certResult.requiredCountWestern(),
-                    certResult.myCountWestern(),
-                    certResult.isClassicsWesternCertPassed()
-                ),
-                new ClassicDomainRequirement(
-                    "EASTERN_HISTORY_THOUGHT",
-                    certResult.requiredCountEastern(),
-                    certResult.myCountEastern(),
-                    certResult.isClassicsEasternCertPassed()
-                ),
-                new ClassicDomainRequirement(
-                    "EAST_WEST_LITERATURE",
-                    certResult.requiredCountEasternAndWestern(),
-                    certResult.myCountEasternAndWestern(),
-                    certResult.isClassicsEasternAndWesternCertPassed()
-                ),
-                new ClassicDomainRequirement(
-                    "SCIENCE_THOUGHT",
-                    certResult.requiredCountScience(),
-                    certResult.myCountScience(),
-                    certResult.isClassicsScienceCertPassed()
-                )
-            )
-        );
-    }
-
-    private Boolean isRequiredByCertRule(String ruleTypeName, GraduationCertType certType) {
-        GraduationCertRuleType ruleType = GraduationCertRuleType.valueOf(ruleTypeName);
-        return ruleType.getGraduationCertTypes().contains(certType);
     }
 
     private List<GraduationCategory> adjustMajorCategories(List<GraduationCategory> graduationCategories) {
@@ -249,5 +186,126 @@ public class GraduationCheckResponseMapper {
             remainingCredits,
             isSatisfied
         );
+    }
+
+    private EnglishTargetType parseEnglishTargetType(GraduationCertCriteriaResponse response) {
+        String typeName = response.criteriaTarget().englishTargetType();
+        return EnglishTargetType.valueOf(typeName);
+    }
+
+    private CodingTargetType parseCodingTargetType(GraduationCertCriteriaResponse response) {
+        String typeName = response.criteriaTarget().codingTargetType();
+        return CodingTargetType.valueOf(typeName);
+    }
+
+    // 졸업인증 전체 기준 정보 생성
+    private GraduationCertifications buildCertifications(
+        CertResult certResult,
+        EnglishTargetType englishTargetType,
+        CodingTargetType codingTargetType
+    ) {
+        CertificationPolicy policy = new CertificationPolicy(certResult.ruleType(), certResult.requiredPassCount());
+        EnglishCertification english = buildEnglishCertification(certResult, englishTargetType);
+        CodingCertification coding = buildCodingCertification(certResult, codingTargetType);
+        ClassicCertification classic = buildClassicCertification(certResult);
+        return new GraduationCertifications(
+            policy,
+            certResult.passedCount(),
+            certResult.requiredPassCount(),
+            certResult.isSatisfied(),
+            english,
+            coding,
+            classic
+        );
+    }
+
+    private EnglishCertification buildEnglishCertification(CertResult certResult, EnglishTargetType englishTargetType) {
+        boolean isRequired = isRequiredEnglish(certResult.ruleType(), englishTargetType);
+        boolean isPassed = normalizePassed(isRequired, certResult.isEnglishCertPassed());
+        return new EnglishCertification(
+            isRequired,
+            isPassed,
+            englishTargetType
+        );
+    }
+
+    private CodingCertification buildCodingCertification(CertResult certResult, CodingTargetType codingTargetType) {
+        boolean isRequired = isRequiredCoding(certResult.ruleType(), codingTargetType);
+        boolean isPassed = normalizePassed(isRequired, certResult.isCodingCertPassed());
+
+        return new CodingCertification(
+            isRequired,
+            isPassed,
+            codingTargetType
+        );
+    }
+
+    private ClassicCertification buildClassicCertification(CertResult certResult) {
+        return new ClassicCertification(
+            isRequiredClassic(certResult.ruleType()),
+            certResult.isClassicsCertPassed(),
+            certResult.classicsTotalRequiredCount(),
+            certResult.classicsTotalMyCount(),
+            List.of(
+                new ClassicDomainRequirement(
+                    "WESTERN_HISTORY_THOUGHT",
+                    certResult.requiredCountWestern(),
+                    certResult.myCountWestern(),
+                    certResult.isClassicsWesternCertPassed()
+                ),
+                new ClassicDomainRequirement(
+                    "EASTERN_HISTORY_THOUGHT",
+                    certResult.requiredCountEastern(),
+                    certResult.myCountEastern(),
+                    certResult.isClassicsEasternCertPassed()
+                ),
+                new ClassicDomainRequirement(
+                    "EAST_WEST_LITERATURE",
+                    certResult.requiredCountEasternAndWestern(),
+                    certResult.myCountEasternAndWestern(),
+                    certResult.isClassicsEasternAndWesternCertPassed()
+                ),
+                new ClassicDomainRequirement(
+                    "SCIENCE_THOUGHT",
+                    certResult.requiredCountScience(),
+                    certResult.myCountScience(),
+                    certResult.isClassicsScienceCertPassed()
+                )
+            )
+        );
+    }
+
+    private boolean isRequiredEnglish(String ruleTypeName, EnglishTargetType englishTargetType) {
+        GraduationCertRuleType ruleType = GraduationCertRuleType.valueOf(ruleTypeName);
+        boolean isRequiredByPolicy = ruleType.getGraduationCertTypes().contains(GraduationCertType.CERT_ENGLISH);
+        boolean isTargetDept = isEnglishTarget(englishTargetType);
+        return isRequiredByPolicy && isTargetDept;
+    }
+
+    private boolean isEnglishTarget(EnglishTargetType englishTargetType) {
+        return !EnglishTargetType.EXEMPT.equals(englishTargetType);
+    }
+
+    private boolean isRequiredCoding(String ruleTypeName, CodingTargetType codingTargetType) {
+        GraduationCertRuleType ruleType = GraduationCertRuleType.valueOf(ruleTypeName);
+        boolean isRequiredByPolicy = ruleType.getGraduationCertTypes().contains(GraduationCertType.CERT_CODING);
+        boolean isTargetDept = isCodingTarget(codingTargetType);
+        return isRequiredByPolicy && isTargetDept;
+    }
+
+    private boolean isCodingTarget(CodingTargetType codingTargetType) {
+        return !CodingTargetType.EXEMPT.equals(codingTargetType);
+    }
+
+    private boolean isRequiredClassic(String ruleTypeName) {
+        GraduationCertRuleType ruleType = GraduationCertRuleType.valueOf(ruleTypeName);
+        return ruleType.getGraduationCertTypes().contains(GraduationCertType.CERT_CLASSIC);
+    }
+
+    private boolean normalizePassed(boolean isRequired, boolean isPassed) {
+        if (isRequired) {
+            return isPassed;
+        }
+        return true;
     }
 }
