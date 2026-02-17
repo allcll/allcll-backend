@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class GraduationCheckPersistenceService {
 
+    private static final String KEY_DELIMITER = "|";
+
     private final GraduationCheckRepository graduationCheckRepository;
     private final GraduationCheckCategoryResultRepository graduationCheckCategoryResultRepository;
     private final GraduationCheckBalanceAreaResultRepository graduationCheckBalanceAreaResultRepository;
@@ -103,7 +105,7 @@ public class GraduationCheckPersistenceService {
     }
 
     private String generateCategoryKey(MajorScope scope, CategoryType type) {
-        return scope + ":" + type;
+        return scope + KEY_DELIMITER + type;
     }
 
     private void saveOrUpdateBalanceAreaResults(Long userId, List<GraduationCategory> categories) {
