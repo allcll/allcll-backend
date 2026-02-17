@@ -13,6 +13,7 @@ import kr.allcll.backend.domain.graduation.balance.BalanceRequiredRule;
 import kr.allcll.backend.domain.graduation.balance.BalanceRequiredRuleRepository;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseDto;
 import kr.allcll.backend.domain.graduation.check.result.dto.GraduationCategory;
+import kr.allcll.backend.domain.graduation.credit.AcademicBasicPolicy;
 import kr.allcll.backend.domain.graduation.credit.CategoryType;
 import kr.allcll.backend.domain.graduation.credit.CreditCriterion;
 import kr.allcll.backend.domain.graduation.department.DeptGroup;
@@ -33,6 +34,7 @@ public class CategoryCreditCalculator {
     private final GraduationDepartmentInfoRepository graduationDepartmentInfoRepository;
     private final BalanceRequiredRuleRepository balanceRequiredRuleRepository;
     private final BalanceRequiredAreaExclusionRepository balanceRequiredAreaExclusionRepository;
+    private final AcademicBasicPolicy academicBasicPolicy;
 
     public List<GraduationCategory> calculateCategoryResults(
         Long userId,
@@ -102,6 +104,7 @@ public class CategoryCreditCalculator {
         double earnedCredits = completedCourses.stream()
             .filter(course -> course.categoryType() == criterion.getCategoryType())
             .filter(course -> matchesMajorScope(course, criterion.getMajorScope()))
+            .filter(course -> academicBasicPolicy.isRecentMajorAcademicBasic(course, criterion))
             .mapToDouble(CompletedCourseDto::credits)
             .sum();
 
