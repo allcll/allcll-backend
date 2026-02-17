@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthFacade {
 
     private final AuthService authService;
+    private final ToscAuthService toscAuthService;
     private final UserFetcher userFetcher;
     private final GraduationCertFetcher graduationCertFetcher;
     private final UserService userService;
@@ -26,6 +27,7 @@ public class AuthFacade {
     @Transactional
     public LoginResult login(LoginRequest loginRequest) {
         OkHttpClient client = authService.login(loginRequest);
+        toscAuthService.loginTosc(client, loginRequest);
 
         UserInfo userInfo = userFetcher.fetch(client);
         User user = userService.findOrCreate(userInfo);
