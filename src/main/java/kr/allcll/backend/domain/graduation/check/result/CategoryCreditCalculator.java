@@ -30,8 +30,9 @@ import org.springframework.stereotype.Component;
 public class CategoryCreditCalculator {
 
     private final UserRepository userRepository;
-    private final GraduationDepartmentInfoRepository graduationDepartmentInfoRepository;
+    private final GeneralElectivePolicy generalElectivePolicy;
     private final BalanceRequiredRuleRepository balanceRequiredRuleRepository;
+    private final GraduationDepartmentInfoRepository graduationDepartmentInfoRepository;
     private final BalanceRequiredAreaExclusionRepository balanceRequiredAreaExclusionRepository;
 
     public List<GraduationCategory> calculateCategoryResults(
@@ -41,46 +42,41 @@ public class CategoryCreditCalculator {
     ) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
-        GraduationDepartmentInfo primaryDeptInfo = findPrimaryDepartmentInfo(user);
-        return calculateMajor(completedCourses, primaryDeptInfo, creditCriteria);
-    }
-
-    private GraduationDepartmentInfo findPrimaryDepartmentInfo(User user) {
-        int admissionYear = user.getAdmissionYear();
-        String deptNm = user.getDeptNm();
-        return graduationDepartmentInfoRepository
-            .findByAdmissionYearAndDeptNm(admissionYear, deptNm)
+        GraduationDepartmentInfo primaryDeptInfo = graduationDepartmentInfoRepository
+            .findByAdmissionYearAndDeptNm(user.getAdmissionYear(), user.getDeptNm())
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND));
+        return calculateCategories(user.getAdmissionYear(), completedCourses, primaryDeptInfo, creditCriteria);
     }
 
-    // 전공 학점 계산
-    private List<GraduationCategory> calculateMajor(
+    // 카테고리 별 학점 계산
+    private List<GraduationCategory> calculateCategories(
+        int admissionYear,
         List<CompletedCourseDto> completedCourses,
         GraduationDepartmentInfo primaryDeptInfo,
         List<CreditCriterion> creditCriteria
     ) {
-        List<GraduationCategory> results = new ArrayList<>();
+        List<GraduationCategory> graduationCategories = new ArrayList<>();
 
         // 1. 이수구분별 학점 계산 (균형교양, 전체이수 제외)
         CreditCriterion totalCriterion = null;
-        for (CreditCriterion criterion : creditCriteria) {
-            if (criterion.getCategoryType() == CategoryType.BALANCE_REQUIRED) {
+        for (CreditCriterion creditCriterion : creditCriteria) {
+            if (CategoryType.BALANCE_REQUIRED.equals(creditCriterion.getCategoryType())) {
                 continue;
             }
-            if (criterion.getCategoryType() == CategoryType.TOTAL_COMPLETION) {
-                totalCriterion = criterion;
+            if (CategoryType.TOTAL_COMPLETION.equals(creditCriterion.getCategoryType())) {
+                totalCriterion = creditCriterion;
                 continue;
             }
-            GraduationCategory category = calculateCategoryCredits(completedCourses, criterion);
-            results.add(category);
+            GraduationCategory category = calculateCategoryCredits(admissionYear, completedCourses, creditCriterion);
+            graduationCategories.add(category);
         }
 
         // 2. 균형교양 처리(복수 전공 시, 주전공 기준)
-        addBalanceRequiredIfNeeded(results, completedCourses, primaryDeptInfo);
+        addBalanceRequiredIfNeeded(graduationCategories, completedCourses, primaryDeptInfo);
 
         // 3. 전체 이수 학점
         if (totalCriterion != null) {
-            results.add(
+            graduationCategories.add(
                 new GraduationCategory(
                     totalCriterion.getMajorScope(),
                     CategoryType.TOTAL_COMPLETION,
@@ -91,17 +87,25 @@ public class CategoryCreditCalculator {
                 )
             );
         }
-        return results;
+        return graduationCategories;
     }
 
     // 이수한 과목들에 대한 특정 이수구분의 학점 계산
     private GraduationCategory calculateCategoryCredits(
+        int admissionYear,
         List<CompletedCourseDto> completedCourses,
         CreditCriterion criterion
     ) {
         double earnedCredits = completedCourses.stream()
             .filter(course -> course.categoryType() == criterion.getCategoryType())
             .filter(course -> matchesMajorScope(course, criterion.getMajorScope()))
+            .filter(course ->
+                !generalElectivePolicy.shouldExcludeFromGeneralElective(
+                    admissionYear,
+                    criterion.getCategoryType(),
+                    course.curiNo()
+                )
+            )
             .mapToDouble(CompletedCourseDto::credits)
             .sum();
 
