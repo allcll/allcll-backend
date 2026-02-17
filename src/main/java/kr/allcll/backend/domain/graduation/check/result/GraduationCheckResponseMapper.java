@@ -53,7 +53,8 @@ public class GraduationCheckResponseMapper {
         // 균형교양 이수 영역 조회
         Set<BalanceRequiredArea> earnedAreas = graduationCheckBalanceAreaResultRepository.findAllByUserId(userId)
             .stream()
-            .map(kr.allcll.backend.domain.graduation.check.result.GraduationCheckBalanceAreaResult::getArea)
+            .map(
+                kr.allcll.backend.domain.graduation.check.result.GraduationCheckBalanceAreaResult::getBalanceRequiredArea)
             .collect(Collectors.toSet());
 
         // 균형교양 필요 영역 수 조회

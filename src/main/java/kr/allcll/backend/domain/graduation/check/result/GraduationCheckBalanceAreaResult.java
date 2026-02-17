@@ -29,10 +29,10 @@ public class GraduationCheckBalanceAreaResult extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "area", nullable = false)
-    private BalanceRequiredArea area;
+    private BalanceRequiredArea balanceRequiredArea;
 
-    public GraduationCheckBalanceAreaResult(Long userId, BalanceRequiredArea area) {
+    public GraduationCheckBalanceAreaResult(Long userId, BalanceRequiredArea balanceRequiredArea) {
         this.userId = userId;
-        this.area = area;
+        this.balanceRequiredArea = balanceRequiredArea;
     }
 }

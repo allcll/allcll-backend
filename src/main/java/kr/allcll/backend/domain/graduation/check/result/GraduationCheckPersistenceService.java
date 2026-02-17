@@ -124,7 +124,7 @@ public class GraduationCheckPersistenceService {
             graduationCheckBalanceAreaResultRepository.findAllByUserId(userId)
                 .stream()
                 .collect(Collectors.toMap(
-                    GraduationCheckBalanceAreaResult::getArea,
+                    GraduationCheckBalanceAreaResult::getBalanceRequiredArea,
                     Function.identity()
                 ));
 
