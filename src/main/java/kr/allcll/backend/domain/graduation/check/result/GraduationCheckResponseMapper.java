@@ -110,8 +110,7 @@ public class GraduationCheckResponseMapper {
     }
 
     private boolean isMajorCategory(GraduationCategory category) {
-        return CategoryType.MAJOR_REQUIRED.equals(category.categoryType())
-            || CategoryType.MAJOR_ELECTIVE.equals(category.categoryType());
+        return category.categoryType().isMajorCategory();
     }
 
     private void adjustMajorCreditsByScope(
@@ -172,8 +171,10 @@ public class GraduationCheckResponseMapper {
         return null;
     }
 
-    private GraduationCategory createAdjustedMajorCategory(GraduationCategory graduationCategory,
-        double adjustedCredits) {
+    private GraduationCategory createAdjustedMajorCategory(
+        GraduationCategory graduationCategory,
+        double adjustedCredits
+    ) {
         double remainingCredits = Math.max(0, graduationCategory.requiredCredits() - adjustedCredits);
         boolean isSatisfied = adjustedCredits >= graduationCategory.requiredCredits();
 
