@@ -100,4 +100,12 @@ public class EnglishCertCriterion extends BaseEntity {
         this.altCuriCredit = altCuriCredit;
         this.note = note;
     }
+
+    public boolean matchesAltCourse(String curiNo) {
+        return hasAltCourse() && altCuriNo.equals(curiNo);
+    }
+
+    private boolean hasAltCourse() {
+        return altCuriNo != null && !altCuriNo.isBlank();
+    }
 }

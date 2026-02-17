@@ -63,16 +63,7 @@ public class CertificationChecker {
             if (!completedCourse.isCreditEarned()) {
                 continue;
             }
-            if (matchesAltCourse(completedCourse, altCuriNo)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean matchesAltCourse(CompletedCourseDto course, String altCuriNo) {
-        if (altCuriNo != null && !altCuriNo.isBlank()) {
-            if (altCuriNo.equals(course.curiNo())) {
+            if (englishCertCriterion.matchesAltCourse(altCuriNo)) {
                 return true;
             }
         }
