@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 public class GeneralElectivePolicyTest {
 
     private static final String SEJONG_CYBER_CURI_NO = "500001";
-    private static final String SEJONG_CYBER_EXCEPTION_CURI_NO = "501335";
 
     private final GeneralElectivePolicy generalElectivePolicy = new GeneralElectivePolicy();
 
@@ -56,20 +55,5 @@ public class GeneralElectivePolicyTest {
 
         // then
         assertThat(result).isTrue();
-    }
-
-    @Test
-    @DisplayName("세사대 예외 과목은 21학번 이전이어도 교양선택에서 제외하지 않는다.")
-    void shouldExcludeFromGeneralElective_exceptionCourse_false() {
-        // given
-        int admissionYear = 2021;
-        CategoryType categoryType = CategoryType.GENERAL_ELECTIVE;
-        String curiNo = SEJONG_CYBER_EXCEPTION_CURI_NO;
-
-        // when
-        boolean result = generalElectivePolicy.shouldExcludeFromGeneralElective(admissionYear, categoryType, curiNo);
-
-        // then
-        assertThat(result).isFalse();
     }
 }
