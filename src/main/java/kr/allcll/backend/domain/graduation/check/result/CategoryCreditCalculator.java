@@ -132,7 +132,7 @@ public class CategoryCreditCalculator {
     }
 
     private void addBalanceRequiredIfNeeded(
-        List<GraduationCategory> results,
+        List<GraduationCategory> categories,
         List<CompletedCourseDto> completedCourses,
         GraduationDepartmentInfo deptInfo
     ) {
@@ -148,7 +148,7 @@ public class CategoryCreditCalculator {
             deptInfo,
             rule
         );
-        results.add(balanceCategory);
+        categories.add(balanceCategory);
     }
 
     // 균형 교양 규칙 조회
