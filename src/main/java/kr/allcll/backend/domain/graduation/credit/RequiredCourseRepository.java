@@ -15,9 +15,9 @@ public interface RequiredCourseRepository extends JpaRepository<RequiredCourse, 
 
     @Query("""
             select r from RequiredCourse r
-            where r.deptNm in : deptNms
+            where r.deptNm in :deptNms
             and r.admissionYear = :admissionYear
-            and r.deptCd in :deptCds
+            and r.categoryType = :categoryType
         """)
-    List<RequiredCourse> findRequiredCourses(List<String> deptNm, Integer admissionYear, CategoryType categoryType);
+    List<RequiredCourse> findRequiredCourses(List<String> deptNms, Integer admissionYear, CategoryType categoryType);
 }
