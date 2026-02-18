@@ -193,4 +193,15 @@ public class GraduationCheckCertResult {
         this.passedCount = newPassedCount;
         this.isSatisfied = this.graduationCertRuleType.isSatisfied(newPassedCount);
     }
+
+    public void updateCodingPassedByAltCourse() {
+        this.isCodingCertPassed = true;
+        int newPassedCount = this.graduationCertRuleType.calculatePassedCount(
+            this.isEnglishCertPassed,
+            this.isClassicsCertPassed,
+            this.isCodingCertPassed
+        );
+        this.passedCount = newPassedCount;
+        this.isSatisfied = this.graduationCertRuleType.isSatisfied(newPassedCount);
+    }
 }

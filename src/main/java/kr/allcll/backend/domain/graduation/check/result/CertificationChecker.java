@@ -1,6 +1,7 @@
 package kr.allcll.backend.domain.graduation.check.result;
 
 import java.util.List;
+import kr.allcll.backend.domain.graduation.certification.CodingAltCoursePolicy;
 import kr.allcll.backend.domain.graduation.certification.EnglishAltCoursePolicy;
 import kr.allcll.backend.domain.graduation.check.cert.GraduationCheckCertResult;
 import kr.allcll.backend.domain.graduation.check.cert.GraduationCheckCertResultRepository;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 public class CertificationChecker {
 
     private final UserRepository userRepository;
+    private final CodingAltCoursePolicy codingAltCoursePolicy;
     private final EnglishAltCoursePolicy englishAltCoursePolicy;
     private final GraduationDepartmentInfoRepository graduationDepartmentInfoRepository;
     private final GraduationCheckCertResultRepository graduationCheckCertResultRepository;
@@ -34,6 +36,7 @@ public class CertificationChecker {
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.GRADUATION_CERT_NOT_FOUND));
 
         englishAltCoursePolicy.applyIfSatisfied(user, departmentInfo, completedCourses, certResult);
+        codingAltCoursePolicy.applyIfSatisfied(user, departmentInfo, completedCourses, certResult);
 
         return CertResult.from(certResult);
     }
