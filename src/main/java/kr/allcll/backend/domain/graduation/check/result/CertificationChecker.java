@@ -58,12 +58,11 @@ public class CertificationChecker {
         }
 
         EnglishCertCriterion englishCertCriterion = englishCertCriterionOpt.get();
-        String altCuriNo = englishCertCriterion.getAltCuriNo();
         for (CompletedCourseDto completedCourse : completedCourses) {
             if (!completedCourse.isCreditEarned()) {
                 continue;
             }
-            if (englishCertCriterion.matchesAltCourse(altCuriNo)) {
+            if (englishCertCriterion.matchesAltCourse(completedCourse.curiNo())) {
                 return true;
             }
         }
