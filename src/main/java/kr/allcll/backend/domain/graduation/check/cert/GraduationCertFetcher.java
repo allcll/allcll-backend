@@ -77,16 +77,7 @@ public class GraduationCertFetcher {
 
     private boolean parseCoding(Document document) {
         Elements resultElements = parser.selectCodingResultElements(document);
-        if (resultElements.isEmpty()) {
-            return false;
-        }
-        for (Element result : resultElements) {
-            String approvalText = result.text().trim();
-            if (!approvalText.equals("불합격")) {
-                return true;
-            }
-        }
-        return false;
+        return !resultElements.isEmpty();
     }
 
     private boolean parsePass(Document document) {
