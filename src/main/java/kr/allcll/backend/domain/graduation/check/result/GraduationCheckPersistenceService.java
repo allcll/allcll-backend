@@ -10,6 +10,7 @@ import kr.allcll.backend.domain.graduation.balance.BalanceRequiredArea;
 import kr.allcll.backend.domain.graduation.check.result.dto.CheckResult;
 import kr.allcll.backend.domain.graduation.check.result.dto.GraduationCategory;
 import kr.allcll.backend.domain.graduation.credit.CategoryType;
+import kr.allcll.backend.support.graduation.KeyUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class GraduationCheckPersistenceService {
-
-    private static final String KEY_DELIMITER = "|";
 
     private final GraduationCheckRepository graduationCheckRepository;
     private final GraduationCheckCategoryResultRepository graduationCheckCategoryResultRepository;
@@ -105,7 +104,7 @@ public class GraduationCheckPersistenceService {
     }
 
     private String generateCategoryKey(MajorScope scope, CategoryType type) {
-        return scope + KEY_DELIMITER + type;
+        return KeyUtils.generate(scope, type);
     }
 
     private void saveOrUpdateBalanceAreaResults(Long userId, List<GraduationCategory> categories) {
