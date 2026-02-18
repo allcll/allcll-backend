@@ -17,6 +17,7 @@ import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfoRepository;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
+import kr.allcll.backend.support.graduation.KeyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -27,7 +28,6 @@ import org.springframework.stereotype.Component;
 public class NonMajorCategoryResolver {
 
     private static final String ALL_DEPT = "0";
-    private static final String KEY_DELIMITER = "|";
 
     private final CourseReplacementResolver courseReplacementResolver;
     private final BalanceRequiredResolver balanceRequiredResolver;
@@ -99,6 +99,6 @@ public class NonMajorCategoryResolver {
     }
 
     private String courseKeyOf(RequiredCourse course) {
-        return course.getCategoryType() + KEY_DELIMITER + course.getCuriNm();
+        return KeyUtils.generate(course.getCategoryType(), course.getCuriNm());
     }
 }
