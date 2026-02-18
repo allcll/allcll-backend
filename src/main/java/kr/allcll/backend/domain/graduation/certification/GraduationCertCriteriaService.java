@@ -169,7 +169,7 @@ public class GraduationCertCriteriaService {
             return null;
         }
 
-        CodingCertCriterion codingCertCriterion = codingCertCriterionRepository.findByAdmissionYearAndCodingTargetType(
+        CodingCertCriterion codingCertCriterion = codingCertCriterionRepository.findCodingCertCriterionForTarget(
                 admissionYear, codingTargetType)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.CODING_CERT_CRITERIA_NOT_FOUND));
 
