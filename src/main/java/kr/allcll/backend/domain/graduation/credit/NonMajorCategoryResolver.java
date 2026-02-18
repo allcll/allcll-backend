@@ -29,7 +29,7 @@ public class NonMajorCategoryResolver {
     private static final String ALL_DEPT = "0";
     private static final String KEY_DELIMITER = "|";
 
-    private final RequiredCourseResolver requiredCourseResolver;
+    private final CourseReplacementResolver courseReplacementResolver;
     private final BalanceRequiredResolver balanceRequiredResolver;
     private final RequiredCourseRepository requiredCourseRepository;
     private final CreditCriterionRepository creditCriterionRepository;
@@ -89,7 +89,7 @@ public class NonMajorCategoryResolver {
                 RequiredCourse::getCategoryType,
                 collectingAndThen(
                     toList(),
-                    requiredCourses -> requiredCourseResolver.replaceDeprecatedSubject(admissionYear, requiredCourses)
+                    requiredCourses -> courseReplacementResolver.replaceDeprecatedSubject(admissionYear, requiredCourses)
                 )
             ));
     }
