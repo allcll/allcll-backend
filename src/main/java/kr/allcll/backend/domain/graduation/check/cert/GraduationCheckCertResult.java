@@ -184,9 +184,6 @@ public class GraduationCheckCertResult {
     }
 
     public void updateEnglishPassedByAltCourse() {
-        if (Boolean.TRUE.equals(this.isEnglishCertPassed)) {
-            return;
-        }
         this.isEnglishCertPassed = true;
         int newPassedCount = this.graduationCertRuleType.calculatePassedCount(
             this.isEnglishCertPassed,
