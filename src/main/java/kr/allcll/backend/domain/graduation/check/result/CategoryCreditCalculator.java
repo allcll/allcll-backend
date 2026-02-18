@@ -15,6 +15,7 @@ import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseDto;
 import kr.allcll.backend.domain.graduation.check.result.dto.GraduationCategory;
 import kr.allcll.backend.domain.graduation.credit.CategoryType;
 import kr.allcll.backend.domain.graduation.credit.CreditCriterion;
+import kr.allcll.backend.domain.graduation.credit.GeneralElectivePolicy;
 import kr.allcll.backend.domain.graduation.department.DeptGroup;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfoRepository;

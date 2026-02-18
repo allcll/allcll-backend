@@ -3,6 +3,7 @@ package kr.allcll.backend.domain.graduation.check.result;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import kr.allcll.backend.domain.graduation.credit.CategoryType;
+import kr.allcll.backend.domain.graduation.credit.GeneralElectivePolicy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
