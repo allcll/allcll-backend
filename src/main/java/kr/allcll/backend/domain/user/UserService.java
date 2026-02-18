@@ -63,19 +63,21 @@ public class UserService {
     public void update(Long userId, UpdateUserRequest updateUserRequest) {
         validateUserId(userId);
         User user = getById(userId);
+        int admissionYear = user.getAdmissionYear();
+
         if (MajorType.SINGLE.equals(updateUserRequest.majorType())) {
-            GraduationDepartmentInfo dept = departmentInfoRepository.findByAdmissionYearAndDeptNm(
-                    user.getAdmissionYear(), updateUserRequest.deptNm())
-                .orElseThrow(
-                    () -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND, updateUserRequest.deptNm()));
+            GraduationDepartmentInfo dept = findDepartment(admissionYear, updateUserRequest.deptNm());
             user.updateSingleMajorUser(updateUserRequest, dept);
             return;
         }
-        GraduationDepartmentInfo doubleDept = departmentInfoRepository.findByAdmissionYearAndDeptNm(
-                user.getAdmissionYear(), updateUserRequest.doubleDeptNm())
-            .orElseThrow(
-                () -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND, updateUserRequest.doubleDeptNm()));
-        user.updateDoubleMajorUser(updateUserRequest, doubleDept);
+
+        String primaryDeptNm = resolveDeptNm(updateUserRequest.deptNm(), user.getDeptNm());
+        String doubleDeptNm = resolveDeptNm(updateUserRequest.doubleDeptNm(), user.getDoubleDeptNm());
+
+        GraduationDepartmentInfo primaryDept = findDepartment(admissionYear, primaryDeptNm);
+        GraduationDepartmentInfo doubleDept = findDepartment(admissionYear, doubleDeptNm);
+
+        user.updateDoubleMajorUser(updateUserRequest, primaryDept, doubleDept);
     }
 
     @Transactional
@@ -98,5 +100,17 @@ public class UserService {
         }
         int year = Integer.parseInt(studentId.substring(0, 2));
         return YEAR_PREFIX + year;
+    }
+
+    private GraduationDepartmentInfo findDepartment(int admissionYear, String deptNm) {
+        return departmentInfoRepository.findByAdmissionYearAndDeptNm(admissionYear, deptNm)
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND, deptNm));
+    }
+
+    private String resolveDeptNm(String requestedDeptNm, String currentDeptNm) {
+        if (requestedDeptNm == null) {
+            return currentDeptNm;
+        }
+        return requestedDeptNm;
     }
 }

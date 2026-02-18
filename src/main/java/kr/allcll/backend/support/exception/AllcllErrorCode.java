@@ -25,6 +25,7 @@ public enum AllcllErrorCode {
     SEJONG_LOGIN_FAIL(HttpStatus.UNAUTHORIZED, "학번 또는 비밀번호가 올바르지 않습니다."),
     SESSION_NOT_FOUND(HttpStatus.UNAUTHORIZED, "로그인이 필요한 서비스입니다."),
     UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "접근 권한이 없습니다."),
+    TOSC_LOGIN_FAIL(HttpStatus.UNAUTHORIZED, "TOSC 로그인에 실패했습니다."),
 
     //404
     SUBJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 과목 입니다. (subjectId: %d)"),
@@ -63,6 +64,7 @@ public enum AllcllErrorCode {
     USER_INFO_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "사용자 정보를 불러오지 못했습니다."),
     STUDENT_ID_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "잘못된 학번 정보입니다: %s"),
     SEJONG_LOGIN_IO_ERROR(HttpStatus.BAD_GATEWAY, "세종포털 로그인 서버와 통신 중 오류가 발생했습니다."),
+    TOSC_LOGIN_IO_ERROR(HttpStatus.BAD_GATEWAY, "TOSC 로그인 서버와 통신 중 오류가 발생했습니다."),
     USER_INFO_FETCH_IO_ERROR(HttpStatus.BAD_GATEWAY, "세종포털 사용자 정보 조회에 실패하였습니다."),
     ENGLISH_INFO_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "영어 인증 정보를 불러오지 못했습니다."),
     CODING_INFO_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "코딩 인증 정보를 불러오지 못했습니다."),

@@ -62,18 +62,25 @@ public class User extends BaseEntity {
         this.doubleDeptCd = doubleDeptCd;
     }
 
-    public void updateSingleMajorUser(UpdateUserRequest updateUserRequest, GraduationDepartmentInfo dept) {
+    public void updateSingleMajorUser(UpdateUserRequest updateUserRequest, GraduationDepartmentInfo primaryDept) {
         this.majorType = updateUserRequest.majorType();
-        this.collegeNm = dept.getCollegeNm();
-        this.deptNm = dept.getDeptNm();
-        this.deptCd = dept.getDeptCd();
+        this.collegeNm = primaryDept.getCollegeNm();
+        this.deptNm = primaryDept.getDeptNm();
+        this.deptCd = primaryDept.getDeptCd();
         this.doubleCollegeNm = null;
         this.doubleDeptNm = null;
         this.doubleDeptCd = null;
     }
 
-    public void updateDoubleMajorUser(UpdateUserRequest updateUserRequest, GraduationDepartmentInfo doubleDept) {
+    public void updateDoubleMajorUser(
+        UpdateUserRequest updateUserRequest,
+        GraduationDepartmentInfo primaryDept,
+        GraduationDepartmentInfo doubleDept
+    ) {
         this.majorType = updateUserRequest.majorType();
+        this.collegeNm = primaryDept.getCollegeNm();
+        this.deptNm = primaryDept.getDeptNm();
+        this.deptCd = primaryDept.getDeptCd();
         this.doubleCollegeNm = doubleDept.getCollegeNm();
         this.doubleDeptNm = doubleDept.getDeptNm();
         this.doubleDeptCd = doubleDept.getDeptCd();
