@@ -22,7 +22,7 @@ class AcademicBasicPolicyTest {
     private AcademicBasicPolicy academicBasicPolicy;
 
     @MockitoBean
-    private RequiredCourseRepository requiredCourseRepository;
+    private RequiredCourseResolver requiredCourseResolver;
 
     @MockitoBean
     private CourseReplacementRepository courseReplacementRepository;
@@ -65,7 +65,7 @@ class AcademicBasicPolicyTest {
         );
         CreditCriterion criterion = createAcademicBasicCreditCriterion();
 
-        given(requiredCourseRepository.findRequiredCourseNames("컴퓨터공학과", 2021, CategoryType.ACADEMIC_BASIC))
+        given(requiredCourseResolver.findRequiredCourseNames("컴퓨터공학과", 2021, CategoryType.ACADEMIC_BASIC))
             .willReturn(List.of("공학설계기초", "기초미적분학"));
 
         // when
@@ -93,7 +93,7 @@ class AcademicBasicPolicyTest {
         );
         CreditCriterion criterion = createAcademicBasicCreditCriterion();
 
-        given(requiredCourseRepository.findRequiredCourseNames("컴퓨터공학과", 2021, CategoryType.ACADEMIC_BASIC))
+        given(requiredCourseResolver.findRequiredCourseNames("컴퓨터공학과", 2021, CategoryType.ACADEMIC_BASIC))
             .willReturn(List.of(oldCourseName));
 
         CourseReplacement replacement = new CourseReplacement(
@@ -131,7 +131,7 @@ class AcademicBasicPolicyTest {
         );
         CreditCriterion criterion = createAcademicBasicCreditCriterion();
 
-        given(requiredCourseRepository.findRequiredCourseNames(any(), any(), any()))
+        given(requiredCourseResolver.findRequiredCourseNames(any(), any(), any()))
             .willReturn(List.of("공학설계기초"));
 
         given(courseReplacementRepository.findRecentCourse(any(), eq(courseName)))
