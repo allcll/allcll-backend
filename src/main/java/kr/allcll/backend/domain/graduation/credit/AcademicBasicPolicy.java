@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class AcademicBasicPolicy {
 
-    private final RequiredCourseRepository requiredCourseRepository;
+    private final RequiredCourseResolver requiredCourseResolver;
     private final CourseReplacementRepository courseReplacementRepository;
 
     public boolean isRecentMajorAcademicBasic(CompletedCourseDto course, CreditCriterion criterion) {
@@ -19,10 +19,11 @@ public class AcademicBasicPolicy {
         String courseName = course.curiNm();
         Integer admissionYear = criterion.getAdmissionYear();
         String departmentName = criterion.getDeptNm();
-        List<String> academicBasicRequiredCourseNames = requiredCourseRepository.findRequiredCourseNames(
+        List<String> academicBasicRequiredCourseNames = requiredCourseResolver.findRequiredCourseNames(
             departmentName,
             admissionYear,
-            CategoryType.ACADEMIC_BASIC);
+            CategoryType.ACADEMIC_BASIC
+        );
 
         if (isExistAcademicBasicCourse(academicBasicRequiredCourseNames, courseName)) {
             return true;
