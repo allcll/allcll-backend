@@ -1,8 +1,6 @@
 package kr.allcll.backend.domain.graduation.credit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
 import java.util.List;
@@ -28,9 +26,11 @@ class AcademicBasicPolicyTest {
     private CourseReplacementRepository courseReplacementRepository;
 
     @Test
-    @DisplayName("학문기초교양이 아닌 과목은 검사 없이 통과한다")
-    void returnTrue_When_NotAcademicBasic() {
+    @DisplayName("ACADEMIC_BASIC이 아닌 과목은 검사 없이 통과한다")
+    void returnTrueWhenNotAcademicBasic() {
         // given
+        String departmentName = "컴퓨터공학과";
+        Integer admissionYear = 2021;
         CompletedCourseDto course = new CompletedCourseDto(
             "123456",
             "알고리즘및실습",
@@ -40,7 +40,7 @@ class AcademicBasicPolicyTest {
             "A+",
             MajorScope.PRIMARY
         );
-        CreditCriterion criterion = createAcademicBasicCreditCriterion();
+        CreditCriterion criterion = createAcademicBasicCreditCriterion(departmentName, admissionYear);
 
         // when
         boolean result = academicBasicPolicy.isRecentMajorAcademicBasic(course, criterion);
@@ -51,9 +51,11 @@ class AcademicBasicPolicyTest {
 
     @Test
     @DisplayName("필수 과목 리스트에 존재하는 과목이면 true를 반환한다")
-    void returnTrue_When_DirectMatch() {
+    void returnTrueWhenDirectMatch() {
         // given
         String courseName = "공학설계기초";
+        String departmentName = "컴퓨터공학과";
+        Integer admissionYear = 2021;
         CompletedCourseDto course = new CompletedCourseDto(
             "123456",
             courseName,
@@ -63,10 +65,14 @@ class AcademicBasicPolicyTest {
             "A+",
             MajorScope.PRIMARY
         );
-        CreditCriterion criterion = createAcademicBasicCreditCriterion();
+        CreditCriterion criterion = createAcademicBasicCreditCriterion(departmentName, admissionYear);
 
-        given(requiredCourseResolver.findRequiredCourseNames("컴퓨터공학과", 2021, CategoryType.ACADEMIC_BASIC))
-            .willReturn(List.of("공학설계기초", "기초미적분학"));
+        given(
+            requiredCourseResolver.findRequiredCourseNames(
+                departmentName,
+                admissionYear,
+                CategoryType.ACADEMIC_BASIC)
+        ).willReturn(List.of("공학설계기초", "기초미적분학"));
 
         // when
         boolean result = academicBasicPolicy.isRecentMajorAcademicBasic(course, criterion);
@@ -77,10 +83,12 @@ class AcademicBasicPolicyTest {
 
     @Test
     @DisplayName("필수 과목엔 없지만, 대체 과목의 레거시 이름이 필수 목록에 있으면 true를 반환한다")
-    void returnTrue_When_ReplacementMatch() {
+    void returnTrueWhenReplacementMatch() {
         // given
         String attendCourseName = "새로운 공학설계기초";
         String oldCourseName = "공학설계기초";
+        String departmentName = "컴퓨터공학과";
+        Integer admissionYear = 2021;
 
         CompletedCourseDto course = new CompletedCourseDto(
             "123456",
@@ -91,10 +99,14 @@ class AcademicBasicPolicyTest {
             "A+",
             MajorScope.PRIMARY
         );
-        CreditCriterion criterion = createAcademicBasicCreditCriterion();
+        CreditCriterion criterion = createAcademicBasicCreditCriterion(departmentName, admissionYear);
 
-        given(requiredCourseResolver.findRequiredCourseNames("컴퓨터공학과", 2021, CategoryType.ACADEMIC_BASIC))
-            .willReturn(List.of(oldCourseName));
+        given(
+            requiredCourseResolver.findRequiredCourseNames(
+                departmentName,
+                admissionYear,
+                CategoryType.ACADEMIC_BASIC)
+        ).willReturn(List.of(oldCourseName));
 
         CourseReplacement replacement = new CourseReplacement(
             2021,
@@ -117,8 +129,10 @@ class AcademicBasicPolicyTest {
 
     @Test
     @DisplayName("필수 과목에도 없고, 대체 과목 정보도 없으면 false를 반환한다")
-    void returnFalse_When_NoMatch_NoReplacement() {
+    void returnFalseWhenNoMatchNoReplacement() {
         // given
+        String departmentName = "컴퓨터공학과";
+        Integer admissionYear = 2021;
         String courseName = "건환공기초창의설계";
         CompletedCourseDto course = new CompletedCourseDto(
             "123456",
@@ -129,12 +143,17 @@ class AcademicBasicPolicyTest {
             "A+",
             MajorScope.PRIMARY
         );
-        CreditCriterion criterion = createAcademicBasicCreditCriterion();
+        CreditCriterion criterion = createAcademicBasicCreditCriterion(departmentName, admissionYear);
 
-        given(requiredCourseResolver.findRequiredCourseNames(any(), any(), any()))
-            .willReturn(List.of("공학설계기초"));
+        given(
+            requiredCourseResolver.findRequiredCourseNames(
+                departmentName,
+                admissionYear,
+                CategoryType.ACADEMIC_BASIC
+            )
+        ).willReturn(List.of("공학설계기초"));
 
-        given(courseReplacementRepository.findRecentCourse(any(), eq(courseName)))
+        given(courseReplacementRepository.findRecentCourse(admissionYear, courseName))
             .willReturn(List.of());
 
         // when
@@ -144,13 +163,13 @@ class AcademicBasicPolicyTest {
         assertThat(result).isFalse();
     }
 
-    private CreditCriterion createAcademicBasicCreditCriterion() {
+    private CreditCriterion createAcademicBasicCreditCriterion(String departmentName, Integer admissionYear) {
         return new CreditCriterion(
-            2021,
+            admissionYear,
             21,
             MajorType.SINGLE,
             "3210",
-            "컴퓨터공학과",
+            departmentName,
             MajorScope.PRIMARY,
             CategoryType.ACADEMIC_BASIC,
             9,
