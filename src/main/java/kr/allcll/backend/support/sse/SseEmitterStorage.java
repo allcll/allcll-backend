@@ -14,8 +14,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class SseEmitterStorage {
 
     /**
-     * token 당 단일 emitter를 저장한다.
-     * ConcurrentHashMap을 사용해 멀티 스레드 환경에서도 put/remove/get을 안전하게 처리한다.
+     * token 당 단일 emitter를 저장한다. ConcurrentHashMap을 사용해 멀티 스레드 환경에서도 put/remove/get을 안전하게 처리한다.
      */
     private final ConcurrentMap<String, SseEmitter> emitters;
 
@@ -33,7 +32,7 @@ public class SseEmitterStorage {
 
         if (previousEmitter != null) {
             log.debug("[SSE] 기존 연결을 교체합니다. token: {}", token);
-            previousEmitter.completeWithError(new IllegalStateException("SSE emitter replaced by newer connection."));
+            previousEmitter.complete();
         }
     }
 

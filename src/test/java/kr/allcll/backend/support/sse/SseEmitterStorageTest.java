@@ -25,7 +25,7 @@ class SseEmitterStorageTest {
         previousEmitter.runCompletionCallback();
 
         assertThat(storage.getEmitter(TOKEN)).contains(latestEmitter);
-        assertThat(previousEmitter.completeWithErrorCalled).isTrue();
+        assertThat(previousEmitter.completeCalled).isTrue();
     }
 
     @DisplayName("재연결 시 이전 emitter의 timeout 콜백이 호출되어도 최신 emitter는 유지된다.")
@@ -57,15 +57,15 @@ class SseEmitterStorageTest {
 
     private static class TrackableSseEmitter extends SseEmitter {
 
-        private boolean completeWithErrorCalled;
+        private boolean completeCalled;
         private Runnable timeoutCallback;
         private Runnable completionCallback;
         private Consumer<Throwable> errorCallback;
 
         @Override
-        public synchronized void completeWithError(Throwable ex) {
-            completeWithErrorCalled = true;
-            super.completeWithError(ex);
+        public void complete() {
+            completeCalled = true;
+            super.complete();
         }
 
         @Override
