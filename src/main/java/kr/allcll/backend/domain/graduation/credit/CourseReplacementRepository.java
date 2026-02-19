@@ -17,4 +17,12 @@ public interface CourseReplacementRepository extends JpaRepository<CourseReplace
         Integer admissionYear,
         Collection<String> legacyNames
     );
+
+    @Query("""
+            select c from CourseReplacement c
+            where c.admissionYear = :admissionYear
+            and c.currentCuriNm = :currentCuriNm
+            and c.enabled = true
+        """)
+    List<CourseReplacement> findRecentCourse(Integer admissionYear, String currentCuriNm);
 }
