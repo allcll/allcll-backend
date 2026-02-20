@@ -17,6 +17,7 @@ import kr.allcll.backend.domain.graduation.credit.AcademicBasicPolicy;
 import kr.allcll.backend.domain.graduation.credit.CategoryType;
 import kr.allcll.backend.domain.graduation.credit.CreditCriterion;
 import kr.allcll.backend.domain.graduation.credit.GeneralElectivePolicy;
+import kr.allcll.backend.domain.graduation.credit.MajorBasicPolicy;
 import kr.allcll.backend.domain.graduation.department.DeptGroup;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfoRepository;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Component;
 public class CategoryCreditCalculator {
 
     private final UserRepository userRepository;
+    private final MajorBasicPolicy majorBasicPolicy;
     private final GeneralElectivePolicy generalElectivePolicy;
     private final BalanceRequiredRuleRepository balanceRequiredRuleRepository;
     private final GraduationDepartmentInfoRepository graduationDepartmentInfoRepository;
@@ -103,9 +105,12 @@ public class CategoryCreditCalculator {
         CreditCriterion criterion
     ) {
         double earnedCredits = completedCourses.stream()
-            .filter(course -> course.categoryType() == criterion.getCategoryType())
+            .filter(course -> majorBasicPolicy.matchesCriterionCategory(admissionYear, course, criterion))
             .filter(course -> matchesMajorScope(course, criterion.getMajorScope()))
-            .filter(course -> academicBasicPolicy.isRecentMajorAcademicBasic(course, criterion))
+            .filter(course -> academicBasicPolicy.isRecentMajorAcademicBasic(
+                majorBasicPolicy.normalizeForAcademicBasicIfNeeded(admissionYear, course, criterion),
+                criterion
+            ))
             .filter(course ->
                 !generalElectivePolicy.shouldExcludeFromGeneralElective(
                     admissionYear,
