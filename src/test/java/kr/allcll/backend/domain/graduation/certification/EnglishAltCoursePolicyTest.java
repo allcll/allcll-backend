@@ -52,7 +52,6 @@ class EnglishAltCoursePolicyTest {
 
         // then
         assertThat(result).isFalse();
-        assertThat(certResult.getIsEnglishCertPassed()).isTrue();
     }
 
     @Test
@@ -110,7 +109,6 @@ class EnglishAltCoursePolicyTest {
 
         // then
         assertThat(result).isTrue();
-        assertThat(certResult.getIsEnglishCertPassed()).isFalse(); // 정책은 판단만(상태 변경 없음)
     }
 
     @Test

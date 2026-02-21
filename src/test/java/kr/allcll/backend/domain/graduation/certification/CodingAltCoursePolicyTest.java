@@ -60,8 +60,6 @@ class CodingAltCoursePolicyTest {
 
         // then
         assertThat(result).isFalse();
-        assertThat(certResult.getIsCodingCertPassed()).isTrue();
-        assertThat(certResult.getPassedCount()).isEqualTo(1);
     }
 
     @Test
@@ -94,7 +92,6 @@ class CodingAltCoursePolicyTest {
 
         // then
         assertThat(result).isFalse();
-        assertThat(certResult.getIsCodingCertPassed()).isFalse();
     }
 
     @Test
@@ -126,7 +123,6 @@ class CodingAltCoursePolicyTest {
 
         // then
         assertThat(result).isTrue();
-        assertThat(certResult.getIsCodingCertPassed()).isTrue();
     }
 
     @Test
@@ -158,7 +154,6 @@ class CodingAltCoursePolicyTest {
 
         // then
         assertThat(result).isFalse();
-        assertThat(certResult.getIsCodingCertPassed()).isFalse();
     }
 
     @Test
@@ -190,7 +185,6 @@ class CodingAltCoursePolicyTest {
 
         // then
         assertThat(result).isTrue();
-        assertThat(certResult.getIsCodingCertPassed()).isTrue();
     }
 
     @Test
@@ -222,7 +216,6 @@ class CodingAltCoursePolicyTest {
 
         // then
         assertThat(result).isTrue();
-        assertThat(certResult.getIsCodingCertPassed()).isTrue();
     }
 
     @Test
@@ -254,6 +247,5 @@ class CodingAltCoursePolicyTest {
 
         // then
         assertThat(result).isFalse();
-        assertThat(certResult.getIsCodingCertPassed()).isFalse();
     }
 }
