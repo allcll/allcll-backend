@@ -13,22 +13,22 @@ public class CodingAltCoursePolicy implements GraduationCertificationAltCoursePo
     private final CodingCertCriterionRepository codingCertCriterionRepository;
 
     @Override
-    public void applyIfSatisfied(
+    public boolean isSatisfiedByAltCourse(
         User user,
         GraduationDepartmentInfo departmentInfo,
         List<CompletedCourseDto> completedCourses,
         GraduationCheckCertResult certResult
     ) {
         if (isAlreadyPassed(certResult)) {
-            return;
+            return false;
         }
 
         CodingTargetType codingTargetType = departmentInfo.getCodingTargetType();
         if (isExempt(codingTargetType)) {
-            return;
+            return false;
         }
 
-        codingCertCriterionRepository
+        return codingCertCriterionRepository
             .findCodingCertCriterion(user.getAdmissionYear(), codingTargetType)
             .filter(codingCertCriterion -> isAltCourseCompletedByTargetType(
                     codingTargetType,
@@ -36,7 +36,7 @@ public class CodingAltCoursePolicy implements GraduationCertificationAltCoursePo
                     codingCertCriterion
                 )
             )
-            .ifPresent(codingCertCriterion -> certResult.updateCodingPassedByAltCourse());
+            .isPresent();
     }
 
     private boolean isAlreadyPassed(GraduationCheckCertResult certResult) {

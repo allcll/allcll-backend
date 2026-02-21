@@ -33,7 +33,7 @@ class CodingAltCoursePolicyTest {
 
     @Test
     @DisplayName("이미 코딩 인증이 통과된 경우 대체 과목 검사를 수행하지 않는다.")
-    void applyIfSatisfied_alreadyPassed_noUpdate() {
+    void isSatisfied_ByAltCourse_alreadyPassed_noUpdate() {
         // given
         GraduationDepartmentInfo deptInfo =
             GraduationDepartmentInfoFixture.createDepartmentInfo(ADMISSION_YEAR, CodingTargetType.NON_MAJOR);
@@ -56,7 +56,7 @@ class CodingAltCoursePolicyTest {
         );
 
         // when
-        codingAltCoursePolicy.applyIfSatisfied(user, deptInfo, completedCourses, certResult);
+        codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
 
         // then
         assertThat(certResult.getIsCodingCertPassed()).isTrue();
@@ -65,7 +65,7 @@ class CodingAltCoursePolicyTest {
 
     @Test
     @DisplayName("코딩 면제 대상인 경우 대체 과목 검사를 수행하지 않는다.")
-    void applyIfSatisfied_exempt_noUpdate() {
+    void isSatisfied_ByAltCourse_exempt_noUpdate() {
         // given
         GraduationDepartmentInfo deptInfo =
             GraduationDepartmentInfoFixture.createDepartmentInfo(ADMISSION_YEAR, CodingTargetType.EXEMPT);
@@ -89,7 +89,7 @@ class CodingAltCoursePolicyTest {
         );
 
         // when
-        codingAltCoursePolicy.applyIfSatisfied(user, deptInfo, completedCourses, certResult);
+        codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
 
         // then
         assertThat(certResult.getIsCodingCertPassed()).isFalse();
@@ -97,7 +97,7 @@ class CodingAltCoursePolicyTest {
 
     @Test
     @DisplayName("코딩 전공자인 경우 대체과목이 최소 기준 학점(B0) 이상이면 코딩 인증을 통과 처리한다.")
-    void applyIfSatisfied_codingMajor_alt1AtLeastB0_pass() {
+    void isSatisfied_ByAltCourse_codingMajor_alt1AtLeastB0_pass() {
         // given
         GraduationDepartmentInfo deptInfo
             = GraduationDepartmentInfoFixture.createDepartmentInfo(ADMISSION_YEAR, CodingTargetType.CODING_MAJOR);
@@ -120,7 +120,7 @@ class CodingAltCoursePolicyTest {
         );
 
         // when
-        codingAltCoursePolicy.applyIfSatisfied(user, deptInfo, completedCourses, certResult);
+        codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
 
         // then
         assertThat(certResult.getIsCodingCertPassed()).isTrue();
@@ -128,7 +128,7 @@ class CodingAltCoursePolicyTest {
 
     @Test
     @DisplayName("코딩 전공자인 겅우 대체과목이 최소 기준 학점(B0)미만이면 통과 처리하지 않는다.")
-    void applyIfSatisfied_codingMajor_alt1BelowB0_notPass() {
+    void isSatisfied_ByAltCourse_codingMajor_alt1BelowB0_notPass() {
         // given
         GraduationDepartmentInfo deptInfo
             = GraduationDepartmentInfoFixture.createDepartmentInfo(ADMISSION_YEAR, CodingTargetType.CODING_MAJOR);
@@ -151,7 +151,7 @@ class CodingAltCoursePolicyTest {
         );
 
         // when
-        codingAltCoursePolicy.applyIfSatisfied(user, deptInfo, completedCourses, certResult);
+        codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
 
         // then
         assertThat(certResult.getIsCodingCertPassed()).isFalse();
@@ -159,7 +159,7 @@ class CodingAltCoursePolicyTest {
 
     @Test
     @DisplayName("코딩 비전공자인 경우 대체과목1이 최소 기준 학점(B0) 이상이면 통과 처리한다.")
-    void applyIfSatisfied_nonMajor_alt1AtLeastB0_pass() {
+    void isSatisfied_ByAltCourse_nonMajor_alt1AtLeastB0_pass() {
         // given
         GraduationDepartmentInfo deptInfo
             = GraduationDepartmentInfoFixture.createDepartmentInfo(ADMISSION_YEAR, CodingTargetType.NON_MAJOR);
@@ -182,7 +182,7 @@ class CodingAltCoursePolicyTest {
         );
 
         // when
-        codingAltCoursePolicy.applyIfSatisfied(user, deptInfo, completedCourses, certResult);
+        codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
 
         // then
         assertThat(certResult.getIsCodingCertPassed()).isTrue();
@@ -190,7 +190,7 @@ class CodingAltCoursePolicyTest {
 
     @Test
     @DisplayName("코딩 비전공자인 경우 대체과목2가 P이면 통과 처리한다.")
-    void applyIfSatisfied_nonMajor_alt2Pass_pass() {
+    void isSatisfied_ByAltCourse_nonMajor_alt2Pass_pass() {
         // given
         GraduationDepartmentInfo deptInfo
             = GraduationDepartmentInfoFixture.createDepartmentInfo(ADMISSION_YEAR, CodingTargetType.NON_MAJOR);
@@ -213,7 +213,7 @@ class CodingAltCoursePolicyTest {
         );
 
         // when
-        codingAltCoursePolicy.applyIfSatisfied(user, deptInfo, completedCourses, certResult);
+        codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
 
         // then
         assertThat(certResult.getIsCodingCertPassed()).isTrue();
@@ -221,7 +221,7 @@ class CodingAltCoursePolicyTest {
 
     @Test
     @DisplayName("코딩 비전공자인 경우 대체과목2가 NP이면 통과 처리하지 않는다.")
-    void applyIfSatisfied_nonMajor_alt2NonPass_notPass() {
+    void isSatisfied_ByAltCourse_nonMajor_alt2NonPass_notPass() {
         // given
         GraduationDepartmentInfo deptInfo
             = GraduationDepartmentInfoFixture.createDepartmentInfo(ADMISSION_YEAR, CodingTargetType.NON_MAJOR);
@@ -244,7 +244,7 @@ class CodingAltCoursePolicyTest {
         );
 
         // when
-        codingAltCoursePolicy.applyIfSatisfied(user, deptInfo, completedCourses, certResult);
+        codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
 
         // then
         assertThat(certResult.getIsCodingCertPassed()).isFalse();

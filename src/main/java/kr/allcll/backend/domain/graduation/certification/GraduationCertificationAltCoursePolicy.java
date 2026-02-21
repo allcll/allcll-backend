@@ -8,7 +8,7 @@ import kr.allcll.backend.domain.user.User;
 
 public interface GraduationCertificationAltCoursePolicy {
 
-    void applyIfSatisfied(
+    boolean isSatisfiedByAltCourse(
         User user,
         GraduationDepartmentInfo departmentInfo,
         List<CompletedCourseDto> completedCourses,

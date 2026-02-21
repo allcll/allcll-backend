@@ -14,6 +14,7 @@ import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -25,6 +26,7 @@ public class CertificationChecker {
     private final GraduationDepartmentInfoRepository graduationDepartmentInfoRepository;
     private final GraduationCheckCertResultRepository graduationCheckCertResultRepository;
 
+    @Transactional
     public CertResult checkAndUpdate(Long userId, List<CompletedCourseDto> completedCourses) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
@@ -34,8 +36,12 @@ public class CertificationChecker {
         GraduationCheckCertResult certResult = graduationCheckCertResultRepository.findByUserId(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.GRADUATION_CERT_NOT_FOUND));
 
-        englishAltCoursePolicy.applyIfSatisfied(user, departmentInfo, completedCourses, certResult);
-        codingAltCoursePolicy.applyIfSatisfied(user, departmentInfo, completedCourses, certResult);
+        if (englishAltCoursePolicy.isSatisfiedByAltCourse(user, departmentInfo, completedCourses, certResult)) {
+            certResult.updateEnglishPassedByAltCourse();
+        }
+        if (codingAltCoursePolicy.isSatisfiedByAltCourse(user, departmentInfo, completedCourses, certResult)) {
+            certResult.updateCodingPassedByAltCourse();
+        }
 
         return CertResult.from(certResult);
     }
