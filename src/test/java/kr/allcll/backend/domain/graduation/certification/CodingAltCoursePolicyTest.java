@@ -48,7 +48,7 @@ class CodingAltCoursePolicyTest {
         );
 
         CodingCertCriterion criterion = CodingCertCriterionFixture.createNonMajorCodingCertCriterion(ADMISSION_YEAR);
-        given(codingCertCriterionRepository.findCodingCertCriterionForTarget(ADMISSION_YEAR, CodingTargetType.NON_MAJOR))
+        given(codingCertCriterionRepository.findCodingCertCriterion(ADMISSION_YEAR, CodingTargetType.NON_MAJOR))
             .willReturn(Optional.of(criterion));
 
         List<CompletedCourseDto> completedCourses = List.of(
@@ -81,7 +81,7 @@ class CodingAltCoursePolicyTest {
 
 
         CodingCertCriterion criterion = CodingCertCriterionFixture.createNonMajorCodingCertCriterion(ADMISSION_YEAR);
-        given(codingCertCriterionRepository.findCodingCertCriterionForTarget(ADMISSION_YEAR, CodingTargetType.EXEMPT))
+        given(codingCertCriterionRepository.findCodingCertCriterion(ADMISSION_YEAR, CodingTargetType.EXEMPT))
             .willReturn(Optional.of(criterion));
 
         List<CompletedCourseDto> completedCourses = List.of(
@@ -112,7 +112,7 @@ class CodingAltCoursePolicyTest {
         );
 
         CodingCertCriterion criterion = CodingCertCriterionFixture.createMajorCodingCertCriterion(ADMISSION_YEAR);
-        given(codingCertCriterionRepository.findCodingCertCriterionForTarget(ADMISSION_YEAR, CodingTargetType.CODING_MAJOR))
+        given(codingCertCriterionRepository.findCodingCertCriterion(ADMISSION_YEAR, CodingTargetType.CODING_MAJOR))
             .willReturn(Optional.of(criterion));
 
         List<CompletedCourseDto> completedCourses = List.of(
@@ -143,7 +143,7 @@ class CodingAltCoursePolicyTest {
         );
 
         CodingCertCriterion criterion = CodingCertCriterionFixture.createMajorCodingCertCriterion(ADMISSION_YEAR);
-        given(codingCertCriterionRepository.findCodingCertCriterionForTarget(ADMISSION_YEAR, CodingTargetType.CODING_MAJOR))
+        given(codingCertCriterionRepository.findCodingCertCriterion(ADMISSION_YEAR, CodingTargetType.CODING_MAJOR))
             .willReturn(Optional.of(criterion));
 
         List<CompletedCourseDto> completedCourses = List.of(
@@ -174,7 +174,7 @@ class CodingAltCoursePolicyTest {
         );
 
         CodingCertCriterion criterion = CodingCertCriterionFixture.createNonMajorCodingCertCriterion(ADMISSION_YEAR);
-        given(codingCertCriterionRepository.findCodingCertCriterionForTarget(ADMISSION_YEAR, CodingTargetType.NON_MAJOR))
+        given(codingCertCriterionRepository.findCodingCertCriterion(ADMISSION_YEAR, CodingTargetType.NON_MAJOR))
             .willReturn(Optional.of(criterion));
 
         List<CompletedCourseDto> completedCourses = List.of(
@@ -205,7 +205,7 @@ class CodingAltCoursePolicyTest {
         );
 
         CodingCertCriterion criterion = CodingCertCriterionFixture.createNonMajorCodingCertCriterion(ADMISSION_YEAR);
-        given(codingCertCriterionRepository.findCodingCertCriterionForTarget(ADMISSION_YEAR, CodingTargetType.NON_MAJOR))
+        given(codingCertCriterionRepository.findCodingCertCriterion(ADMISSION_YEAR, CodingTargetType.NON_MAJOR))
             .willReturn(Optional.of(criterion));
 
         List<CompletedCourseDto> completedCourses = List.of(
@@ -236,7 +236,7 @@ class CodingAltCoursePolicyTest {
         );
 
         CodingCertCriterion criterion = CodingCertCriterionFixture.createNonMajorCodingCertCriterion(ADMISSION_YEAR);
-        given(codingCertCriterionRepository.findCodingCertCriterionForTarget(ADMISSION_YEAR, CodingTargetType.NON_MAJOR))
+        given(codingCertCriterionRepository.findCodingCertCriterion(ADMISSION_YEAR, CodingTargetType.NON_MAJOR))
             .willReturn(Optional.of(criterion));
 
         List<CompletedCourseDto> completedCourses = List.of(

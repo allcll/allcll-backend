@@ -11,5 +11,5 @@ public interface CodingCertCriterionRepository extends JpaRepository<CodingCertC
         where c.admissionYear = :admissionYear
         and c.codingTargetType = :codingTargetType
         """)
-    Optional<CodingCertCriterion> findCodingCertCriterionForTarget(int admissionYear, CodingTargetType codingTargetType);
+    Optional<CodingCertCriterion> findCodingCertCriterion(int admissionYear, CodingTargetType codingTargetType);
 }

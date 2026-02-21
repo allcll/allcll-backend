@@ -29,7 +29,7 @@ public class CodingAltCoursePolicy implements GraduationCertificationPolicy{
         }
 
         codingCertCriterionRepository
-            .findCodingCertCriterionForTarget(user.getAdmissionYear(), codingTargetType)
+            .findCodingCertCriterion(user.getAdmissionYear(), codingTargetType)
             .filter(codingCertCriterion -> isAltCourseCompletedByTargetType(
                     codingTargetType,
                     completedCourses,
