@@ -92,14 +92,14 @@ class MajorBasicPolicyTest {
 
     @Test
     @DisplayName("23학번 이하에서 전기 과목은 기필로 변환된다.")
-    void normalizeForAcademicBasicIfNeeded_convertToAcademicBasic_whenMajorBasic() {
+    void normalizeForAcademicBasic_convertToAcademicBasic_whenMajorBasic() {
         // given
         int admissionYear = 2023;
         CompletedCourseDto course = CompletedCourseFixture.createCompletedCourse(CategoryType.MAJOR_BASIC);
         CreditCriterion criterion = CreditCriterionFixture.createCriterion(CategoryType.ACADEMIC_BASIC);
 
         // when
-        CompletedCourseDto normalized = majorBasicPolicy.normalizeForAcademicBasicIfNeeded(admissionYear, course,
+        CompletedCourseDto normalized = majorBasicPolicy.normalizeForAcademicBasic(admissionYear, course,
             criterion);
 
         // then
@@ -114,7 +114,7 @@ class MajorBasicPolicyTest {
 
     @Test
     @DisplayName("24학번 이상이면 정규화 시 원본 객체를 그대로 반환한다.")
-    void normalizeForAcademicBasicIfNeeded_returnOriginal_whenNotMajorBasic() {
+    void normalizeForAcademicBasic_returnOriginal_whenNotMajorBasic() {
         // given
         int admissionYear = 2024;
         CompletedCourseDto course = CompletedCourseFixture.createCompletedCourse(CategoryType.MAJOR_BASIC);
@@ -122,7 +122,7 @@ class MajorBasicPolicyTest {
 
         // when
         CompletedCourseDto normalizedCompletedCourse =
-            majorBasicPolicy.normalizeForAcademicBasicIfNeeded(admissionYear, course, criterion);
+            majorBasicPolicy.normalizeForAcademicBasic(admissionYear, course, criterion);
 
         // then
         assertThat(normalizedCompletedCourse).isSameAs(course);

@@ -24,7 +24,7 @@ public class MajorBasicPolicy {
         return shouldCountMajorBasicAsAcademicBasic(admissionYear, courseCategoryType, criterionCategoryType);
     }
 
-    public CompletedCourseDto normalizeForAcademicBasicIfNeeded(
+    public CompletedCourseDto normalizeForAcademicBasic(
         int admissionYear,
         CompletedCourseDto course,
         CreditCriterion criterion

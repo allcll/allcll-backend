@@ -108,7 +108,7 @@ public class CategoryCreditCalculator {
             .filter(course -> majorBasicPolicy.matchesCriterionCategory(admissionYear, course, criterion))
             .filter(course -> matchesMajorScope(course, criterion.getMajorScope()))
             .filter(course -> academicBasicPolicy.isRecentMajorAcademicBasic(
-                majorBasicPolicy.normalizeForAcademicBasicIfNeeded(admissionYear, course, criterion),
+                majorBasicPolicy.normalizeForAcademicBasic(admissionYear, course, criterion),
                 criterion
             ))
             .filter(course ->
