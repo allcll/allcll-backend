@@ -80,10 +80,6 @@ public class CodingAltCoursePolicy {
         String altCuriNo,
         String minGrade
     ) {
-        if (altCuriNo == null || altCuriNo.isBlank() || minGrade == null || minGrade.isBlank()) {
-            return false;
-        }
-
         GradeThreshold requirement = GradeThreshold.from(minGrade);
         if (requirement == null) {
             return false;
