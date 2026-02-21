@@ -19,12 +19,12 @@ public class CodingAltCoursePolicy implements GraduationCertificationPolicy{
         List<CompletedCourseDto> completedCourses,
         GraduationCheckCertResult certResult
     ) {
-        if (Boolean.TRUE.equals(certResult.getIsCodingCertPassed())) {
+        if (isAlreadyPassed(certResult)) {
             return;
         }
 
         CodingTargetType codingTargetType = departmentInfo.getCodingTargetType();
-        if (CodingTargetType.EXEMPT.equals(codingTargetType)) {
+        if (isExempt(codingTargetType)) {
             return;
         }
 
@@ -37,6 +37,14 @@ public class CodingAltCoursePolicy implements GraduationCertificationPolicy{
                 )
             )
             .ifPresent(codingCertCriterion -> certResult.updateCodingPassedByAltCourse());
+    }
+
+    private boolean isAlreadyPassed(GraduationCheckCertResult certResult) {
+        return Boolean.TRUE.equals(certResult.getIsCodingCertPassed());
+    }
+
+    private boolean isExempt(CodingTargetType codingTargetType) {
+        return CodingTargetType.EXEMPT.equals(codingTargetType);
     }
 
     private boolean isAltCourseCompletedByTargetType(
