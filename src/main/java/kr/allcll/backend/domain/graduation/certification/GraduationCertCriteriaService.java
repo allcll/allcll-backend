@@ -127,7 +127,7 @@ public class GraduationCertCriteriaService {
         }
 
         EnglishCertCriterion englishCertCriterion =
-            englishCertCriterionRepository.findByAdmissionYearAndEnglishTargetType(admissionYear, englishTargetType)
+            englishCertCriterionRepository.findEnglishCertCriterion(admissionYear, englishTargetType)
                 .orElseThrow(() -> new AllcllException(AllcllErrorCode.ENGLISH_CERT_CRITERIA_NOT_FOUND));
 
         EnglishCertAltCourseResponse englishCertAltCourse = EnglishCertAltCourseResponse.of(
@@ -169,7 +169,7 @@ public class GraduationCertCriteriaService {
             return null;
         }
 
-        CodingCertCriterion codingCertCriterion = codingCertCriterionRepository.findByAdmissionYearAndCodingTargetType(
+        CodingCertCriterion codingCertCriterion = codingCertCriterionRepository.findCodingCertCriterion(
                 admissionYear, codingTargetType)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.CODING_CERT_CRITERIA_NOT_FOUND));
 

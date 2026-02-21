@@ -352,21 +352,18 @@ public class GraduationCheckResponseMapper {
 
     private EnglishCertification buildEnglishCertification(CertResult certResult, EnglishTargetType englishTargetType) {
         boolean isRequired = isRequiredEnglish(certResult.ruleType(), englishTargetType);
-        boolean isPassed = normalizePassed(isRequired, certResult.isEnglishCertPassed());
         return new EnglishCertification(
             isRequired,
-            isPassed,
+            certResult.isEnglishCertPassed(),
             englishTargetType
         );
     }
 
     private CodingCertification buildCodingCertification(CertResult certResult, CodingTargetType codingTargetType) {
         boolean isRequired = isRequiredCoding(certResult.ruleType(), codingTargetType);
-        boolean isPassed = normalizePassed(isRequired, certResult.isCodingCertPassed());
-
         return new CodingCertification(
             isRequired,
-            isPassed,
+            certResult.isCodingCertPassed(),
             codingTargetType
         );
     }
@@ -431,12 +428,5 @@ public class GraduationCheckResponseMapper {
     private boolean isRequiredClassic(String ruleTypeName) {
         GraduationCertRuleType ruleType = GraduationCertRuleType.valueOf(ruleTypeName);
         return ruleType.getGraduationCertTypes().contains(GraduationCertType.CERT_CLASSIC);
-    }
-
-    private boolean normalizePassed(boolean isRequired, boolean isPassed) {
-        if (isRequired) {
-            return isPassed;
-        }
-        return true;
     }
 }
