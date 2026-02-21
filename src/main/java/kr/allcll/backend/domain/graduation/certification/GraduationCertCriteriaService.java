@@ -127,7 +127,7 @@ public class GraduationCertCriteriaService {
         }
 
         EnglishCertCriterion englishCertCriterion =
-            englishCertCriterionRepository.findEnglishCertCriterionForTarget(admissionYear, englishTargetType)
+            englishCertCriterionRepository.findEnglishCertCriterion(admissionYear, englishTargetType)
                 .orElseThrow(() -> new AllcllException(AllcllErrorCode.ENGLISH_CERT_CRITERIA_NOT_FOUND));
 
         EnglishCertAltCourseResponse englishCertAltCourse = EnglishCertAltCourseResponse.of(

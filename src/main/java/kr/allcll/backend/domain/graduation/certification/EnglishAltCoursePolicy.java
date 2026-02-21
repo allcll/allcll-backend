@@ -26,7 +26,7 @@ public class EnglishAltCoursePolicy implements GraduationCertificationAltCourseP
         EnglishTargetType englishTargetType = departmentInfo.getEnglishTargetType();
 
         return englishCertCriterionRepository
-            .findEnglishCertCriterionForTarget(user.getAdmissionYear(), englishTargetType)
+            .findEnglishCertCriterion(user.getAdmissionYear(), englishTargetType)
             .map(EnglishCertCriterion::getAltCuriNo)
             .filter(altCuriNo -> isAltCourseCompleted(completedCourses, altCuriNo))
             .isPresent();

@@ -71,7 +71,7 @@ class EnglishAltCoursePolicyTest {
             false
         );
 
-        given(englishCertCriterionRepository.findEnglishCertCriterionForTarget(ADMISSION_YEAR, EnglishTargetType.NON_MAJOR))
+        given(englishCertCriterionRepository.findEnglishCertCriterion(ADMISSION_YEAR, EnglishTargetType.NON_MAJOR))
             .willReturn(Optional.empty());
 
         // when
@@ -98,7 +98,7 @@ class EnglishAltCoursePolicyTest {
         );
 
         EnglishCertCriterion criterion = EnglishCertCriterionFixture.createNonMajorEnglishCertCriterion(ADMISSION_YEAR);
-        given(englishCertCriterionRepository.findEnglishCertCriterionForTarget(ADMISSION_YEAR, EnglishTargetType.NON_MAJOR))
+        given(englishCertCriterionRepository.findEnglishCertCriterion(ADMISSION_YEAR, EnglishTargetType.NON_MAJOR))
             .willReturn(Optional.of(criterion));
 
         List<CompletedCourseDto> completedCourses = List.of(
@@ -130,7 +130,7 @@ class EnglishAltCoursePolicyTest {
         );
 
         EnglishCertCriterion criterion = EnglishCertCriterionFixture.createNonMajorEnglishCertCriterion(ADMISSION_YEAR);
-        given(englishCertCriterionRepository.findEnglishCertCriterionForTarget(ADMISSION_YEAR, EnglishTargetType.NON_MAJOR))
+        given(englishCertCriterionRepository.findEnglishCertCriterion(ADMISSION_YEAR, EnglishTargetType.NON_MAJOR))
             .willReturn(Optional.of(criterion));
 
         List<CompletedCourseDto> completedCourses = List.of(
@@ -161,7 +161,7 @@ class EnglishAltCoursePolicyTest {
         );
 
         EnglishCertCriterion criterion = EnglishCertCriterionFixture.createNonMajorEnglishCertCriterion(ADMISSION_YEAR);
-        given(englishCertCriterionRepository.findEnglishCertCriterionForTarget(ADMISSION_YEAR, EnglishTargetType.NON_MAJOR))
+        given(englishCertCriterionRepository.findEnglishCertCriterion(ADMISSION_YEAR, EnglishTargetType.NON_MAJOR))
             .willReturn(Optional.of(criterion));
 
         List<CompletedCourseDto> completedCourses = List.of(
