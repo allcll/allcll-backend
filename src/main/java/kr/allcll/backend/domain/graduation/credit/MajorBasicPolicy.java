@@ -12,9 +12,8 @@ public class MajorBasicPolicy {
     public boolean matchesCriterionCategory(
         int admissionYear,
         CompletedCourseDto course,
-        CreditCriterion criterion
+        CategoryType criterionCategoryType
     ) {
-        CategoryType criterionCategoryType = criterion.getCategoryType();
         CategoryType courseCategoryType = course.categoryType();
 
         if (Objects.equals(courseCategoryType, criterionCategoryType)) {
@@ -27,9 +26,8 @@ public class MajorBasicPolicy {
     public CompletedCourseDto normalizeForAcademicBasic(
         int admissionYear,
         CompletedCourseDto course,
-        CreditCriterion criterion
+        CategoryType criterionCategoryType
     ) {
-        CategoryType criterionCategoryType = criterion.getCategoryType();
         CategoryType courseCategoryType = course.categoryType();
 
         if (shouldCountMajorBasicAsAcademicBasic(admissionYear, courseCategoryType, criterionCategoryType)) {

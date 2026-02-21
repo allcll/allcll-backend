@@ -105,10 +105,10 @@ public class CategoryCreditCalculator {
         CreditCriterion criterion
     ) {
         double earnedCredits = completedCourses.stream()
-            .filter(course -> majorBasicPolicy.matchesCriterionCategory(admissionYear, course, criterion))
+            .filter(course -> majorBasicPolicy.matchesCriterionCategory(admissionYear, course, criterion.getCategoryType()))
             .filter(course -> matchesMajorScope(course, criterion.getMajorScope()))
             .filter(course -> academicBasicPolicy.isRecentMajorAcademicBasic(
-                majorBasicPolicy.normalizeForAcademicBasic(admissionYear, course, criterion),
+                majorBasicPolicy.normalizeForAcademicBasic(admissionYear, course, criterion.getCategoryType()),
                 criterion
             ))
             .filter(course ->

@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseDto;
 import kr.allcll.backend.fixture.CompletedCourseFixture;
-import kr.allcll.backend.fixture.CreditCriterionFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +21,10 @@ class MajorBasicPolicyTest {
         // given
         int admissionYear = 2025;
         CompletedCourseDto course = CompletedCourseFixture.createCompletedCourse(CategoryType.ACADEMIC_BASIC);
-        CreditCriterion criterion = CreditCriterionFixture.createCriterion(CategoryType.ACADEMIC_BASIC);
+        CategoryType criterionCategoryType = CategoryType.ACADEMIC_BASIC;
 
         // when
-        boolean result = majorBasicPolicy.matchesCriterionCategory(admissionYear, course, criterion);
+        boolean result = majorBasicPolicy.matchesCriterionCategory(admissionYear, course, criterionCategoryType);
 
         // then
         assertThat(result).isTrue();
@@ -37,10 +36,10 @@ class MajorBasicPolicyTest {
         // given
         int admissionYear = 2024;
         CompletedCourseDto course = CompletedCourseFixture.createCompletedCourse(CategoryType.MAJOR_BASIC);
-        CreditCriterion criterion = CreditCriterionFixture.createCriterion(CategoryType.ACADEMIC_BASIC);
+        CategoryType criterionCategoryType = CategoryType.ACADEMIC_BASIC;
 
         // when
-        boolean result = majorBasicPolicy.matchesCriterionCategory(admissionYear, course, criterion);
+        boolean result = majorBasicPolicy.matchesCriterionCategory(admissionYear, course, criterionCategoryType);
 
         // then
         assertThat(result).isFalse();
@@ -52,10 +51,10 @@ class MajorBasicPolicyTest {
         // given
         int admissionYear = 2023;
         CompletedCourseDto course = CompletedCourseFixture.createCompletedCourse(CategoryType.MAJOR_BASIC);
-        CreditCriterion criterion = CreditCriterionFixture.createCriterion(CategoryType.ACADEMIC_BASIC);
+        CategoryType criterionCategoryType = CategoryType.ACADEMIC_BASIC;
 
         // when
-        boolean result = majorBasicPolicy.matchesCriterionCategory(admissionYear, course, criterion);
+        boolean result = majorBasicPolicy.matchesCriterionCategory(admissionYear, course, criterionCategoryType);
 
         // then
         assertThat(result).isTrue();
@@ -67,9 +66,10 @@ class MajorBasicPolicyTest {
         // given
         int admissionYear = 2023;
         CompletedCourseDto course = CompletedCourseFixture.createCompletedCourse(CategoryType.MAJOR_ELECTIVE);
-        CreditCriterion criterion = CreditCriterionFixture.createCriterion(CategoryType.ACADEMIC_BASIC);
+        CategoryType criterionCategoryType = CategoryType.ACADEMIC_BASIC;
+
         // when
-        boolean result = majorBasicPolicy.matchesCriterionCategory(admissionYear, course, criterion);
+        boolean result = majorBasicPolicy.matchesCriterionCategory(admissionYear, course, criterionCategoryType);
 
         // then
         assertThat(result).isFalse();
@@ -81,10 +81,10 @@ class MajorBasicPolicyTest {
         // given
         int admissionYear = 2023;
         CompletedCourseDto course = CompletedCourseFixture.createCompletedCourse(CategoryType.MAJOR_BASIC);
-        CreditCriterion criterion = CreditCriterionFixture.createCriterion(CategoryType.MAJOR_REQUIRED);
+        CategoryType criterionCategoryType = CategoryType.MAJOR_REQUIRED;
 
         // when
-        boolean result = majorBasicPolicy.matchesCriterionCategory(admissionYear, course, criterion);
+        boolean result = majorBasicPolicy.matchesCriterionCategory(admissionYear, course, criterionCategoryType);
 
         // then
         assertThat(result).isFalse();
@@ -96,11 +96,11 @@ class MajorBasicPolicyTest {
         // given
         int admissionYear = 2023;
         CompletedCourseDto course = CompletedCourseFixture.createCompletedCourse(CategoryType.MAJOR_BASIC);
-        CreditCriterion criterion = CreditCriterionFixture.createCriterion(CategoryType.ACADEMIC_BASIC);
+        CategoryType criterionCategoryType = CategoryType.ACADEMIC_BASIC;
 
         // when
-        CompletedCourseDto normalized = majorBasicPolicy.normalizeForAcademicBasic(admissionYear, course,
-            criterion);
+        CompletedCourseDto normalized =
+            majorBasicPolicy.normalizeForAcademicBasic(admissionYear, course, criterionCategoryType);
 
         // then
         assertThat(normalized.categoryType()).isEqualTo(CategoryType.ACADEMIC_BASIC);
@@ -118,11 +118,11 @@ class MajorBasicPolicyTest {
         // given
         int admissionYear = 2024;
         CompletedCourseDto course = CompletedCourseFixture.createCompletedCourse(CategoryType.MAJOR_BASIC);
-        CreditCriterion criterion = CreditCriterionFixture.createCriterion(CategoryType.MAJOR_REQUIRED);
+        CategoryType criterionCategoryType = CategoryType.MAJOR_REQUIRED;
 
         // when
         CompletedCourseDto normalizedCompletedCourse =
-            majorBasicPolicy.normalizeForAcademicBasic(admissionYear, course, criterion);
+            majorBasicPolicy.normalizeForAcademicBasic(admissionYear, course, criterionCategoryType);
 
         // then
         assertThat(normalizedCompletedCourse).isSameAs(course);
