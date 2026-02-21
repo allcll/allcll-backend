@@ -1,6 +1,6 @@
 package kr.allcll.backend.domain.graduation.certification;
 
-public enum CodingAltCourseGradeRequirement {
+public enum GradeThreshold {
 
     PASS("P", null),
     NON_PASS("NP", null),
@@ -17,14 +17,14 @@ public enum CodingAltCourseGradeRequirement {
     private final String code;
     private final Integer score;
 
-    CodingAltCourseGradeRequirement(String code, Integer score) {
+    GradeThreshold(String code, Integer score) {
         this.code = code;
         this.score = score;
     }
 
-    public static CodingAltCourseGradeRequirement from(String grade) {
+    public static GradeThreshold from(String grade) {
         String code = grade.trim().toUpperCase();
-        for (CodingAltCourseGradeRequirement requirement : values()) {
+        for (GradeThreshold requirement : values()) {
             if (requirement.code.equals(code)) {
                 return requirement;
             }
@@ -33,7 +33,7 @@ public enum CodingAltCourseGradeRequirement {
     }
 
     public boolean satisfiedMinGrade(String actualGrade) {
-        CodingAltCourseGradeRequirement actual = from(actualGrade);
+        GradeThreshold actual = from(actualGrade);
         if (actual == null) {
             return false;
         }

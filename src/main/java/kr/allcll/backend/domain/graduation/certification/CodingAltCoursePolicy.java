@@ -84,7 +84,7 @@ public class CodingAltCoursePolicy {
             return false;
         }
 
-        CodingAltCourseGradeRequirement requirement = CodingAltCourseGradeRequirement.from(minGrade);
+        GradeThreshold requirement = GradeThreshold.from(minGrade);
         if (requirement == null) {
             return false;
         }
