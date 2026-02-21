@@ -14,18 +14,18 @@ public enum GradeThreshold {
     D0("D0", 2),
     F("F", 0);
 
-    private final String code;
+    private final String grade;
     private final Integer score;
 
-    GradeThreshold(String code, Integer score) {
-        this.code = code;
+    GradeThreshold(String grade, Integer score) {
+        this.grade = grade;
         this.score = score;
     }
 
     public static GradeThreshold from(String grade) {
         String code = grade.trim().toUpperCase();
         for (GradeThreshold requirement : values()) {
-            if (requirement.code.equals(code)) {
+            if (requirement.grade.equals(code)) {
                 return requirement;
             }
         }
