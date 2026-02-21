@@ -56,9 +56,10 @@ class CodingAltCoursePolicyTest {
         );
 
         // when
-        codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
+        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
 
         // then
+        assertThat(result).isFalse();
         assertThat(certResult.getIsCodingCertPassed()).isTrue();
         assertThat(certResult.getPassedCount()).isEqualTo(1);
     }
@@ -89,9 +90,10 @@ class CodingAltCoursePolicyTest {
         );
 
         // when
-        codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
+        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
 
         // then
+        assertThat(result).isFalse();
         assertThat(certResult.getIsCodingCertPassed()).isFalse();
     }
 
@@ -120,9 +122,10 @@ class CodingAltCoursePolicyTest {
         );
 
         // when
-        codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
+        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
 
         // then
+        assertThat(result).isTrue();
         assertThat(certResult.getIsCodingCertPassed()).isTrue();
     }
 
@@ -151,9 +154,10 @@ class CodingAltCoursePolicyTest {
         );
 
         // when
-        codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
+        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
 
         // then
+        assertThat(result).isFalse();
         assertThat(certResult.getIsCodingCertPassed()).isFalse();
     }
 
@@ -182,9 +186,10 @@ class CodingAltCoursePolicyTest {
         );
 
         // when
-        codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
+        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
 
         // then
+        assertThat(result).isTrue();
         assertThat(certResult.getIsCodingCertPassed()).isTrue();
     }
 
@@ -213,9 +218,10 @@ class CodingAltCoursePolicyTest {
         );
 
         // when
-        codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
+        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
 
         // then
+        assertThat(result).isTrue();
         assertThat(certResult.getIsCodingCertPassed()).isTrue();
     }
 
@@ -244,9 +250,10 @@ class CodingAltCoursePolicyTest {
         );
 
         // when
-        codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
+        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
 
         // then
+        assertThat(result).isFalse();
         assertThat(certResult.getIsCodingCertPassed()).isFalse();
     }
 }
