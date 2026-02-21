@@ -2,11 +2,9 @@ package kr.allcll.backend.domain.graduation.credit;
 
 import java.util.Objects;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseDto;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class MajorBasicPolicy {
 
     private static final int MAJOR_BASIC_INTRODUCED_ADMISSION_YEAR = 2024;
