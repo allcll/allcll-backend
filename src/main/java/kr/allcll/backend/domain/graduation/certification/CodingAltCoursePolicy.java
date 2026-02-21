@@ -8,7 +8,7 @@ import kr.allcll.backend.domain.user.User;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class CodingAltCoursePolicy implements GraduationCertificationPolicy{
+public class CodingAltCoursePolicy implements GraduationCertificationAltCoursePolicy{
 
     private final CodingCertCriterionRepository codingCertCriterionRepository;
 

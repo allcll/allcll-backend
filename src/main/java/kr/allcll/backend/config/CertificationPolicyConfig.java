@@ -4,7 +4,7 @@ import kr.allcll.backend.domain.graduation.certification.CodingAltCoursePolicy;
 import kr.allcll.backend.domain.graduation.certification.CodingCertCriterionRepository;
 import kr.allcll.backend.domain.graduation.certification.EnglishAltCoursePolicy;
 import kr.allcll.backend.domain.graduation.certification.EnglishCertCriterionRepository;
-import kr.allcll.backend.domain.graduation.certification.GraduationCertificationPolicy;
+import kr.allcll.backend.domain.graduation.certification.GraduationCertificationAltCoursePolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,12 +17,12 @@ public class CertificationPolicyConfig {
     private final CodingCertCriterionRepository codingCertCriterionRepository;
 
     @Bean
-    public GraduationCertificationPolicy englishAltCoursePolicy() {
+    public GraduationCertificationAltCoursePolicy englishAltCoursePolicy() {
         return new EnglishAltCoursePolicy(englishCertCriterionRepository);
     }
 
     @Bean
-    public GraduationCertificationPolicy codingAltCoursePolicy() {
+    public GraduationCertificationAltCoursePolicy codingAltCoursePolicy() {
         return new CodingAltCoursePolicy(codingCertCriterionRepository);
     }
 }

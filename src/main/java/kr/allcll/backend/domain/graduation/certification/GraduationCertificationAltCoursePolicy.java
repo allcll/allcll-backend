@@ -6,7 +6,7 @@ import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseDto;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
 import kr.allcll.backend.domain.user.User;
 
-public interface GraduationCertificationPolicy {
+public interface GraduationCertificationAltCoursePolicy {
 
     void applyIfSatisfied(
         User user,
