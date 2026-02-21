@@ -33,15 +33,7 @@ public class MajorBasicPolicy {
         CategoryType courseCategoryType = course.categoryType();
 
         if (shouldCountMajorBasicAsAcademicBasic(admissionYear, courseCategoryType, criterionCategoryType)) {
-            return new CompletedCourseDto(
-                course.curiNo(),
-                course.curiNm(),
-                CategoryType.ACADEMIC_BASIC,
-                course.selectedArea(),
-                course.credits(),
-                course.grade(),
-                course.majorScope()
-            );
+            return course.toAcademicBasic();
         }
 
         return course;
