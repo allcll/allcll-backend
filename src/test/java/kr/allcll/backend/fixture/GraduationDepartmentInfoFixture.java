@@ -20,4 +20,18 @@ public class GraduationDepartmentInfoFixture {
             null
         );
     }
+
+    public static GraduationDepartmentInfo createDepartmentInfo(int admissionYear, EnglishTargetType englishTargetType) {
+        return new GraduationDepartmentInfo(
+            admissionYear,
+            admissionYear % 100,
+            "테스트학과",
+            "3220",
+            "테스트대학",
+            DeptGroup.SOFTWARE_CONVERGENCE_COLLEGE,
+            englishTargetType,
+            CodingTargetType.NON_MAJOR,
+            null
+        );
+    }
 }
