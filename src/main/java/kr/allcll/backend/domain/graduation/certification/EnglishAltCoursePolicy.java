@@ -6,14 +6,13 @@ import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseDto;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
 import kr.allcll.backend.domain.user.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
-@Component
 @RequiredArgsConstructor
-public class EnglishAltCoursePolicy {
+public class EnglishAltCoursePolicy implements GraduationCertificationPolicy{
 
     private final EnglishCertCriterionRepository englishCertCriterionRepository;
 
+    @Override
     public void applyIfSatisfied(
         User user,
         GraduationDepartmentInfo departmentInfo,

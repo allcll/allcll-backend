@@ -1,8 +1,7 @@
 package kr.allcll.backend.domain.graduation.check.result;
 
 import java.util.List;
-import kr.allcll.backend.domain.graduation.certification.CodingAltCoursePolicy;
-import kr.allcll.backend.domain.graduation.certification.EnglishAltCoursePolicy;
+import kr.allcll.backend.domain.graduation.certification.GraduationCertificationPolicy;
 import kr.allcll.backend.domain.graduation.check.cert.GraduationCheckCertResult;
 import kr.allcll.backend.domain.graduation.check.cert.GraduationCheckCertResultRepository;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseDto;
@@ -21,8 +20,8 @@ import org.springframework.stereotype.Component;
 public class CertificationChecker {
 
     private final UserRepository userRepository;
-    private final CodingAltCoursePolicy codingAltCoursePolicy;
-    private final EnglishAltCoursePolicy englishAltCoursePolicy;
+    private final GraduationCertificationPolicy codingAltCoursePolicy;
+    private final GraduationCertificationPolicy englishAltCoursePolicy;
     private final GraduationDepartmentInfoRepository graduationDepartmentInfoRepository;
     private final GraduationCheckCertResultRepository graduationCheckCertResultRepository;
 
