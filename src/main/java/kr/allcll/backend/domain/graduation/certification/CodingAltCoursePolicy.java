@@ -86,7 +86,6 @@ public class CodingAltCoursePolicy {
         }
 
         return completedCourses.stream()
-            .filter(CompletedCourseDto::isCreditEarned)
             .filter(completedCourse -> altCuriNo.equals(completedCourse.curiNo()))
             .anyMatch(completedCourse -> requirement.satisfiedMinGrade(completedCourse.grade()));
     }

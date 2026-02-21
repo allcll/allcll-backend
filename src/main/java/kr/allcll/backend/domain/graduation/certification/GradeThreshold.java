@@ -12,7 +12,9 @@ public enum GradeThreshold {
     C0("C0", 4),
     D_PLUS("D+", 3),
     D0("D0", 2),
-    F("F", 0);
+    F("F", 0),
+    FA("FA", 0);
+
 
     private final String grade;
     private final Integer score;
