@@ -36,11 +36,17 @@ public class CertificationChecker {
         GraduationCheckCertResult certResult = graduationCheckCertResultRepository.findByUserId(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.GRADUATION_CERT_NOT_FOUND));
 
+        boolean isChanged = false;
         if (englishAltCoursePolicy.isSatisfiedByAltCourse(user, departmentInfo, completedCourses, certResult)) {
-            certResult.updateEnglishPassedByAltCourse();
+            certResult.passEnglish();
+            isChanged = true;
         }
         if (codingAltCoursePolicy.isSatisfiedByAltCourse(user, departmentInfo, completedCourses, certResult)) {
-            certResult.updateCodingPassedByAltCourse();
+            certResult.passCoding();
+            isChanged = true;
+        }
+        if (isChanged) {
+            certResult.reCalculate();
         }
 
         return CertResult.from(certResult);
