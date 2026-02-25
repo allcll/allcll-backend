@@ -26,7 +26,8 @@ public class SseEmitterStorage {
 
     public void add(String token, SseEmitter sseEmitter) {
         emitters.put(token, sseEmitter);
-        log.info("[SSE] 새로운 연결이 추가되었습니다. 현재 연결 수: {}", emitters.size());
+        // #3 SSE 로그 레벨: 운영 환경에서 연결이 많을 때 info 로그 부담 방지
+        log.debug("[SSE] 새로운 연결이 추가되었습니다. 현재 연결 수: {}", emitters.size());
         sseEmitter.onTimeout(() -> {
             emitters.remove(token);
             log.debug("[SSE] 연결이 타임아웃으로 종료되었습니다. 현재 연결 수: {}", emitters.size());

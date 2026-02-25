@@ -22,6 +22,9 @@ public class AuthService {
 
     private final LoginProperties properties;
 
+    // #2 OkHttpClient 재사용: ConnectionPool과 Dispatcher를 공유하는 공용 클라이언트
+    private final OkHttpClient sharedClient = new OkHttpClient();
+
     public OkHttpClient login(LoginRequest loginRequest) {
         try {
             String studentId = loginRequest.studentId();
@@ -30,7 +33,8 @@ public class AuthService {
             CookieManager cookieManager = new CookieManager();
             cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
 
-            OkHttpClient client = new OkHttpClient().newBuilder()
+            // #2 OkHttpClient 재사용: 공용 client에서 파생하여 connection pool 공유
+            OkHttpClient client = sharedClient.newBuilder()
                 .cookieJar(new JavaNetCookieJar(cookieManager))
                 .build();
 

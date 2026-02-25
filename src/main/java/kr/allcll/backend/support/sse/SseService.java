@@ -50,8 +50,9 @@ public class SseService {
         }
     }
 
+    // #3 중복 stream 제거: getUserTokens()가 이미 새 List를 반환하므로 재변환 불필요
     public List<String> getConnectedTokens() {
-        return sseEmitterStorage.getUserTokens().stream().toList();
+        return sseEmitterStorage.getUserTokens();
     }
 
     public SseStatusResponse isConnected(String token) {

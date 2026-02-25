@@ -1,7 +1,9 @@
 package kr.allcll.backend.domain.basket;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import kr.allcll.backend.domain.basket.dto.BasketsEachSubject;
 import kr.allcll.backend.domain.basket.dto.BasketsResponse;
 import kr.allcll.backend.domain.basket.dto.SubjectBasketsResponse;
@@ -33,16 +35,22 @@ public class BasketService {
         return new BasketsResponse(result);
     }
 
+    // #1 N+1 제거: 과목별 개별 쿼리 → 한 번의 배치 쿼리로 변경
     private List<BasketsEachSubject> getBasketsEachSubject(List<Subject> subjects) {
-        List<BasketsEachSubject> result = new ArrayList<>();
-        for (Subject subject : subjects) {
-            List<Basket> baskets = basketRepository.findBySubjectId(
-                subject.getId(),
-                Semester.getCurrentSemester()
-            );
-            result.add(BasketsEachSubject.from(subject, baskets));
+        if (subjects.isEmpty()) {
+            return List.of();
         }
-        return result;
+        List<Long> subjectIds = subjects.stream().map(Subject::getId).toList();
+        List<Basket> allBaskets = basketRepository.findBySubjectIds(subjectIds, Semester.getCurrentSemester());
+        Map<Long, List<Basket>> basketsBySubjectId = allBaskets.stream()
+            .collect(Collectors.groupingBy(basket -> basket.getSubject().getId()));
+
+        return subjects.stream()
+            .map(subject -> BasketsEachSubject.from(
+                subject,
+                basketsBySubjectId.getOrDefault(subject.getId(), Collections.emptyList())
+            ))
+            .toList();
     }
 
     private Specification<Subject> getCondition(
