@@ -6,7 +6,7 @@ import static org.mockito.BDDMockito.given;
 import java.util.List;
 import java.util.Optional;
 import kr.allcll.backend.domain.graduation.check.cert.GraduationCheckCertResult;
-import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseDto;
+import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
 import kr.allcll.backend.domain.user.User;
 import kr.allcll.backend.fixture.CodingCertCriterionFixture;
@@ -32,37 +32,6 @@ class CodingAltCoursePolicyTest {
     private CodingCertCriterionRepository codingCertCriterionRepository;
 
     @Test
-    @DisplayName("이미 코딩 인증이 통과된 경우 대체 과목 검사를 수행하지 않는다.")
-    void isSatisfied_ByAltCourse_alreadyPassed_noUpdate() {
-        // given
-        GraduationDepartmentInfo deptInfo =
-            GraduationDepartmentInfoFixture.createDepartmentInfo(ADMISSION_YEAR, CodingTargetType.NON_MAJOR);
-        User user = UserFixture.singleMajorUser(ADMISSION_YEAR, deptInfo);
-
-        GraduationCheckCertResult certResult = GraduationCheckCertResultFixture.createCertResult(
-            user,
-            GraduationCertRuleType.TWO_OF_THREE,
-            false,
-            true,
-            false
-        );
-
-        CodingCertCriterion criterion = CodingCertCriterionFixture.createNonMajorCodingCertCriterion(ADMISSION_YEAR);
-        given(codingCertCriterionRepository.findCodingCertCriterion(ADMISSION_YEAR, CodingTargetType.NON_MAJOR))
-            .willReturn(Optional.of(criterion));
-
-        List<CompletedCourseDto> completedCourses = List.of(
-            CompletedCourseFixture.createCompletedCourse(criterion.getAlt1CuriNo(), "A0")
-        );
-
-        // when
-        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
-
-        // then
-        assertThat(result).isFalse();
-    }
-
-    @Test
     @DisplayName("코딩 면제 대상인 경우 대체 과목 검사를 수행하지 않는다.")
     void isSatisfied_ByAltCourse_exempt_noUpdate() {
         // given
@@ -70,25 +39,16 @@ class CodingAltCoursePolicyTest {
             GraduationDepartmentInfoFixture.createDepartmentInfo(ADMISSION_YEAR, CodingTargetType.EXEMPT);
         User user = UserFixture.singleMajorUser(ADMISSION_YEAR, deptInfo);
 
-        GraduationCheckCertResult certResult = GraduationCheckCertResultFixture.createCertResult(
-            user,
-            GraduationCertRuleType.TWO_OF_THREE,
-            false,
-            false,
-            false
-        );
-
-
         CodingCertCriterion criterion = CodingCertCriterionFixture.createNonMajorCodingCertCriterion(ADMISSION_YEAR);
         given(codingCertCriterionRepository.findCodingCertCriterion(ADMISSION_YEAR, CodingTargetType.EXEMPT))
             .willReturn(Optional.of(criterion));
 
-        List<CompletedCourseDto> completedCourses = List.of(
-            CompletedCourseFixture.createCompletedCourse(criterion.getAlt1CuriNo(), "A0")
+        List<CompletedCourse> completedCourses = List.of(
+            CompletedCourseFixture.createCompletedCourse(1L, criterion.getAlt1CuriNo(), "A0")
         );
 
         // when
-        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
+        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses);
 
         // then
         assertThat(result).isFalse();
@@ -114,12 +74,12 @@ class CodingAltCoursePolicyTest {
         given(codingCertCriterionRepository.findCodingCertCriterion(ADMISSION_YEAR, CodingTargetType.CODING_MAJOR))
             .willReturn(Optional.of(criterion));
 
-        List<CompletedCourseDto> completedCourses = List.of(
-            CompletedCourseFixture.createCompletedCourse(criterion.getAlt1CuriNo(), "B0")
+        List<CompletedCourse> completedCourses = List.of(
+            CompletedCourseFixture.createCompletedCourse(1L, criterion.getAlt1CuriNo(), "B0")
         );
 
         // when
-        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
+        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses);
 
         // then
         assertThat(result).isTrue();
@@ -145,12 +105,12 @@ class CodingAltCoursePolicyTest {
         given(codingCertCriterionRepository.findCodingCertCriterion(ADMISSION_YEAR, CodingTargetType.CODING_MAJOR))
             .willReturn(Optional.of(criterion));
 
-        List<CompletedCourseDto> completedCourses = List.of(
-            CompletedCourseFixture.createCompletedCourse(criterion.getAlt1CuriNo(), "C0")
+        List<CompletedCourse> completedCourses = List.of(
+            CompletedCourseFixture.createCompletedCourse(1L, criterion.getAlt1CuriNo(), "C0")
         );
 
         // when
-        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
+        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses);
 
         // then
         assertThat(result).isFalse();
@@ -176,12 +136,12 @@ class CodingAltCoursePolicyTest {
         given(codingCertCriterionRepository.findCodingCertCriterion(ADMISSION_YEAR, CodingTargetType.NON_MAJOR))
             .willReturn(Optional.of(criterion));
 
-        List<CompletedCourseDto> completedCourses = List.of(
-            CompletedCourseFixture.createCompletedCourse(criterion.getAlt1CuriNo(), "A0")
+        List<CompletedCourse> completedCourses = List.of(
+            CompletedCourseFixture.createCompletedCourse(1L, criterion.getAlt1CuriNo(), "A0")
         );
 
         // when
-        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
+        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses);
 
         // then
         assertThat(result).isTrue();
@@ -207,12 +167,12 @@ class CodingAltCoursePolicyTest {
         given(codingCertCriterionRepository.findCodingCertCriterion(ADMISSION_YEAR, CodingTargetType.NON_MAJOR))
             .willReturn(Optional.of(criterion));
 
-        List<CompletedCourseDto> completedCourses = List.of(
-            CompletedCourseFixture.createCompletedCourse(criterion.getAlt2CuriNo(), "P")
+        List<CompletedCourse> completedCourses = List.of(
+            CompletedCourseFixture.createCompletedCourse(1L, criterion.getAlt2CuriNo(), "P")
         );
 
         // when
-        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
+        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses);
 
         // then
         assertThat(result).isTrue();
@@ -238,12 +198,12 @@ class CodingAltCoursePolicyTest {
         given(codingCertCriterionRepository.findCodingCertCriterion(ADMISSION_YEAR, CodingTargetType.NON_MAJOR))
             .willReturn(Optional.of(criterion));
 
-        List<CompletedCourseDto> completedCourses = List.of(
-            CompletedCourseFixture.createCompletedCourse(criterion.getAlt2CuriNo(), "NP")
+        List<CompletedCourse> completedCourses = List.of(
+            CompletedCourseFixture.createCompletedCourse(1L, criterion.getAlt2CuriNo(), "NP")
         );
 
         // when
-        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses, certResult);
+        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses);
 
         // then
         assertThat(result).isFalse();
