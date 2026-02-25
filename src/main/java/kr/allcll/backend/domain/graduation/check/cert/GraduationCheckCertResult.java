@@ -182,22 +182,4 @@ public class GraduationCheckCertResult {
         this.myCountScience = certInfo.myCountScience();
         this.isClassicsScienceCertPassed = isScienceSatisfied;
     }
-
-    public void passEnglish() {
-        this.isEnglishCertPassed = true;
-    }
-
-    public void passCoding() {
-        this.isCodingCertPassed = true;
-    }
-
-    public void reCalculate() {
-        int newPassedCount = this.graduationCertRuleType.calculatePassedCount(
-            this.isEnglishCertPassed,
-            this.isClassicsCertPassed,
-            this.isCodingCertPassed
-        );
-        this.passedCount = newPassedCount;
-        this.isSatisfied = this.graduationCertRuleType.isSatisfied(newPassedCount);
-    }
 }
