@@ -52,7 +52,7 @@ public class GraduationChecker {
         TotalSummary totalSummary = summarizeTotalCredits(completedCourses, categoryResults);
 
         // 졸업인증제도 검사
-        CertResult certResult = certificationChecker.getResult(userId);
+        CertResult certResult = certificationChecker.checkAndUpdate(userId);
         boolean isGraduatable = canGraduate(categoryResults, certResult);
 
         return new CheckResult(
