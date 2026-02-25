@@ -15,13 +15,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class GraduationCertService {
 
-    private final GraduationCheckCertResultRepository graduationCheckCertResultRepository;
+    private final EntityManager entityManager;
     private final GraduationCertRuleRepository graduationCertRuleRepository;
     private final ClassicCertCriterionRepository classicCertCriterionRepository;
-    private final EntityManager entityManager;
+    private final GraduationCheckCertResultRepository graduationCheckCertResultRepository;
 
     @Transactional
     public void createOrUpdate(User user, GraduationCertInfo certInfo) {
