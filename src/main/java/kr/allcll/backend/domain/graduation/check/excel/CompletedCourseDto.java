@@ -37,6 +37,19 @@ public record CompletedCourseDto(
         );
     }
 
+    public CompletedCourse toEntity(Long userId) {
+        return new CompletedCourse(
+            userId,
+            curiNo,
+            curiNm,
+            categoryType,
+            selectedArea,
+            credits,
+            grade,
+            majorScope
+        );
+    }
+
     // grade 기준 학점 인정 판별 메서드
     public boolean isCreditEarned() {
         if (grade == null || grade.isEmpty()) {
