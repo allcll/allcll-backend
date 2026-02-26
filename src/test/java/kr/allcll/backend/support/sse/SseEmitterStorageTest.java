@@ -1,8 +1,14 @@
 package kr.allcll.backend.support.sse;
 
+
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.assertj.core.api.SoftAssertions;
+
+import java.lang.reflect.Field;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -105,5 +111,149 @@ class SseEmitterStorageTest {
     void getEmitter_shouldReturnEmptyForNonExistentToken() {
         // when & then
         assertThat(storage.getEmitter("non-existent")).isEmpty();
+    }
+
+    @DisplayName("[버그 재현] 30초 이상 유지되는 정상 SSE 연결이 비활성으로 처리된다")
+    @Test
+    void getUserTokens_shouldNotExcludeLongLivedActiveConnections() throws Exception {
+        // given - SSE 연결을 생성하고 추가
+        String token = "long-lived-connection";
+        SseEmitter emitter = new SseEmitter(60000L); // 60초 타임아웃
+        storage.add(token, emitter);
+
+        // when - 초기 상태 확인 (연결이 활성 상태여야 함)
+        assertThat(storage.getUserTokens()).contains(token);
+        assertThat(storage.getActiveConnectionCount()).isEqualTo(1);
+        assertThat(storage.getEmitter(token)).isPresent();
+
+        // lastActiveTime을 31초 전으로 설정 (리플렉션 사용)
+        setLastActiveTime(token, LocalDateTime.now().minusSeconds(31));
+
+        // then - 31초 후에도 연결이 여전히 살아있음 (emitters에 존재)
+        assertThat(storage.getActiveConnectionCount()).isEqualTo(1);
+        assertThat(storage.getEmitter(token)).isPresent();
+
+        // 하지만 getUserTokens()는 해당 토큰을 반환하지 않음 (버그!)
+        List<String> activeTokens = storage.getUserTokens();
+
+        // 현재 구현으로는 이 assertion이 실패함 - 버그 재현!
+        assertThat(activeTokens)
+            .as("30초 이상 유지되는 정상 SSE 연결도 활성 목록에 포함되어야 함")
+            .contains(token);
+    }
+
+    @DisplayName("emitters에 존재하는 연결은 항상 getUserTokens에 포함되어야 한다")
+    @Test
+    void getUserTokens_shouldIncludeAllActiveEmitters() throws Exception {
+        // given
+        String oldToken = "old-active-connection";
+        String newToken = "new-active-connection";
+
+        SseEmitter oldEmitter = new SseEmitter(60000L);
+        SseEmitter newEmitter = new SseEmitter(60000L);
+
+        storage.add(oldToken, oldEmitter);
+
+        // oldToken의 lastActiveTime을 31초 전으로 설정
+        setLastActiveTime(oldToken, LocalDateTime.now().minusSeconds(31));
+
+        // 새로운 연결 추가
+        storage.add(newToken, newEmitter);
+
+        // when
+        List<String> activeTokens = storage.getUserTokens();
+        int activeCount = storage.getActiveConnectionCount();
+
+        // then
+        assertThat(activeCount).isEqualTo(2); // 두 연결 모두 살아있음
+
+        // 하지만 getUserTokens는 최근 30초 이내 연결만 반환 (버그!)
+        assertThat(activeTokens)
+            .as("emitters에 존재하는 모든 연결은 getUserTokens에 포함되어야 함")
+            .containsExactlyInAnyOrder(oldToken, newToken);
+    }
+
+    @DisplayName("연결 종료 후 30초 이내에는 getUserTokens에 포함되어야 한다 (Grace Period)")
+    @Test
+    void getUserTokens_shouldIncludeRecentlyDisconnectedTokensWithinGracePeriod() throws Exception {
+        // given
+        String token = "disconnected-token";
+        SseEmitter emitter = new SseEmitter();
+        storage.add(token, emitter);
+
+        // when - 연결 종료 시뮬레이션 (onCompletion 콜백을 수동으로 실행)
+        // 실제 HTTP 연결 없는 테스트 환경에서는 complete() 호출이 콜백을 트리거하지 않음
+        removeFromEmitters(token);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(storage.getActiveConnectionCount()).isEqualTo(0);
+            softly.assertThat(storage.getEmitter(token)).isEmpty();
+            softly.assertThat(storage.getUserTokens()).contains(token);
+        });
+
+        setLastActiveTime(token, LocalDateTime.now().minusSeconds(31));
+
+        // 31초 후에는 제외됨
+        assertThat(storage.getUserTokens()).doesNotContain(token);
+    }
+
+    @DisplayName("cleanupExpiredActiveTimes는 Grace Period를 초과한 비활성 토큰만 제거한다")
+    @Test
+    void cleanupExpiredActiveTimes_shouldOnlyRemoveExpiredInactiveTokens() throws Exception {
+        // given
+        /// 활성 연결 추가
+        String activeToken = "still-connected";
+        SseEmitter activeEmitter = new SseEmitter(60000L);
+        storage.add(activeToken, activeEmitter);
+
+        /// 만료될 비활성 연결 추가
+        String expiredToken = "expired-disconnected";
+        SseEmitter expiredEmitter = new SseEmitter();
+        storage.add(expiredToken, expiredEmitter);
+        removeFromEmitters(expiredToken);
+        setLastActiveTime(expiredToken, LocalDateTime.now().minusSeconds(31));  // 31초 전으로 설정
+
+        // when
+        storage.cleanupExpiredActiveTimes();
+
+        // then
+        List<String> tokens = storage.getUserTokens();
+        assertThat(tokens)
+            .contains(activeToken)
+            .doesNotContain(expiredToken);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void setLastActiveTime(String token, LocalDateTime time) throws Exception {
+        Field connectionsField = SseEmitterStorage.class.getDeclaredField("connections");
+        connectionsField.setAccessible(true);
+        Map<String, Object> connections = (Map<String, Object>) connectionsField.get(storage);
+
+        Object connection = connections.get(token);
+        if (connection != null) {
+            Field emitterField = connection.getClass().getDeclaredField("emitter");
+            emitterField.setAccessible(true);
+            SseEmitter emitter = (SseEmitter) emitterField.get(connection);
+
+            Class<?> sseConnectionClass = Class.forName("kr.allcll.backend.support.sse.SseConnection");
+            var constructor = sseConnectionClass.getDeclaredConstructor(SseEmitter.class, LocalDateTime.class);
+            constructor.setAccessible(true);
+            Object newConnection = constructor.newInstance(emitter, time);
+            connections.put(token, newConnection);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void removeFromEmitters(String token) throws Exception {
+        Field connectionsField = SseEmitterStorage.class.getDeclaredField("connections");
+        connectionsField.setAccessible(true);
+        Map<String, Object> connections = (Map<String, Object>) connectionsField.get(storage);
+
+        Object connection = connections.get(token);
+        if (connection != null) {
+            var disconnectMethod = connection.getClass().getDeclaredMethod("disconnect");
+            disconnectMethod.setAccessible(true);
+            disconnectMethod.invoke(connection);
+        }
     }
 }
