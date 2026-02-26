@@ -34,9 +34,6 @@ public class SseEmitterStorage {
         sseEmitter.onError(e -> {
             emitters.remove(token);
         });
-        sseEmitter.onCompletion(() -> {
-            emitters.remove(token);
-        });
     }
 
     /*
