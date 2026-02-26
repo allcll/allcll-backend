@@ -35,10 +35,14 @@ public class SseService {
     }
 
     public void propagate(String token, String eventName, Object data) {
-        sseEmitterStorage.getEmitter(token).ifPresent(emitter -> {
-            SseEventBuilder eventBuilder = SseEventBuilderFactory.create(eventName, data);
-            sendEvent(emitter, eventBuilder);
-        });
+        sseEmitterStorage.getEmitter(token).ifPresentOrElse(
+            emitter -> {
+                SseEventBuilder eventBuilder = SseEventBuilderFactory.create(eventName, data);
+                sendEvent(emitter, eventBuilder);
+                log.debug("[SSE-propagate] 이벤트 전송 완료. token: {}, eventName: {}", token, eventName);
+            },
+            () -> log.warn("[SSE-propagate] 이벤트 전송 실패 - Emitter가 Map에 없음. token: {}, eventName: {}", token, eventName)
+        );
     }
 
     private void sendEvent(SseEmitter sseEmitter, SseEventBuilder eventBuilder) {
