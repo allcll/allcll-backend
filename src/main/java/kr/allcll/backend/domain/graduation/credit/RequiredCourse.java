@@ -1,10 +1,17 @@
 package kr.allcll.backend.domain.graduation.credit;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import kr.allcll.backend.support.entity.BaseEntity;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.AccessLevel;
 
 @Table(name = "required_courses")
 @Entity
@@ -24,6 +31,9 @@ public class RequiredCourse extends BaseEntity {
 
     @Column(name = "dept_cd", nullable = false)
     private String deptCd; // 학과 코드
+
+    @Column(name = "dept_nm", nullable = false)
+    private String deptNm; // 학과 코드
 
     @Enumerated(EnumType.STRING)
     @Column(name = "category_type", nullable = false)
@@ -48,6 +58,7 @@ public class RequiredCourse extends BaseEntity {
         Integer admissionYear,
         Integer admissionYearShort,
         String deptCd,
+        String deptNm,
         CategoryType categoryType,
         String curiNo,
         String curiNm,
@@ -58,6 +69,7 @@ public class RequiredCourse extends BaseEntity {
         this.admissionYear = admissionYear;
         this.admissionYearShort = admissionYearShort;
         this.deptCd = deptCd;
+        this.deptNm = deptNm;
         this.categoryType = categoryType;
         this.curiNo = curiNo;
         this.curiNm = curiNm;

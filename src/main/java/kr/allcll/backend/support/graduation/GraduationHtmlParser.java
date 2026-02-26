@@ -13,7 +13,7 @@ public class GraduationHtmlParser {
     }
 
     public Elements selectCodingResultElements(Document document) {
-        return document.select("span.certificate");
+        return document.select("span.certificate:has(button)");
     }
 
     public String selectClassicsPassText(Document document) {
