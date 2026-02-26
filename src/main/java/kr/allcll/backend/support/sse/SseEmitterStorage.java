@@ -29,17 +29,18 @@ public class SseEmitterStorage {
         log.info("[SSE] 새로운 연결이 추가되었습니다. 현재 연결 수: {}", getActiveConnectionCount());
 
         sseEmitter.onTimeout(() -> {
-            disconnectToken(token);
+            disconnectToken(token, sseEmitter);
             log.debug("[SSE] 연결이 타임아웃으로 종료되었습니다. 현재 연결 수: {}", getActiveConnectionCount());
         });
-        sseEmitter.onError(e -> disconnectToken(token));
-        sseEmitter.onCompletion(() -> disconnectToken(token));
+        sseEmitter.onError(e -> disconnectToken(token, sseEmitter));
+        sseEmitter.onCompletion(() -> disconnectToken(token, sseEmitter));
     }
 
-    private void disconnectToken(String token) {
+    private void disconnectToken(String token, SseEmitter sseEmitter) {
         SseConnection connection = connections.get(token);
-        if (connection != null) {
+        if (connection != null && connection.getEmitter() == sseEmitter) {
             connection.disconnect();
+            connections.remove(token);
         }
     }
 

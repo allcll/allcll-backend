@@ -215,6 +215,81 @@ class SseEmitterStorageTest {
             .doesNotContain(expiredToken);
     }
 
+    @DisplayName("같은 토큰으로 재연결 시 이전 emitter의 콜백이 새 연결을 끊지 않아야 한다")
+    @Test
+    void reconnection_shouldNotDisconnectNewEmitterByOldEmitterCallback() {
+        // given
+        String token = "reconnect-user";
+        SseEmitter oldEmitter = new SseEmitter(5000L);
+        storage.add(token, oldEmitter);
+
+        // when
+        SseEmitter newEmitter = new SseEmitter(60000L);
+        storage.add(token, newEmitter);
+        oldEmitter.complete();
+
+        // then
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(storage.getEmitter(token))
+                .isPresent();
+            softly.assertThat(storage.getActiveConnectionCount())
+                .isEqualTo(1);
+            softly.assertThat(storage.getUserTokens())
+                .contains(token);
+        });
+    }
+
+    @DisplayName("재연결 시 이전 연결의 여러 콜백이 동시에 실행되어도 새 연결이 유지되어야 한다")
+    @Test
+    void reconnection_shouldMaintainNewConnectionEvenWithMultipleOldCallbacks() {
+        // given
+        String token = "multi-callback-user";
+        SseEmitter oldEmitter = new SseEmitter(5000L);
+        storage.add(token, oldEmitter);
+
+        SseEmitter newEmitter = new SseEmitter(60000L);
+        storage.add(token, newEmitter);
+
+        assertThat(storage.getActiveConnectionCount()).isEqualTo(1);
+
+        // when
+        oldEmitter.completeWithError(new RuntimeException("Old connection error"));
+        oldEmitter.complete();
+
+        // then
+        assertThat(storage.getEmitter(token)).isPresent();
+        assertThat(storage.getActiveConnectionCount()).isEqualTo(1);
+        assertThat(storage.getUserTokens()).contains(token);
+    }
+
+    @DisplayName("동일 토큰으로 빠르게 여러 번 재연결해도 마지막 연결만 유지되어야 한다")
+    @Test
+    void reconnection_shouldKeepOnlyLastConnectionAfterMultipleReconnects() {
+        // given
+        String token = "rapid-reconnect-user";
+
+        // when
+        SseEmitter emitter1 = new SseEmitter();
+        storage.add(token, emitter1);
+        assertThat(storage.getActiveConnectionCount()).isEqualTo(1);
+
+        SseEmitter emitter2 = new SseEmitter();
+        storage.add(token, emitter2);
+        assertThat(storage.getActiveConnectionCount()).isEqualTo(1);
+
+        SseEmitter emitter3 = new SseEmitter();
+        storage.add(token, emitter3);
+
+        // 이전 emitter들의 콜백 실행
+        emitter1.complete();
+        emitter2.complete();
+
+        // then - 마지막 연결만 활성 상태
+        assertThat(storage.getActiveConnectionCount()).isEqualTo(1);
+        assertThat(storage.getEmitter(token)).isPresent();
+        assertThat(storage.getUserTokens()).contains(token);
+    }
+
     @SuppressWarnings("unchecked")
     private void setLastActiveTime(String token, LocalDateTime time) throws Exception {
         Field connectionsField = SseEmitterStorage.class.getDeclaredField("connections");
