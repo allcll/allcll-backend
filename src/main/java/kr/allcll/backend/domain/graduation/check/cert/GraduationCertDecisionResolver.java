@@ -126,25 +126,25 @@ public class GraduationCertDecisionResolver {
         }
     }
 
-    private boolean isEnglishAlreadyPassed(GraduationCheckCertResult ClassicsResult) {
-        if (ClassicsResult == null) {
+    private boolean isEnglishAlreadyPassed(GraduationCheckCertResult certResult) {
+        if (certResult == null) {
             return false;
         }
-        return Boolean.TRUE.equals(ClassicsResult.getIsEnglishCertPassed());
+        return Boolean.TRUE.equals(certResult.getIsEnglishCertPassed());
     }
 
-    private boolean isCodingAlreadyPassed(GraduationCheckCertResult ClassicsResult) {
-        if (ClassicsResult == null) {
+    private boolean isCodingAlreadyPassed(GraduationCheckCertResult certResult) {
+        if (certResult == null) {
             return false;
         }
-        return Boolean.TRUE.equals(ClassicsResult.getIsCodingCertPassed());
+        return Boolean.TRUE.equals(certResult.getIsCodingCertPassed());
     }
 
-    private boolean isClassicsAlreadyPassed(GraduationCheckCertResult ClassicsResult) {
-        if (ClassicsResult == null) {
+    private boolean isClassicsAlreadyPassed(GraduationCheckCertResult certResult) {
+        if (certResult == null) {
             return false;
         }
-        return Boolean.TRUE.equals(ClassicsResult.getIsClassicsCertPassed());
+        return Boolean.TRUE.equals(certResult.getIsClassicsCertPassed());
     }
 
     private ClassicsCounts fallbackCounts(GraduationCheckCertResult certResult) {
