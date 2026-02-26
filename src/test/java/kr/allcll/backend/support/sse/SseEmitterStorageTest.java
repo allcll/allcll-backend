@@ -72,7 +72,7 @@ class SseEmitterStorageTest {
         // when
         storage.cleanupExpiredActiveTimes();
 
-        // then - Grace Period 내이므로 여전히 존재
+        // then
         List<String> tokens = storage.getUserTokens();
         assertThat(tokens).contains(token);
     }
@@ -113,32 +113,30 @@ class SseEmitterStorageTest {
         assertThat(storage.getEmitter("non-existent")).isEmpty();
     }
 
-    @DisplayName("[버그 재현] 30초 이상 유지되는 정상 SSE 연결이 비활성으로 처리된다")
+    @DisplayName("30초 이상 유지되는 정상 SSE 연결이 활성으로 처리되어야 한다")
     @Test
     void getUserTokens_shouldNotExcludeLongLivedActiveConnections() throws Exception {
-        // given - SSE 연결을 생성하고 추가
+        // given
         String token = "long-lived-connection";
-        SseEmitter emitter = new SseEmitter(60000L); // 60초 타임아웃
+        SseEmitter emitter = new SseEmitter(60000L);
         storage.add(token, emitter);
 
-        // when - 초기 상태 확인 (연결이 활성 상태여야 함)
-        assertThat(storage.getUserTokens()).contains(token);
-        assertThat(storage.getActiveConnectionCount()).isEqualTo(1);
-        assertThat(storage.getEmitter(token)).isPresent();
+        // when
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(storage.getUserTokens()).contains(token);
+            softly.assertThat(storage.getActiveConnectionCount()).isEqualTo(1);
+            softly.assertThat(storage.getEmitter(token)).isPresent();
+        });
 
-        // lastActiveTime을 31초 전으로 설정 (리플렉션 사용)
         setLastActiveTime(token, LocalDateTime.now().minusSeconds(31));
 
-        // then - 31초 후에도 연결이 여전히 살아있음 (emitters에 존재)
+        // then
         assertThat(storage.getActiveConnectionCount()).isEqualTo(1);
         assertThat(storage.getEmitter(token)).isPresent();
 
-        // 하지만 getUserTokens()는 해당 토큰을 반환하지 않음 (버그!)
         List<String> activeTokens = storage.getUserTokens();
 
-        // 현재 구현으로는 이 assertion이 실패함 - 버그 재현!
         assertThat(activeTokens)
-            .as("30초 이상 유지되는 정상 SSE 연결도 활성 목록에 포함되어야 함")
             .contains(token);
     }
 
@@ -156,8 +154,6 @@ class SseEmitterStorageTest {
 
         // oldToken의 lastActiveTime을 31초 전으로 설정
         setLastActiveTime(oldToken, LocalDateTime.now().minusSeconds(31));
-
-        // 새로운 연결 추가
         storage.add(newToken, newEmitter);
 
         // when
@@ -165,11 +161,9 @@ class SseEmitterStorageTest {
         int activeCount = storage.getActiveConnectionCount();
 
         // then
-        assertThat(activeCount).isEqualTo(2); // 두 연결 모두 살아있음
+        assertThat(activeCount).isEqualTo(2);
 
-        // 하지만 getUserTokens는 최근 30초 이내 연결만 반환 (버그!)
         assertThat(activeTokens)
-            .as("emitters에 존재하는 모든 연결은 getUserTokens에 포함되어야 함")
             .containsExactlyInAnyOrder(oldToken, newToken);
     }
 
@@ -181,8 +175,7 @@ class SseEmitterStorageTest {
         SseEmitter emitter = new SseEmitter();
         storage.add(token, emitter);
 
-        // when - 연결 종료 시뮬레이션 (onCompletion 콜백을 수동으로 실행)
-        // 실제 HTTP 연결 없는 테스트 환경에서는 complete() 호출이 콜백을 트리거하지 않음
+        // when
         removeFromEmitters(token);
 
         SoftAssertions.assertSoftly(softly -> {
@@ -193,7 +186,6 @@ class SseEmitterStorageTest {
 
         setLastActiveTime(token, LocalDateTime.now().minusSeconds(31));
 
-        // 31초 후에는 제외됨
         assertThat(storage.getUserTokens()).doesNotContain(token);
     }
 
@@ -211,7 +203,7 @@ class SseEmitterStorageTest {
         SseEmitter expiredEmitter = new SseEmitter();
         storage.add(expiredToken, expiredEmitter);
         removeFromEmitters(expiredToken);
-        setLastActiveTime(expiredToken, LocalDateTime.now().minusSeconds(31));  // 31초 전으로 설정
+        setLastActiveTime(expiredToken, LocalDateTime.now().minusSeconds(31));
 
         // when
         storage.cleanupExpiredActiveTimes();
@@ -243,6 +235,10 @@ class SseEmitterStorageTest {
         }
     }
 
+    /**
+     - 연결 종료 시뮬레이션 (onCompletion 콜백을 수동으로 실행)
+     - 실제 HTTP 연결 없는 테스트 환경에서는 complete() 호출이 콜백을 트리거하지 않음
+     **/
     @SuppressWarnings("unchecked")
     private void removeFromEmitters(String token) throws Exception {
         Field connectionsField = SseEmitterStorage.class.getDeclaredField("connections");
