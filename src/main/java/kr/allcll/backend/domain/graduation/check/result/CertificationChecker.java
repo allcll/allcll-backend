@@ -29,7 +29,7 @@ public class CertificationChecker {
     private final GraduationDepartmentInfoRepository graduationDepartmentInfoRepository;
     private final GraduationCheckCertResultRepository graduationCheckCertResultRepository;
 
-    @Transactional(readOnly = true)
+    @Transactional
     public CertResult checkAndUpdate(Long userId) {
         applyAltCourse(userId);
         GraduationCheckCertResult certResult = graduationCheckCertResultRepository.findByUserId(userId)
@@ -37,7 +37,6 @@ public class CertificationChecker {
         return CertResult.from(certResult);
     }
 
-    @Transactional
     private void applyAltCourse(Long userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
