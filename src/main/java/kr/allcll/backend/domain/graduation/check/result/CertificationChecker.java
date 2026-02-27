@@ -41,7 +41,7 @@ public class CertificationChecker {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
 
-        GraduationDepartmentInfo deptInfo = graduationDepartmentInfoRepository
+        GraduationDepartmentInfo userDept = graduationDepartmentInfoRepository
             .findByAdmissionYearAndDeptCd(user.getAdmissionYear(), user.getDeptCd())
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND));
 
@@ -51,11 +51,11 @@ public class CertificationChecker {
         List<CompletedCourse> completedCourses = completedCourseRepository.findAllByUserId(userId);
 
         boolean isChanged = false;
-        if (englishAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses)) {
+        if (englishAltCoursePolicy.isSatisfiedByAltCourse(user, userDept, completedCourses)) {
             certResult.passEnglish();
             isChanged = true;
         }
-        if (codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses)) {
+        if (codingAltCoursePolicy.isSatisfiedByAltCourse(user, userDept, completedCourses)) {
             certResult.passCoding();
             isChanged = true;
         }

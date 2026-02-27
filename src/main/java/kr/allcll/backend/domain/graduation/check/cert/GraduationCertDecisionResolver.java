@@ -33,7 +33,7 @@ public class GraduationCertDecisionResolver {
 
 
     public GraduationCertInfo resolve(User user, OkHttpClient client) {
-        GraduationDepartmentInfo deptInfo = graduationDepartmentInfoRepository
+        GraduationDepartmentInfo userDept = graduationDepartmentInfoRepository
             .findByAdmissionYearAndDeptCd(user.getAdmissionYear(), user.getDeptCd())
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND));
 
@@ -42,8 +42,8 @@ public class GraduationCertDecisionResolver {
         GraduationCheckCertResult certResult = graduationCheckCertResultRepository.findByUserId(user.getId())
             .orElse(null);
 
-        boolean englishPassed = resolveEnglishPassed(user, client, deptInfo, completedCourses, certResult);
-        boolean codingPassed = resolveCodingPassed(user, client, deptInfo, completedCourses, certResult);
+        boolean englishPassed = resolveEnglishPassed(user, client, userDept, completedCourses, certResult);
+        boolean codingPassed = resolveCodingPassed(user, client, userDept, completedCourses, certResult);
         ClassicsResult classicsResult = resolveClassics(client, certResult);
 
         return GraduationCertInfo.of(
@@ -57,7 +57,7 @@ public class GraduationCertDecisionResolver {
     private boolean resolveEnglishPassed(
         User user,
         OkHttpClient client,
-        GraduationDepartmentInfo deptInfo,
+        GraduationDepartmentInfo userDept,
         List<CompletedCourse> completedCourses,
         GraduationCheckCertResult certResult
     ) {
@@ -65,7 +65,7 @@ public class GraduationCertDecisionResolver {
             return true;
         }
 
-        if (englishAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses)) {
+        if (englishAltCoursePolicy.isSatisfiedByAltCourse(user, userDept, completedCourses)) {
             return true;
         }
 
@@ -80,7 +80,8 @@ public class GraduationCertDecisionResolver {
     private boolean resolveCodingPassed(
         User user,
         OkHttpClient client,
-        GraduationDepartmentInfo deptInfo,
+        GraduationDepartmentInfo userDept
+        ,
         List<CompletedCourse> completedCourses,
         GraduationCheckCertResult certResult
     ) {
@@ -88,7 +89,7 @@ public class GraduationCertDecisionResolver {
             return true;
         }
 
-        if (codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses)) {
+        if (codingAltCoursePolicy.isSatisfiedByAltCourse(user, userDept, completedCourses)) {
             return true;
         }
 

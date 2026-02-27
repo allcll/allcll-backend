@@ -35,9 +35,9 @@ class CodingAltCoursePolicyTest {
     @DisplayName("코딩 면제 대상인 경우 대체 과목 검사를 수행하지 않는다.")
     void isSatisfied_ByAltCourse_exempt_noUpdate() {
         // given
-        GraduationDepartmentInfo deptInfo =
+        GraduationDepartmentInfo userDept =
             GraduationDepartmentInfoFixture.createDepartmentInfo(ADMISSION_YEAR, CodingTargetType.EXEMPT);
-        User user = UserFixture.singleMajorUser(ADMISSION_YEAR, deptInfo);
+        User user = UserFixture.singleMajorUser(ADMISSION_YEAR, userDept);
 
         CodingCertCriterion criterion = CodingCertCriterionFixture.createNonMajorCodingCertCriterion(ADMISSION_YEAR);
         given(codingCertCriterionRepository.findCodingCertCriterion(ADMISSION_YEAR, CodingTargetType.EXEMPT))
@@ -48,7 +48,7 @@ class CodingAltCoursePolicyTest {
         );
 
         // when
-        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses);
+        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, userDept, completedCourses);
 
         // then
         assertThat(result).isFalse();
@@ -58,9 +58,9 @@ class CodingAltCoursePolicyTest {
     @DisplayName("코딩 전공자인 경우 대체과목이 최소 기준 학점(B0) 이상이면 코딩 인증을 통과 처리한다.")
     void isSatisfied_ByAltCourse_codingMajor_alt1AtLeastB0_pass() {
         // given
-        GraduationDepartmentInfo deptInfo
+        GraduationDepartmentInfo userDept
             = GraduationDepartmentInfoFixture.createDepartmentInfo(ADMISSION_YEAR, CodingTargetType.CODING_MAJOR);
-        User user = UserFixture.singleMajorUser(ADMISSION_YEAR, deptInfo);
+        User user = UserFixture.singleMajorUser(ADMISSION_YEAR, userDept);
 
         GraduationCheckCertResult certResult = GraduationCheckCertResultFixture.createCertResult(
             user,
@@ -79,7 +79,7 @@ class CodingAltCoursePolicyTest {
         );
 
         // when
-        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses);
+        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, userDept, completedCourses);
 
         // then
         assertThat(result).isTrue();
@@ -89,9 +89,9 @@ class CodingAltCoursePolicyTest {
     @DisplayName("코딩 전공자인 겅우 대체과목이 최소 기준 학점(B0)미만이면 통과 처리하지 않는다.")
     void isSatisfied_ByAltCourse_codingMajor_alt1BelowB0_notPass() {
         // given
-        GraduationDepartmentInfo deptInfo
+        GraduationDepartmentInfo userDept
             = GraduationDepartmentInfoFixture.createDepartmentInfo(ADMISSION_YEAR, CodingTargetType.CODING_MAJOR);
-        User user = UserFixture.singleMajorUser(ADMISSION_YEAR, deptInfo);
+        User user = UserFixture.singleMajorUser(ADMISSION_YEAR, userDept);
 
         GraduationCheckCertResult certResult = GraduationCheckCertResultFixture.createCertResult(
             user,
@@ -110,7 +110,7 @@ class CodingAltCoursePolicyTest {
         );
 
         // when
-        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses);
+        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, userDept, completedCourses);
 
         // then
         assertThat(result).isFalse();
@@ -120,9 +120,9 @@ class CodingAltCoursePolicyTest {
     @DisplayName("코딩 비전공자인 경우 대체과목1이 최소 기준 학점(B0) 이상이면 통과 처리한다.")
     void isSatisfied_ByAltCourse_nonMajor_alt1AtLeastB0_pass() {
         // given
-        GraduationDepartmentInfo deptInfo
+        GraduationDepartmentInfo userDept
             = GraduationDepartmentInfoFixture.createDepartmentInfo(ADMISSION_YEAR, CodingTargetType.NON_MAJOR);
-        User user = UserFixture.singleMajorUser(ADMISSION_YEAR, deptInfo);
+        User user = UserFixture.singleMajorUser(ADMISSION_YEAR, userDept);
 
         GraduationCheckCertResult certResult = GraduationCheckCertResultFixture.createCertResult(
             user,
@@ -141,7 +141,7 @@ class CodingAltCoursePolicyTest {
         );
 
         // when
-        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses);
+        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, userDept, completedCourses);
 
         // then
         assertThat(result).isTrue();
@@ -151,9 +151,9 @@ class CodingAltCoursePolicyTest {
     @DisplayName("코딩 비전공자인 경우 대체과목2가 P이면 통과 처리한다.")
     void isSatisfied_ByAltCourse_nonMajor_alt2Pass_pass() {
         // given
-        GraduationDepartmentInfo deptInfo
+        GraduationDepartmentInfo userDept
             = GraduationDepartmentInfoFixture.createDepartmentInfo(ADMISSION_YEAR, CodingTargetType.NON_MAJOR);
-        User user = UserFixture.singleMajorUser(ADMISSION_YEAR, deptInfo);
+        User user = UserFixture.singleMajorUser(ADMISSION_YEAR, userDept);
 
         GraduationCheckCertResult certResult = GraduationCheckCertResultFixture.createCertResult(
             user,
@@ -172,7 +172,7 @@ class CodingAltCoursePolicyTest {
         );
 
         // when
-        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses);
+        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, userDept, completedCourses);
 
         // then
         assertThat(result).isTrue();
@@ -182,9 +182,9 @@ class CodingAltCoursePolicyTest {
     @DisplayName("코딩 비전공자인 경우 대체과목2가 NP이면 통과 처리하지 않는다.")
     void isSatisfied_ByAltCourse_nonMajor_alt2NonPass_notPass() {
         // given
-        GraduationDepartmentInfo deptInfo
+        GraduationDepartmentInfo userDept
             = GraduationDepartmentInfoFixture.createDepartmentInfo(ADMISSION_YEAR, CodingTargetType.NON_MAJOR);
-        User user = UserFixture.singleMajorUser(ADMISSION_YEAR, deptInfo);
+        User user = UserFixture.singleMajorUser(ADMISSION_YEAR, userDept);
 
         GraduationCheckCertResult certResult = GraduationCheckCertResultFixture.createCertResult(
             user,
@@ -203,7 +203,7 @@ class CodingAltCoursePolicyTest {
         );
 
         // when
-        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses);
+        boolean result = codingAltCoursePolicy.isSatisfiedByAltCourse(user, userDept, completedCourses);
 
         // then
         assertThat(result).isFalse();

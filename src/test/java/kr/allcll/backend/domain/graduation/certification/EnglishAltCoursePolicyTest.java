@@ -33,9 +33,9 @@ class EnglishAltCoursePolicyTest {
     @DisplayName("영어 비전공자인 경우 대체과목을 이수했다면 통과 처리한다.")
     void isSatisfied_ByAltCourse_altCourseCreditEarned() {
         // given
-        GraduationDepartmentInfo deptInfo =
+        GraduationDepartmentInfo userDept =
             GraduationDepartmentInfoFixture.createDepartmentInfo(ADMISSION_YEAR, EnglishTargetType.NON_MAJOR);
-        User user = UserFixture.singleMajorUser(ADMISSION_YEAR, deptInfo);
+        User user = UserFixture.singleMajorUser(ADMISSION_YEAR, userDept);
 
         EnglishCertCriterion criterion = EnglishCertCriterionFixture.createNonMajorEnglishCertCriterion(ADMISSION_YEAR);
         given(englishCertCriterionRepository.findEnglishCertCriterion(ADMISSION_YEAR, EnglishTargetType.NON_MAJOR))
@@ -46,7 +46,7 @@ class EnglishAltCoursePolicyTest {
         );
 
         // when
-        boolean result = englishAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses);
+        boolean result = englishAltCoursePolicy.isSatisfiedByAltCourse(user, userDept, completedCourses);
 
         // then
         assertThat(result).isTrue();
@@ -56,9 +56,9 @@ class EnglishAltCoursePolicyTest {
     @DisplayName("대체과목 학수번호가 일치하지 않으면 통과 처리하지 않는다.")
     void isSatisfied_ByAltCourse_altCourseNotFound() {
         // given
-        GraduationDepartmentInfo deptInfo =
+        GraduationDepartmentInfo userDept =
             GraduationDepartmentInfoFixture.createDepartmentInfo(ADMISSION_YEAR, EnglishTargetType.NON_MAJOR);
-        User user = UserFixture.singleMajorUser(ADMISSION_YEAR, deptInfo);
+        User user = UserFixture.singleMajorUser(ADMISSION_YEAR, userDept);
 
         EnglishCertCriterion criterion = EnglishCertCriterionFixture.createNonMajorEnglishCertCriterion(ADMISSION_YEAR);
         given(englishCertCriterionRepository.findEnglishCertCriterion(ADMISSION_YEAR, EnglishTargetType.NON_MAJOR))
@@ -69,7 +69,7 @@ class EnglishAltCoursePolicyTest {
         );
 
         // when
-        boolean result = englishAltCoursePolicy.isSatisfiedByAltCourse(user, deptInfo, completedCourses);
+        boolean result = englishAltCoursePolicy.isSatisfiedByAltCourse(user, userDept, completedCourses);
 
         // then
         assertThat(result).isFalse();

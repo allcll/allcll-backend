@@ -45,17 +45,17 @@ public class CategoryCreditCalculator {
     ) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
-        GraduationDepartmentInfo primaryDeptInfo = graduationDepartmentInfoRepository
+        GraduationDepartmentInfo primaryuserDept = graduationDepartmentInfoRepository
             .findByAdmissionYearAndDeptNm(user.getAdmissionYear(), user.getDeptNm())
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND));
-        return calculateCategories(user.getAdmissionYear(), completedCourses, primaryDeptInfo, creditCriteria);
+        return calculateCategories(user.getAdmissionYear(), completedCourses, primaryuserDept, creditCriteria);
     }
 
     // 카테고리 별 학점 계산
     private List<GraduationCategory> calculateCategories(
         int admissionYear,
         List<CompletedCourse> completedCourses,
-        GraduationDepartmentInfo primaryDeptInfo,
+        GraduationDepartmentInfo primaryuserDept,
         List<CreditCriterion> creditCriteria
     ) {
         List<GraduationCategory> graduationCategories = new ArrayList<>();
@@ -75,7 +75,7 @@ public class CategoryCreditCalculator {
         }
 
         // 2. 균형교양 처리(복수 전공 시, 주전공 기준)
-        addBalanceRequiredIfNeeded(graduationCategories, completedCourses, primaryDeptInfo);
+        addBalanceRequiredIfNeeded(graduationCategories, completedCourses, primaryuserDept);
 
         // 3. 전체 이수 학점
         if (totalCriterion != null) {
@@ -143,9 +143,9 @@ public class CategoryCreditCalculator {
     private void addBalanceRequiredIfNeeded(
         List<GraduationCategory> categories,
         List<CompletedCourse> completedCourses,
-        GraduationDepartmentInfo deptInfo
+        GraduationDepartmentInfo userDept
     ) {
-        BalanceRequiredRule rule = findBalanceRequiredRule(deptInfo);
+        BalanceRequiredRule rule = findBalanceRequiredRule(userDept);
         // 균형교양이 면제인 경우
         if (rule == null || !rule.getRequired()) {
             return;
@@ -154,16 +154,16 @@ public class CategoryCreditCalculator {
         // 균형교양 학점 계산
         GraduationCategory balanceCategory = calculateBalanceRequired(
             completedCourses,
-            deptInfo,
+            userDept,
             rule
         );
         categories.add(balanceCategory);
     }
 
     // 균형 교양 규칙 조회
-    private BalanceRequiredRule findBalanceRequiredRule(GraduationDepartmentInfo deptInfo) {
-        Integer admissionYear = deptInfo.getAdmissionYear();
-        String deptNm = deptInfo.getDeptNm();
+    private BalanceRequiredRule findBalanceRequiredRule(GraduationDepartmentInfo userDept) {
+        Integer admissionYear = userDept.getAdmissionYear();
+        String deptNm = userDept.getDeptNm();
 
         // 입학년도 + 학과 기준으로 조회 시 규칙이 없으면 null 반환
         BalanceRequiredRule rule = balanceRequiredRuleRepository
@@ -182,11 +182,11 @@ public class CategoryCreditCalculator {
 
     private GraduationCategory calculateBalanceRequired(
         List<CompletedCourse> completedCourses,
-        GraduationDepartmentInfo deptInfo,
+        GraduationDepartmentInfo userDept,
         BalanceRequiredRule rule
     ) {
         // 1. 제외 영역 조회
-        Set<BalanceRequiredArea> excludedAreas = getExcludedAreas(deptInfo);
+        Set<BalanceRequiredArea> excludedAreas = getExcludedAreas(userDept);
 
         // 2. 이수한 균형교양 과목의 영역 수집
         Set<BalanceRequiredArea> completedAreas = completedCourses.stream()
@@ -224,9 +224,9 @@ public class CategoryCreditCalculator {
         );
     }
 
-    private Set<BalanceRequiredArea> getExcludedAreas(GraduationDepartmentInfo deptInfo) {
-        Integer admissionYear = deptInfo.getAdmissionYear();
-        DeptGroup deptGroup = deptInfo.getDeptGroup();
+    private Set<BalanceRequiredArea> getExcludedAreas(GraduationDepartmentInfo userDept) {
+        Integer admissionYear = userDept.getAdmissionYear();
+        DeptGroup deptGroup = userDept.getDeptGroup();
 
         return balanceRequiredAreaExclusionRepository
             .findAllByAdmissionYearAndDeptGroup(admissionYear, deptGroup)
