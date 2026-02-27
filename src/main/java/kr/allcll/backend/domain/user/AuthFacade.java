@@ -1,6 +1,6 @@
 package kr.allcll.backend.domain.user;
 
-import kr.allcll.backend.domain.graduation.check.cert.GraduationCertDecisionResolver;
+import kr.allcll.backend.domain.graduation.check.cert.GraduationCertResolver;
 import kr.allcll.backend.domain.graduation.check.cert.GraduationCertService;
 import kr.allcll.backend.domain.graduation.check.cert.dto.GraduationCertInfo;
 import kr.allcll.backend.domain.user.dto.LoginRequest;
@@ -22,7 +22,7 @@ public class AuthFacade {
     private final UserService userService;
     private final ToscAuthService toscAuthService;
     private final GraduationCertService graduationCertService;
-    private final GraduationCertDecisionResolver graduationCertDecisionResolver;
+    private final GraduationCertResolver graduationCertResolver;
 
     @Transactional
     public LoginResult login(LoginRequest loginRequest) {
@@ -33,7 +33,7 @@ public class AuthFacade {
         User user = userService.findOrCreate(userInfo);
 
         try {
-            GraduationCertInfo certInfo = graduationCertDecisionResolver.resolve(user, client);
+            GraduationCertInfo certInfo = graduationCertResolver.resolve(user, client);
             graduationCertService.createOrUpdate(user, certInfo);
         } catch (Exception exception) {
             log.error("[GraduationCert] 인증 정보 저장 중 오류 발생 (유저 ID: {}): {}", user.getId(), exception.getMessage());

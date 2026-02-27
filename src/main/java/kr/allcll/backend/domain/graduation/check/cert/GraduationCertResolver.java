@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class GraduationCertDecisionResolver {
+public class GraduationCertResolver {
 
     private final CompletedCourseRepository completedCourseRepository;
     private final GraduationCodingCertFetcher graduationCodingCertFetcher;
@@ -30,7 +30,6 @@ public class GraduationCertDecisionResolver {
     private final GraduationCertificationAltCoursePolicy englishAltCoursePolicy;
     private final GraduationDepartmentInfoRepository graduationDepartmentInfoRepository;
     private final GraduationCheckCertResultRepository graduationCheckCertResultRepository;
-
 
     public GraduationCertInfo resolve(User user, OkHttpClient client) {
         GraduationDepartmentInfo userDept = graduationDepartmentInfoRepository
@@ -80,8 +79,7 @@ public class GraduationCertDecisionResolver {
     private boolean resolveCodingPassed(
         User user,
         OkHttpClient client,
-        GraduationDepartmentInfo userDept
-        ,
+        GraduationDepartmentInfo userDept,
         List<CompletedCourse> completedCourses,
         GraduationCheckCertResult certResult
     ) {
