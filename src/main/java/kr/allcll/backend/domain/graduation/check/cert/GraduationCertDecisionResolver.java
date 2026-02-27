@@ -104,25 +104,21 @@ public class GraduationCertDecisionResolver {
         OkHttpClient client,
         GraduationCheckCertResult certResult
     ) {
-        ClassicsCounts fallbackCounts = fallbackCounts(certResult);
+        ClassicsCounts fallbackCounts = ClassicsCounts.fallback(certResult);
 
         if (isClassicsAlreadyPassed(certResult)) {
-            return new ClassicsResult(true, fallbackCounts);
+            return ClassicsResult.passedWith(fallbackCounts);
         }
 
         try {
             ClassicsResult classicsResult = graduationClassicsCertFetcher.fetchClassics(client);
             if (classicsResult == null) {
-                return new ClassicsResult(false, fallbackCounts);
+                return ClassicsResult.empty();
             }
-            ClassicsCounts classicsCounts = classicsResult.counts();
-            if (classicsCounts == null) {
-                classicsCounts = fallbackCounts;
-            }
-            return new ClassicsResult(classicsResult.passed(), classicsCounts);
+            return classicsResult.withFallbackCounts(fallbackCounts);
         } catch (Exception e) {
             log.error("[졸업요건검사] 고전인증 여부를 불러오지 못했습니다.", e);
-            return new ClassicsResult(isClassicsAlreadyPassed(certResult), fallbackCounts);
+            return ClassicsResult.failedWith(fallbackCounts);
         }
     }
 
@@ -145,17 +141,5 @@ public class GraduationCertDecisionResolver {
             return false;
         }
         return Boolean.TRUE.equals(certResult.getIsClassicsCertPassed());
-    }
-
-    private ClassicsCounts fallbackCounts(GraduationCheckCertResult certResult) {
-        if (certResult == null) {
-            return new ClassicsCounts(0, 0, 0, 0);
-        }
-        return new ClassicsCounts(
-            certResult.getMyCountWestern(),
-            certResult.getMyCountEastern(),
-            certResult.getMyCountEasternAndWestern(),
-            certResult.getMyCountScience()
-        );
     }
 }
