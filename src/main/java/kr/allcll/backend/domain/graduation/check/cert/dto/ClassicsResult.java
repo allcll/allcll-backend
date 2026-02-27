@@ -1,6 +1,9 @@
 package kr.allcll.backend.domain.graduation.check.cert.dto;
 
-public record ClassicsResult(boolean passed, ClassicsCounts counts) {
+public record ClassicsResult(
+    boolean passed,
+    ClassicsCounts counts
+) {
 
     public static ClassicsResult empty() {
         return new ClassicsResult(false, ClassicsCounts.empty());
