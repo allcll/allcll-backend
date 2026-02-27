@@ -3,6 +3,7 @@ package kr.allcll.backend.domain.graduation.check.excel;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -12,8 +13,8 @@ public class CompletedCoursePersistenceService {
 
     private final CompletedCourseRepository completedCourseRepository;
 
-    @Transactional
-    public void saveAllCompletedCourse(Long userId, List<CompletedCourseDto> completedCourses) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public List<CompletedCourse> saveAllCompletedCourse(Long userId, List<CompletedCourseDto> completedCourses) {
         completedCourseRepository.deleteByUserId(userId);
 
         List<CompletedCourse> entities = completedCourses.stream()
@@ -21,6 +22,6 @@ public class CompletedCoursePersistenceService {
             .map(dto -> dto.toEntity(userId))
             .toList();
 
-        completedCourseRepository.saveAll(entities);
+        return completedCourseRepository.saveAll(entities);
     }
 }

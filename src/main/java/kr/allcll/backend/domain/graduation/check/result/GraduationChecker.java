@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import kr.allcll.backend.domain.graduation.MajorType;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
-import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseRepository;
 import kr.allcll.backend.domain.graduation.check.result.dto.CertResult;
 import kr.allcll.backend.domain.graduation.check.result.dto.CheckResult;
 import kr.allcll.backend.domain.graduation.check.result.dto.CriterionKey;
@@ -33,15 +32,13 @@ public class GraduationChecker {
 
     private final UserRepository userRepository;
     private final CreditCriterionRepository creditCriterionRepository;
-    private final CompletedCourseRepository completedCourseRepository;
     private final DoubleCreditCriterionRepository doubleCreditCriterionRepository;
 
-    public CheckResult calculate(Long userId) {
+    public CheckResult calculate(Long userId, List<CompletedCourse> completedCourses) {
         // 사용자의 졸업 요건 기준 조회
         List<CreditCriterion> creditCriteria = resolveCreditCriteria(userId);
 
         // 이수구분별 학점 계산
-        List<CompletedCourse> completedCourses = completedCourseRepository.findAllByUserId(userId);
         List<GraduationCategory> categoryResults = categoryCalculator.calculateCategoryResults(
             userId,
             completedCourses,

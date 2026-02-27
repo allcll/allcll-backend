@@ -1,6 +1,7 @@
 package kr.allcll.backend.domain.graduation.check.result;
 
 import java.util.List;
+import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseDto;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCoursePersistenceService;
 import kr.allcll.backend.domain.graduation.check.excel.GradeExcelParser;
@@ -32,9 +33,10 @@ public class GraduationCheckService {
         // 1. 엑셀 파싱
         List<CompletedCourseDto> completedCourseDtos = gradeExcelParser.parse(gradeExcel);
         // 2. 이수과목 DB 저장
-        completedCoursePersistenceService.saveAllCompletedCourse(userId, completedCourseDtos);
+        List<CompletedCourse> savedCourses
+            = completedCoursePersistenceService.saveAllCompletedCourse(userId, completedCourseDtos);
         // 3. 졸업 요건 검사 수행
-        CheckResult checkResult = graduationChecker.calculate(userId);
+        CheckResult checkResult = graduationChecker.calculate(userId, savedCourses);
         // 4. 검사 결과 저장
         graduationCheckPersistenceService.saveCheckResult(userId, checkResult);
     }
