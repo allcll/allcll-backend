@@ -17,7 +17,6 @@ public class CompletedCoursePersistenceService {
         completedCourseRepository.deleteByUserId(userId);
 
         List<CompletedCourse> entities = completedCourses.stream()
-            .filter(CompletedCourseDto::isCreditEarned)
             .map(dto -> dto.toEntity(userId))
             .toList();
 
