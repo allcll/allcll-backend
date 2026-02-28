@@ -5,7 +5,6 @@ import kr.allcll.backend.domain.graduation.certification.GraduationCertification
 import kr.allcll.backend.domain.graduation.check.cert.GraduationCheckCertResult;
 import kr.allcll.backend.domain.graduation.check.cert.GraduationCheckCertResultRepository;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
-import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseRepository;
 import kr.allcll.backend.domain.graduation.check.result.dto.CertResult;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfoRepository;
@@ -23,21 +22,20 @@ import org.springframework.transaction.annotation.Transactional;
 public class CertificationChecker {
 
     private final UserRepository userRepository;
-    private final CompletedCourseRepository completedCourseRepository;
     private final GraduationCertificationAltCoursePolicy codingAltCoursePolicy;
     private final GraduationCertificationAltCoursePolicy englishAltCoursePolicy;
     private final GraduationDepartmentInfoRepository graduationDepartmentInfoRepository;
     private final GraduationCheckCertResultRepository graduationCheckCertResultRepository;
 
     @Transactional
-    public CertResult checkAndUpdate(Long userId) {
-        applyAltCourse(userId);
+    public CertResult checkAndUpdate(Long userId, List<CompletedCourse> earnedCourses) {
+        applyAltCourse(userId, earnedCourses);
         GraduationCheckCertResult certResult = graduationCheckCertResultRepository.findByUserId(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.GRADUATION_CERT_NOT_FOUND));
         return CertResult.from(certResult);
     }
 
-    private void applyAltCourse(Long userId) {
+    private void applyAltCourse(Long userId, List<CompletedCourse> earnedCourses) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
 
@@ -48,14 +46,12 @@ public class CertificationChecker {
         GraduationCheckCertResult certResult = graduationCheckCertResultRepository.findByUserId(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.GRADUATION_CERT_NOT_FOUND));
 
-        List<CompletedCourse> completedCourses = completedCourseRepository.findAllByUserId(userId);
-
         boolean isChanged = false;
-        if (englishAltCoursePolicy.isSatisfiedByAltCourse(user, userDept, completedCourses)) {
+        if (englishAltCoursePolicy.isSatisfiedByAltCourse(user, userDept, earnedCourses)) {
             certResult.passEnglish();
             isChanged = true;
         }
-        if (codingAltCoursePolicy.isSatisfiedByAltCourse(user, userDept, completedCourses)) {
+        if (codingAltCoursePolicy.isSatisfiedByAltCourse(user, userDept, earnedCourses)) {
             certResult.passCoding();
             isChanged = true;
         }

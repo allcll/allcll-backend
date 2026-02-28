@@ -15,19 +15,19 @@ public class EnglishAltCoursePolicy implements GraduationCertificationAltCourseP
     public boolean isSatisfiedByAltCourse(
         User user,
         GraduationDepartmentInfo departmentInfo,
-        List<CompletedCourse> completedCourses
+        List<CompletedCourse> earnedCourses
     ) {
         EnglishTargetType englishTargetType = departmentInfo.getEnglishTargetType();
 
         return englishCertCriterionRepository
             .findEnglishCertCriterion(user.getAdmissionYear(), englishTargetType)
             .map(EnglishCertCriterion::getAltCuriNo)
-            .filter(altCuriNo -> isAltCourseCompleted(completedCourses, altCuriNo))
+            .filter(altCuriNo -> isAltCourseCompleted(earnedCourses, altCuriNo))
             .isPresent();
     }
 
-    private boolean isAltCourseCompleted(List<CompletedCourse> completedCourses, String altCuriNo) {
-        return completedCourses.stream()
+    private boolean isAltCourseCompleted(List<CompletedCourse> earnedCourses, String altCuriNo) {
+        return earnedCourses.stream()
             .map(CompletedCourse::getCuriNo)
             .anyMatch(altCuriNo::equals);
     }
