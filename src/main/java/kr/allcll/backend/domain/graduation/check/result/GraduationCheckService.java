@@ -26,7 +26,6 @@ public class GraduationCheckService {
     private final CompletedCoursePersistenceService completedCoursePersistenceService;
     private final GraduationCheckPersistenceService graduationCheckPersistenceService;
 
-    @Transactional
     public void checkGraduationRequirements(Long userId, MultipartFile gradeExcel) {
         validateExcelFile(gradeExcel);
 
