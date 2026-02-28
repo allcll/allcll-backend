@@ -13,11 +13,11 @@ public class CompletedCoursePersistenceService {
     private final CompletedCourseRepository completedCourseRepository;
 
     @Transactional
-    public List<CompletedCourse> saveAllCompletedCourse(Long userId, List<CompletedCourseDto> completedCourseDtos) {
+    public List<CompletedCourse> saveAllCompletedCourse(Long userId, List<CompletedCourseDto> parsedCourses) {
         completedCourseRepository.deleteByUserId(userId);
 
-        List<CompletedCourse> completedCourses = completedCourseDtos.stream()
-            .map(completedCourseDto -> completedCourseDto.toEntity(userId))
+        List<CompletedCourse> completedCourses = parsedCourses.stream()
+            .map(parsedCourse -> parsedCourse.toEntity(userId))
             .toList();
 
         return completedCourseRepository.saveAll(completedCourses);

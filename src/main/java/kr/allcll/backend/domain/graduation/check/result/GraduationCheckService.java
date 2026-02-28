@@ -28,10 +28,10 @@ public class GraduationCheckService {
         validateExcelFile(gradeExcel);
 
         // 1. 엑셀 파싱
-        List<CompletedCourseDto> completedCourseDtos = gradeExcelParser.parse(gradeExcel);
+        List<CompletedCourseDto> parsedCourses = gradeExcelParser.parse(gradeExcel);
         // 2. 이수과목 DB 저장
         List<CompletedCourse> savedCourses
-            = completedCoursePersistenceService.saveAllCompletedCourse(userId, completedCourseDtos);
+            = completedCoursePersistenceService.saveAllCompletedCourse(userId, parsedCourses);
         // 3. 졸업 요건 검사 수행
         CheckResult checkResult = graduationChecker.calculate(userId, savedCourses);
         // 4. 검사 결과 저장
