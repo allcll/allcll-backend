@@ -1,5 +1,6 @@
 package kr.allcll.backend.domain.graduation.check.result;
 
+import kr.allcll.backend.domain.graduation.check.result.dto.CompletedCoursesResponse;
 import kr.allcll.backend.domain.graduation.check.result.dto.GraduationCheckResponse;
 import kr.allcll.backend.support.web.Auth;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,12 @@ public class GraduationCheckApi {
     @GetMapping("/api/graduation/check")
     public ResponseEntity<GraduationCheckResponse> getLatestCheckResult(@Auth Long userId) {
         GraduationCheckResponse response = graduationCheckService.getCheckResult(userId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/api/graduation/courses")
+    public ResponseEntity<CompletedCoursesResponse> getAllEarnedCourses(@Auth Long userId) {
+        CompletedCoursesResponse response = graduationCheckService.getAllEarnedCourses(userId);
         return ResponseEntity.ok(response);
     }
 }
