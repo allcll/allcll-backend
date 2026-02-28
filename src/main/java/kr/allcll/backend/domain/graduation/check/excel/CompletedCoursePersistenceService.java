@@ -22,4 +22,8 @@ public class CompletedCoursePersistenceService {
 
         return completedCourseRepository.saveAll(completedCourses);
     }
+
+    public List<CompletedCourse> getCompletedCourses(Long userId) {
+        return completedCourseRepository.findAllByUserId(userId);
+    }
 }

@@ -6,6 +6,7 @@ import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseDto;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCoursePersistenceService;
 import kr.allcll.backend.domain.graduation.check.excel.GradeExcelParser;
 import kr.allcll.backend.domain.graduation.check.result.dto.CheckResult;
+import kr.allcll.backend.domain.graduation.check.result.dto.CompletedCoursesResponse;
 import kr.allcll.backend.domain.graduation.check.result.dto.GraduationCheckResponse;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
@@ -54,5 +55,10 @@ public class GraduationCheckService {
         if (filename == null || !filename.endsWith(".xlsx")) {
             throw new AllcllException(AllcllErrorCode.INVALID_FILE_TYPE);
         }
+    }
+
+    public CompletedCoursesResponse getAllEarnedCourses(Long userId) {
+        List<CompletedCourse> completedCourses = completedCoursePersistenceService.getCompletedCourses(userId);
+        return CompletedCoursesResponse.from(completedCourses);
     }
 }
