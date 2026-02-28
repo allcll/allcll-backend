@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import kr.allcll.backend.domain.graduation.MajorType;
-import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseDto;
+import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
 import kr.allcll.backend.domain.graduation.check.result.dto.CertResult;
 import kr.allcll.backend.domain.graduation.check.result.dto.CheckResult;
 import kr.allcll.backend.domain.graduation.check.result.dto.CriterionKey;
@@ -16,8 +16,6 @@ import kr.allcll.backend.domain.graduation.credit.CreditCriterion;
 import kr.allcll.backend.domain.graduation.credit.CreditCriterionRepository;
 import kr.allcll.backend.domain.graduation.credit.DoubleCreditCriterion;
 import kr.allcll.backend.domain.graduation.credit.DoubleCreditCriterionRepository;
-import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
-import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfoRepository;
 import kr.allcll.backend.domain.user.User;
 import kr.allcll.backend.domain.user.UserRepository;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
@@ -33,26 +31,29 @@ public class GraduationChecker {
     private final CertificationChecker certificationChecker;
 
     private final UserRepository userRepository;
-    private final GraduationDepartmentInfoRepository graduationDepartmentInfoRepository;
     private final CreditCriterionRepository creditCriterionRepository;
     private final DoubleCreditCriterionRepository doubleCreditCriterionRepository;
 
-    public CheckResult calculate(Long userId, List<CompletedCourseDto> completedCourses) {
+    public CheckResult calculate(Long userId, List<CompletedCourse> savedCourses) {
+        List<CompletedCourse> earnedCourses = savedCourses.stream()
+            .filter(CompletedCourse::isEarned)
+            .toList();
+
         // 사용자의 졸업 요건 기준 조회
         List<CreditCriterion> creditCriteria = resolveCreditCriteria(userId);
 
         // 이수구분별 학점 계산
         List<GraduationCategory> categoryResults = categoryCalculator.calculateCategoryResults(
             userId,
-            completedCourses,
+            earnedCourses,
             creditCriteria
         );
 
         // 총 학점 정보 추출 (엑셀에서 직접 합산)
-        TotalSummary totalSummary = summarizeTotalCredits(completedCourses, categoryResults);
+        TotalSummary totalSummary = summarizeTotalCredits(earnedCourses, categoryResults);
 
         // 졸업인증제도 검사
-        CertResult certResult = certificationChecker.checkAndUpdate(userId, completedCourses);
+        CertResult certResult = certificationChecker.checkAndUpdate(userId, earnedCourses);
         boolean isGraduatable = canGraduate(categoryResults, certResult);
 
         return new CheckResult(
@@ -63,14 +64,6 @@ public class GraduationChecker {
             categoryResults,
             certResult
         );
-    }
-
-    private GraduationDepartmentInfo findPrimaryDepartmentInfo(User user) {
-        int admissionYear = user.getAdmissionYear();
-        String deptNm = user.getDeptNm();
-        return graduationDepartmentInfoRepository
-            .findByAdmissionYearAndDeptNm(admissionYear, deptNm)
-            .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND));
     }
 
     private List<CreditCriterion> resolveCreditCriteria(Long userId) {
@@ -159,11 +152,10 @@ public class GraduationChecker {
     }
 
     private TotalSummary summarizeTotalCredits(
-        List<CompletedCourseDto> completedCourses,
+        List<CompletedCourse> earnedCourses,
         List<GraduationCategory> categories
     ) {
-
-        double totalCredits = calculateTotalCredits(completedCourses);
+        double totalCredits = calculateTotalCredits(earnedCourses);
 
         GraduationCategory totalCategory = categories.stream()
             .filter(category -> category.categoryType() == CategoryType.TOTAL_COMPLETION)
@@ -191,10 +183,9 @@ public class GraduationChecker {
         return new TotalSummary(totalCredits, requiredCredits, remainingCredits);
     }
 
-    private double calculateTotalCredits(List<CompletedCourseDto> completedCourses) {
+    private double calculateTotalCredits(List<CompletedCourse> completedCourses) {
         return completedCourses.stream()
-            .filter(CompletedCourseDto::isCreditEarned)
-            .mapToDouble(CompletedCourseDto::credits)
+            .mapToDouble(CompletedCourse::getCredits)
             .sum();
     }
 

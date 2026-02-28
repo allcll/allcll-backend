@@ -193,11 +193,12 @@ public class GraduationCheckCertResult {
 
     public void reCalculate() {
         int newPassedCount = this.graduationCertRuleType.calculatePassedCount(
-            this.isEnglishCertPassed,
-            this.isClassicsCertPassed,
-            this.isCodingCertPassed
+            Boolean.TRUE.equals(this.isEnglishCertPassed),
+            Boolean.TRUE.equals(this.isClassicsCertPassed),
+            Boolean.TRUE.equals(this.isCodingCertPassed)
         );
         this.passedCount = newPassedCount;
+        this.requiredPassCount = this.graduationCertRuleType.getRequiredPassCount();
         this.isSatisfied = this.graduationCertRuleType.isSatisfied(newPassedCount);
     }
 }

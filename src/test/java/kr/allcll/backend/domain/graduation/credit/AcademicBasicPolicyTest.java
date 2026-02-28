@@ -6,7 +6,7 @@ import static org.mockito.BDDMockito.given;
 import java.util.List;
 import kr.allcll.backend.domain.graduation.MajorScope;
 import kr.allcll.backend.domain.graduation.MajorType;
-import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseDto;
+import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,14 +31,16 @@ class AcademicBasicPolicyTest {
         // given
         String departmentName = "컴퓨터공학과";
         Integer admissionYear = 2021;
-        CompletedCourseDto course = new CompletedCourseDto(
+        CompletedCourse course = new CompletedCourse(
+            1L,
             "123456",
             "알고리즘및실습",
             CategoryType.MAJOR_BASIC,
             "",
             3.0,
             "A+",
-            MajorScope.PRIMARY
+            MajorScope.PRIMARY,
+            true
         );
         CreditCriterion criterion = createAcademicBasicCreditCriterion(departmentName, admissionYear);
 
@@ -56,14 +58,16 @@ class AcademicBasicPolicyTest {
         String courseName = "공학설계기초";
         String departmentName = "컴퓨터공학과";
         Integer admissionYear = 2021;
-        CompletedCourseDto course = new CompletedCourseDto(
+        CompletedCourse course = new CompletedCourse(
+            1L,
             "123456",
             courseName,
             CategoryType.ACADEMIC_BASIC,
             "",
             3.0,
             "A+",
-            MajorScope.PRIMARY
+            MajorScope.PRIMARY,
+            true
         );
         CreditCriterion criterion = createAcademicBasicCreditCriterion(departmentName, admissionYear);
 
@@ -90,14 +94,16 @@ class AcademicBasicPolicyTest {
         String departmentName = "컴퓨터공학과";
         Integer admissionYear = 2021;
 
-        CompletedCourseDto course = new CompletedCourseDto(
+        CompletedCourse course = new CompletedCourse(
+            1L,
             "123456",
             attendCourseName,
             CategoryType.ACADEMIC_BASIC,
             "",
             3.0,
             "A+",
-            MajorScope.PRIMARY
+            MajorScope.PRIMARY,
+            true
         );
         CreditCriterion criterion = createAcademicBasicCreditCriterion(departmentName, admissionYear);
 
@@ -134,14 +140,16 @@ class AcademicBasicPolicyTest {
         String departmentName = "컴퓨터공학과";
         Integer admissionYear = 2021;
         String courseName = "건환공기초창의설계";
-        CompletedCourseDto course = new CompletedCourseDto(
+        CompletedCourse course = new CompletedCourse(
+            1L,
             "123456",
             courseName,
             CategoryType.ACADEMIC_BASIC,
             "",
             3.0,
             "A+",
-            MajorScope.PRIMARY
+            MajorScope.PRIMARY,
+            true
         );
         CreditCriterion criterion = createAcademicBasicCreditCriterion(departmentName, admissionYear);
 
