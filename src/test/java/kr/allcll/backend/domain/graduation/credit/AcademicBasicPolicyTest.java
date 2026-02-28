@@ -39,7 +39,8 @@ class AcademicBasicPolicyTest {
             "",
             3.0,
             "A+",
-            MajorScope.PRIMARY
+            MajorScope.PRIMARY,
+            true
         );
         CreditCriterion criterion = createAcademicBasicCreditCriterion(departmentName, admissionYear);
 
@@ -65,7 +66,8 @@ class AcademicBasicPolicyTest {
             "",
             3.0,
             "A+",
-            MajorScope.PRIMARY
+            MajorScope.PRIMARY,
+            true
         );
         CreditCriterion criterion = createAcademicBasicCreditCriterion(departmentName, admissionYear);
 
@@ -100,7 +102,8 @@ class AcademicBasicPolicyTest {
             "",
             3.0,
             "A+",
-            MajorScope.PRIMARY
+            MajorScope.PRIMARY,
+            true
         );
         CreditCriterion criterion = createAcademicBasicCreditCriterion(departmentName, admissionYear);
 
@@ -145,7 +148,8 @@ class AcademicBasicPolicyTest {
             "",
             3.0,
             "A+",
-            MajorScope.PRIMARY
+            MajorScope.PRIMARY,
+            true
         );
         CreditCriterion criterion = createAcademicBasicCreditCriterion(departmentName, admissionYear);
 

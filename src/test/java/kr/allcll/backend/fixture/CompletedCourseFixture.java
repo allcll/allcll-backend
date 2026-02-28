@@ -15,7 +15,8 @@ public class CompletedCourseFixture {
             "",
             3.0,
             grade,
-            MajorScope.PRIMARY
+            MajorScope.PRIMARY,
+            true
         );
     }
 }
