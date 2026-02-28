@@ -51,6 +51,9 @@ public class CompletedCourse extends BaseEntity {
     @Column(name = "major_scope")
     private MajorScope majorScope;
 
+    @Column(name = "is_earned")
+    private boolean isEarned;
+
     public CompletedCourse(
         Long userId,
         String curiNo,
@@ -59,7 +62,8 @@ public class CompletedCourse extends BaseEntity {
         String selectedArea,
         Double credits,
         String grade,
-        MajorScope majorScope
+        MajorScope majorScope,
+        boolean isEarned
     ) {
         this.userId = userId;
         this.curiNo = curiNo;
@@ -69,5 +73,6 @@ public class CompletedCourse extends BaseEntity {
         this.credits = credits;
         this.grade = grade;
         this.majorScope = majorScope;
+        this.isEarned = isEarned;
     }
 }

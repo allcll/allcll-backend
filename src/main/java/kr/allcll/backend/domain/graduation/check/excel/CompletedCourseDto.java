@@ -46,7 +46,8 @@ public record CompletedCourseDto(
             selectedArea,
             credits,
             grade,
-            majorScope
+            majorScope,
+            isCreditEarned()
         );
     }
 
