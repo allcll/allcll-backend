@@ -191,6 +191,10 @@ public class GraduationCheckCertResult {
         this.isCodingCertPassed = true;
     }
 
+    public void passClassic() {
+        this.isClassicsCertPassed = true;
+    }
+
     public void reCalculate() {
         int newPassedCount = this.graduationCertRuleType.calculatePassedCount(
             Boolean.TRUE.equals(this.isEnglishCertPassed),
