@@ -1,8 +1,8 @@
 package kr.allcll.backend.domain.graduation.credit;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import kr.allcll.backend.domain.graduation.balance.dto.BalanceAreaCoursesResponse;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
 import kr.allcll.backend.domain.graduation.credit.dto.GraduationCategoryResponse;
@@ -29,16 +29,20 @@ public class UncompletedCourseFilter {
     }
 
     private Set<String> buildEarnedCuriNos(Integer admissionYear, List<CompletedCourse> earnedCourses) {
-        List<String> earnedCuriNms = earnedCourses.stream()
-            .map(CompletedCourse::getCuriNm)
-            .map(String::trim)
-            .filter(string -> !string.isBlank())
-            .distinct()
-            .toList();
+        Set<String> earnedCuriNos = new HashSet<>();
+        Set<String> earnedCuriNms = new HashSet<>();
 
-        Set<String> earnedCuriNos = earnedCourses.stream()
-            .map(CompletedCourse::getCuriNo)
-            .collect(Collectors.toSet());
+        for (CompletedCourse completedCourse : earnedCourses) {
+            String curiNo = completedCourse.getCuriNo();
+            earnedCuriNos.add(curiNo);
+
+            String curiNm = completedCourse.getCuriNm();
+            String trimmedCuriNm = curiNm.trim();
+            if (!trimmedCuriNm.isBlank()) {
+                earnedCuriNms.add(trimmedCuriNm);
+            }
+        }
+
         earnedCuriNos.addAll(courseReplacementResolver.resolveCurrentCuriNos(admissionYear, earnedCuriNms));
 
         return earnedCuriNos;

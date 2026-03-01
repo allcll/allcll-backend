@@ -3,6 +3,7 @@ package kr.allcll.backend.domain.graduation.credit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import kr.allcll.backend.domain.graduation.credit.dto.RequiredCourseResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +21,10 @@ public class CourseReplacementResolver {
 
     public List<RequiredCourseResponse> replaceDeprecatedSubject(Integer admissionYear,
         List<RequiredCourse> requiredCourses) {
-        List<String> legacyNamesToReplace = requiredCourses.stream()
+        Set<String> legacyNamesToReplace = requiredCourses.stream()
             .filter(this::isDeprecated)
             .map(RequiredCourse::getCuriNm)
-            .distinct()
-            .toList();
+            .collect(Collectors.toSet());
 
         Map<String, CourseReplacement> replacementByLegacyName = loadReplacementMap(admissionYear, legacyNamesToReplace);
         return requiredCourses.stream()
@@ -32,14 +32,16 @@ public class CourseReplacementResolver {
             .toList();
     }
 
-    public List<String> resolveCurrentCuriNos(Integer admissionYear, List<String> legacyNames) {
+    public List<String> resolveCurrentCuriNos(Integer admissionYear, Set<String> legacyNames) {
         return loadReplacementMap(admissionYear, legacyNames).values().stream()
             .map(CourseReplacement::getCurrentCuriNo)
             .toList();
     }
 
-    private Map<String, CourseReplacement> loadReplacementMap(Integer admissionYear,
-        List<String> legacyNamesToReplace) {
+    private Map<String, CourseReplacement> loadReplacementMap(
+        Integer admissionYear,
+        Set<String> legacyNamesToReplace
+    ) {
         if (legacyNamesToReplace.isEmpty()) {
             return new HashMap<>();
         }
