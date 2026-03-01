@@ -2,6 +2,8 @@ package kr.allcll.backend.domain.graduation.credit;
 
 import java.util.ArrayList;
 import java.util.List;
+import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
+import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseRepository;
 import kr.allcll.backend.domain.graduation.credit.dto.GraduationCategoriesResponse;
 import kr.allcll.backend.domain.graduation.credit.dto.GraduationCategoryResponse;
 import kr.allcll.backend.domain.graduation.credit.dto.GraduationContextResponse;
@@ -20,7 +22,9 @@ public class GraduationCategoryService {
 
     private final UserRepository userRepository;
     private final MajorCategoryResolver majorCategoryResolver;
+    private final UncompletedCourseFilter uncompletedCourseFilter;
     private final NonMajorCategoryResolver nonMajorCategoryResolver;
+    private final CompletedCourseRepository completedCourseRepository;
 
     public GraduationCategoriesResponse getAllCategories(Long userId) {
         User user = userRepository.findById(userId)
@@ -35,11 +39,13 @@ public class GraduationCategoryService {
             user.getDoubleDeptNm()
         );
 
-        List<GraduationCategoryResponse> graduationCategoryResponses = new ArrayList<>();
-        addNonMajorCategories(graduationCategoryResponses, user);
-        addMajorCategories(graduationCategoryResponses, user);
+        List<GraduationCategoryResponse> categories = new ArrayList<>();
+        addNonMajorCategories(categories, user);
+        addMajorCategories(categories, user);
 
-        return GraduationCategoriesResponse.of(graduationContextResponse, graduationCategoryResponses);
+        List<GraduationCategoryResponse> filteredCourses = filterUncompletedCourses(userId, user, categories);
+
+        return GraduationCategoriesResponse.of(graduationContextResponse, filteredCourses);
     }
 
     private void addNonMajorCategories(List<GraduationCategoryResponse> graduationCategoryResponses, User user) {
@@ -57,5 +63,18 @@ public class GraduationCategoryService {
             user
         );
         graduationCategoryResponses.addAll(majorCategories);
+    }
+
+    private List<GraduationCategoryResponse> filterUncompletedCourses(
+        Long userId,
+        User user,
+        List<GraduationCategoryResponse> categories
+    ) {
+        List<CompletedCourse> earnedCourses = completedCourseRepository.findAllByUserIdAndIsEarnedTrue(userId);
+        return uncompletedCourseFilter.filterUncompletedCourses(
+            user.getAdmissionYear(),
+            categories,
+            earnedCourses
+        );
     }
 }

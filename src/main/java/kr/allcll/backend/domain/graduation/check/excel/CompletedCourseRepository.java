@@ -20,4 +20,11 @@ public interface CompletedCourseRepository extends JpaRepository<CompletedCourse
         where c.userId = :userId
         """)
     void deleteByUserId(Long userId);
+
+    @Query("""
+        select c from CompletedCourse c
+        where c.userId = :userId
+        and c.isEarned = true
+        """)
+    List<CompletedCourse> findAllByUserIdAndIsEarnedTrue(Long userId);
 }
