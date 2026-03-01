@@ -75,4 +75,9 @@ public class CompletedCourse extends BaseEntity {
         this.majorScope = majorScope;
         this.isEarned = isEarned;
     }
+
+    public CompletedCourse updateAcademicBasic() {
+        this.categoryType = CategoryType.ACADEMIC_BASIC;
+        return this;
+    }
 }

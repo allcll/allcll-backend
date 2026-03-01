@@ -1,7 +1,7 @@
 package kr.allcll.backend.domain.graduation.credit;
 
 import java.util.Objects;
-import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseDto;
+import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -11,10 +11,10 @@ public class MajorBasicPolicy {
 
     public boolean matchesCriterionCategory(
         int admissionYear,
-        CompletedCourseDto course,
+        CompletedCourse completedCourse,
         CategoryType criterionCategoryType
     ) {
-        CategoryType courseCategoryType = course.categoryType();
+        CategoryType courseCategoryType = completedCourse.getCategoryType();
 
         if (Objects.equals(courseCategoryType, criterionCategoryType)) {
             return true;
@@ -23,18 +23,18 @@ public class MajorBasicPolicy {
         return shouldCountMajorBasicAsAcademicBasic(admissionYear, courseCategoryType, criterionCategoryType);
     }
 
-    public CompletedCourseDto normalizeForAcademicBasic(
+    public CompletedCourse normalizeForAcademicBasic(
         int admissionYear,
-        CompletedCourseDto course,
+        CompletedCourse completedCourse,
         CategoryType criterionCategoryType
     ) {
-        CategoryType courseCategoryType = course.categoryType();
+        CategoryType courseCategoryType = completedCourse.getCategoryType();
 
         if (shouldCountMajorBasicAsAcademicBasic(admissionYear, courseCategoryType, criterionCategoryType)) {
-            return course.toAcademicBasic();
+            return completedCourse.updateAcademicBasic();
         }
 
-        return course;
+        return completedCourse;
     }
 
     private boolean shouldCountMajorBasicAsAcademicBasic(
