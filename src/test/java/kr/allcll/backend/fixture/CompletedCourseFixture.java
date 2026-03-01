@@ -19,4 +19,18 @@ public class CompletedCourseFixture {
             true
         );
     }
+
+    public static CompletedCourse createCompletedCourse(CategoryType categoryType) {
+        return new CompletedCourse(
+            1L,
+            "1234",
+            "테스트과목",
+            categoryType,
+            "",
+            3.0,
+            "A+",
+            MajorScope.PRIMARY,
+            true
+        );
+    }
 }

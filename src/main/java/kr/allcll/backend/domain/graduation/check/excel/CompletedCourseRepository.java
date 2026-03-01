@@ -26,4 +26,10 @@ public interface CompletedCourseRepository extends JpaRepository<CompletedCourse
         where c.userId = :userId and c.curiNm = :curiNm
         """)
     List<String> findCompletedCourseGrade(Long userId, String curiNm);
+    @Query("""
+        select c from CompletedCourse c
+        where c.userId = :userId
+        and c.isEarned = true
+        """)
+    List<CompletedCourse> findEarnedCourses(Long userId);
 }
