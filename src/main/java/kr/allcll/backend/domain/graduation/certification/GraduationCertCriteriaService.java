@@ -36,10 +36,10 @@ public class GraduationCertCriteriaService {
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
         int admissionYear = user.getAdmissionYear();
 
-        GraduationDepartmentInfo primaryDeptInfo = findDepartment(admissionYear, user.getDeptCd());
+        GraduationDepartmentInfo primaryuserDept = findDepartment(admissionYear, user.getDeptCd());
 
-        EnglishTargetType englishTargetType = primaryDeptInfo.getEnglishTargetType();
-        CodingTargetType codingTargetType = primaryDeptInfo.getCodingTargetType();
+        EnglishTargetType englishTargetType = primaryuserDept.getEnglishTargetType();
+        CodingTargetType codingTargetType = primaryuserDept.getCodingTargetType();
 
         GraduationCertRule graduationCertRule = graduationCertRuleRepository.findByAdmissionYear(admissionYear)
             .orElseThrow(() ->
@@ -127,7 +127,7 @@ public class GraduationCertCriteriaService {
         }
 
         EnglishCertCriterion englishCertCriterion =
-            englishCertCriterionRepository.findByAdmissionYearAndEnglishTargetType(admissionYear, englishTargetType)
+            englishCertCriterionRepository.findEnglishCertCriterion(admissionYear, englishTargetType)
                 .orElseThrow(() -> new AllcllException(AllcllErrorCode.ENGLISH_CERT_CRITERIA_NOT_FOUND));
 
         EnglishCertAltCourseResponse englishCertAltCourse = EnglishCertAltCourseResponse.of(
@@ -169,7 +169,7 @@ public class GraduationCertCriteriaService {
             return null;
         }
 
-        CodingCertCriterion codingCertCriterion = codingCertCriterionRepository.findByAdmissionYearAndCodingTargetType(
+        CodingCertCriterion codingCertCriterion = codingCertCriterionRepository.findCodingCertCriterion(
                 admissionYear, codingTargetType)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.CODING_CERT_CRITERIA_NOT_FOUND));
 

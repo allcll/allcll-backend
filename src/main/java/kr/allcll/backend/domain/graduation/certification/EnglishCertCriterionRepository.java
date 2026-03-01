@@ -11,5 +11,5 @@ public interface EnglishCertCriterionRepository extends JpaRepository<EnglishCer
         where e.admissionYear = :admissionYear
         and e.englishTargetType = :englishTargetType
         """)
-    Optional<EnglishCertCriterion> findByAdmissionYearAndEnglishTargetType(int admissionYear, EnglishTargetType englishTargetType);
+    Optional<EnglishCertCriterion> findEnglishCertCriterion(int admissionYear, EnglishTargetType englishTargetType);
 }

@@ -11,7 +11,7 @@ import kr.allcll.backend.domain.graduation.balance.BalanceRequiredAreaExclusion;
 import kr.allcll.backend.domain.graduation.balance.BalanceRequiredAreaExclusionRepository;
 import kr.allcll.backend.domain.graduation.balance.BalanceRequiredRule;
 import kr.allcll.backend.domain.graduation.balance.BalanceRequiredRuleRepository;
-import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseDto;
+import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
 import kr.allcll.backend.domain.graduation.check.result.dto.GraduationCategory;
 import kr.allcll.backend.domain.graduation.credit.AcademicBasicPolicy;
 import kr.allcll.backend.domain.graduation.credit.CategoryType;
@@ -42,22 +42,22 @@ public class CategoryCreditCalculator {
 
     public List<GraduationCategory> calculateCategoryResults(
         Long userId,
-        List<CompletedCourseDto> completedCourses,
+        List<CompletedCourse> earnedCourses,
         List<CreditCriterion> creditCriteria
     ) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
-        GraduationDepartmentInfo primaryDeptInfo = graduationDepartmentInfoRepository
+        GraduationDepartmentInfo primaryuserDept = graduationDepartmentInfoRepository
             .findByAdmissionYearAndDeptNm(user.getAdmissionYear(), user.getDeptNm())
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND));
-        return calculateCategories(user.getAdmissionYear(), completedCourses, primaryDeptInfo, creditCriteria);
+        return calculateCategories(user.getAdmissionYear(), earnedCourses, primaryuserDept, creditCriteria);
     }
 
     // 카테고리 별 학점 계산
     private List<GraduationCategory> calculateCategories(
         int admissionYear,
-        List<CompletedCourseDto> completedCourses,
-        GraduationDepartmentInfo primaryDeptInfo,
+        List<CompletedCourse> earnedCourses,
+        GraduationDepartmentInfo primaryuserDept,
         List<CreditCriterion> creditCriteria
     ) {
         List<GraduationCategory> graduationCategories = new ArrayList<>();
@@ -72,12 +72,12 @@ public class CategoryCreditCalculator {
                 totalCriterion = creditCriterion;
                 continue;
             }
-            GraduationCategory category = calculateCategoryCredits(admissionYear, completedCourses, creditCriterion);
+            GraduationCategory category = calculateCategoryCredits(admissionYear, earnedCourses, creditCriterion);
             graduationCategories.add(category);
         }
 
         // 2. 균형교양 처리(복수 전공 시, 주전공 기준)
-        addBalanceRequiredIfNeeded(graduationCategories, completedCourses, primaryDeptInfo);
+        addBalanceRequiredIfNeeded(graduationCategories, earnedCourses, primaryuserDept);
 
         // 3. 전체 이수 학점
         if (totalCriterion != null) {
@@ -101,10 +101,10 @@ public class CategoryCreditCalculator {
     // 이수한 과목들에 대한 특정 이수구분의 학점 계산
     private GraduationCategory calculateCategoryCredits(
         int admissionYear,
-        List<CompletedCourseDto> completedCourses,
+        List<CompletedCourse> earnedCourses,
         CreditCriterion criterion
     ) {
-        double earnedCredits = completedCourses.stream()
+        double earnedCredits = earnedCourses.stream()
             .filter(course -> majorBasicPolicy.matchesCriterionCategory(admissionYear, course, criterion.getCategoryType()))
             .filter(course -> matchesMajorScope(course, criterion.getMajorScope()))
             .filter(course -> academicBasicPolicy.isRecentMajorAcademicBasic(
@@ -115,10 +115,10 @@ public class CategoryCreditCalculator {
                 !generalElectivePolicy.shouldExcludeFromGeneralElective(
                     admissionYear,
                     criterion.getCategoryType(),
-                    course.curiNo()
+                    course.getCuriNo()
                 )
             )
-            .mapToDouble(CompletedCourseDto::credits)
+            .mapToDouble(CompletedCourse::getCredits)
             .sum();
 
         int requiredCredits = criterion.getRequiredCredits();
@@ -138,19 +138,19 @@ public class CategoryCreditCalculator {
         );
     }
 
-    private boolean matchesMajorScope(CompletedCourseDto course, MajorScope criterionScope) {
-        if (course.majorScope() == null) {
+    private boolean matchesMajorScope(CompletedCourse course, MajorScope criterionScope) {
+        if (course.getMajorScope() == null) {
             return MajorScope.PRIMARY.equals(criterionScope);
         }
-        return course.majorScope() == criterionScope;
+        return course.getMajorScope() == criterionScope;
     }
 
     private void addBalanceRequiredIfNeeded(
         List<GraduationCategory> categories,
-        List<CompletedCourseDto> completedCourses,
-        GraduationDepartmentInfo deptInfo
+        List<CompletedCourse> earnedCourses,
+        GraduationDepartmentInfo userDept
     ) {
-        BalanceRequiredRule rule = findBalanceRequiredRule(deptInfo);
+        BalanceRequiredRule rule = findBalanceRequiredRule(userDept);
         // 균형교양이 면제인 경우
         if (rule == null || !rule.getRequired()) {
             return;
@@ -158,17 +158,17 @@ public class CategoryCreditCalculator {
 
         // 균형교양 학점 계산
         GraduationCategory balanceCategory = calculateBalanceRequired(
-            completedCourses,
-            deptInfo,
+            earnedCourses,
+            userDept,
             rule
         );
         categories.add(balanceCategory);
     }
 
     // 균형 교양 규칙 조회
-    private BalanceRequiredRule findBalanceRequiredRule(GraduationDepartmentInfo deptInfo) {
-        Integer admissionYear = deptInfo.getAdmissionYear();
-        String deptNm = deptInfo.getDeptNm();
+    private BalanceRequiredRule findBalanceRequiredRule(GraduationDepartmentInfo userDept) {
+        Integer admissionYear = userDept.getAdmissionYear();
+        String deptNm = userDept.getDeptNm();
 
         // 입학년도 + 학과 기준으로 조회 시 규칙이 없으면 null 반환
         BalanceRequiredRule rule = balanceRequiredRuleRepository
@@ -186,26 +186,26 @@ public class CategoryCreditCalculator {
     }
 
     private GraduationCategory calculateBalanceRequired(
-        List<CompletedCourseDto> completedCourses,
-        GraduationDepartmentInfo deptInfo,
+        List<CompletedCourse> earnedCourses,
+        GraduationDepartmentInfo userDept,
         BalanceRequiredRule rule
     ) {
         // 1. 제외 영역 조회
-        Set<BalanceRequiredArea> excludedAreas = getExcludedAreas(deptInfo);
+        Set<BalanceRequiredArea> excludedAreas = getExcludedAreas(userDept);
 
         // 2. 이수한 균형교양 과목의 영역 수집
-        Set<BalanceRequiredArea> completedAreas = completedCourses.stream()
-            .filter(course -> course.categoryType() == CategoryType.BALANCE_REQUIRED)
-            .map(CompletedCourseDto::selectedArea)
+        Set<BalanceRequiredArea> completedAreas = earnedCourses.stream()
+            .filter(course -> course.getCategoryType() == CategoryType.BALANCE_REQUIRED)
+            .map(CompletedCourse::getSelectedArea)
             .map(BalanceRequiredArea::fromSelectedArea)
             .filter(Objects::nonNull)
             .filter(area -> !excludedAreas.contains(area))
             .collect(Collectors.toSet());
 
         // 3. 이수 학점 계산
-        double earnedCredits = completedCourses.stream()
-            .filter(course -> course.categoryType() == CategoryType.BALANCE_REQUIRED)
-            .mapToDouble(CompletedCourseDto::credits)
+        double earnedCredits = earnedCourses.stream()
+            .filter(course -> course.getCategoryType() == CategoryType.BALANCE_REQUIRED)
+            .mapToDouble(CompletedCourse::getCredits)
             .sum();
         int requiredCredits = rule.getRequiredCredits();
         double remainingCredits = calculateRemainingCredits(requiredCredits, earnedCredits);
@@ -229,9 +229,9 @@ public class CategoryCreditCalculator {
         );
     }
 
-    private Set<BalanceRequiredArea> getExcludedAreas(GraduationDepartmentInfo deptInfo) {
-        Integer admissionYear = deptInfo.getAdmissionYear();
-        DeptGroup deptGroup = deptInfo.getDeptGroup();
+    private Set<BalanceRequiredArea> getExcludedAreas(GraduationDepartmentInfo userDept) {
+        Integer admissionYear = userDept.getAdmissionYear();
+        DeptGroup deptGroup = userDept.getDeptGroup();
 
         return balanceRequiredAreaExclusionRepository
             .findAllByAdmissionYearAndDeptGroup(admissionYear, deptGroup)

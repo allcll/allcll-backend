@@ -37,6 +37,20 @@ public record CompletedCourseDto(
         );
     }
 
+    public CompletedCourse toEntity(Long userId) {
+        return new CompletedCourse(
+            userId,
+            curiNo,
+            curiNm,
+            categoryType,
+            selectedArea,
+            credits,
+            grade,
+            majorScope,
+            isCreditEarned()
+        );
+    }
+
     public CompletedCourseDto toAcademicBasic() {
         return new CompletedCourseDto(
             this.curiNo,
