@@ -16,7 +16,6 @@ import kr.allcll.backend.domain.graduation.check.result.dto.GraduationCategory;
 import kr.allcll.backend.domain.graduation.credit.AcademicBasicPolicy;
 import kr.allcll.backend.domain.graduation.credit.CategoryType;
 import kr.allcll.backend.domain.graduation.credit.CreditCriterion;
-import kr.allcll.backend.domain.graduation.credit.GeneralElectivePolicy;
 import kr.allcll.backend.domain.graduation.credit.MajorBasicPolicy;
 import kr.allcll.backend.domain.graduation.department.DeptGroup;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
@@ -34,7 +33,6 @@ public class CategoryCreditCalculator {
 
     private final UserRepository userRepository;
     private final MajorBasicPolicy majorBasicPolicy;
-    private final GeneralElectivePolicy generalElectivePolicy;
     private final BalanceRequiredRuleRepository balanceRequiredRuleRepository;
     private final GraduationDepartmentInfoRepository graduationDepartmentInfoRepository;
     private final BalanceRequiredAreaExclusionRepository balanceRequiredAreaExclusionRepository;
@@ -111,13 +109,6 @@ public class CategoryCreditCalculator {
                 majorBasicPolicy.normalizeForAcademicBasic(admissionYear, course, criterion.getCategoryType()),
                 criterion
             ))
-            .filter(course ->
-                !generalElectivePolicy.shouldExcludeFromGeneralElective(
-                    admissionYear,
-                    criterion.getCategoryType(),
-                    course.getCuriNo()
-                )
-            )
             .mapToDouble(CompletedCourse::getCredits)
             .sum();
 
