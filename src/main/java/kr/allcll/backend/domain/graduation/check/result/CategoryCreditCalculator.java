@@ -45,17 +45,17 @@ public class CategoryCreditCalculator {
     ) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
-        GraduationDepartmentInfo primaryuserDept = graduationDepartmentInfoRepository
+        GraduationDepartmentInfo primaryUserDept = graduationDepartmentInfoRepository
             .findByAdmissionYearAndDeptNm(user.getAdmissionYear(), user.getDeptNm())
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND));
-        return calculateCategories(user.getAdmissionYear(), earnedCourses, primaryuserDept, creditCriteria);
+        return calculateCategories(user.getAdmissionYear(), earnedCourses, primaryUserDept, creditCriteria);
     }
 
     // 카테고리 별 학점 계산
     private List<GraduationCategory> calculateCategories(
         int admissionYear,
         List<CompletedCourse> earnedCourses,
-        GraduationDepartmentInfo primaryuserDept,
+        GraduationDepartmentInfo primaryUserDept,
         List<CreditCriterion> creditCriteria
     ) {
         List<GraduationCategory> graduationCategories = new ArrayList<>();
@@ -75,7 +75,7 @@ public class CategoryCreditCalculator {
         }
 
         // 2. 균형교양 처리(복수 전공 시, 주전공 기준)
-        addBalanceRequiredIfNeeded(graduationCategories, earnedCourses, primaryuserDept);
+        addBalanceRequiredIfNeeded(graduationCategories, earnedCourses, primaryUserDept);
 
         // 3. 전체 이수 학점
         if (totalCriterion != null) {
