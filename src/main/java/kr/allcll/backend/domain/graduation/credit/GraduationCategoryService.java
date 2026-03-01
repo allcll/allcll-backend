@@ -43,7 +43,7 @@ public class GraduationCategoryService {
         addNonMajorCategories(categories, user);
         addMajorCategories(categories, user);
 
-        List<GraduationCategoryResponse> filteredCourses = filterUncompletedCourses(userId, user, categories);
+        List<GraduationCategoryResponse> filteredCourses = filterUncompletedCourses(user, categories);
 
         return GraduationCategoriesResponse.of(graduationContextResponse, filteredCourses);
     }
@@ -66,11 +66,10 @@ public class GraduationCategoryService {
     }
 
     private List<GraduationCategoryResponse> filterUncompletedCourses(
-        Long userId,
         User user,
         List<GraduationCategoryResponse> categories
     ) {
-        List<CompletedCourse> earnedCourses = completedCourseRepository.findEarnedCourses(userId);
+        List<CompletedCourse> earnedCourses = completedCourseRepository.findEarnedCourses(user.getId());
         return uncompletedCourseFilter.filterUncompletedCourses(
             user.getAdmissionYear(),
             categories,
