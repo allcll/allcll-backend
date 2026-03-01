@@ -26,5 +26,5 @@ public interface CompletedCourseRepository extends JpaRepository<CompletedCourse
         where c.userId = :userId
         and c.isEarned = true
         """)
-    List<CompletedCourse> findAllByUserIdAndIsEarnedTrue(Long userId);
+    List<CompletedCourse> findEarnedCourses(Long userId);
 }

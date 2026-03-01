@@ -70,7 +70,7 @@ public class GraduationCategoryService {
         User user,
         List<GraduationCategoryResponse> categories
     ) {
-        List<CompletedCourse> earnedCourses = completedCourseRepository.findAllByUserIdAndIsEarnedTrue(userId);
+        List<CompletedCourse> earnedCourses = completedCourseRepository.findEarnedCourses(userId);
         return uncompletedCourseFilter.filterUncompletedCourses(
             user.getAdmissionYear(),
             categories,
