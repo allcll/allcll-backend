@@ -48,11 +48,12 @@ public class CategoryCreditCalculator {
         GraduationDepartmentInfo primaryUserDept = graduationDepartmentInfoRepository
             .findByAdmissionYearAndDeptNm(user.getAdmissionYear(), user.getDeptNm())
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND));
-        return calculateCategories(earnedCourses, primaryUserDept, creditCriteria);
+        return calculateCategories(user.getAdmissionYear(), earnedCourses, primaryUserDept, creditCriteria);
     }
 
     // 카테고리 별 학점 계산
     private List<GraduationCategory> calculateCategories(
+        int admissionYear,
         List<CompletedCourse> earnedCourses,
         GraduationDepartmentInfo primaryUserDept,
         List<CreditCriterion> creditCriteria
@@ -102,7 +103,8 @@ public class CategoryCreditCalculator {
         CreditCriterion criterion
     ) {
         double earnedCredits = earnedCourses.stream()
-            .filter(course -> majorBasicPolicy.matchesCriterionCategory(admissionYear, course, criterion.getCategoryType()))
+            .filter(
+                course -> majorBasicPolicy.matchesCriterionCategory(admissionYear, course, criterion.getCategoryType()))
             .filter(course -> matchesMajorScope(course, criterion.getMajorScope()))
             .filter(course -> academicBasicPolicy.isRecentMajorAcademicBasic(
                 majorBasicPolicy.normalizeForAcademicBasic(admissionYear, course, criterion.getCategoryType()),
