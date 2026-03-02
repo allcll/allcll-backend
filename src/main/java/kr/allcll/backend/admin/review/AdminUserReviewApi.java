@@ -15,7 +15,7 @@ public class AdminUserReviewApi {
     private final AdminRequestValidator validator;
     private final AdminUserReviewService adminUserReviewService;
 
-    @GetMapping("api/admin/review")
+    @GetMapping("/api/admin/review")
     public ResponseEntity<AdminUserReviewResponses> getReview(HttpServletRequest request) {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
