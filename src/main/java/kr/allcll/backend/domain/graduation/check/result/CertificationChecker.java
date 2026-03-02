@@ -1,6 +1,7 @@
 package kr.allcll.backend.domain.graduation.check.result;
 
 import java.util.List;
+import kr.allcll.backend.domain.graduation.certification.ClassicAltCoursePolicy;
 import kr.allcll.backend.domain.graduation.certification.GraduationCertificationAltCoursePolicy;
 import kr.allcll.backend.domain.graduation.check.cert.GraduationCheckCertResult;
 import kr.allcll.backend.domain.graduation.check.cert.GraduationCheckCertResultRepository;
@@ -24,6 +25,7 @@ public class CertificationChecker {
     private final UserRepository userRepository;
     private final GraduationCertificationAltCoursePolicy codingAltCoursePolicy;
     private final GraduationCertificationAltCoursePolicy englishAltCoursePolicy;
+    private final ClassicAltCoursePolicy classicAltCoursePolicy;
     private final GraduationDepartmentInfoRepository graduationDepartmentInfoRepository;
     private final GraduationCheckCertResultRepository graduationCheckCertResultRepository;
 
@@ -53,6 +55,10 @@ public class CertificationChecker {
         }
         if (codingAltCoursePolicy.isSatisfiedByAltCourse(user, userDept, earnedCourses)) {
             certResult.passCoding();
+            isChanged = true;
+        }
+        if (classicAltCoursePolicy.isSatisfiedByAltCourse(user)) {
+            certResult.passClassic();
             isChanged = true;
         }
         if (isChanged) {

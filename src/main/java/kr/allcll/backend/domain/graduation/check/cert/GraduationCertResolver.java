@@ -1,6 +1,7 @@
 package kr.allcll.backend.domain.graduation.check.cert;
 
 import java.util.List;
+import kr.allcll.backend.domain.graduation.certification.ClassicAltCoursePolicy;
 import kr.allcll.backend.domain.graduation.certification.GraduationCertificationAltCoursePolicy;
 import kr.allcll.backend.domain.graduation.check.cert.dto.ClassicsCounts;
 import kr.allcll.backend.domain.graduation.check.cert.dto.ClassicsResult;
@@ -28,6 +29,7 @@ public class GraduationCertResolver {
     private final GraduationClassicsCertFetcher graduationClassicsCertFetcher;
     private final GraduationCertificationAltCoursePolicy codingAltCoursePolicy;
     private final GraduationCertificationAltCoursePolicy englishAltCoursePolicy;
+    private final ClassicAltCoursePolicy classicAltCoursePolicy;
     private final GraduationDepartmentInfoRepository graduationDepartmentInfoRepository;
     private final GraduationCheckCertResultRepository graduationCheckCertResultRepository;
 
@@ -43,7 +45,7 @@ public class GraduationCertResolver {
 
         boolean englishPassed = resolveEnglishPassed(user, client, userDept, completedCourses, certResult);
         boolean codingPassed = resolveCodingPassed(user, client, userDept, completedCourses, certResult);
-        ClassicsResult classicsResult = resolveClassics(client, certResult);
+        ClassicsResult classicsResult = resolveClassics(user, client, certResult);
 
         return GraduationCertInfo.of(
             englishPassed,
@@ -100,6 +102,7 @@ public class GraduationCertResolver {
     }
 
     private ClassicsResult resolveClassics(
+        User user,
         OkHttpClient client,
         GraduationCheckCertResult certResult
     ) {
@@ -109,6 +112,15 @@ public class GraduationCertResolver {
             return ClassicsResult.passedWith(fallbackCounts);
         }
 
+        ClassicsResult classicsResult = fetchClassicsResultFromExternal(client, fallbackCounts);
+        if (classicsResult.passed()) {
+            return classicsResult;
+        }
+        boolean satisfiedByAltCourse = classicAltCoursePolicy.isSatisfiedByAltCourse(user);
+        return classicsResult.passedWith(satisfiedByAltCourse, classicsResult.counts());
+    }
+
+    private ClassicsResult fetchClassicsResultFromExternal(OkHttpClient client, ClassicsCounts fallbackCounts) {
         try {
             ClassicsResult classicsResult = graduationClassicsCertFetcher.fetchClassics(client);
             if (classicsResult == null) {

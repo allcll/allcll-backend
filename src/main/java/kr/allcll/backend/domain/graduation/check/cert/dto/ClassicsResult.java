@@ -13,6 +13,10 @@ public record ClassicsResult(
         return new ClassicsResult(true, fallbackCounts);
     }
 
+    public ClassicsResult passedWith(boolean passed, ClassicsCounts fallbackCounts) {
+        return new ClassicsResult(passed, fallbackCounts);
+    }
+
     public static ClassicsResult failedWith(ClassicsCounts fallbackCounts) {
         return new ClassicsResult(false, fallbackCounts);
     }
