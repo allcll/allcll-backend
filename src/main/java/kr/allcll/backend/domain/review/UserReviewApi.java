@@ -15,7 +15,7 @@ public class UserReviewApi {
 
     private final UserReviewService userReviewService;
 
-    @PostMapping("api/review")
+    @PostMapping("/api/review")
     public ResponseEntity<Void> createReview(
         @Auth Long userId,
         @RequestBody UserReviewRequest userReviewRequest
