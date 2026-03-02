@@ -81,6 +81,7 @@ public record CompletedCourseDto(
             case "균필" -> CategoryType.BALANCE_REQUIRED;
             case "기교", "기필" -> CategoryType.ACADEMIC_BASIC;
             case "교선", "교선1", "교선2" -> CategoryType.GENERAL_ELECTIVE;
+            case "교양" -> CategoryType.GENERAL;
             case "전필", "복필" -> CategoryType.MAJOR_REQUIRED;
             case "전선", "복선" -> CategoryType.MAJOR_ELECTIVE;
             case "전기" -> CategoryType.MAJOR_BASIC;
