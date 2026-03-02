@@ -21,7 +21,12 @@ public class UserReviewService {
     public void createReview(Long userId, UserReviewRequest userReviewRequest) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
-        UserReview review = new UserReview(user, userReviewRequest);
+        UserReview review = new UserReview(
+            user.getStudentId(),
+            userReviewRequest.rate(),
+            userReviewRequest.operationType(),
+            userReviewRequest.detail()
+        );
         userReviewRepository.save(review);
     }
 }
