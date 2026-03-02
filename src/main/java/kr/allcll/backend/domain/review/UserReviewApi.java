@@ -3,6 +3,7 @@ package kr.allcll.backend.domain.review;
 import kr.allcll.backend.domain.review.dto.UserReviewRequest;
 import kr.allcll.backend.support.web.Auth;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,6 +21,6 @@ public class UserReviewApi {
         @RequestBody UserReviewRequest userReviewRequest
     ) {
         userReviewService.createReview(userId, userReviewRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
