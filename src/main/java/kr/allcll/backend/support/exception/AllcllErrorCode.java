@@ -44,6 +44,7 @@ public enum AllcllErrorCode {
     GRADUATION_CHECK_NOT_FOUND(HttpStatus.NOT_FOUND, "졸업 요건 검사 결과를 찾을 수 없습니다."),
     BALANCE_REQUIRED_RULE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 연도의 균형교양 졸업요건 규칙을 찾을 수 없습니다."),
     BALANCE_REQUIRED_EXCLUSION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 연도의 균형교양 제외 영역 정보를 찾을 수 없습니다."),
+    OPERATION_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 서비스 명을 찾을 수 없습니다."),
 
     //409
     PIN_LIMIT_EXCEEDED(HttpStatus.CONFLICT, "이미 %d개의 핀을 등록했습니다."),
