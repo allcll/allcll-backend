@@ -33,8 +33,8 @@ public class GraduationCheckApi {
     }
 
     @GetMapping("/api/graduation/courses")
-    public ResponseEntity<CompletedCoursesResponse> getAllEarnedCourses(@Auth Long userId) {
-        CompletedCoursesResponse response = graduationCheckService.getAllEarnedCourses(userId);
+    public ResponseEntity<CompletedCoursesResponse> getAllCompletedCourses(@Auth Long userId) {
+        CompletedCoursesResponse response = graduationCheckService.getAllCompletedCourses(userId);
         return ResponseEntity.ok(response);
     }
 }

@@ -57,7 +57,7 @@ public class GraduationCheckService {
         }
     }
 
-    public CompletedCoursesResponse getAllEarnedCourses(Long userId) {
+    public CompletedCoursesResponse getAllCompletedCourses(Long userId) {
         List<CompletedCourse> completedCourses = completedCoursePersistenceService.getCompletedCourses(userId);
         return CompletedCoursesResponse.from(completedCourses);
     }

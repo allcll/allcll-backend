@@ -58,7 +58,7 @@ class GraduationCheckServiceTest {
         );
 
         // when
-        CompletedCoursesResponse allEarnedCourses = graduationCheckService.getAllEarnedCourses(user.getId());
+        CompletedCoursesResponse allEarnedCourses = graduationCheckService.getAllCompletedCourses(user.getId());
 
         // then
         assertThat(allEarnedCourses.value()).hasSize(2)
