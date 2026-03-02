@@ -16,7 +16,6 @@ import kr.allcll.backend.domain.graduation.check.result.dto.GraduationCategory;
 import kr.allcll.backend.domain.graduation.credit.AcademicBasicPolicy;
 import kr.allcll.backend.domain.graduation.credit.CategoryType;
 import kr.allcll.backend.domain.graduation.credit.CreditCriterion;
-import kr.allcll.backend.domain.graduation.credit.GeneralElectivePolicy;
 import kr.allcll.backend.domain.graduation.credit.MajorBasicPolicy;
 import kr.allcll.backend.domain.graduation.department.DeptGroup;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
@@ -34,7 +33,6 @@ public class CategoryCreditCalculator {
 
     private final UserRepository userRepository;
     private final MajorBasicPolicy majorBasicPolicy;
-    private final GeneralElectivePolicy generalElectivePolicy;
     private final BalanceRequiredRuleRepository balanceRequiredRuleRepository;
     private final GraduationDepartmentInfoRepository graduationDepartmentInfoRepository;
     private final BalanceRequiredAreaExclusionRepository balanceRequiredAreaExclusionRepository;
@@ -47,17 +45,17 @@ public class CategoryCreditCalculator {
     ) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
-        GraduationDepartmentInfo primaryuserDept = graduationDepartmentInfoRepository
+        GraduationDepartmentInfo primaryUserDept = graduationDepartmentInfoRepository
             .findByAdmissionYearAndDeptNm(user.getAdmissionYear(), user.getDeptNm())
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND));
-        return calculateCategories(user.getAdmissionYear(), earnedCourses, primaryuserDept, creditCriteria);
+        return calculateCategories(user.getAdmissionYear(), earnedCourses, primaryUserDept, creditCriteria);
     }
 
     // 카테고리 별 학점 계산
     private List<GraduationCategory> calculateCategories(
         int admissionYear,
         List<CompletedCourse> earnedCourses,
-        GraduationDepartmentInfo primaryuserDept,
+        GraduationDepartmentInfo primaryUserDept,
         List<CreditCriterion> creditCriteria
     ) {
         List<GraduationCategory> graduationCategories = new ArrayList<>();
@@ -77,7 +75,7 @@ public class CategoryCreditCalculator {
         }
 
         // 2. 균형교양 처리(복수 전공 시, 주전공 기준)
-        addBalanceRequiredIfNeeded(graduationCategories, earnedCourses, primaryuserDept);
+        addBalanceRequiredIfNeeded(graduationCategories, earnedCourses, primaryUserDept);
 
         // 3. 전체 이수 학점
         if (totalCriterion != null) {
@@ -105,19 +103,13 @@ public class CategoryCreditCalculator {
         CreditCriterion criterion
     ) {
         double earnedCredits = earnedCourses.stream()
-            .filter(course -> majorBasicPolicy.matchesCriterionCategory(admissionYear, course, criterion.getCategoryType()))
+            .filter(
+                course -> majorBasicPolicy.matchesCriterionCategory(admissionYear, course, criterion.getCategoryType()))
             .filter(course -> matchesMajorScope(course, criterion.getMajorScope()))
             .filter(course -> academicBasicPolicy.isRecentMajorAcademicBasic(
                 majorBasicPolicy.normalizeForAcademicBasic(admissionYear, course, criterion.getCategoryType()),
                 criterion
             ))
-            .filter(course ->
-                !generalElectivePolicy.shouldExcludeFromGeneralElective(
-                    admissionYear,
-                    criterion.getCategoryType(),
-                    course.getCuriNo()
-                )
-            )
             .mapToDouble(CompletedCourse::getCredits)
             .sum();
 
