@@ -61,7 +61,7 @@ class GraduationCheckServiceTest {
         CompletedCoursesResponse allEarnedCourses = graduationCheckService.getAllCompletedCourses(user.getId());
 
         // then
-        assertThat(allEarnedCourses.value()).hasSize(2)
+        assertThat(allEarnedCourses.courses()).hasSize(2)
             .extracting(
                 "curiNo", "curiNm", "isEarned"
             )

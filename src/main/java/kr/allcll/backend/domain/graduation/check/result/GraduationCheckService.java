@@ -1,5 +1,6 @@
 package kr.allcll.backend.domain.graduation.check.result;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseDto;
@@ -59,6 +60,10 @@ public class GraduationCheckService {
 
     public CompletedCoursesResponse getAllCompletedCourses(Long userId) {
         List<CompletedCourse> completedCourses = completedCoursePersistenceService.getCompletedCourses(userId);
-        return CompletedCoursesResponse.from(completedCourses);
+        if (completedCourses.isEmpty()) {
+            return CompletedCoursesResponse.from(null, completedCourses);
+        }
+        LocalDateTime createdAt = completedCourses.getFirst().getCreatedAt();
+        return CompletedCoursesResponse.from(createdAt, completedCourses);
     }
 }
