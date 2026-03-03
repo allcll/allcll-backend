@@ -1,16 +1,20 @@
 package kr.allcll.backend.domain.graduation.check.result.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
+import kr.allcll.backend.domain.graduation.check.excel.CompletedCourses;
 
 public record CompletedCoursesResponse(
-    List<CompletedCourseResponse> value
+    LocalDateTime createdAt,
+    List<CompletedCourseResponse> courses
 ) {
 
-    public static CompletedCoursesResponse from(List<CompletedCourse> completedCourses) {
-        return new CompletedCoursesResponse(completedCourses.stream()
-            .map(CompletedCourseResponse::from)
-            .toList()
+    public static CompletedCoursesResponse from(CompletedCourses completedCourses) {
+        return new CompletedCoursesResponse(
+            completedCourses.getCourseCreatedDate(),
+            completedCourses.getCourses().stream()
+                .map(CompletedCourseResponse::from)
+                .toList()
         );
     }
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseDto;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCoursePersistenceService;
+import kr.allcll.backend.domain.graduation.check.excel.CompletedCourses;
 import kr.allcll.backend.domain.graduation.check.excel.GradeExcelParser;
 import kr.allcll.backend.domain.graduation.check.result.dto.CheckResult;
 import kr.allcll.backend.domain.graduation.check.result.dto.CompletedCoursesResponse;
@@ -58,7 +59,8 @@ public class GraduationCheckService {
     }
 
     public CompletedCoursesResponse getAllCompletedCourses(Long userId) {
-        List<CompletedCourse> completedCourses = completedCoursePersistenceService.getCompletedCourses(userId);
+        List<CompletedCourse> userCompletedCourses = completedCoursePersistenceService.getCompletedCourses(userId);
+        CompletedCourses completedCourses = new CompletedCourses(userCompletedCourses);
         return CompletedCoursesResponse.from(completedCourses);
     }
 }
