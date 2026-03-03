@@ -2,8 +2,9 @@ package kr.allcll.backend.domain.graduation.check.excel;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import kr.allcll.backend.domain.graduation.check.result.dto.CompletedCoursesResponse;
+import lombok.Getter;
 
+@Getter
 public class CompletedCourses {
 
     private final List<CompletedCourse> courses;
@@ -21,9 +22,5 @@ public class CompletedCourses {
             return null;
         }
         return courses.getFirst().getCreatedAt();
-    }
-
-    public CompletedCoursesResponse toResponse() {
-        return CompletedCoursesResponse.from(getCourseCreatedDate(), courses);
     }
 }
