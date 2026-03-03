@@ -114,7 +114,7 @@ public class GraduationCheckResponseMapper {
 
         return new GraduationCheckResponse(
             userId,
-            check.getCreatedAt(),
+            check.getUpdatedAt(),
             adjustedGraduatable,
             summary,
             adjustedCategories,

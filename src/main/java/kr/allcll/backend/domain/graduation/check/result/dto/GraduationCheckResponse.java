@@ -5,7 +5,7 @@ import java.util.List;
 
 public record GraduationCheckResponse(
     Long checkId,
-    LocalDateTime createdAt,
+    LocalDateTime updatedAt,
     Boolean isGraduatable,
     GraduationSummary summary,
     List<GraduationCategory> categories,

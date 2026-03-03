@@ -1,6 +1,7 @@
 package kr.allcll.backend.support.entity;
 
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import kr.allcll.backend.support.semester.Semester;
@@ -11,6 +12,12 @@ public class BaseEntityListener {
     public void initialize(BaseEntity entity) {
         entity.setSemesterAtIfAbsent(getCurrentSemester());
         entity.setCreatedAtIfAbsent(LocalDateTime.now());
+        entity.setUpdatedAt(LocalDateTime.now());
+    }
+
+    @PreUpdate
+    public void updateTimestamp(BaseEntity entity) {
+        entity.setUpdatedAt(LocalDateTime.now());
     }
 
     private String getCurrentSemester() {
