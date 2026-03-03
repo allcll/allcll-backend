@@ -8,7 +8,8 @@ public enum OperationType {
     BASKETS("baskets"),
     SIMULATION("simulation"),
     LIVE("live"),
-    PRESEAT("preseat");
+    PRESEAT("preseat"),
+    GRADUATION("graduation");
 
     private final String value;
 

@@ -11,16 +11,16 @@ public class UserFixture {
 
     public static User singleMajorUser(
         int admissionYear,
-        GraduationDepartmentInfo primaryDeptInfo
+        GraduationDepartmentInfo primaryuserDept
     ) {
         return new User(
             DEFAULT_STUDENT_ID,
             DEFAULT_NAME,
             admissionYear,
             MajorType.SINGLE,
-            primaryDeptInfo.getCollegeNm(),
-            primaryDeptInfo.getDeptNm(),
-            primaryDeptInfo.getDeptCd(),
+            primaryuserDept.getCollegeNm(),
+            primaryuserDept.getDeptNm(),
+            primaryuserDept.getDeptCd(),
             null,
             null,
             null
@@ -29,20 +29,20 @@ public class UserFixture {
 
     public static User doubleMajorUser(
         int admissionYear,
-        GraduationDepartmentInfo primaryDeptInfo,
-        GraduationDepartmentInfo doubleDeptInfo
+        GraduationDepartmentInfo primaryuserDept,
+        GraduationDepartmentInfo doubleuserDept
     ) {
         return new User(
             DEFAULT_STUDENT_ID,
             DEFAULT_NAME,
             admissionYear,
             MajorType.DOUBLE,
-            primaryDeptInfo.getCollegeNm(),
-            primaryDeptInfo.getDeptNm(),
-            primaryDeptInfo.getDeptCd(),
-            doubleDeptInfo.getCollegeNm(),
-            doubleDeptInfo.getDeptNm(),
-            doubleDeptInfo.getDeptCd()
+            primaryuserDept.getCollegeNm(),
+            primaryuserDept.getDeptNm(),
+            primaryuserDept.getDeptCd(),
+            doubleuserDept.getCollegeNm(),
+            doubleuserDept.getDeptNm(),
+            doubleuserDept.getDeptCd()
         );
     }
 }

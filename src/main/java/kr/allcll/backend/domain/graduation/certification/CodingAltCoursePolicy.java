@@ -1,8 +1,7 @@
 package kr.allcll.backend.domain.graduation.certification;
 
 import java.util.List;
-import kr.allcll.backend.domain.graduation.check.cert.GraduationCheckCertResult;
-import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseDto;
+import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
 import kr.allcll.backend.domain.user.User;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +15,8 @@ public class CodingAltCoursePolicy implements GraduationCertificationAltCoursePo
     public boolean isSatisfiedByAltCourse(
         User user,
         GraduationDepartmentInfo departmentInfo,
-        List<CompletedCourseDto> completedCourses,
-        GraduationCheckCertResult certResult
+        List<CompletedCourse> earnedCourses
     ) {
-        if (isAlreadyPassed(certResult)) {
-            return false;
-        }
-
         CodingTargetType codingTargetType = departmentInfo.getCodingTargetType();
         if (isExempt(codingTargetType)) {
             return false;
@@ -32,15 +26,11 @@ public class CodingAltCoursePolicy implements GraduationCertificationAltCoursePo
             .findCodingCertCriterion(user.getAdmissionYear(), codingTargetType)
             .filter(codingCertCriterion -> isAltCourseCompletedByTargetType(
                     codingTargetType,
-                    completedCourses,
+                    earnedCourses,
                     codingCertCriterion
                 )
             )
             .isPresent();
-    }
-
-    private boolean isAlreadyPassed(GraduationCheckCertResult certResult) {
-        return Boolean.TRUE.equals(certResult.getIsCodingCertPassed());
     }
 
     private boolean isExempt(CodingTargetType codingTargetType) {
@@ -49,41 +39,41 @@ public class CodingAltCoursePolicy implements GraduationCertificationAltCoursePo
 
     private boolean isAltCourseCompletedByTargetType(
         CodingTargetType codingTargetType,
-        List<CompletedCourseDto> completedCourses,
+        List<CompletedCourse> earnedCourses,
         CodingCertCriterion codingCertCriterion
     ) {
         if (CodingTargetType.CODING_MAJOR.equals(codingTargetType)) {
-            return isAltCourseCompletedForCodingMajor(completedCourses, codingCertCriterion);
+            return isAltCourseCompletedForCodingMajor(earnedCourses, codingCertCriterion);
         }
         if (CodingTargetType.NON_MAJOR.equals(codingTargetType)) {
-            return isAltCourseCompletedForNonMajor(completedCourses, codingCertCriterion);
+            return isAltCourseCompletedForNonMajor(earnedCourses, codingCertCriterion);
         }
         return false;
     }
 
     private boolean isAltCourseCompletedForCodingMajor(
-        List<CompletedCourseDto> completedCourses,
+        List<CompletedCourse> earnedCourses,
         CodingCertCriterion codingCertCriterion
     ) {
         String alt1CuriNo = codingCertCriterion.getAlt1CuriNo();
         String alt1MinGrade = codingCertCriterion.getAlt1MinGrade();
-        return isAltCourseCompleted(completedCourses, alt1CuriNo, alt1MinGrade);
+        return isAltCourseCompleted(earnedCourses, alt1CuriNo, alt1MinGrade);
     }
 
     private boolean isAltCourseCompletedForNonMajor(
-        List<CompletedCourseDto> completedCourses,
+        List<CompletedCourse> earnedCourses,
         CodingCertCriterion codingCertCriterion
     ) {
         String alt1CuriNo = codingCertCriterion.getAlt1CuriNo();
         String alt1MinGrade = codingCertCriterion.getAlt1MinGrade();
         String alt2CuriNo = codingCertCriterion.getAlt2CuriNo();
         String alt2MinGrade = codingCertCriterion.getAlt2MinGrade();
-        return isAltCourseCompleted(completedCourses, alt1CuriNo, alt1MinGrade)
-            || isAltCourseCompleted(completedCourses, alt2CuriNo, alt2MinGrade);
+        return isAltCourseCompleted(earnedCourses, alt1CuriNo, alt1MinGrade)
+            || isAltCourseCompleted(earnedCourses, alt2CuriNo, alt2MinGrade);
     }
 
     private boolean isAltCourseCompleted(
-        List<CompletedCourseDto> completedCourses,
+        List<CompletedCourse> earnedCourses,
         String altCuriNo,
         String minGrade
     ) {
@@ -92,8 +82,8 @@ public class CodingAltCoursePolicy implements GraduationCertificationAltCoursePo
             return false;
         }
 
-        return completedCourses.stream()
-            .filter(completedCourse -> altCuriNo.equals(completedCourse.curiNo()))
-            .anyMatch(completedCourse -> requirement.satisfiedMinGrade(completedCourse.grade()));
+        return earnedCourses.stream()
+            .filter(completedCourse -> altCuriNo.equals(completedCourse.getCuriNo()))
+            .anyMatch(completedCourse -> requirement.satisfiedMinGrade(completedCourse.getGrade()));
     }
 }

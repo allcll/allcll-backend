@@ -66,7 +66,7 @@ class GraduationCertCriteriaServiceTest {
         certRuleRepository.saveAndFlush(
             new GraduationCertRule(admissionYear, 22, GraduationCertRuleType.BOTH_REQUIRED));
 
-        GraduationDepartmentInfo deptInfo = departmentInfoRepository.saveAndFlush(
+        GraduationDepartmentInfo userDept = departmentInfoRepository.saveAndFlush(
             new GraduationDepartmentInfo(
                 admissionYear,
                 22,
@@ -80,7 +80,7 @@ class GraduationCertCriteriaServiceTest {
             )
         );
 
-        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, deptInfo));
+        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, userDept));
 
         englishCertCriterionRepository.saveAndFlush(
             EnglishCertCriterionFixture.createNonMajorEnglishCertCriterion(admissionYear)
@@ -112,7 +112,7 @@ class GraduationCertCriteriaServiceTest {
         certRuleRepository.saveAndFlush(
             new GraduationCertRule(admissionYear, 22, GraduationCertRuleType.BOTH_REQUIRED));
 
-        GraduationDepartmentInfo deptInfo = departmentInfoRepository.saveAndFlush(
+        GraduationDepartmentInfo userDept = departmentInfoRepository.saveAndFlush(
             new GraduationDepartmentInfo(
                 admissionYear,
                 22,
@@ -126,7 +126,7 @@ class GraduationCertCriteriaServiceTest {
             )
         );
 
-        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, deptInfo));
+        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, userDept));
 
         englishCertCriterionRepository.saveAndFlush(
             EnglishCertCriterionFixture.createMajorEnglishCertCriterion(admissionYear)
@@ -158,7 +158,7 @@ class GraduationCertCriteriaServiceTest {
 
         certRuleRepository.saveAndFlush(new GraduationCertRule(admissionYear, 25, GraduationCertRuleType.TWO_OF_THREE));
 
-        GraduationDepartmentInfo deptInfo = departmentInfoRepository.saveAndFlush(
+        GraduationDepartmentInfo userDept = departmentInfoRepository.saveAndFlush(
             new GraduationDepartmentInfo(
                 admissionYear,
                 25,
@@ -172,7 +172,7 @@ class GraduationCertCriteriaServiceTest {
             )
         );
 
-        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, deptInfo));
+        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, userDept));
 
         englishCertCriterionRepository.saveAndFlush(
             EnglishCertCriterionFixture.createNonMajorEnglishCertCriterion(admissionYear)
@@ -206,7 +206,7 @@ class GraduationCertCriteriaServiceTest {
 
         certRuleRepository.saveAndFlush(new GraduationCertRule(admissionYear, 25, GraduationCertRuleType.TWO_OF_THREE));
 
-        GraduationDepartmentInfo deptInfo = departmentInfoRepository.saveAndFlush(
+        GraduationDepartmentInfo userDept = departmentInfoRepository.saveAndFlush(
             new GraduationDepartmentInfo(
                 admissionYear,
                 25,
@@ -220,7 +220,7 @@ class GraduationCertCriteriaServiceTest {
             )
         );
 
-        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, deptInfo));
+        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, userDept));
 
         englishCertCriterionRepository.saveAndFlush(
             EnglishCertCriterionFixture.createMajorEnglishCertCriterion(admissionYear)
@@ -253,7 +253,7 @@ class GraduationCertCriteriaServiceTest {
 
         certRuleRepository.saveAndFlush(new GraduationCertRule(admissionYear, 25, GraduationCertRuleType.TWO_OF_THREE));
 
-        GraduationDepartmentInfo deptInfo = departmentInfoRepository.saveAndFlush(
+        GraduationDepartmentInfo userDept = departmentInfoRepository.saveAndFlush(
             new GraduationDepartmentInfo(
                 admissionYear, 25,
                 "콘텐츠소프트웨어학과", deptCd,
@@ -265,7 +265,7 @@ class GraduationCertCriteriaServiceTest {
             )
         );
 
-        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, deptInfo));
+        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, userDept));
 
         englishCertCriterionRepository.saveAndFlush(
             EnglishCertCriterionFixture.createNonMajorEnglishCertCriterion(admissionYear)
@@ -301,7 +301,7 @@ class GraduationCertCriteriaServiceTest {
         // 정책
         certRuleRepository.saveAndFlush(new GraduationCertRule(admissionYear, 25, GraduationCertRuleType.TWO_OF_THREE));
 
-        GraduationDepartmentInfo primaryDeptInfo = departmentInfoRepository.saveAndFlush(
+        GraduationDepartmentInfo primaryuserDept = departmentInfoRepository.saveAndFlush(
             new GraduationDepartmentInfo(
                 admissionYear, 25,
                 "영어데이터융합전공", "2135",
@@ -313,7 +313,7 @@ class GraduationCertCriteriaServiceTest {
             )
         );
 
-        GraduationDepartmentInfo doubleDeptInfo = departmentInfoRepository.saveAndFlush(
+        GraduationDepartmentInfo doubleuserDept = departmentInfoRepository.saveAndFlush(
             new GraduationDepartmentInfo(
                 admissionYear, 25,
                 "콘텐츠소프트웨어학과", "3523",
@@ -325,7 +325,7 @@ class GraduationCertCriteriaServiceTest {
             )
         );
 
-        User user = userRepository.saveAndFlush(UserFixture.doubleMajorUser(admissionYear, primaryDeptInfo, doubleDeptInfo));
+        User user = userRepository.saveAndFlush(UserFixture.doubleMajorUser(admissionYear, primaryuserDept, doubleuserDept));
 
         englishCertCriterionRepository.saveAndFlush(
             EnglishCertCriterionFixture.createMajorEnglishCertCriterion(admissionYear)
@@ -362,7 +362,7 @@ class GraduationCertCriteriaServiceTest {
             new GraduationCertRule(admissionYear, 22, GraduationCertRuleType.TWO_OF_THREE)
         );
 
-        GraduationDepartmentInfo deptInfo = departmentInfoRepository.saveAndFlush(
+        GraduationDepartmentInfo userDept = departmentInfoRepository.saveAndFlush(
             new GraduationDepartmentInfo(
                 admissionYear,
                 22,
@@ -376,7 +376,7 @@ class GraduationCertCriteriaServiceTest {
             )
         );
 
-        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, deptInfo));
+        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, userDept));
 
         classicCertCriterionRepository.saveAndFlush(
             ClassicCertCriterionFixture.createClassicCertCriterion(admissionYear)
@@ -413,7 +413,7 @@ class GraduationCertCriteriaServiceTest {
             new GraduationCertRule(admissionYear, 22, GraduationCertRuleType.TWO_OF_THREE)
         );
 
-        GraduationDepartmentInfo deptInfo = departmentInfoRepository.saveAndFlush(
+        GraduationDepartmentInfo userDept = departmentInfoRepository.saveAndFlush(
             new GraduationDepartmentInfo(
                 admissionYear,
                 22,
@@ -427,7 +427,7 @@ class GraduationCertCriteriaServiceTest {
             )
         );
 
-        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, deptInfo));
+        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, userDept));
 
         englishCertCriterionRepository.saveAndFlush(
             EnglishCertCriterionFixture.createMajorEnglishCertCriterion(admissionYear)
@@ -464,7 +464,7 @@ class GraduationCertCriteriaServiceTest {
             new GraduationCertRule(admissionYear, 22, GraduationCertRuleType.TWO_OF_THREE)
         );
 
-        GraduationDepartmentInfo deptInfo = departmentInfoRepository.saveAndFlush(
+        GraduationDepartmentInfo userDept = departmentInfoRepository.saveAndFlush(
             new GraduationDepartmentInfo(
                 admissionYear,
                 25,
@@ -478,7 +478,7 @@ class GraduationCertCriteriaServiceTest {
             )
         );
 
-        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, deptInfo));
+        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, userDept));
 
         classicCertCriterionRepository.saveAndFlush(
             ClassicCertCriterionFixture.createClassicCertCriterion(admissionYear)
@@ -528,7 +528,7 @@ class GraduationCertCriteriaServiceTest {
         int admissionYear = 2025;
         String deptCd = "2658";
 
-        GraduationDepartmentInfo deptInfo = departmentInfoRepository.saveAndFlush(
+        GraduationDepartmentInfo userDept = departmentInfoRepository.saveAndFlush(
             new GraduationDepartmentInfo(
                 admissionYear,
                 25,
@@ -541,7 +541,7 @@ class GraduationCertCriteriaServiceTest {
             )
         );
 
-        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, deptInfo));
+        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, userDept));
 
         // when & then
         assertThatThrownBy(() -> graduationCertCriteriaService.getGraduationCertCriteria(user.getId()))
@@ -558,7 +558,7 @@ class GraduationCertCriteriaServiceTest {
 
         certRuleRepository.saveAndFlush(new GraduationCertRule(admissionYear, 25, GraduationCertRuleType.TWO_OF_THREE));
 
-        GraduationDepartmentInfo deptInfo = departmentInfoRepository.saveAndFlush(
+        GraduationDepartmentInfo userDept = departmentInfoRepository.saveAndFlush(
             new GraduationDepartmentInfo(
                 admissionYear,
                 25,
@@ -572,7 +572,7 @@ class GraduationCertCriteriaServiceTest {
             )
         );
 
-        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, deptInfo));
+        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, userDept));
 
 
         classicCertCriterionRepository.saveAndFlush(ClassicCertCriterionFixture.createClassicCertCriterion(admissionYear));
@@ -591,7 +591,7 @@ class GraduationCertCriteriaServiceTest {
 
         certRuleRepository.saveAndFlush(new GraduationCertRule(admissionYear, 25, GraduationCertRuleType.TWO_OF_THREE));
 
-        GraduationDepartmentInfo deptInfo = departmentInfoRepository.saveAndFlush(
+        GraduationDepartmentInfo userDept = departmentInfoRepository.saveAndFlush(
             new GraduationDepartmentInfo(
                 admissionYear,
                 25,
@@ -605,7 +605,7 @@ class GraduationCertCriteriaServiceTest {
             )
         );
 
-        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, deptInfo));
+        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, userDept));
 
         englishCertCriterionRepository.saveAndFlush(
             EnglishCertCriterionFixture.createNonMajorEnglishCertCriterion(admissionYear)
@@ -626,7 +626,7 @@ class GraduationCertCriteriaServiceTest {
 
         certRuleRepository.saveAndFlush(new GraduationCertRule(admissionYear, 25, GraduationCertRuleType.TWO_OF_THREE));
 
-        GraduationDepartmentInfo deptInfo = departmentInfoRepository.saveAndFlush(
+        GraduationDepartmentInfo userDept = departmentInfoRepository.saveAndFlush(
             new GraduationDepartmentInfo(
                 admissionYear,
                 25,
@@ -640,7 +640,7 @@ class GraduationCertCriteriaServiceTest {
             )
         );
 
-        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, deptInfo));
+        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, userDept));
 
         englishCertCriterionRepository.saveAndFlush(
             EnglishCertCriterionFixture.createNonMajorEnglishCertCriterion(admissionYear)

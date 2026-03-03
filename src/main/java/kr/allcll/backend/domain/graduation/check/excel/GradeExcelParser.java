@@ -47,9 +47,7 @@ public class GradeExcelParser {
 
             try {
                 CompletedCourseDto course = parseRow(row);
-                if (course.isCreditEarned()) {
-                    completedCourses.add(course);
-                }
+                completedCourses.add(course);
             } catch (Exception exception) {
                 log.warn("엑셀 파싱 실패 - row {}: {}", rowNumber, exception);
             }

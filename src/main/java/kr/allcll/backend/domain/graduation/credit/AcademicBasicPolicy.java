@@ -1,7 +1,7 @@
 package kr.allcll.backend.domain.graduation.credit;
 
 import java.util.List;
-import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseDto;
+import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -12,11 +12,11 @@ public class AcademicBasicPolicy {
     private final RequiredCourseResolver requiredCourseResolver;
     private final CourseReplacementRepository courseReplacementRepository;
 
-    public boolean isRecentMajorAcademicBasic(CompletedCourseDto course, CreditCriterion criterion) {
+    public boolean isRecentMajorAcademicBasic(CompletedCourse course, CreditCriterion criterion) {
         if (isNotAcademicBasic(course)) {
             return true;
         }
-        String courseName = course.curiNm();
+        String courseName = course.getCuriNm();
         Integer admissionYear = criterion.getAdmissionYear();
         String departmentName = criterion.getDeptNm();
         List<String> academicBasicRequiredCourseNames = requiredCourseResolver.findRequiredCourseNames(
@@ -58,11 +58,11 @@ public class AcademicBasicPolicy {
         return false;
     }
 
-    private boolean isNotAcademicBasic(CompletedCourseDto course) {
+    private boolean isNotAcademicBasic(CompletedCourse course) {
         return !isAcademicBasic(course);
     }
 
-    private boolean isAcademicBasic(CompletedCourseDto course) {
-        return CategoryType.ACADEMIC_BASIC.equals(course.categoryType());
+    private boolean isAcademicBasic(CompletedCourse course) {
+        return CategoryType.ACADEMIC_BASIC.equals(course.getCategoryType());
     }
 }

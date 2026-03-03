@@ -37,6 +37,32 @@ public record CompletedCourseDto(
         );
     }
 
+    public CompletedCourse toEntity(Long userId) {
+        return new CompletedCourse(
+            userId,
+            curiNo,
+            curiNm,
+            categoryType,
+            selectedArea,
+            credits,
+            grade,
+            majorScope,
+            isCreditEarned()
+        );
+    }
+
+    public CompletedCourseDto toAcademicBasic() {
+        return new CompletedCourseDto(
+            this.curiNo,
+            this.curiNm,
+            CategoryType.ACADEMIC_BASIC,
+            this.selectedArea,
+            this.credits,
+            this.grade,
+            this.majorScope
+        );
+    }
+
     // grade 기준 학점 인정 판별 메서드
     public boolean isCreditEarned() {
         if (grade == null || grade.isEmpty()) {
@@ -55,6 +81,7 @@ public record CompletedCourseDto(
             case "균필" -> CategoryType.BALANCE_REQUIRED;
             case "기교", "기필" -> CategoryType.ACADEMIC_BASIC;
             case "교선", "교선1", "교선2" -> CategoryType.GENERAL_ELECTIVE;
+            case "교양" -> CategoryType.GENERAL;
             case "전필", "복필" -> CategoryType.MAJOR_REQUIRED;
             case "전선", "복선" -> CategoryType.MAJOR_ELECTIVE;
             case "전기" -> CategoryType.MAJOR_BASIC;

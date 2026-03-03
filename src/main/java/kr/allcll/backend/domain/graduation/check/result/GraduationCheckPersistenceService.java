@@ -16,14 +16,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
-@Transactional
 public class GraduationCheckPersistenceService {
 
     private final GraduationCheckRepository graduationCheckRepository;
     private final GraduationCheckCategoryResultRepository graduationCheckCategoryResultRepository;
     private final GraduationCheckBalanceAreaResultRepository graduationCheckBalanceAreaResultRepository;
 
+    @Transactional
     public void saveCheckResult(Long userId, CheckResult checkResult) {
         saveOrUpdateGraduationCheck(userId, checkResult);
         saveOrUpdateCategoryResults(userId, checkResult.categories());
