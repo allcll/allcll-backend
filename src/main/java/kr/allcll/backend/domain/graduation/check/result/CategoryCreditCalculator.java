@@ -16,7 +16,6 @@ import kr.allcll.backend.domain.graduation.check.result.dto.GraduationCategory;
 import kr.allcll.backend.domain.graduation.credit.AcademicBasicPolicy;
 import kr.allcll.backend.domain.graduation.credit.CategoryType;
 import kr.allcll.backend.domain.graduation.credit.CreditCriterion;
-import kr.allcll.backend.domain.graduation.credit.MajorBasicPolicy;
 import kr.allcll.backend.domain.graduation.department.DeptGroup;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfoRepository;
@@ -32,7 +31,6 @@ import org.springframework.stereotype.Component;
 public class CategoryCreditCalculator {
 
     private final UserRepository userRepository;
-    private final MajorBasicPolicy majorBasicPolicy;
     private final BalanceRequiredRuleRepository balanceRequiredRuleRepository;
     private final GraduationDepartmentInfoRepository graduationDepartmentInfoRepository;
     private final BalanceRequiredAreaExclusionRepository balanceRequiredAreaExclusionRepository;
@@ -48,12 +46,11 @@ public class CategoryCreditCalculator {
         GraduationDepartmentInfo primaryUserDept = graduationDepartmentInfoRepository
             .findByAdmissionYearAndDeptNm(user.getAdmissionYear(), user.getDeptNm())
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND));
-        return calculateCategories(user.getAdmissionYear(), earnedCourses, primaryUserDept, creditCriteria);
+        return calculateCategories(earnedCourses, primaryUserDept, creditCriteria);
     }
 
     // 카테고리 별 학점 계산
     private List<GraduationCategory> calculateCategories(
-        int admissionYear,
         List<CompletedCourse> earnedCourses,
         GraduationDepartmentInfo primaryUserDept,
         List<CreditCriterion> creditCriteria
@@ -70,7 +67,7 @@ public class CategoryCreditCalculator {
                 totalCriterion = creditCriterion;
                 continue;
             }
-            GraduationCategory category = calculateCategoryCredits(admissionYear, earnedCourses, creditCriterion);
+            GraduationCategory category = calculateCategoryCredits(earnedCourses, creditCriterion);
             graduationCategories.add(category);
         }
 
@@ -98,18 +95,13 @@ public class CategoryCreditCalculator {
 
     // 이수한 과목들에 대한 특정 이수구분의 학점 계산
     private GraduationCategory calculateCategoryCredits(
-        int admissionYear,
         List<CompletedCourse> earnedCourses,
         CreditCriterion criterion
     ) {
         double earnedCredits = earnedCourses.stream()
-            .filter(
-                course -> majorBasicPolicy.matchesCriterionCategory(admissionYear, course, criterion.getCategoryType()))
+            .filter(course -> course.getCategoryType() == criterion.getCategoryType())
             .filter(course -> matchesMajorScope(course, criterion.getMajorScope()))
-            .filter(course -> academicBasicPolicy.isRecentMajorAcademicBasic(
-                majorBasicPolicy.normalizeForAcademicBasic(admissionYear, course, criterion.getCategoryType()),
-                criterion
-            ))
+            .filter(course -> academicBasicPolicy.isRecentMajorAcademicBasic(course, criterion))
             .mapToDouble(CompletedCourse::getCredits)
             .sum();
 
