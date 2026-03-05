@@ -15,6 +15,8 @@ public enum CategoryType { // 이수구분
     TOTAL_COMPLETION,      // 전체 이수
     ;
 
+    private static final int MAJOR_BASIC_INTRODUCED_ADMISSION_YEAR = 2024;
+
     private static final Set<CategoryType> MAJOR_CATEGORIES = EnumSet.of(
         MAJOR_REQUIRED,
         MAJOR_ELECTIVE
@@ -26,5 +28,34 @@ public enum CategoryType { // 이수구분
 
     public boolean isNonMajorCategory() {
         return !isMajorCategory();
+    }
+
+    public static CategoryType fromRaw(String categoryTypeRaw, int admissionYear) {
+        if (categoryTypeRaw == null) {
+            return null;
+        }
+        String stripped = categoryTypeRaw.strip();
+        return switch (stripped) {
+            case "교필", "공필" -> COMMON_REQUIRED;
+            case "균필" -> BALANCE_REQUIRED;
+            case "기교", "기필" -> ACADEMIC_BASIC;
+            case "교선", "교선1", "교선2" -> GENERAL_ELECTIVE;
+            case "교양" -> GENERAL;
+            case "전필", "복필" -> MAJOR_REQUIRED;
+            case "전선", "복선" -> MAJOR_ELECTIVE;
+            case "전기" -> normalizeMajorBasic(admissionYear);
+            default -> null;
+        };
+    }
+
+    private static CategoryType normalizeMajorBasic(int admissionYear) {
+        if (shouldConvertMajorBasicAsAcademicBasic(admissionYear)){
+            return ACADEMIC_BASIC;
+        }
+        return MAJOR_BASIC;
+    }
+
+    private static boolean shouldConvertMajorBasicAsAcademicBasic(int admissionYear) {
+        return admissionYear < MAJOR_BASIC_INTRODUCED_ADMISSION_YEAR;
     }
 }
