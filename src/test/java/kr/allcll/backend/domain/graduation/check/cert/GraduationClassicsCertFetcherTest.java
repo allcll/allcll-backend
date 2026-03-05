@@ -98,10 +98,12 @@ class GraduationClassicsCertFetcherTest {
         // then
         assertThat(result.passed()).isTrue();
         ClassicsCounts counts = result.counts();
-        assertThat(counts.myCountWestern()).isEqualTo(4);
-        assertThat(counts.myCountEastern()).isEqualTo(2);
+        assertThat(counts.myCountWestern()).isEqualTo(7);
+        assertThat(counts.myCountEastern()).isEqualTo(3);
         assertThat(counts.myCountEasternAndWestern()).isEqualTo(2);
         assertThat(counts.myCountScience()).isEqualTo(1);
+        // totalMyCount는 최대 인정 권수로 제한 (4 + 2 + 2 + 1 = 9)
+        assertThat(counts.totalMyCount()).isEqualTo(9);
     }
 
     @DisplayName("\"X권\" 형태의 HTML도 정상적으로 파싱한다")
@@ -314,7 +316,7 @@ class GraduationClassicsCertFetcherTest {
         assertThat(counts.myCountEastern()).isZero();
     }
 
-    @DisplayName("최대 인정 권수를 초과한 경우 최대값으로 제한한다")
+    @DisplayName("최대 인정 권수를 초과한 경우 실제 값을 저장하고 totalMyCount는 최대값으로 계산한다")
     @Test
     void parseCounts_limitsToMaxRecognizedCount() {
         // given
@@ -371,9 +373,12 @@ class GraduationClassicsCertFetcherTest {
 
         // then
         ClassicsCounts counts = result.counts();
-        assertThat(counts.myCountWestern()).isEqualTo(4);
-        assertThat(counts.myCountEastern()).isEqualTo(2);
-        assertThat(counts.myCountEasternAndWestern()).isEqualTo(3);
-        assertThat(counts.myCountScience()).isEqualTo(1);
+        // 실제 인증 권수는 그대로 저장
+        assertThat(counts.myCountWestern()).isEqualTo(5);
+        assertThat(counts.myCountEastern()).isEqualTo(3);
+        assertThat(counts.myCountEasternAndWestern()).isEqualTo(4);
+        assertThat(counts.myCountScience()).isEqualTo(2);
+        // totalMyCount는 최대 인정 권수로 제한 (4 + 2 + 3 + 1 = 10)
+        assertThat(counts.totalMyCount()).isEqualTo(10);
     }
 }

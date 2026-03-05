@@ -60,8 +60,7 @@ public class GraduationClassicsCertFetcher {
 
             ClassicsArea.findByLabel(label).ifPresent(area -> {
                 int actualCount = extractCompletedCount(tds.getFirst());
-                int recognizedCount = area.getRecognizedCount(actualCount);
-                countMap.put(area, recognizedCount);
+                countMap.put(area, actualCount);
             });
         }
 
