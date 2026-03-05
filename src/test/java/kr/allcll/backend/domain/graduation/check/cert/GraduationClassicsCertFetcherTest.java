@@ -1,5 +1,11 @@
 package kr.allcll.backend.domain.graduation.check.cert;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+
 import kr.allcll.backend.client.LoginProperties;
 import kr.allcll.backend.domain.graduation.check.cert.dto.ClassicsCounts;
 import kr.allcll.backend.domain.graduation.check.cert.dto.ClassicsResult;
@@ -14,12 +20,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
 
 @DisplayName("GraduationClassicsCertFetcher 테스트")
 @ExtendWith(MockitoExtension.class)
@@ -98,10 +98,10 @@ class GraduationClassicsCertFetcherTest {
         // then
         assertThat(result.passed()).isTrue();
         ClassicsCounts counts = result.counts();
-        assertThat(counts.myCountWestern()).isEqualTo(4);  // 7권 -> 최대 4권으로 제한
-        assertThat(counts.myCountEastern()).isEqualTo(2);  // 3권 -> 최대 2권으로 제한
-        assertThat(counts.myCountEasternAndWestern()).isEqualTo(2);  // 2권 (제한 이하)
-        assertThat(counts.myCountScience()).isEqualTo(1);  // 1권 (제한 이하)
+        assertThat(counts.myCountWestern()).isEqualTo(4);
+        assertThat(counts.myCountEastern()).isEqualTo(2);
+        assertThat(counts.myCountEasternAndWestern()).isEqualTo(2);
+        assertThat(counts.myCountScience()).isEqualTo(1);
     }
 
     @DisplayName("\"X권\" 형태의 HTML도 정상적으로 파싱한다")
@@ -224,8 +224,8 @@ class GraduationClassicsCertFetcherTest {
         ClassicsCounts counts = result.counts();
         assertThat(counts.myCountWestern()).isEqualTo(4);
         assertThat(counts.myCountEastern()).isEqualTo(2);
-        assertThat(counts.myCountEasternAndWestern()).isZero();  // 파싱되지 않음 -> 0
-        assertThat(counts.myCountScience()).isZero();  // 파싱되지 않음 -> 0
+        assertThat(counts.myCountEasternAndWestern()).isZero();
+        assertThat(counts.myCountScience()).isZero();
     }
 
     @DisplayName("영역별 인증현황 테이블이 없으면 예외를 발생시킨다")
@@ -310,8 +310,8 @@ class GraduationClassicsCertFetcherTest {
 
         // then
         ClassicsCounts counts = result.counts();
-        assertThat(counts.myCountWestern()).isZero();  // N/A -> 0
-        assertThat(counts.myCountEastern()).isZero();  // - -> 0
+        assertThat(counts.myCountWestern()).isZero();
+        assertThat(counts.myCountEastern()).isZero();
     }
 
     @DisplayName("최대 인정 권수를 초과한 경우 최대값으로 제한한다")
@@ -371,9 +371,9 @@ class GraduationClassicsCertFetcherTest {
 
         // then
         ClassicsCounts counts = result.counts();
-        assertThat(counts.myCountWestern()).isEqualTo(4);  // 5권 -> 최대 4권으로 제한
-        assertThat(counts.myCountEastern()).isEqualTo(2);  // 3권 -> 최대 2권으로 제한
-        assertThat(counts.myCountEasternAndWestern()).isEqualTo(3);  // 4권 -> 최대 3권으로 제한
-        assertThat(counts.myCountScience()).isEqualTo(1);  // 2권 -> 최대 1권으로 제한
+        assertThat(counts.myCountWestern()).isEqualTo(4);
+        assertThat(counts.myCountEastern()).isEqualTo(2);
+        assertThat(counts.myCountEasternAndWestern()).isEqualTo(3);
+        assertThat(counts.myCountScience()).isEqualTo(1);
     }
 }

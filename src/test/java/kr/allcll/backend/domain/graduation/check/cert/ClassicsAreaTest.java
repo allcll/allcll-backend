@@ -1,13 +1,12 @@
 package kr.allcll.backend.domain.graduation.check.cert;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("ClassicsArea enum 테스트")
 class ClassicsAreaTest {
@@ -90,10 +89,10 @@ class ClassicsAreaTest {
     @Test
     void getRecognizedCount_exceedsLimit() {
         // given
-        int westernActual = 5;  // 최대 4권
-        int easternActual = 3;  // 최대 2권
-        int literatureActual = 4;  // 최대 3권
-        int scienceActual = 2;  // 최대 1권
+        int westernActual = 5;
+        int easternActual = 3;
+        int literatureActual = 4;
+        int scienceActual = 2;
 
         // when & then
         assertThat(ClassicsArea.WESTERN.getRecognizedCount(westernActual)).isEqualTo(4);
