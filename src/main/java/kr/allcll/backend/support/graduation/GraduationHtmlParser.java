@@ -1,5 +1,6 @@
 package kr.allcll.backend.support.graduation;
 
+import java.util.Arrays;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -16,11 +17,14 @@ public class GraduationHtmlParser {
         return document.select("span.certificate:has(button)");
     }
 
-    public String selectClassicsPassText(Document document) {
-        return document.select(
+    public String[] selectClassicsPassText(Document document) {
+        String text = document.select(
             ".b-con-box:has(h4.b-h4-tit01:contains(사용자 정보)) " +
                 "table tbody tr:has(th:contains(인증여부)) td"
         ).text();
+        return Arrays.stream(text.split("[()]", 2))
+            .map(String::trim)
+            .toArray(String[]::new);
     }
 
     public Element selectClassicsDetailTable(Document document) {
