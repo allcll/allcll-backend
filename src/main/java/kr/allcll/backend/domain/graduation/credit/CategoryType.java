@@ -31,9 +31,6 @@ public enum CategoryType { // 이수구분
     }
 
     public static CategoryType fromRaw(String categoryTypeRaw, int admissionYear) {
-        if (categoryTypeRaw == null) {
-            return null;
-        }
         String stripped = categoryTypeRaw.strip();
         return switch (stripped) {
             case "교필", "공필" -> COMMON_REQUIRED;
