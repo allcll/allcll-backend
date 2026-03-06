@@ -53,9 +53,6 @@ public record CompletedCourseDto(
 
     // grade 기준 학점 인정 판별 메서드
     public boolean isCreditEarned() {
-        if (grade == null || grade.isEmpty()) {
-            return true;
-        }
         return !NOT_EARNED_GRADES.contains(grade);
     }
 
