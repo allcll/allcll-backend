@@ -1,7 +1,11 @@
 package kr.allcll.backend.domain.graduation.credit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import kr.allcll.backend.support.exception.AllcllErrorCode;
+import kr.allcll.backend.support.exception.AllcllException;
+import kr.allcll.backend.support.web.PrefixParser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,17 +14,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 class CategoryTypeTest {
 
     @Test
-    @DisplayName("정의된 이수구분과 매핑되지 않는 값이면 null을 반환한다.")
+    @DisplayName("정의된 이수구분과 매핑되지 않는 값이면 예외을 반환한다.")
     void fromRaw_whenUnknownCategoryTypeRaw() {
         // given
         String CategoryTypeRaw = "UNKNOWN";
         int admissionYear = 2025;
 
-        // when
-        CategoryType result = CategoryType.fromRaw(CategoryTypeRaw, admissionYear);
-
-        // then
-        assertThat(result).isNull();
+        // when && then
+        assertThatThrownBy(() -> CategoryType.fromRaw(CategoryTypeRaw, admissionYear))
+            .isInstanceOf(AllcllException.class)
+            .hasMessage(AllcllErrorCode.CATEGORY_TYPE_NOT_FOUND.getMessage());
     }
 
     @Test
