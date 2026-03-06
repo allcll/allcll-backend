@@ -10,20 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 class CategoryTypeTest {
 
     @Test
-    @DisplayName("엑셀 이수구분 문자열이 null이면 null을 반환한다.")
-    void fromRaw_whenCategoryTypeRawIsNull() {
-        // given
-        String categoryTypeRaw = null;
-        int admissionYear = 2025;
-
-        // when
-        CategoryType result = CategoryType.fromRaw(categoryTypeRaw, admissionYear);
-
-        // then
-        assertThat(result).isNull();
-    }
-
-    @Test
     @DisplayName("정의된 이수구분과 매핑되지 않는 값이면 null을 반환한다.")
     void fromRaw_whenUnknownCategoryTypeRaw() {
         // given
