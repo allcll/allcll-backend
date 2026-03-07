@@ -1,6 +1,5 @@
 package kr.allcll.backend.domain.graduation.certification;
 
-import kr.allcll.backend.domain.graduation.certification.dto.ClassicCertCriteriaResponse;
 import kr.allcll.backend.domain.graduation.certification.dto.CodingCertAltCourseResponse;
 import kr.allcll.backend.domain.graduation.certification.dto.CodingCertCriteriaResponse;
 import kr.allcll.backend.domain.graduation.certification.dto.EnglishCertAltCourseResponse;
@@ -27,7 +26,6 @@ public class GraduationCertCriteriaService {
     private final GraduationCertRuleRepository graduationCertRuleRepository;
     private final CodingCertCriterionRepository codingCertCriterionRepository;
     private final GraduationDepartmentInfoRepository departmentInfoRepository;
-    private final ClassicCertCriterionRepository classicCertCriterionRepository;
     private final EnglishCertCriterionRepository englishCertCriterionRepository;
 
 
@@ -49,10 +47,9 @@ public class GraduationCertCriteriaService {
         GraduationCertPolicyResponse certPolicy =
             buildCertPolicy(graduationCertRule.getGraduationCertRuleType(), englishTargetType, codingTargetType);
         EnglishCertCriteriaResponse englishCriteria = buildEnglishCriteria(admissionYear, englishTargetType);
-        ClassicCertCriteriaResponse classicCriteria = buildClassicCriteria(admissionYear);
         CodingCertCriteriaResponse codingCriteria = buildCodingCriteria(admissionYear, codingTargetType);
 
-        return GraduationCertCriteriaResponse.of(criteriaTarget, certPolicy, englishCriteria, classicCriteria,
+        return GraduationCertCriteriaResponse.of(criteriaTarget, certPolicy, englishCriteria,
             codingCriteria);
     }
 
@@ -148,19 +145,6 @@ public class GraduationCertCriteriaService {
             englishCertCriterion.getGtelpMinScore(),
             englishCertCriterion.getGtelpSpeakingLevel(),
             englishCertAltCourse
-        );
-    }
-
-    private ClassicCertCriteriaResponse buildClassicCriteria(int admissionYear) {
-        ClassicCertCriterion classicCertCriterion = classicCertCriterionRepository.findByAdmissionYear(admissionYear)
-            .orElseThrow(() -> new AllcllException(AllcllErrorCode.CLASSIC_CERT_CRITERIA_NOT_FOUND));
-
-        return ClassicCertCriteriaResponse.of(
-            classicCertCriterion.getTotalRequiredCount(),
-            classicCertCriterion.getRequiredCountWestern(),
-            classicCertCriterion.getRequiredCountEastern(),
-            classicCertCriterion.getRequiredCountEasternAndWestern(),
-            classicCertCriterion.getRequiredCountScience()
         );
     }
 

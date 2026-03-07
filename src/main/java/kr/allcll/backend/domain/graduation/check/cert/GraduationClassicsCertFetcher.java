@@ -13,6 +13,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
+import java.util.EnumMap;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class GraduationClassicsCertFetcher {
@@ -46,10 +49,7 @@ public class GraduationClassicsCertFetcher {
             throw new AllcllException(AllcllErrorCode.CLASSIC_DETAIL_INFO_FETCH_FAIL);
         }
 
-        int westernCompleted = 0;
-        int easternCompleted = 0;
-        int literatureCompleted = 0;
-        int scienceCompleted = 0;
+        Map<ClassicsArea, Integer> countMap = new EnumMap<>(ClassicsArea.class);
 
         for (Element row : table.select("tbody tr")) {
             Element th = row.selectFirst("th");
@@ -61,28 +61,24 @@ public class GraduationClassicsCertFetcher {
             Elements tds = row.select("td");
             if (tds.isEmpty()) continue;
 
-            int completedCount = extractCount(tds.get(0));
-
-            if (label.contains("서양의 역사와 사상")) {
-                westernCompleted = completedCount;
-            }
-            else if (label.contains("동양의 역사와 사상")) {
-                easternCompleted = completedCount;
-            }
-            else if (label.contains("동·서양의 문학")) {
-                literatureCompleted = completedCount;
-            }
-            else if (label.contains("과학 사상")) {
-                scienceCompleted = completedCount;
-            }
+            ClassicsArea.findByLabel(label).ifPresent(area -> {
+                int actualCount = extractCompletedCount(tds.getFirst());
+                countMap.put(area, actualCount);
+            });
         }
 
-        return new ClassicsCounts(westernCompleted, easternCompleted, literatureCompleted, scienceCompleted);
+        return new ClassicsCounts(
+            countMap.getOrDefault(ClassicsArea.WESTERN, 0),
+            countMap.getOrDefault(ClassicsArea.EASTERN, 0),
+            countMap.getOrDefault(ClassicsArea.EASTERN_AND_WESTERN, 0),
+            countMap.getOrDefault(ClassicsArea.SCIENCE, 0)
+        );
     }
 
-    private int extractCount(Element value) {
+    private int extractCompletedCount(Element value) {
         try {
-            return Integer.parseInt(value.text().replace("권", "").trim());
+            String text = value.text().replace("권", "").trim();
+            return Integer.parseInt(text);
         } catch (NumberFormatException e) {
             return 0;
         }
