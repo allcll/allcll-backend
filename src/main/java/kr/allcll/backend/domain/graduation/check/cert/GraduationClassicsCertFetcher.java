@@ -20,6 +20,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class GraduationClassicsCertFetcher {
 
+    private static final int PASS_STATUS_INDEX = 0;
+
     private final LoginProperties properties;
     private final GraduationHtmlParser parser;
     private final GraduationCertDocumentFetcher documentFetcher;
@@ -36,8 +38,9 @@ public class GraduationClassicsCertFetcher {
     }
 
     private boolean parsePass(Document document) {
-        String approvalText = parser.selectClassicsPassText(document).trim();
-        return !approvalText.equals("아니오");
+        String[] passTextParts = parser.selectClassicsPassText(document);
+        String passText = passTextParts[PASS_STATUS_INDEX];
+        return !passText.equals("아니오");
     }
 
     private ClassicsCounts parseCounts(Document document) {

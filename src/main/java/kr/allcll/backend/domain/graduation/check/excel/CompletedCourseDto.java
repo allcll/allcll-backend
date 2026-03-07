@@ -9,7 +9,7 @@ import kr.allcll.backend.support.exception.AllcllException;
 public record CompletedCourseDto(
     String curiNo,             // 학수번호
     String curiNm,             // 교과목명
-    CategoryType categoryType, // 이수구분 (변환됨)
+    String categoryTypeRaw, // 이수구분 (변환됨)
     String selectedArea,       // 선택영역 (균형교양 영역)
     Double credits,            // 학점
     String grade,              // 등급 (성적)
@@ -29,7 +29,7 @@ public record CompletedCourseDto(
         return new CompletedCourseDto(
             curiNo,
             curiNm,
-            convertCategoryType(categoryTypeRaw),
+            categoryTypeRaw,
             selectedArea,
             credits,
             grade,
@@ -37,12 +37,12 @@ public record CompletedCourseDto(
         );
     }
 
-    public CompletedCourse toEntity(Long userId) {
+    public CompletedCourse toEntity(Long userId, int admissionYear) {
         return new CompletedCourse(
             userId,
             curiNo,
             curiNm,
-            categoryType,
+            CategoryType.fromRaw(categoryTypeRaw, admissionYear),
             selectedArea,
             credits,
             grade,
@@ -51,42 +51,9 @@ public record CompletedCourseDto(
         );
     }
 
-    public CompletedCourseDto toAcademicBasic() {
-        return new CompletedCourseDto(
-            this.curiNo,
-            this.curiNm,
-            CategoryType.ACADEMIC_BASIC,
-            this.selectedArea,
-            this.credits,
-            this.grade,
-            this.majorScope
-        );
-    }
-
     // grade 기준 학점 인정 판별 메서드
     public boolean isCreditEarned() {
-        if (grade == null || grade.isEmpty()) {
-            return true;
-        }
         return !NOT_EARNED_GRADES.contains(grade);
-    }
-
-    private static CategoryType convertCategoryType(String raw) {
-        if (raw == null) {
-            return null;
-        }
-        String stripped = raw.strip();
-        return switch (stripped) {
-            case "교필", "공필" -> CategoryType.COMMON_REQUIRED;
-            case "균필" -> CategoryType.BALANCE_REQUIRED;
-            case "기교", "기필" -> CategoryType.ACADEMIC_BASIC;
-            case "교선", "교선1", "교선2" -> CategoryType.GENERAL_ELECTIVE;
-            case "교양" -> CategoryType.GENERAL;
-            case "전필", "복필" -> CategoryType.MAJOR_REQUIRED;
-            case "전선", "복선" -> CategoryType.MAJOR_ELECTIVE;
-            case "전기" -> CategoryType.MAJOR_BASIC;
-            default -> null;
-        };
     }
 
     private static MajorScope determineMajorScope(String categoryTypeRaw) {
