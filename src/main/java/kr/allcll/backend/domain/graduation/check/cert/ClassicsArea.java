@@ -23,6 +23,12 @@ public enum ClassicsArea {
             .findFirst();
     }
 
+    public static int getTotalRequiredCount() {
+        return Arrays.stream(values())
+            .mapToInt(ClassicsArea::getMaxRecognizedCount)
+            .sum();
+    }
+
     public int getRecognizedCount(int actualCount) {
         return Math.min(actualCount, maxRecognizedCount);
     }

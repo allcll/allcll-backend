@@ -1,8 +1,6 @@
 package kr.allcll.backend.domain.graduation.check.cert;
 
 import jakarta.persistence.EntityManager;
-import kr.allcll.backend.domain.graduation.certification.ClassicCertCriterion;
-import kr.allcll.backend.domain.graduation.certification.ClassicCertCriterionRepository;
 import kr.allcll.backend.domain.graduation.certification.GraduationCertRule;
 import kr.allcll.backend.domain.graduation.certification.GraduationCertRuleRepository;
 import kr.allcll.backend.domain.graduation.certification.GraduationCertRuleType;
@@ -21,7 +19,6 @@ public class GraduationCertService {
 
     private final EntityManager entityManager;
     private final GraduationCertRuleRepository graduationCertRuleRepository;
-    private final ClassicCertCriterionRepository classicCertCriterionRepository;
     private final GraduationCheckCertResultRepository graduationCheckCertResultRepository;
 
     @Transactional
@@ -39,17 +36,12 @@ public class GraduationCertService {
         int requiredPassCount = certRuleType.getRequiredPassCount();
         boolean isSatisfied = certRuleType.isSatisfied(passedCount);
 
-        // 고전독서 기준 데이터 DB에서 조회
-        ClassicCertCriterion classicCriteria = classicCertCriterionRepository
-            .findByAdmissionYear(user.getAdmissionYear())
-            .orElseThrow(
-                () -> new AllcllException(AllcllErrorCode.GRADUATION_CERT_RULE_NOT_FOUND, user.getAdmissionYear()));
-
-        int requiredCountWestern = classicCriteria.getRequiredCountWestern();
-        int requiredCountEastern = classicCriteria.getRequiredCountEastern();
-        int requiredCountEasternAndWestern = classicCriteria.getRequiredCountEasternAndWestern();
-        int requiredCountScience = classicCriteria.getRequiredCountScience();
-        int classicsTotalRequiredCount = classicCriteria.getTotalRequiredCount();
+        // 고전독서 기준 데이터 enum에서 조회
+        int classicsTotalRequiredCount = ClassicsArea.getTotalRequiredCount();
+        int requiredCountWestern = ClassicsArea.WESTERN.getMaxRecognizedCount();
+        int requiredCountEastern = ClassicsArea.EASTERN.getMaxRecognizedCount();
+        int requiredCountEasternAndWestern = ClassicsArea.EASTERN_AND_WESTERN.getMaxRecognizedCount();
+        int requiredCountScience = ClassicsArea.SCIENCE.getMaxRecognizedCount();
 
         boolean isWesternSatisfied = certInfo.myCountWestern() >= requiredCountWestern;
         boolean isEasternSatisfied = certInfo.myCountEastern() >= requiredCountEastern;
