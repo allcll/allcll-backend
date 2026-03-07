@@ -75,11 +75,6 @@ public class GraduationClassicsCertFetcher {
     private int extractCompletedCount(Element value) {
         try {
             String text = value.text().replace("권", "").trim();
-            // "5/4" 형태에서 앞의 숫자만 추출
-            if (text.contains("/")) {
-                String completedPart = text.split("/")[0].trim();
-                return Integer.parseInt(completedPart);
-            }
             return Integer.parseInt(text);
         } catch (NumberFormatException e) {
             return 0;

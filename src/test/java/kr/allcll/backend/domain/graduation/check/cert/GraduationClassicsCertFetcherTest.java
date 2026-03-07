@@ -40,9 +40,9 @@ class GraduationClassicsCertFetcherTest {
     @InjectMocks
     private GraduationClassicsCertFetcher fetcher;
 
-    @DisplayName("\"X/Y권\" 형태의 HTML을 파싱하여 완료된 권수만 추출한다")
+    @DisplayName("\"X권\" 형태의 HTML을 파싱하여 완료된 권수를 추출한다")
     @Test
-    void parseCounts_withSlashFormat() {
+    void parseCounts_withCountFormat() {
         // given
         String html = """
             <html>
@@ -64,19 +64,19 @@ class GraduationClassicsCertFetcherTest {
                             <tbody>
                                 <tr>
                                     <th>서양의 역사와 사상</th>
-                                    <td>7/4권</td>
+                                    <td>4권</td>
                                 </tr>
                                 <tr>
                                     <th>동양의 역사와 사상</th>
-                                    <td>3/2권</td>
+                                    <td>2권</td>
                                 </tr>
                                 <tr>
                                     <th>동·서양의 문학</th>
-                                    <td>2/3권</td>
+                                    <td>2권</td>
                                 </tr>
                                 <tr>
                                     <th>과학 사상</th>
-                                    <td>1/1권</td>
+                                    <td>1권</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -98,17 +98,17 @@ class GraduationClassicsCertFetcherTest {
         // then
         assertThat(result.passed()).isTrue();
         ClassicsCounts counts = result.counts();
-        assertThat(counts.myCountWestern()).isEqualTo(7);
-        assertThat(counts.myCountEastern()).isEqualTo(3);
+        assertThat(counts.myCountWestern()).isEqualTo(4);
+        assertThat(counts.myCountEastern()).isEqualTo(2);
         assertThat(counts.myCountEasternAndWestern()).isEqualTo(2);
         assertThat(counts.myCountScience()).isEqualTo(1);
         // totalMyCount는 최대 인정 권수로 제한 (4 + 2 + 2 + 1 = 9)
         assertThat(counts.totalMyCount()).isEqualTo(9);
     }
 
-    @DisplayName("\"X권\" 형태의 HTML도 정상적으로 파싱한다")
+    @DisplayName("인증 미완료 상태의 HTML을 정상적으로 파싱한다")
     @Test
-    void parseCounts_withoutSlashFormat() {
+    void parseCounts_notPassed() {
         // given
         String html = """
             <html>
@@ -194,7 +194,7 @@ class GraduationClassicsCertFetcherTest {
                             <tbody>
                                 <tr>
                                     <th>서양의 역사와 사상</th>
-                                    <td>4/4권</td>
+                                    <td>4권</td>
                                 </tr>
                                 <tr>
                                     <th>알 수 없는 영역</th>
@@ -202,7 +202,7 @@ class GraduationClassicsCertFetcherTest {
                                 </tr>
                                 <tr>
                                     <th>동양의 역사와 사상</th>
-                                    <td>2/2권</td>
+                                    <td>2권</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -340,19 +340,19 @@ class GraduationClassicsCertFetcherTest {
                             <tbody>
                                 <tr>
                                     <th>서양의 역사와 사상</th>
-                                    <td>5/4권</td>
+                                    <td>5권</td>
                                 </tr>
                                 <tr>
                                     <th>동양의 역사와 사상</th>
-                                    <td>3/2권</td>
+                                    <td>3권</td>
                                 </tr>
                                 <tr>
                                     <th>동·서양의 문학</th>
-                                    <td>4/3권</td>
+                                    <td>4권</td>
                                 </tr>
                                 <tr>
                                     <th>과학 사상</th>
-                                    <td>2/1권</td>
+                                    <td>2권</td>
                                 </tr>
                             </tbody>
                         </table>
