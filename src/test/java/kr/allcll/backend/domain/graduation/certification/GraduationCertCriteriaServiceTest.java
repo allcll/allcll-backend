@@ -98,7 +98,6 @@ class GraduationCertCriteriaServiceTest {
         assertThat(response.certPolicy().enableClassic()).isTrue();
         assertThat(response.certPolicy().enableCoding()).isFalse();
         assertThat(response.englishCertCriteria()).isNotNull();
-        assertThat(response.classicCertCriteria()).isNotNull();
         assertThat(response.codingCertCriteria()).isNull();
     }
 
@@ -145,7 +144,6 @@ class GraduationCertCriteriaServiceTest {
         assertThat(response.certPolicy().enableCoding()).isFalse();
         assertThat(response.englishCertCriteria()).isNotNull();
         assertThat(response.englishCertCriteria().englishTargetType()).isEqualTo("ENGLISH_MAJOR");
-        assertThat(response.classicCertCriteria()).isNotNull();
         assertThat(response.codingCertCriteria()).isNull();
     }
 
@@ -193,7 +191,6 @@ class GraduationCertCriteriaServiceTest {
         assertThat(response.certPolicy().enableClassic()).isTrue();
         assertThat(response.certPolicy().enableCoding()).isTrue();
         assertThat(response.englishCertCriteria()).isNotNull();
-        assertThat(response.classicCertCriteria()).isNotNull();
         assertThat(response.codingCertCriteria()).isNotNull();
     }
 
@@ -398,7 +395,6 @@ class GraduationCertCriteriaServiceTest {
         assertThat(response.criteriaTarget().englishTargetType()).isEqualTo("EXEMPT");
         assertThat(response.englishCertCriteria()).isNull();
 
-        assertThat(response.classicCertCriteria()).isNotNull();
         assertThat(response.codingCertCriteria()).isNotNull();
     }
 
@@ -450,7 +446,6 @@ class GraduationCertCriteriaServiceTest {
         assertThat(response.codingCertCriteria()).isNull();
 
         assertThat(response.englishCertCriteria()).isNotNull();
-        assertThat(response.classicCertCriteria()).isNotNull();
     }
 
     @Test
@@ -496,7 +491,6 @@ class GraduationCertCriteriaServiceTest {
 
         assertThat(response.englishCertCriteria()).isNull();
         assertThat(response.codingCertCriteria()).isNull();
-        assertThat(response.classicCertCriteria()).isNotNull();
     }
 
     @Test

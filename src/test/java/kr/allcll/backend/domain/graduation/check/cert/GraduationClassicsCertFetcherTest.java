@@ -88,7 +88,7 @@ class GraduationClassicsCertFetcherTest {
         Document document = Jsoup.parse(html);
         given(loginProperties.studentInfoPageUrl()).willReturn("http://test.com");
         given(documentFetcher.fetch(any(), anyString(), any())).willReturn(document);
-        given(parser.selectClassicsPassText(any())).willReturn("예");
+        given(parser.selectClassicsPassText(any())).willReturn(new String[]{"예"});
         given(parser.selectClassicsDetailTable(any()))
             .willReturn(document.selectFirst(".b-con-box:has(h4.b-h4-tit01:contains(영역별 인증현황)) table.b-board-table"));
 
@@ -154,7 +154,7 @@ class GraduationClassicsCertFetcherTest {
         Document document = Jsoup.parse(html);
         given(loginProperties.studentInfoPageUrl()).willReturn("http://test.com");
         given(documentFetcher.fetch(any(), anyString(), any())).willReturn(document);
-        given(parser.selectClassicsPassText(any())).willReturn("아니오");
+        given(parser.selectClassicsPassText(any())).willReturn(new String[]{"아니오"});
         given(parser.selectClassicsDetailTable(any()))
             .willReturn(document.selectFirst(".b-con-box:has(h4.b-h4-tit01:contains(영역별 인증현황)) table.b-board-table"));
 
@@ -214,7 +214,7 @@ class GraduationClassicsCertFetcherTest {
         Document document = Jsoup.parse(html);
         given(loginProperties.studentInfoPageUrl()).willReturn("http://test.com");
         given(documentFetcher.fetch(any(), anyString(), any())).willReturn(document);
-        given(parser.selectClassicsPassText(any())).willReturn("예");
+        given(parser.selectClassicsPassText(any())).willReturn(new String[]{"예"});
         given(parser.selectClassicsDetailTable(any()))
             .willReturn(document.selectFirst(".b-con-box:has(h4.b-h4-tit01:contains(영역별 인증현황)) table.b-board-table"));
 
@@ -255,7 +255,7 @@ class GraduationClassicsCertFetcherTest {
         Document document = Jsoup.parse(html);
         given(loginProperties.studentInfoPageUrl()).willReturn("http://test.com");
         given(documentFetcher.fetch(any(), anyString(), any())).willReturn(document);
-        given(parser.selectClassicsPassText(any())).willReturn("예");
+        given(parser.selectClassicsPassText(any())).willReturn(new String[]{"예"});
         given(parser.selectClassicsDetailTable(any())).willReturn(null);
 
         // when & then
@@ -303,7 +303,7 @@ class GraduationClassicsCertFetcherTest {
         Document document = Jsoup.parse(html);
         given(loginProperties.studentInfoPageUrl()).willReturn("http://test.com");
         given(documentFetcher.fetch(any(), anyString(), any())).willReturn(document);
-        given(parser.selectClassicsPassText(any())).willReturn("예");
+        given(parser.selectClassicsPassText(any())).willReturn(new String[]{"예"});
         given(parser.selectClassicsDetailTable(any()))
             .willReturn(document.selectFirst(".b-con-box:has(h4.b-h4-tit01:contains(영역별 인증현황)) table.b-board-table"));
 
@@ -364,7 +364,7 @@ class GraduationClassicsCertFetcherTest {
         Document document = Jsoup.parse(html);
         given(loginProperties.studentInfoPageUrl()).willReturn("http://test.com");
         given(documentFetcher.fetch(any(), anyString(), any())).willReturn(document);
-        given(parser.selectClassicsPassText(any())).willReturn("예");
+        given(parser.selectClassicsPassText(any())).willReturn(new String[]{"예"});
         given(parser.selectClassicsDetailTable(any()))
             .willReturn(document.selectFirst(".b-con-box:has(h4.b-h4-tit01:contains(영역별 인증현황)) table.b-board-table"));
 
