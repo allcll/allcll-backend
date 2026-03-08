@@ -1,5 +1,6 @@
 package kr.allcll.backend.domain.graduation.check.cert.dto;
 
+import kr.allcll.backend.domain.graduation.check.cert.ClassicsArea;
 import kr.allcll.backend.domain.graduation.check.cert.GraduationCheckCertResult;
 
 public record ClassicsCounts(
@@ -10,7 +11,10 @@ public record ClassicsCounts(
 ) {
 
     public int totalMyCount() {
-        return myCountWestern + myCountEastern + myCountEasternAndWestern + myCountScience;
+        return ClassicsArea.WESTERN.getRecognizedCount(myCountWestern)
+            + ClassicsArea.EASTERN.getRecognizedCount(myCountEastern)
+            + ClassicsArea.EASTERN_AND_WESTERN.getRecognizedCount(myCountEasternAndWestern)
+            + ClassicsArea.SCIENCE.getRecognizedCount(myCountScience);
     }
 
     public static ClassicsCounts fallback(GraduationCheckCertResult certResult) {
