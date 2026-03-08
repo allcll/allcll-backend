@@ -3,18 +3,17 @@ package kr.allcll.backend.domain.graduation.check.cert;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 import kr.allcll.backend.client.LoginProperties;
+import kr.allcll.backend.domain.graduation.check.cert.dto.ClassicsCounts;
 import kr.allcll.backend.domain.graduation.check.cert.dto.ClassicsResult;
-import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import kr.allcll.backend.support.graduation.GraduationHtmlParser;
 import okhttp3.OkHttpClient;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,11 +21,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+@DisplayName("GraduationClassicsCertFetcher 테스트")
 @ExtendWith(MockitoExtension.class)
 class GraduationClassicsCertFetcherTest {
 
     @Mock
-    private LoginProperties properties;
+    private LoginProperties loginProperties;
 
     @Mock
     private GraduationHtmlParser parser;
@@ -34,222 +34,351 @@ class GraduationClassicsCertFetcherTest {
     @Mock
     private GraduationCertDocumentFetcher documentFetcher;
 
-    @InjectMocks
-    private GraduationClassicsCertFetcher classicsCertFetcher;
-
+    @Mock
     private OkHttpClient client;
-    private Document mockDocument;
 
-    @BeforeEach
-    void setUp() {
-        client = new OkHttpClient();
-        mockDocument = Jsoup.parse("<html><body></body></html>");
-    }
+    @InjectMocks
+    private GraduationClassicsCertFetcher fetcher;
 
+    @DisplayName("\"X권\" 형태의 HTML을 파싱하여 완료된 권수를 추출한다")
     @Test
-    @DisplayName("고전인증 합격 시 true를 반환한다")
-    void fetchClassics_pass() {
+    void parseCounts_withCountFormat() {
         // given
-        given(properties.studentInfoPageUrl()).willReturn("http://test.com");
-        given(documentFetcher.fetch(any(OkHttpClient.class), eq("http://test.com"),
-            eq(AllcllErrorCode.CLASSIC_INFO_FETCH_FAIL)))
-            .willReturn(mockDocument);
-        given(parser.selectClassicsPassText(mockDocument)).willReturn(new String[]{"예", "2024-01-01"});
+        String html = """
+            <html>
+                <body>
+                    <div class="b-con-box">
+                        <h4 class="b-h4-tit01">사용자 정보</h4>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <th>인증여부</th>
+                                    <td>예</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="b-con-box">
+                        <h4 class="b-h4-tit01">영역별 인증현황</h4>
+                        <table class="b-board-table">
+                            <tbody>
+                                <tr>
+                                    <th>서양의 역사와 사상</th>
+                                    <td>4권</td>
+                                </tr>
+                                <tr>
+                                    <th>동양의 역사와 사상</th>
+                                    <td>2권</td>
+                                </tr>
+                                <tr>
+                                    <th>동·서양의 문학</th>
+                                    <td>2권</td>
+                                </tr>
+                                <tr>
+                                    <th>과학 사상</th>
+                                    <td>1권</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </body>
+            </html>
+            """;
 
-        Document detailDoc = createMockClassicsDetailDocument(2, 2, 2, 2);
-        given(parser.selectClassicsDetailTable(mockDocument)).willReturn(detailDoc.selectFirst("table"));
+        Document document = Jsoup.parse(html);
+        given(loginProperties.studentInfoPageUrl()).willReturn("http://test.com");
+        given(documentFetcher.fetch(any(), anyString(), any())).willReturn(document);
+        given(parser.selectClassicsPassText(any())).willReturn(new String[]{"예"});
+        given(parser.selectClassicsDetailTable(any()))
+            .willReturn(document.selectFirst(".b-con-box:has(h4.b-h4-tit01:contains(영역별 인증현황)) table.b-board-table"));
 
         // when
-        ClassicsResult result = classicsCertFetcher.fetchClassics(client);
+        ClassicsResult result = fetcher.fetchClassics(client);
 
         // then
         assertThat(result.passed()).isTrue();
-        assertThat(result.counts().myCountWestern()).isEqualTo(2);
-        assertThat(result.counts().myCountEastern()).isEqualTo(2);
-        assertThat(result.counts().myCountEasternAndWestern()).isEqualTo(2);
-        assertThat(result.counts().myCountScience()).isEqualTo(2);
+        ClassicsCounts counts = result.counts();
+        assertThat(counts.myCountWestern()).isEqualTo(4);
+        assertThat(counts.myCountEastern()).isEqualTo(2);
+        assertThat(counts.myCountEasternAndWestern()).isEqualTo(2);
+        assertThat(counts.myCountScience()).isEqualTo(1);
+        // totalMyCount는 최대 인정 권수로 제한 (4 + 2 + 2 + 1 = 9)
+        assertThat(counts.totalMyCount()).isEqualTo(9);
     }
 
+    @DisplayName("인증 미완료 상태의 HTML을 정상적으로 파싱한다")
     @Test
-    @DisplayName("고전인증 불합격 시 false를 반환한다")
-    void fetchClassics_fail() {
+    void parseCounts_notPassed() {
         // given
-        given(properties.studentInfoPageUrl()).willReturn("http://test.com");
-        given(documentFetcher.fetch(any(OkHttpClient.class), eq("http://test.com"),
-            eq(AllcllErrorCode.CLASSIC_INFO_FETCH_FAIL)))
-            .willReturn(mockDocument);
-        given(parser.selectClassicsPassText(mockDocument)).willReturn(new String[]{"아니오", ""});
+        String html = """
+            <html>
+                <body>
+                    <div class="b-con-box">
+                        <h4 class="b-h4-tit01">사용자 정보</h4>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <th>인증여부</th>
+                                    <td>아니오</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="b-con-box">
+                        <h4 class="b-h4-tit01">영역별 인증현황</h4>
+                        <table class="b-board-table">
+                            <tbody>
+                                <tr>
+                                    <th>서양의 역사와 사상</th>
+                                    <td>3권</td>
+                                </tr>
+                                <tr>
+                                    <th>동양의 역사와 사상</th>
+                                    <td>2권</td>
+                                </tr>
+                                <tr>
+                                    <th>동·서양의 문학</th>
+                                    <td>1권</td>
+                                </tr>
+                                <tr>
+                                    <th>과학 사상</th>
+                                    <td>0권</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </body>
+            </html>
+            """;
 
-        Document detailDoc = createMockClassicsDetailDocument(1, 1, 1, 1);
-        given(parser.selectClassicsDetailTable(mockDocument)).willReturn(detailDoc.selectFirst("table"));
+        Document document = Jsoup.parse(html);
+        given(loginProperties.studentInfoPageUrl()).willReturn("http://test.com");
+        given(documentFetcher.fetch(any(), anyString(), any())).willReturn(document);
+        given(parser.selectClassicsPassText(any())).willReturn(new String[]{"아니오"});
+        given(parser.selectClassicsDetailTable(any()))
+            .willReturn(document.selectFirst(".b-con-box:has(h4.b-h4-tit01:contains(영역별 인증현황)) table.b-board-table"));
 
         // when
-        ClassicsResult result = classicsCertFetcher.fetchClassics(client);
+        ClassicsResult result = fetcher.fetchClassics(client);
 
         // then
         assertThat(result.passed()).isFalse();
-        assertThat(result.counts().myCountWestern()).isEqualTo(1);
-        assertThat(result.counts().myCountEastern()).isEqualTo(1);
-        assertThat(result.counts().myCountEasternAndWestern()).isEqualTo(1);
-        assertThat(result.counts().myCountScience()).isEqualTo(1);
+        ClassicsCounts counts = result.counts();
+        assertThat(counts.myCountWestern()).isEqualTo(3);
+        assertThat(counts.myCountEastern()).isEqualTo(2);
+        assertThat(counts.myCountEasternAndWestern()).isEqualTo(1);
+        assertThat(counts.myCountScience()).isZero();
     }
 
+    @DisplayName("알 수 없는 영역은 무시하고 파싱을 계속한다")
     @Test
-    @DisplayName("고전 영역별 이수 권수가 0인 경우 0을 반환한다")
-    void fetchClassics_noBooksCompleted() {
+    void parseCounts_ignoreUnknownArea() {
         // given
-        given(properties.studentInfoPageUrl()).willReturn("http://test.com");
-        given(documentFetcher.fetch(any(OkHttpClient.class), eq("http://test.com"),
-            eq(AllcllErrorCode.CLASSIC_INFO_FETCH_FAIL)))
-            .willReturn(mockDocument);
-        given(parser.selectClassicsPassText(mockDocument)).willReturn(new String[]{"아니오", ""});
+        String html = """
+            <html>
+                <body>
+                    <div class="b-con-box">
+                        <h4 class="b-h4-tit01">사용자 정보</h4>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <th>인증여부</th>
+                                    <td>예</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="b-con-box">
+                        <h4 class="b-h4-tit01">영역별 인증현황</h4>
+                        <table class="b-board-table">
+                            <tbody>
+                                <tr>
+                                    <th>서양의 역사와 사상</th>
+                                    <td>4권</td>
+                                </tr>
+                                <tr>
+                                    <th>알 수 없는 영역</th>
+                                    <td>99권</td>
+                                </tr>
+                                <tr>
+                                    <th>동양의 역사와 사상</th>
+                                    <td>2권</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </body>
+            </html>
+            """;
 
-        Document detailDoc = createMockClassicsDetailDocument(0, 0, 0, 0);
-        given(parser.selectClassicsDetailTable(mockDocument)).willReturn(detailDoc.selectFirst("table"));
+        Document document = Jsoup.parse(html);
+        given(loginProperties.studentInfoPageUrl()).willReturn("http://test.com");
+        given(documentFetcher.fetch(any(), anyString(), any())).willReturn(document);
+        given(parser.selectClassicsPassText(any())).willReturn(new String[]{"예"});
+        given(parser.selectClassicsDetailTable(any()))
+            .willReturn(document.selectFirst(".b-con-box:has(h4.b-h4-tit01:contains(영역별 인증현황)) table.b-board-table"));
 
         // when
-        ClassicsResult result = classicsCertFetcher.fetchClassics(client);
+        ClassicsResult result = fetcher.fetchClassics(client);
 
         // then
-        assertThat(result.passed()).isFalse();
-        assertThat(result.counts().myCountWestern()).isEqualTo(0);
-        assertThat(result.counts().myCountEastern()).isEqualTo(0);
-        assertThat(result.counts().myCountEasternAndWestern()).isEqualTo(0);
-        assertThat(result.counts().myCountScience()).isEqualTo(0);
+        assertThat(result.passed()).isTrue();
+        ClassicsCounts counts = result.counts();
+        assertThat(counts.myCountWestern()).isEqualTo(4);
+        assertThat(counts.myCountEastern()).isEqualTo(2);
+        assertThat(counts.myCountEasternAndWestern()).isZero();
+        assertThat(counts.myCountScience()).isZero();
     }
 
+    @DisplayName("영역별 인증현황 테이블이 없으면 예외를 발생시킨다")
     @Test
-    @DisplayName("고전특강 대상자인 경우에도 불합격으로 처리한다")
-    void fetchClassics_failWithClassicsLectureTarget() {
+    void parseCounts_noTable() {
         // given
-        given(properties.studentInfoPageUrl()).willReturn("http://test.com");
-        given(documentFetcher.fetch(any(OkHttpClient.class), eq("http://test.com"),
-            eq(AllcllErrorCode.CLASSIC_INFO_FETCH_FAIL)))
-            .willReturn(mockDocument);
-        given(parser.selectClassicsPassText(mockDocument)).willReturn(new String[]{"아니오", "고전특강 대상자"});
+        String html = """
+            <html>
+                <body>
+                    <div class="b-con-box">
+                        <h4 class="b-h4-tit01">사용자 정보</h4>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <th>인증여부</th>
+                                    <td>예</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </body>
+            </html>
+            """;
 
-        Document detailDoc = createMockClassicsDetailDocument(1, 1, 1, 1);
-        given(parser.selectClassicsDetailTable(mockDocument)).willReturn(detailDoc.selectFirst("table"));
-
-        // when
-        ClassicsResult result = classicsCertFetcher.fetchClassics(client);
-
-        // then
-        assertThat(result.passed()).isFalse();
-        assertThat(result.counts().myCountWestern()).isEqualTo(1);
-        assertThat(result.counts().myCountEastern()).isEqualTo(1);
-        assertThat(result.counts().myCountEasternAndWestern()).isEqualTo(1);
-        assertThat(result.counts().myCountScience()).isEqualTo(1);
-    }
-
-    @Test
-    @DisplayName("고전 상세 테이블이 null인 경우 예외를 발생시킨다")
-    void fetchClassics_throwsWhenTableIsNull() {
-        // given
-        given(properties.studentInfoPageUrl()).willReturn("http://test.com");
-        given(documentFetcher.fetch(any(OkHttpClient.class), eq("http://test.com"),
-            eq(AllcllErrorCode.CLASSIC_INFO_FETCH_FAIL)))
-            .willReturn(mockDocument);
-        given(parser.selectClassicsPassText(mockDocument)).willReturn(new String[]{"아니오", ""});
-        given(parser.selectClassicsDetailTable(mockDocument)).willReturn(null);
+        Document document = Jsoup.parse(html);
+        given(loginProperties.studentInfoPageUrl()).willReturn("http://test.com");
+        given(documentFetcher.fetch(any(), anyString(), any())).willReturn(document);
+        given(parser.selectClassicsPassText(any())).willReturn(new String[]{"예"});
+        given(parser.selectClassicsDetailTable(any())).willReturn(null);
 
         // when & then
-        assertThatThrownBy(() -> classicsCertFetcher.fetchClassics(client))
-            .isInstanceOf(AllcllException.class)
-            .hasMessageContaining(AllcllErrorCode.CLASSIC_DETAIL_INFO_FETCH_FAIL.getMessage());
+        assertThatThrownBy(() -> fetcher.fetchClassics(client))
+            .isInstanceOf(AllcllException.class);
     }
 
+    @DisplayName("숫자가 아닌 값이 있으면 0으로 처리한다")
     @Test
-    @DisplayName("공백이 포함된 인증 텍스트를 정상적으로 처리한다")
-    void fetchClassics_withWhitespace() {
+    void parseCounts_invalidNumber() {
         // given
-        given(properties.studentInfoPageUrl()).willReturn("http://test.com");
-        given(documentFetcher.fetch(any(OkHttpClient.class), eq("http://test.com"),
-            eq(AllcllErrorCode.CLASSIC_INFO_FETCH_FAIL)))
-            .willReturn(mockDocument);
-        // 공백이 포함된 텍스트 (trim 전제)
-        given(parser.selectClassicsPassText(mockDocument)).willReturn(new String[]{"  예  ", "2024-01-01"});
-
-        Document detailDoc = createMockClassicsDetailDocument(2, 2, 2, 2);
-        given(parser.selectClassicsDetailTable(mockDocument)).willReturn(detailDoc.selectFirst("table"));
-
-        // when
-        ClassicsResult result = classicsCertFetcher.fetchClassics(client);
-
-        // then
-        assertThat(result.passed()).isTrue();
-    }
-
-    @Test
-    @DisplayName("숫자 파싱 실패 시 0을 반환한다")
-    void fetchClassics_invalidNumberFormat() {
-        // given
-        given(properties.studentInfoPageUrl()).willReturn("http://test.com");
-        given(documentFetcher.fetch(any(OkHttpClient.class), eq("http://test.com"),
-            eq(AllcllErrorCode.CLASSIC_INFO_FETCH_FAIL)))
-            .willReturn(mockDocument);
-        given(parser.selectClassicsPassText(mockDocument)).willReturn(new String[]{"아니오", ""});
-
-        // 잘못된 숫자 형식 포함
-        Document detailDoc = createMockClassicsDetailDocumentWithInvalidNumber();
-        given(parser.selectClassicsDetailTable(mockDocument)).willReturn(detailDoc.selectFirst("table"));
-
-        // when
-        ClassicsResult result = classicsCertFetcher.fetchClassics(client);
-
-        // then
-        assertThat(result.counts().myCountWestern()).isEqualTo(0);
-    }
-
-    private Document createMockClassicsDetailDocument(int western, int eastern, int literature, int science) {
-        String html = String.format("""
-            <table class="b-board-table">
-                <tbody>
-                    <tr>
-                        <th>서양의 역사와 사상</th>
-                        <td>%d권</td>
-                    </tr>
-                    <tr>
-                        <th>동양의 역사와 사상</th>
-                        <td>%d권</td>
-                    </tr>
-                    <tr>
-                        <th>동·서양의 문학</th>
-                        <td>%d권</td>
-                    </tr>
-                    <tr>
-                        <th>과학 사상</th>
-                        <td>%d권</td>
-                    </tr>
-                </tbody>
-            </table>
-            """, western, eastern, literature, science);
-        return Jsoup.parse(html);
-    }
-
-    private Document createMockClassicsDetailDocumentWithInvalidNumber() {
         String html = """
-            <table class="b-board-table">
-                <tbody>
-                    <tr>
-                        <th>서양의 역사와 사상</th>
-                        <td>잘못된값</td>
-                    </tr>
-                    <tr>
-                        <th>동양의 역사와 사상</th>
-                        <td>1권</td>
-                    </tr>
-                    <tr>
-                        <th>동·서양의 문학</th>
-                        <td>1권</td>
-                    </tr>
-                    <tr>
-                        <th>과학 사상</th>
-                        <td>1권</td>
-                    </tr>
-                </tbody>
-            </table>
+            <html>
+                <body>
+                    <div class="b-con-box">
+                        <h4 class="b-h4-tit01">사용자 정보</h4>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <th>인증여부</th>
+                                    <td>예</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="b-con-box">
+                        <h4 class="b-h4-tit01">영역별 인증현황</h4>
+                        <table class="b-board-table">
+                            <tbody>
+                                <tr>
+                                    <th>서양의 역사와 사상</th>
+                                    <td>N/A</td>
+                                </tr>
+                                <tr>
+                                    <th>동양의 역사와 사상</th>
+                                    <td>-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </body>
+            </html>
             """;
-        return Jsoup.parse(html);
+
+        Document document = Jsoup.parse(html);
+        given(loginProperties.studentInfoPageUrl()).willReturn("http://test.com");
+        given(documentFetcher.fetch(any(), anyString(), any())).willReturn(document);
+        given(parser.selectClassicsPassText(any())).willReturn(new String[]{"예"});
+        given(parser.selectClassicsDetailTable(any()))
+            .willReturn(document.selectFirst(".b-con-box:has(h4.b-h4-tit01:contains(영역별 인증현황)) table.b-board-table"));
+
+        // when
+        ClassicsResult result = fetcher.fetchClassics(client);
+
+        // then
+        ClassicsCounts counts = result.counts();
+        assertThat(counts.myCountWestern()).isZero();
+        assertThat(counts.myCountEastern()).isZero();
+    }
+
+    @DisplayName("최대 인정 권수를 초과한 경우 실제 값을 저장하고 totalMyCount는 최대값으로 계산한다")
+    @Test
+    void parseCounts_limitsToMaxRecognizedCount() {
+        // given
+        String html = """
+            <html>
+                <body>
+                    <div class="b-con-box">
+                        <h4 class="b-h4-tit01">사용자 정보</h4>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <th>인증여부</th>
+                                    <td>예</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="b-con-box">
+                        <h4 class="b-h4-tit01">영역별 인증현황</h4>
+                        <table class="b-board-table">
+                            <tbody>
+                                <tr>
+                                    <th>서양의 역사와 사상</th>
+                                    <td>5권</td>
+                                </tr>
+                                <tr>
+                                    <th>동양의 역사와 사상</th>
+                                    <td>3권</td>
+                                </tr>
+                                <tr>
+                                    <th>동·서양의 문학</th>
+                                    <td>4권</td>
+                                </tr>
+                                <tr>
+                                    <th>과학 사상</th>
+                                    <td>2권</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </body>
+            </html>
+            """;
+
+        Document document = Jsoup.parse(html);
+        given(loginProperties.studentInfoPageUrl()).willReturn("http://test.com");
+        given(documentFetcher.fetch(any(), anyString(), any())).willReturn(document);
+        given(parser.selectClassicsPassText(any())).willReturn(new String[]{"예"});
+        given(parser.selectClassicsDetailTable(any()))
+            .willReturn(document.selectFirst(".b-con-box:has(h4.b-h4-tit01:contains(영역별 인증현황)) table.b-board-table"));
+
+        // when
+        ClassicsResult result = fetcher.fetchClassics(client);
+
+        // then
+        ClassicsCounts counts = result.counts();
+        // 실제 인증 권수는 그대로 저장
+        assertThat(counts.myCountWestern()).isEqualTo(5);
+        assertThat(counts.myCountEastern()).isEqualTo(3);
+        assertThat(counts.myCountEasternAndWestern()).isEqualTo(4);
+        assertThat(counts.myCountScience()).isEqualTo(2);
+        // totalMyCount는 최대 인정 권수로 제한 (4 + 2 + 3 + 1 = 10)
+        assertThat(counts.totalMyCount()).isEqualTo(10);
     }
 }

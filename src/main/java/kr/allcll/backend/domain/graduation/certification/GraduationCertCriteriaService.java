@@ -27,7 +27,6 @@ public class GraduationCertCriteriaService {
     private final GraduationCertRuleRepository graduationCertRuleRepository;
     private final CodingCertCriterionRepository codingCertCriterionRepository;
     private final GraduationDepartmentInfoRepository departmentInfoRepository;
-    private final ClassicCertCriterionRepository classicCertCriterionRepository;
     private final EnglishCertCriterionRepository englishCertCriterionRepository;
 
 
@@ -49,11 +48,11 @@ public class GraduationCertCriteriaService {
         GraduationCertPolicyResponse certPolicy =
             buildCertPolicy(graduationCertRule.getGraduationCertRuleType(), englishTargetType, codingTargetType);
         EnglishCertCriteriaResponse englishCriteria = buildEnglishCriteria(admissionYear, englishTargetType);
-        ClassicCertCriteriaResponse classicCriteria = buildClassicCriteria(admissionYear);
+        ClassicCertCriteriaResponse classicCriteria = buildClassicCriteria();
         CodingCertCriteriaResponse codingCriteria = buildCodingCriteria(admissionYear, codingTargetType);
 
-        return GraduationCertCriteriaResponse.of(criteriaTarget, certPolicy, englishCriteria, classicCriteria,
-            codingCriteria);
+        return GraduationCertCriteriaResponse.of(criteriaTarget, certPolicy, englishCriteria,
+            classicCriteria, codingCriteria);
     }
 
     private GraduationDepartmentInfo findDepartment(int admissionYear, String deptCd) {
@@ -151,17 +150,8 @@ public class GraduationCertCriteriaService {
         );
     }
 
-    private ClassicCertCriteriaResponse buildClassicCriteria(int admissionYear) {
-        ClassicCertCriterion classicCertCriterion = classicCertCriterionRepository.findByAdmissionYear(admissionYear)
-            .orElseThrow(() -> new AllcllException(AllcllErrorCode.CLASSIC_CERT_CRITERIA_NOT_FOUND));
-
-        return ClassicCertCriteriaResponse.of(
-            classicCertCriterion.getTotalRequiredCount(),
-            classicCertCriterion.getRequiredCountWestern(),
-            classicCertCriterion.getRequiredCountEastern(),
-            classicCertCriterion.getRequiredCountEasternAndWestern(),
-            classicCertCriterion.getRequiredCountScience()
-        );
+    private ClassicCertCriteriaResponse buildClassicCriteria() {
+        return ClassicCertCriteriaResponse.fromEnum();
     }
 
     private CodingCertCriteriaResponse buildCodingCriteria(int admissionYear, CodingTargetType codingTargetType) {
