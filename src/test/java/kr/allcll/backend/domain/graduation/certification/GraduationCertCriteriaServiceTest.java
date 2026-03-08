@@ -10,7 +10,6 @@ import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfoRepository;
 import kr.allcll.backend.domain.user.User;
 import kr.allcll.backend.domain.user.UserRepository;
-import kr.allcll.backend.fixture.ClassicCertCriterionFixture;
 import kr.allcll.backend.fixture.CodingCertCriterionFixture;
 import kr.allcll.backend.fixture.EnglishCertCriterionFixture;
 import kr.allcll.backend.fixture.UserFixture;
@@ -85,9 +84,6 @@ class GraduationCertCriteriaServiceTest {
         englishCertCriterionRepository.saveAndFlush(
             EnglishCertCriterionFixture.createNonMajorEnglishCertCriterion(admissionYear)
         );
-        classicCertCriterionRepository.saveAndFlush(
-            ClassicCertCriterionFixture.createClassicCertCriterion(admissionYear)
-        );
 
         // when
         GraduationCertCriteriaResponse response = graduationCertCriteriaService.getGraduationCertCriteria(user.getId());
@@ -98,6 +94,12 @@ class GraduationCertCriteriaServiceTest {
         assertThat(response.certPolicy().enableClassic()).isTrue();
         assertThat(response.certPolicy().enableCoding()).isFalse();
         assertThat(response.englishCertCriteria()).isNotNull();
+        assertThat(response.classicCertCriteria()).isNotNull();
+        assertThat(response.classicCertCriteria().totalRequiredCount()).isEqualTo(10);
+        assertThat(response.classicCertCriteria().requiredCountWestern()).isEqualTo(4);
+        assertThat(response.classicCertCriteria().requiredCountEastern()).isEqualTo(2);
+        assertThat(response.classicCertCriteria().requiredCountEasternAndWestern()).isEqualTo(3);
+        assertThat(response.classicCertCriteria().requiredCountScience()).isEqualTo(1);
         assertThat(response.codingCertCriteria()).isNull();
     }
 
@@ -130,9 +132,6 @@ class GraduationCertCriteriaServiceTest {
         englishCertCriterionRepository.saveAndFlush(
             EnglishCertCriterionFixture.createMajorEnglishCertCriterion(admissionYear)
         );
-        classicCertCriterionRepository.saveAndFlush(
-            ClassicCertCriterionFixture.createClassicCertCriterion(admissionYear)
-        );
 
         // when
         GraduationCertCriteriaResponse response = graduationCertCriteriaService.getGraduationCertCriteria(user.getId());
@@ -144,6 +143,7 @@ class GraduationCertCriteriaServiceTest {
         assertThat(response.certPolicy().enableCoding()).isFalse();
         assertThat(response.englishCertCriteria()).isNotNull();
         assertThat(response.englishCertCriteria().englishTargetType()).isEqualTo("ENGLISH_MAJOR");
+        assertThat(response.classicCertCriteria()).isNotNull();
         assertThat(response.codingCertCriteria()).isNull();
     }
 
@@ -175,9 +175,6 @@ class GraduationCertCriteriaServiceTest {
         englishCertCriterionRepository.saveAndFlush(
             EnglishCertCriterionFixture.createNonMajorEnglishCertCriterion(admissionYear)
         );
-        classicCertCriterionRepository.saveAndFlush(
-            ClassicCertCriterionFixture.createClassicCertCriterion(admissionYear)
-        );
         codingCertCriterionRepository.saveAndFlush(
             CodingCertCriterionFixture.createNonMajorCodingCertCriterion(admissionYear)
         );
@@ -191,6 +188,7 @@ class GraduationCertCriteriaServiceTest {
         assertThat(response.certPolicy().enableClassic()).isTrue();
         assertThat(response.certPolicy().enableCoding()).isTrue();
         assertThat(response.englishCertCriteria()).isNotNull();
+        assertThat(response.classicCertCriteria()).isNotNull();
         assertThat(response.codingCertCriteria()).isNotNull();
     }
 
@@ -222,9 +220,6 @@ class GraduationCertCriteriaServiceTest {
         englishCertCriterionRepository.saveAndFlush(
             EnglishCertCriterionFixture.createMajorEnglishCertCriterion(admissionYear)
         );
-        classicCertCriterionRepository.saveAndFlush(
-            ClassicCertCriterionFixture.createClassicCertCriterion(admissionYear)
-        );
         codingCertCriterionRepository.saveAndFlush(
             CodingCertCriterionFixture.createNonMajorCodingCertCriterion(admissionYear)
         );
@@ -238,6 +233,7 @@ class GraduationCertCriteriaServiceTest {
         assertThat(response.certPolicy().enableClassic()).isTrue();
         assertThat(response.certPolicy().enableCoding()).isTrue();
         assertThat(response.englishCertCriteria().englishTargetType()).isEqualTo("ENGLISH_MAJOR");
+        assertThat(response.classicCertCriteria()).isNotNull();
         assertThat(response.codingCertCriteria().codingTargetType()).isEqualTo("NON_MAJOR");
     }
 
@@ -267,9 +263,6 @@ class GraduationCertCriteriaServiceTest {
         englishCertCriterionRepository.saveAndFlush(
             EnglishCertCriterionFixture.createNonMajorEnglishCertCriterion(admissionYear)
         );
-        classicCertCriterionRepository.saveAndFlush(
-            ClassicCertCriterionFixture.createClassicCertCriterion(admissionYear)
-        );
         codingCertCriterionRepository.saveAndFlush(
             CodingCertCriterionFixture.createMajorCodingCertCriterion(admissionYear)
         );
@@ -283,6 +276,7 @@ class GraduationCertCriteriaServiceTest {
         assertThat(response.certPolicy().enableClassic()).isTrue();
         assertThat(response.certPolicy().enableCoding()).isTrue();
 
+        assertThat(response.classicCertCriteria()).isNotNull();
         assertThat(response.codingCertCriteria().codingTargetType()).isEqualTo("CODING_MAJOR");
         assertThat(response.codingCertCriteria().altCourse().alt2CuriNo()).isNull();
         assertThat(response.codingCertCriteria().altCourse().alt2CuriNm()).isNull();
@@ -327,9 +321,6 @@ class GraduationCertCriteriaServiceTest {
         englishCertCriterionRepository.saveAndFlush(
             EnglishCertCriterionFixture.createMajorEnglishCertCriterion(admissionYear)
         );
-        classicCertCriterionRepository.saveAndFlush(
-            ClassicCertCriterionFixture.createClassicCertCriterion(admissionYear)
-        );
         codingCertCriterionRepository.saveAndFlush(
             CodingCertCriterionFixture.createNonMajorCodingCertCriterion(admissionYear)
         );
@@ -345,6 +336,7 @@ class GraduationCertCriteriaServiceTest {
         assertThat(response.criteriaTarget().englishTargetType()).isEqualTo("ENGLISH_MAJOR");
         assertThat(response.criteriaTarget().codingTargetType()).isEqualTo("NON_MAJOR");
         assertThat(response.englishCertCriteria().englishTargetType()).isEqualTo("ENGLISH_MAJOR");
+        assertThat(response.classicCertCriteria()).isNotNull();
         assertThat(response.codingCertCriteria().codingTargetType()).isEqualTo("NON_MAJOR");
     }
 
@@ -375,9 +367,6 @@ class GraduationCertCriteriaServiceTest {
 
         User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, userDept));
 
-        classicCertCriterionRepository.saveAndFlush(
-            ClassicCertCriterionFixture.createClassicCertCriterion(admissionYear)
-        );
         codingCertCriterionRepository.saveAndFlush(
             CodingCertCriterionFixture.createNonMajorCodingCertCriterion(admissionYear)
         );
@@ -395,6 +384,7 @@ class GraduationCertCriteriaServiceTest {
         assertThat(response.criteriaTarget().englishTargetType()).isEqualTo("EXEMPT");
         assertThat(response.englishCertCriteria()).isNull();
 
+        assertThat(response.classicCertCriteria()).isNotNull();
         assertThat(response.codingCertCriteria()).isNotNull();
     }
 
@@ -428,9 +418,6 @@ class GraduationCertCriteriaServiceTest {
         englishCertCriterionRepository.saveAndFlush(
             EnglishCertCriterionFixture.createMajorEnglishCertCriterion(admissionYear)
         );
-        classicCertCriterionRepository.saveAndFlush(
-            ClassicCertCriterionFixture.createClassicCertCriterion(admissionYear)
-        );
 
         // when
         GraduationCertCriteriaResponse response = graduationCertCriteriaService.getGraduationCertCriteria(user.getId());
@@ -445,6 +432,7 @@ class GraduationCertCriteriaServiceTest {
         assertThat(response.criteriaTarget().codingTargetType()).isEqualTo("EXEMPT");
         assertThat(response.codingCertCriteria()).isNull();
 
+        assertThat(response.classicCertCriteria()).isNotNull();
         assertThat(response.englishCertCriteria()).isNotNull();
     }
 
@@ -475,10 +463,6 @@ class GraduationCertCriteriaServiceTest {
 
         User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, userDept));
 
-        classicCertCriterionRepository.saveAndFlush(
-            ClassicCertCriterionFixture.createClassicCertCriterion(admissionYear)
-        );
-
         // when
         GraduationCertCriteriaResponse response = graduationCertCriteriaService.getGraduationCertCriteria(user.getId());
 
@@ -490,6 +474,7 @@ class GraduationCertCriteriaServiceTest {
         assertThat(response.certPolicy().enableCoding()).isFalse();
 
         assertThat(response.englishCertCriteria()).isNull();
+        assertThat(response.classicCertCriteria()).isNotNull();
         assertThat(response.codingCertCriteria()).isNull();
     }
 
@@ -568,8 +553,6 @@ class GraduationCertCriteriaServiceTest {
 
         User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, userDept));
 
-
-        classicCertCriterionRepository.saveAndFlush(ClassicCertCriterionFixture.createClassicCertCriterion(admissionYear));
         codingCertCriterionRepository.saveAndFlush(CodingCertCriterionFixture.createNonMajorCodingCertCriterion(admissionYear));
 
         // when & then
@@ -603,9 +586,6 @@ class GraduationCertCriteriaServiceTest {
 
         englishCertCriterionRepository.saveAndFlush(
             EnglishCertCriterionFixture.createNonMajorEnglishCertCriterion(admissionYear)
-        );
-        classicCertCriterionRepository.saveAndFlush(
-            ClassicCertCriterionFixture.createClassicCertCriterion(admissionYear)
         );
 
         assertThatThrownBy(() -> graduationCertCriteriaService.getGraduationCertCriteria(user.getId()))

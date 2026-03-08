@@ -34,7 +34,7 @@ class GraduationCertCriteriaApiTest {
         session.setAttribute(LOGIN_SESSION, userId);
 
         GraduationCertCriteriaResponse mockResponse = GraduationCertCriteriaResponse.of(
-            null, null, null, null
+            null, null, null, null, null
         );
 
         when(graduationCertCriteriaService.getGraduationCertCriteria(userId)).thenReturn(mockResponse);

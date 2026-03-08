@@ -1,5 +1,6 @@
 package kr.allcll.backend.domain.graduation.certification;
 
+import kr.allcll.backend.domain.graduation.certification.dto.ClassicCertCriteriaResponse;
 import kr.allcll.backend.domain.graduation.certification.dto.CodingCertAltCourseResponse;
 import kr.allcll.backend.domain.graduation.certification.dto.CodingCertCriteriaResponse;
 import kr.allcll.backend.domain.graduation.certification.dto.EnglishCertAltCourseResponse;
@@ -47,10 +48,11 @@ public class GraduationCertCriteriaService {
         GraduationCertPolicyResponse certPolicy =
             buildCertPolicy(graduationCertRule.getGraduationCertRuleType(), englishTargetType, codingTargetType);
         EnglishCertCriteriaResponse englishCriteria = buildEnglishCriteria(admissionYear, englishTargetType);
+        ClassicCertCriteriaResponse classicCriteria = buildClassicCriteria();
         CodingCertCriteriaResponse codingCriteria = buildCodingCriteria(admissionYear, codingTargetType);
 
         return GraduationCertCriteriaResponse.of(criteriaTarget, certPolicy, englishCriteria,
-            codingCriteria);
+            classicCriteria, codingCriteria);
     }
 
     private GraduationDepartmentInfo findDepartment(int admissionYear, String deptCd) {
@@ -146,6 +148,10 @@ public class GraduationCertCriteriaService {
             englishCertCriterion.getGtelpSpeakingLevel(),
             englishCertAltCourse
         );
+    }
+
+    private ClassicCertCriteriaResponse buildClassicCriteria() {
+        return ClassicCertCriteriaResponse.fromEnum();
     }
 
     private CodingCertCriteriaResponse buildCodingCriteria(int admissionYear, CodingTargetType codingTargetType) {
