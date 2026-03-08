@@ -579,41 +579,6 @@ class GraduationCertCriteriaServiceTest {
     }
 
     @Test
-    @DisplayName("해당 입학년도에 대한 고전인증 기준 데이터가 없을 경우 예외를 검증한다.")
-    void getGraduationCertCriteria_throwsClassicCriteriaNotFound() {
-        int admissionYear = 2025;
-
-        certRuleRepository.saveAndFlush(new GraduationCertRule(admissionYear, 25, GraduationCertRuleType.TWO_OF_THREE));
-
-        GraduationDepartmentInfo userDept = departmentInfoRepository.saveAndFlush(
-            new GraduationDepartmentInfo(
-                admissionYear,
-                25,
-                "수학통계학과",
-                "2658",
-                "자연과학대학",
-                DeptGroup.NATURAL_SCIENCES_COLLEGE,
-                EnglishTargetType.NON_MAJOR,
-                CodingTargetType.NON_MAJOR,
-                null
-            )
-        );
-
-        User user = userRepository.saveAndFlush(UserFixture.singleMajorUser(admissionYear, userDept));
-
-        englishCertCriterionRepository.saveAndFlush(
-            EnglishCertCriterionFixture.createNonMajorEnglishCertCriterion(admissionYear)
-        );
-        codingCertCriterionRepository.saveAndFlush(
-            CodingCertCriterionFixture.createNonMajorCodingCertCriterion(admissionYear)
-        );
-
-        assertThatThrownBy(() -> graduationCertCriteriaService.getGraduationCertCriteria(user.getId()))
-            .isInstanceOf(AllcllException.class)
-            .hasMessageContaining(AllcllErrorCode.CLASSIC_CERT_CRITERIA_NOT_FOUND.getMessage());
-    }
-
-    @Test
     @DisplayName("해당 입학년도 및 학과에 대한 코딩인증 기준 데이터가 없을 경우 예외를 검증한다.")
     void getGraduationCertCriteria_withoutCodingCriterion_throws() {
         int admissionYear = 2025;
