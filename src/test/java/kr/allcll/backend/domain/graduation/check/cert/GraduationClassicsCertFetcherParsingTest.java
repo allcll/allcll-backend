@@ -26,15 +26,8 @@ public class GraduationClassicsCertFetcherParsingTest {
                                 <tr>
                                     <th class="td-left" scope="row">인증여부</th>
                                     <td class="td-left">
-                
-                
-                
-                
-                
                                     								2024년도 1학기
                                     								인증
-                
-                
                                    </td>
                                 </tr>
                             </tbody>
@@ -47,10 +40,6 @@ public class GraduationClassicsCertFetcherParsingTest {
 
         // when
         String[] passTextParts = parser.selectClassicsPassText(document);
-        System.out.println(passTextParts.length);
-        System.out.println(passTextParts[0]);
-        System.out.println(passTextParts[1]);
-
         String passText = passTextParts[PASS_STATUS_INDEX];
         boolean expect = !passText.equals("아니오");
 
@@ -75,13 +64,7 @@ public class GraduationClassicsCertFetcherParsingTest {
                                         <tr>
                                             <th class="td-left" scope="row">인증여부</th>
                                             <td class="td-left">
-                
-                
                                             									아니오(고전특강 대상자)
-                
-                
-                
-                
                                             </td>
                                         </tr>
                                     </tbody>
@@ -96,9 +79,6 @@ public class GraduationClassicsCertFetcherParsingTest {
 
         // when
         String[] passTextParts = parser.selectClassicsPassText(document);
-        System.out.println(passTextParts.length);
-        System.out.println(passTextParts[0]);
-        System.out.println(passTextParts[0]);
 
         String passText = passTextParts[PASS_STATUS_INDEX];
         boolean result = !passText.equals("아니오");
@@ -124,13 +104,7 @@ public class GraduationClassicsCertFetcherParsingTest {
                                         <tr>
                                             <th class="td-left" scope="row">인증여부</th>
                                             <<td class="td-left">
-                
-                
                                              									아니오
-                
-                
-                
-                
                                             </td>
                                         </tr>
                                     </tbody>
@@ -145,9 +119,6 @@ public class GraduationClassicsCertFetcherParsingTest {
 
         // when
         String[] passTextParts = parser.selectClassicsPassText(document);
-        System.out.println(passTextParts.length);
-        System.out.println(passTextParts[0]);
-
         String passText = passTextParts[PASS_STATUS_INDEX];
         boolean result = !passText.equals("아니오");
 
