@@ -279,7 +279,7 @@ public class GraduationCheckResponseMapper {
         double adjustedCredits
     ) {
         double remainingCredits = Math.max(0, graduationCategory.requiredCredits() - adjustedCredits);
-        boolean isSatisfied = adjustedCredits >= graduationCategory.requiredCredits();
+        boolean isSatisfied = isSatisfiedCreditCriterion(graduationCategory, adjustedCredits);
 
         return new GraduationCategory(
             graduationCategory.majorScope(),
@@ -292,6 +292,10 @@ public class GraduationCheckResponseMapper {
             null,
             isSatisfied
         );
+    }
+
+    private static boolean isSatisfiedCreditCriterion(GraduationCategory graduationCategory, double adjustedCredits) {
+        return adjustedCredits >= graduationCategory.requiredCredits();
     }
 
     private EnglishTargetType parseEnglishTargetType(GraduationCertCriteriaResponse response) {
