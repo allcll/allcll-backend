@@ -3,6 +3,7 @@ package kr.allcll.backend.domain.graduation.check.result.dto;
 import java.util.Set;
 import kr.allcll.backend.domain.graduation.MajorScope;
 import kr.allcll.backend.domain.graduation.balance.BalanceRequiredArea;
+import kr.allcll.backend.domain.graduation.check.result.GraduationCheckCategoryResult;
 import kr.allcll.backend.domain.graduation.credit.CategoryType;
 
 public record GraduationCategory(
@@ -17,4 +18,42 @@ public record GraduationCategory(
     Boolean satisfied
 ) {
 
+    public static GraduationCategory of(
+        GraduationCheckCategoryResult categoryResult,
+        Set<BalanceRequiredArea> earnedAreas,
+        Integer requiredAreasCnt
+    ) {
+        if (categoryResult.getCategoryType() == CategoryType.BALANCE_REQUIRED) {
+            return GraduationCategory.ofBalance(categoryResult, earnedAreas, requiredAreasCnt);
+        }
+        return new GraduationCategory(
+            categoryResult.getMajorScope(),
+            categoryResult.getCategoryType(),
+            categoryResult.getMyCredits(),
+            categoryResult.getRequiredCredits(),
+            categoryResult.getRemainingCredits(),
+            null,
+            null,
+            null,
+            categoryResult.getIsSatisfied()
+        );
+    }
+
+    private static GraduationCategory ofBalance(
+        GraduationCheckCategoryResult balanceCategory,
+        Set<BalanceRequiredArea> earnedAreas,
+        Integer requiredAreasCnt
+    ) {
+        return new GraduationCategory(
+            balanceCategory.getMajorScope(),
+            balanceCategory.getCategoryType(),
+            balanceCategory.getMyCredits(),
+            balanceCategory.getRequiredCredits(),
+            balanceCategory.getRemainingCredits(),
+            earnedAreas.size(),
+            requiredAreasCnt,
+            earnedAreas,
+            balanceCategory.getIsSatisfied()
+        );
+    }
 }

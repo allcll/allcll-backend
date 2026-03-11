@@ -64,32 +64,7 @@ public class GraduationCheckResponseMapper {
         Integer requiredAreasCnt = findRequiredAreasCnt(userId);
 
         List<GraduationCategory> categories = categoryResults.stream()
-            .map(result -> {
-                if (result.getCategoryType() == CategoryType.BALANCE_REQUIRED) {
-                    return new GraduationCategory(
-                        result.getMajorScope(),
-                        result.getCategoryType(),
-                        result.getMyCredits(),
-                        result.getRequiredCredits(),
-                        result.getRemainingCredits(),
-                        earnedAreas.size(),
-                        requiredAreasCnt,
-                        earnedAreas,
-                        result.getIsSatisfied()
-                    );
-                }
-                return new GraduationCategory(
-                    result.getMajorScope(),
-                    result.getCategoryType(),
-                    result.getMyCredits(),
-                    result.getRequiredCredits(),
-                    result.getRemainingCredits(),
-                    null,
-                    null,
-                    null,
-                    result.getIsSatisfied()
-                );
-            })
+            .map(result -> GraduationCategory.of(result, earnedAreas, requiredAreasCnt))
             .toList();
 
         // 2. 전필 초과 시 전선으로 학점 보정
