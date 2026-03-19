@@ -1,6 +1,5 @@
 package kr.allcll.backend.domain.graduation.check.cert;
 
-import java.util.List;
 import kr.allcll.backend.domain.graduation.certification.ClassicAltCoursePolicy;
 import kr.allcll.backend.domain.graduation.certification.GraduationCertificationAltCoursePolicy;
 import kr.allcll.backend.domain.graduation.check.cert.dto.ClassicsCounts;
@@ -17,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -35,32 +36,32 @@ public class GraduationCertResolver {
 
     public GraduationCertInfo resolve(User user, OkHttpClient client) {
         GraduationDepartmentInfo userDept = graduationDepartmentInfoRepository
-            .findByAdmissionYearAndDeptCd(user.getAdmissionYear(), user.getDeptCd())
-            .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND));
+                .findByAdmissionYearAndDeptCd(user.getAdmissionYear(), user.getDeptCd())
+                .orElseThrow(() -> new AllcllException(AllcllErrorCode.DEPARTMENT_NOT_FOUND));
 
         List<CompletedCourse> completedCourses = completedCourseRepository.findAllByUserId(user.getId());
 
         GraduationCheckCertResult certResult = graduationCheckCertResultRepository.findByUserId(user.getId())
-            .orElse(null);
+                .orElse(null);
 
         boolean englishPassed = resolveEnglishPassed(user, client, userDept, completedCourses, certResult);
         boolean codingPassed = resolveCodingPassed(user, client, userDept, completedCourses, certResult);
         ClassicsResult classicsResult = resolveClassics(user, client, certResult);
 
         return GraduationCertInfo.of(
-            englishPassed,
-            codingPassed,
-            classicsResult.passed(),
-            classicsResult.counts()
+                englishPassed,
+                codingPassed,
+                classicsResult.passed(),
+                classicsResult.counts()
         );
     }
 
     private boolean resolveEnglishPassed(
-        User user,
-        OkHttpClient client,
-        GraduationDepartmentInfo userDept,
-        List<CompletedCourse> completedCourses,
-        GraduationCheckCertResult certResult
+            User user,
+            OkHttpClient client,
+            GraduationDepartmentInfo userDept,
+            List<CompletedCourse> completedCourses,
+            GraduationCheckCertResult certResult
     ) {
         if (isEnglishAlreadyPassed(certResult)) {
             return true;
@@ -79,11 +80,11 @@ public class GraduationCertResolver {
     }
 
     private boolean resolveCodingPassed(
-        User user,
-        OkHttpClient client,
-        GraduationDepartmentInfo userDept,
-        List<CompletedCourse> completedCourses,
-        GraduationCheckCertResult certResult
+            User user,
+            OkHttpClient client,
+            GraduationDepartmentInfo userDept,
+            List<CompletedCourse> completedCourses,
+            GraduationCheckCertResult certResult
     ) {
         if (isCodingAlreadyPassed(certResult)) {
             return true;
@@ -102,9 +103,9 @@ public class GraduationCertResolver {
     }
 
     private ClassicsResult resolveClassics(
-        User user,
-        OkHttpClient client,
-        GraduationCheckCertResult certResult
+            User user,
+            OkHttpClient client,
+            GraduationCheckCertResult certResult
     ) {
         ClassicsCounts fallbackCounts = ClassicsCounts.fallback(certResult);
 
@@ -113,11 +114,13 @@ public class GraduationCertResolver {
         }
 
         ClassicsResult classicsResult = fetchClassicsResultFromExternal(client, fallbackCounts);
-        if (classicsResult.passed()) {
-            return classicsResult;
-        }
+        boolean isSatisfiedByCrawledResult = classicsResult.isSatisfiedByCrawledResult();
         boolean satisfiedByAltCourse = classicAltCoursePolicy.isSatisfiedByAltCourse(user);
-        return classicsResult.passedWith(satisfiedByAltCourse, classicsResult.counts());
+        if (isSatisfiedByCrawledResult || satisfiedByAltCourse) {
+            return ClassicsResult.passedWith(classicsResult.counts());
+        }
+
+        return ClassicsResult.failedWith(classicsResult.counts());
     }
 
     private ClassicsResult fetchClassicsResultFromExternal(OkHttpClient client, ClassicsCounts fallbackCounts) {
