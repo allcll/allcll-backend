@@ -1,13 +1,14 @@
 package kr.allcll.backend.domain.graduation.check.cert;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import kr.allcll.backend.support.graduation.GraduationHtmlParser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+@DisplayName("GraduationClassicsCertFetcher 테스트")
 public class GraduationClassicsCertFetcherParsingTest {
 
     private final GraduationHtmlParser parser = new GraduationHtmlParser();
@@ -18,23 +19,23 @@ public class GraduationClassicsCertFetcherParsingTest {
         // given
         int PASS_STATUS_INDEX = 0;
         String html = """
-                <div class="b-con-box">
-                    <h4 class="b-h4-tit01">사용자 정보</h4>
-                    <div class="table-wrap">
-                        <table class="b-board-table">
-                            <tbody>
-                                <tr>
-                                    <th class="td-left" scope="row">인증여부</th>
-                                    <td class="td-left">
-                                    								2024년도 1학기
-                                    								인증
-                                   </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+            <div class="b-con-box">
+                <h4 class="b-h4-tit01">사용자 정보</h4>
+                <div class="table-wrap">
+                    <table class="b-board-table">
+                        <tbody>
+                            <tr>
+                                <th class="td-left" scope="row">인증여부</th>
+                                <td class="td-left">
+                                								2024년도 1학기
+                                								인증
+                               </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                """;
+            </div>
+            """;
 
         Document document = Jsoup.parse(html);
 
@@ -54,26 +55,26 @@ public class GraduationClassicsCertFetcherParsingTest {
         int PASS_STATUS_INDEX = 0;
 
         String html = """
-                <div class="co-board">
-                    <div class="bn-view-common type01">
-                        <div class="b-con-box">
-                            <h4 class="b-h4-tit01">사용자 정보</h4>
-                            <div class="table-wrap">
-                                <table class="b-board-table">
-                                    <tbody>
-                                        <tr>
-                                            <th class="td-left" scope="row">인증여부</th>
-                                            <td class="td-left">
-                                            									아니오(고전특강 대상자)
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+            <div class="co-board">
+                <div class="bn-view-common type01">
+                    <div class="b-con-box">
+                        <h4 class="b-h4-tit01">사용자 정보</h4>
+                        <div class="table-wrap">
+                            <table class="b-board-table">
+                                <tbody>
+                                    <tr>
+                                        <th class="td-left" scope="row">인증여부</th>
+                                        <td class="td-left">
+                                        									아니오(고전특강 대상자)
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-                """;
+            </div>
+            """;
 
         Document document = Jsoup.parse(html);
 
@@ -94,26 +95,26 @@ public class GraduationClassicsCertFetcherParsingTest {
         int PASS_STATUS_INDEX = 0;
 
         String html = """
-                <div class="co-board">
-                    <div class="bn-view-common type01">
-                        <div class="b-con-box">
-                            <h4 class="b-h4-tit01">사용자 정보</h4>
-                            <div class="table-wrap">
-                                <table class="b-board-table">
-                                    <tbody>
-                                        <tr>
-                                            <th class="td-left" scope="row">인증여부</th>
-                                            <<td class="td-left">
-                                             									아니오
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+            <div class="co-board">
+                <div class="bn-view-common type01">
+                    <div class="b-con-box">
+                        <h4 class="b-h4-tit01">사용자 정보</h4>
+                        <div class="table-wrap">
+                            <table class="b-board-table">
+                                <tbody>
+                                    <tr>
+                                        <th class="td-left" scope="row">인증여부</th>
+                                        <<td class="td-left">
+                                         									아니오
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-                """;
+            </div>
+            """;
 
         Document document = Jsoup.parse(html);
 
