@@ -39,6 +39,20 @@ public record GraduationCategory(
         );
     }
 
+    public static GraduationCategory createEmptyGraduationCategory(MajorScope majorScope, CategoryType categoryType) {
+        return new GraduationCategory(
+            majorScope,
+            categoryType,
+            0.0,
+            0,
+            0.0,
+            null,
+            null,
+            null,
+            true
+        );
+    }
+
     private static GraduationCategory ofBalance(
         GraduationCheckCategoryResult balanceCategory,
         Set<BalanceRequiredArea> earnedAreas,
