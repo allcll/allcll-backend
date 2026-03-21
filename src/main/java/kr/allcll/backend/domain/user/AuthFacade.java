@@ -27,7 +27,15 @@ public class AuthFacade {
     @Transactional
     public LoginResult login(LoginRequest loginRequest) {
         OkHttpClient client = authService.login(loginRequest);
-        toscAuthService.loginTosc(client, loginRequest);
+
+        boolean toscLoginFailed = false;
+        try {
+            toscAuthService.loginTosc(client, loginRequest);
+        } catch (Exception exception) {
+            toscLoginFailed = true;
+            log.error("[TOSC] 로그인 실패, TOSC 정보 업데이트 불가 (학번: {}): {}",
+                loginRequest.studentId(), exception.getMessage());
+        }
 
         UserInfo userInfo = userFetcher.fetch(client);
         User user = userService.findOrCreate(userInfo);
@@ -36,9 +44,10 @@ public class AuthFacade {
             GraduationCertInfo certInfo = graduationCertResolver.resolve(user, client);
             graduationCertService.createOrUpdate(user, certInfo);
         } catch (Exception exception) {
-            log.error("[GraduationCert] 인증 정보 저장 중 오류 발생 (유저 ID: {}): {}", user.getId(), exception.getMessage());
+            log.error("[GraduationCert] 인증 정보 저장 중 오류 발생 (유저 ID: {}): {}",
+                user.getId(), exception.getMessage());
         }
 
-        return new LoginResult(user.getId());
+        return new LoginResult(user.getId(), toscLoginFailed);
     }
 }
