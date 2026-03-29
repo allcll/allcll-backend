@@ -19,5 +19,5 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
         where n.id = :id
         and n.isDeleted = false
         """)
-    Optional<Notice> findById(Long id);
+    Optional<Notice> findActiveById(Long id);
 }

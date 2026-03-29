@@ -28,13 +28,17 @@ public class AdminNoticeService {
 
     @Transactional
     public CreateNoticeResponse createNewNotice(CreateNoticeRequest createNoticeRequest) {
-        Notice notice = noticeRepository.save(createNoticeRequest.toEntity());
+        Notice notice = noticeRepository.save(Notice.of(
+            createNoticeRequest.title(),
+            createNoticeRequest.content(),
+            createNoticeRequest.operationType()
+        ));
         return CreateNoticeResponse.from(notice);
     }
 
     @Transactional
     public UpdateNoticeResponse updateNotice(Long id, UpdateNoticeRequest updateNoticeRequest) {
-        Notice notice = noticeRepository.findById(id)
+        Notice notice = noticeRepository.findActiveById(id)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.NOTICE_NOT_FOUND, id));
         notice.update(
             updateNoticeRequest.title(),
@@ -42,5 +46,16 @@ public class AdminNoticeService {
             updateNoticeRequest.operationType()
         );
         return UpdateNoticeResponse.from(notice);
+    }
+
+    @Transactional
+    public void deleteNotice(Long id) {
+        Notice notice = noticeRepository.findActiveById(id)
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.NOTICE_NOT_FOUND, id));
+        softDeleteNotice(notice);
+    }
+
+    private void softDeleteNotice(Notice notice) {
+        notice.delete();
     }
 }

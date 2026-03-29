@@ -11,6 +11,7 @@ import kr.allcll.backend.admin.notice.dto.UpdateNoticeResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -57,5 +58,17 @@ public class AdminNoticeApi {
         }
         UpdateNoticeResponse response = adminNoticeService.updateNotice(id, updateNoticeRequest);
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/api/admin/notices/{id}")
+    public ResponseEntity<Void> deleteNotice(
+        HttpServletRequest request,
+        @PathVariable Long id
+    ) {
+        if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
+            return ResponseEntity.status(401).build();
+        }
+        adminNoticeService.deleteNotice(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

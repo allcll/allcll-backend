@@ -3,7 +3,6 @@ package kr.allcll.backend.admin.notice.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import kr.allcll.backend.domain.notice.Notice;
 import kr.allcll.backend.domain.operationPeriod.OperationType;
 
 public record CreateNoticeRequest(
@@ -19,11 +18,4 @@ public record CreateNoticeRequest(
     OperationType operationType
 ) {
 
-    public Notice toEntity() {
-        return new Notice(
-            title,
-            content,
-            operationType
-        );
-    }
 }

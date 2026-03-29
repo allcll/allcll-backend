@@ -33,10 +33,18 @@ public class Notice extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private OperationType operationType;
 
-    public Notice(String title, String content, OperationType operationType) {
+    private Notice(String title, String content, OperationType operationType) {
         this.title = title;
         this.content = content;
         this.operationType = operationType;
+    }
+
+    public static Notice of(String title, String content, OperationType operationType) {
+        return new Notice(
+            title,
+            content,
+            operationType
+        );
     }
 
     public void update(String title, String content, OperationType operationType) {
@@ -49,5 +57,9 @@ public class Notice extends BaseEntity {
         if (operationType != null) {
             this.operationType = operationType;
         }
+    }
+
+    public void delete() {
+        super.delete();
     }
 }
