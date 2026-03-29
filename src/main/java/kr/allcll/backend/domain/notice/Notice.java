@@ -32,4 +32,10 @@ public class Notice extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private OperationType operationType;
+
+    public Notice(String title, String content, OperationType operationType) {
+        this.title = title;
+        this.content = content;
+        this.operationType = operationType;
+    }
 }
