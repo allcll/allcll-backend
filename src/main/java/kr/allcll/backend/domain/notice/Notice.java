@@ -38,4 +38,16 @@ public class Notice extends BaseEntity {
         this.content = content;
         this.operationType = operationType;
     }
+
+    public void update(String title, String content, OperationType operationType) {
+        if (title != null) {
+            this.title = title;
+        }
+        if (content != null) {
+            this.content = content;
+        }
+        if (operationType != null) {
+            this.operationType = operationType;
+        }
+    }
 }

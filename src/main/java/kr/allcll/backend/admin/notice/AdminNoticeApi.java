@@ -6,10 +6,14 @@ import kr.allcll.backend.admin.AdminRequestValidator;
 import kr.allcll.backend.admin.notice.dto.CreateNoticeRequest;
 import kr.allcll.backend.admin.notice.dto.CreateNoticeResponse;
 import kr.allcll.backend.admin.notice.dto.NoticesResponse;
+import kr.allcll.backend.admin.notice.dto.UpdateNoticeRequest;
+import kr.allcll.backend.admin.notice.dto.UpdateNoticeResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,5 +44,18 @@ public class AdminNoticeApi {
         }
         CreateNoticeResponse response = adminNoticeService.createNewNotice(createNoticeRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PatchMapping("/api/admin/notices/{id}")
+    public ResponseEntity<UpdateNoticeResponse> modifyNotice(
+        HttpServletRequest request,
+        @PathVariable Long id,
+        @Valid @RequestBody UpdateNoticeRequest updateNoticeRequest
+    ) {
+        if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
+            return ResponseEntity.status(401).build();
+        }
+        UpdateNoticeResponse response = adminNoticeService.updateNotice(id, updateNoticeRequest);
+        return ResponseEntity.ok(response);
     }
 }
