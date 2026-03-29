@@ -19,7 +19,7 @@ public class AdminNoticeService {
     private final NoticeRepository noticeRepository;
 
     public NoticesResponse getAllNotice() {
-        List<Notice> allNotices = noticeRepository.findAll();
+        List<Notice> allNotices = noticeRepository.findAllOrderedByCreatedAt();
         return NoticesResponse.from(allNotices);
     }
 
