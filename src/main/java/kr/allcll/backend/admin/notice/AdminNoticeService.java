@@ -6,7 +6,6 @@ import kr.allcll.backend.admin.notice.dto.CreateNoticeResponse;
 import kr.allcll.backend.admin.notice.dto.NoticesResponse;
 import kr.allcll.backend.domain.notice.Notice;
 import kr.allcll.backend.domain.notice.NoticeRepository;
-import kr.allcll.backend.domain.operationPeriod.OperationType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,10 +24,7 @@ public class AdminNoticeService {
 
     @Transactional
     public CreateNoticeResponse createNewNotice(CreateNoticeRequest createNoticeRequest) {
-        String title = createNoticeRequest.title();
-        String content = createNoticeRequest.content();
-        OperationType operationType = createNoticeRequest.operationType();
-        Notice notice = noticeRepository.save(new Notice(title, content, operationType));
+        Notice notice = noticeRepository.save(createNoticeRequest.toEntity());
         return CreateNoticeResponse.from(notice);
     }
 }

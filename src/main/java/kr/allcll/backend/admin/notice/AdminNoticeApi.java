@@ -1,6 +1,7 @@
 package kr.allcll.backend.admin.notice;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import kr.allcll.backend.admin.AdminRequestValidator;
 import kr.allcll.backend.admin.notice.dto.CreateNoticeRequest;
 import kr.allcll.backend.admin.notice.dto.CreateNoticeResponse;
@@ -32,7 +33,7 @@ public class AdminNoticeApi {
     @PostMapping("/api/admin/notices")
     public ResponseEntity<CreateNoticeResponse> createNotice(
         HttpServletRequest request,
-        @RequestBody CreateNoticeRequest createNoticeRequest
+        @Valid @RequestBody CreateNoticeRequest createNoticeRequest
     ) {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
