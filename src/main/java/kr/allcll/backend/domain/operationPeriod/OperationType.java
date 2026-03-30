@@ -4,12 +4,14 @@ import lombok.Getter;
 
 @Getter
 public enum OperationType {
+    ALL("all"),
     TIMETABLE("timetable"),
     BASKETS("baskets"),
     SIMULATION("simulation"),
     LIVE("live"),
     PRESEAT("preseat"),
-    GRADUATION("graduation");
+    GRADUATION("graduation"),
+    ;
 
     private final String value;
 
