@@ -13,6 +13,27 @@ public class RequiredCourseResolver {
     private static final String WILD_CARD_DEPT_NM = "ALL";
     private final RequiredCourseRepository requiredCourseRepository;
 
+    public boolean findRequiredCourseInGroup(
+        String departmentName,
+        Integer admissionYear,
+        CategoryType categoryType,
+        String groupCode
+    ) {
+        List<RequiredCourse> requiredCourseCandidatesWithWildCard =
+            requiredCourseRepository.findRequiredCoursesByGroupCode(
+                List.of(WILD_CARD_DEPT_NM, departmentName),
+                admissionYear,
+                categoryType,
+                groupCode
+            );
+
+        List<RequiredCourse> requiredCoursesWithStatus
+            = getDepartmentRequiredCourses(requiredCourseCandidatesWithWildCard, departmentName);
+
+        return requiredCoursesWithStatus.stream()
+            .anyMatch(RequiredCourse::getRequired);
+    }
+
     public List<String> findRequiredCourseNames(
         String departmentName,
         Integer admissionYear,

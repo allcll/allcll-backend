@@ -10,13 +10,14 @@ import org.springframework.stereotype.Component;
 public class AcademicBasicPolicy {
 
     private final RequiredCourseResolver requiredCourseResolver;
-    private final CourseReplacementRepository courseReplacementRepository;
+    private final CourseEquivalenceRepository courseEquivalenceRepository;
 
     public boolean isRecentMajorAcademicBasic(CompletedCourse course, CreditCriterion criterion) {
         if (isNotAcademicBasic(course)) {
             return true;
         }
-        String courseName = course.getCuriNm();
+        String curiNm = course.getCuriNm();
+        String curiNo = course.getCuriNo();
         Integer admissionYear = criterion.getAdmissionYear();
         String departmentName = criterion.getDeptNm();
         List<String> academicBasicRequiredCourseNames = requiredCourseResolver.findRequiredCourseNames(
@@ -25,44 +26,33 @@ public class AcademicBasicPolicy {
             CategoryType.ACADEMIC_BASIC
         );
 
-        if (isExistAcademicBasicCourse(academicBasicRequiredCourseNames, courseName)) {
+        if (isExistAcademicBasicCourse(academicBasicRequiredCourseNames, curiNm)) {
             return true;
         }
 
-        return isHaveReplaceCourse(academicBasicRequiredCourseNames, admissionYear, courseName);
+        return isHaveReplaceOrEquivalenceCourse(admissionYear, departmentName, curiNo);
     }
 
     private boolean isExistAcademicBasicCourse(List<String> academicBasicRequiredCourseNames, String courseName) {
         return academicBasicRequiredCourseNames.contains(courseName);
     }
 
-    /*
-    대체된 최신 과목을 들었을 경우를 판별한다.
-    대체된 최신 과목이 없는 경우 false를 반환한다.
-    대체 과목의 예전 과목 명이, 학생의 이수 요건에 없으면 false를 반환한다.
-     */
-    private boolean isHaveReplaceCourse(
-        List<String> academicBasicRequiredCourseNames,
-        Integer admissionYear,
-        String courseName
-    ) {
-        List<CourseReplacement> recentCourse = courseReplacementRepository.findRecentCourse(admissionYear, courseName);
-        if (recentCourse.isEmpty()) {
-            return false;
-        }
-        for (CourseReplacement courseReplacement : recentCourse) {
-            if (academicBasicRequiredCourseNames.contains(courseReplacement.getLegacyCuriNm())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private boolean isNotAcademicBasic(CompletedCourse course) {
-        return !isAcademicBasic(course);
+        return !CategoryType.ACADEMIC_BASIC.equals(course.getCategoryType());
     }
 
-    private boolean isAcademicBasic(CompletedCourse course) {
-        return CategoryType.ACADEMIC_BASIC.equals(course.getCategoryType());
+    private boolean isHaveReplaceOrEquivalenceCourse(
+        Integer admissionYear,
+        String departmentName,
+        String curiNo
+    ) {
+        return courseEquivalenceRepository.findGroupCodeByCuriNo(curiNo)
+            .map(groupCode -> requiredCourseResolver.findRequiredCourseInGroup(
+                departmentName,
+                admissionYear,
+                CategoryType.ACADEMIC_BASIC,
+                groupCode
+            ))
+            .orElse(false);
     }
 }
