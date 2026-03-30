@@ -48,6 +48,9 @@ public class RequiredCourse extends BaseEntity {
     @Column(name = "alt_group")
     private String altGroup; // 선택 과목 그룹 키
 
+    @Column(name = "group_code")
+    private String groupCode; // 동일 및 대체 과목 그룹 코드
+
     @Column(name = "required", nullable = false)
     private Boolean required; // 검사 대상 여부
 
@@ -63,6 +66,7 @@ public class RequiredCourse extends BaseEntity {
         String curiNo,
         String curiNm,
         String altGroup,
+        String groupCode,
         Boolean required,
         String note
     ) {
@@ -74,6 +78,7 @@ public class RequiredCourse extends BaseEntity {
         this.curiNo = curiNo;
         this.curiNm = curiNm;
         this.altGroup = altGroup;
+        this.groupCode = groupCode;
         this.required = required;
         this.note = note;
     }
