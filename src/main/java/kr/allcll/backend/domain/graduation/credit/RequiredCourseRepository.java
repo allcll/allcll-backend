@@ -34,4 +34,11 @@ public interface RequiredCourseRepository extends JpaRepository<RequiredCourse, 
         CategoryType categoryType,
         String groupCode
     );
+
+    @Query("""
+            select r from RequiredCourse r
+            where r.groupCode = :groupCode
+            and r.curiNo != :deprecatedCuriNo
+        """)
+    List<RequiredCourse> findCurrentCourseByGroupCode(String groupCode, String deprecatedCuriNo);
 }
