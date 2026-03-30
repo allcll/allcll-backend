@@ -33,4 +33,18 @@ public class CompletedCourseFixture {
             true
         );
     }
+
+    public static CompletedCourse createCompletedCourse(String curiNo, String curiNm, CategoryType categoryType) {
+        return new CompletedCourse(
+            1L,
+            curiNo,
+            curiNm,
+            categoryType,
+            "",
+            3.0,
+            "A+",
+            MajorScope.PRIMARY,
+            true
+        );
+    }
 }
