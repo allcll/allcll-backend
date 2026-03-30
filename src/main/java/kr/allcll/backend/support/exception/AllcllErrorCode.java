@@ -16,6 +16,7 @@ public enum AllcllErrorCode {
     EXCEL_PARSE_ERROR(HttpStatus.BAD_REQUEST, "엑셀 파일 파싱 중 오류가 발생했습니다."),
     INVALID_FILE_TYPE(HttpStatus.BAD_REQUEST, "지원하지 않는 파일 형식입니다."),
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "기이수성적 엑셀 파일이 첨부되지 않았습니다."),
+    INVALID_REQUEST_VALUE(HttpStatus.BAD_REQUEST, "요청 값이 올바르지 않습니다."),
     EMPTY_REQUIRED_COLUMN(HttpStatus.BAD_REQUEST, "엑셀의 필수 컬럼에 값이 비어 있습니다: %s"),
     INVALID_CREDIT_COLUMN(HttpStatus.BAD_REQUEST, "기이수성적 엑셀의 학점 칼럼에 숫자 외의 값이 포함되어있습니다."),
 
@@ -32,6 +33,7 @@ public enum AllcllErrorCode {
     TIMETABLE_NOT_FOUND(HttpStatus.NOT_FOUND, "시간표를 찾을 수 없습니다."),
     CUSTOM_SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "커스텀 일정을 찾을 수 없습니다."),
     BASKET_NOT_FOUND(HttpStatus.NOT_FOUND, "관심과목 정보가 존재하지 않습니다."),
+    NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 공지사항입니다. (noticeId: %d)"),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자 정보를 찾을 수 없습니다."),
     GOOGLE_KEY_NOT_FOUND(HttpStatus.NOT_FOUND, "구글 서비스 계정 키 파일을 찾을 수 없습니다."),
     GOOGLE_SHEET_TAB_NOT_FOUND(HttpStatus.NOT_FOUND, "구글 시트가 존재하지 않습니다."),

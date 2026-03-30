@@ -1,5 +1,6 @@
 package kr.allcll.backend.domain.review;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -27,6 +28,7 @@ public class UserReview {
     @Enumerated(EnumType.STRING)
     private OperationType operationType;
 
+    @Column(nullable = false, length = 1000)
     private String detail;
 
     public UserReview(String studentId, Short rate, OperationType operationType, String detail) {
