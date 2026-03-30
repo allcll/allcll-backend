@@ -7,15 +7,15 @@ import kr.allcll.backend.domain.graduation.credit.CreditCriterion;
 
 public class CreditCriterionFixture {
 
-    public static CreditCriterion createCriterion(CategoryType categoryType) {
+    public static CreditCriterion createAcademicBasicCriterion(String deptNm, Integer admissionYear) {
         return new CreditCriterion(
-            2023,
-            23,
+            admissionYear,
+            admissionYear % 100,
             MajorType.SINGLE,
-            "소프트웨어학과",
-            "3220",
+            "3210",
+            deptNm,
             MajorScope.PRIMARY,
-            categoryType,
+            CategoryType.ACADEMIC_BASIC,
             9,
             true,
             ""
