@@ -23,6 +23,8 @@ import kr.allcll.backend.domain.graduation.certification.GraduationCertRule;
 import kr.allcll.backend.domain.graduation.certification.GraduationCertRuleRepository;
 import kr.allcll.backend.domain.graduation.certification.GraduationCertRuleType;
 import kr.allcll.backend.domain.graduation.credit.CategoryType;
+import kr.allcll.backend.domain.graduation.credit.CourseEquivalence;
+import kr.allcll.backend.domain.graduation.credit.CourseEquivalenceRepository;
 import kr.allcll.backend.domain.graduation.credit.CourseReplacement;
 import kr.allcll.backend.domain.graduation.credit.CourseReplacementRepository;
 import kr.allcll.backend.domain.graduation.credit.CreditCriterion;
@@ -42,6 +44,7 @@ import kr.allcll.backend.support.sheet.validation.BalanceRequiredCourseAreaMapSh
 import kr.allcll.backend.support.sheet.validation.BalanceRequiredRulesSheetValidator;
 import kr.allcll.backend.support.sheet.validation.ClassicCertCriteriaSheetValidator;
 import kr.allcll.backend.support.sheet.validation.CodingCertCriteriaSheetValidator;
+import kr.allcll.backend.support.sheet.validation.CourseEquivalencesSheetValidator;
 import kr.allcll.backend.support.sheet.validation.CourseReplacementsSheetValidator;
 import kr.allcll.backend.support.sheet.validation.CreditCriteriaSheetValidator;
 import kr.allcll.backend.support.sheet.validation.DoubleCreditCriteriaSheetValidator;
@@ -64,6 +67,7 @@ public class AdminGraduationSyncService {
     private final RequiredCourseRepository requiredCourseRepository;
     private final CreditCriterionRepository creditCriterionRepository;
     private final GraduationSheetProperties graduationSheetProperties;
+    private final CourseEquivalenceRepository courseEquivalenceRepository;
     private final CourseReplacementRepository courseReplacementRepository;
     private final GraduationCertRuleRepository graduationCertRuleRepository;
     private final BalanceRequiredRuleRepository balanceRequiredRuleRepository;
@@ -83,6 +87,7 @@ public class AdminGraduationSyncService {
         syncDoubleCreditCriteria();
         syncRequiredCourses();
         syncCourseReplacements();
+        syncCourseEquivalences();
 
         syncBalanceRequiredRule();
         syncBalanceRequiredCourseAreaMap();
@@ -179,6 +184,7 @@ public class AdminGraduationSyncService {
                 graduationSheetTable.getString(row, "curi_no"),
                 graduationSheetTable.getString(row, "curi_nm"),
                 graduationSheetTable.getString(row, "alt_group"),
+                graduationSheetTable.getString(row, "group_code"),
                 graduationSheetTable.getBoolean(row, "required"),
                 graduationSheetTable.getString(row, "note")
             );
@@ -215,6 +221,25 @@ public class AdminGraduationSyncService {
         log.info("[졸업요건 데이터 동기화] 탭 이름={}, {}개 저장 완료", tabKey, courseReplacementList.size());
     }
 
+    private void syncCourseEquivalences() {
+        String tabKey = CourseEquivalencesSheetValidator.TAB_KEY;
+        GraduationSheetTable graduationSheetTable = fetchAndValidate(tabKey);
+
+        List<CourseEquivalence> courseEquivalenceList = new ArrayList<>();
+        for (List<Object> row : graduationSheetTable.getDataRows()) {
+            CourseEquivalence courseEquivalence = new CourseEquivalence(
+                graduationSheetTable.getString(row, "group_code"),
+                graduationSheetTable.getString(row, "curi_no"),
+                graduationSheetTable.getString(row, "curi_nm")
+            );
+            courseEquivalenceList.add(courseEquivalence);
+        }
+
+        courseEquivalenceRepository.deleteAllInBatch();
+        courseEquivalenceRepository.saveAll(courseEquivalenceList);
+
+        log.info("[졸업요건 데이터 동기화] 탭 이름={}, {}개 저장 완료", tabKey, courseEquivalenceList.size());
+    }
 
     private void syncBalanceRequiredRule() {
         String tabKey = BalanceRequiredRulesSheetValidator.TAB_KEY;
