@@ -16,6 +16,7 @@ public enum AllcllErrorCode {
     EXCEL_PARSE_ERROR(HttpStatus.BAD_REQUEST, "엑셀 파일 파싱 중 오류가 발생했습니다."),
     INVALID_FILE_TYPE(HttpStatus.BAD_REQUEST, "지원하지 않는 파일 형식입니다."),
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "기이수성적 엑셀 파일이 첨부되지 않았습니다."),
+    INVALID_REQUEST_VALUE(HttpStatus.BAD_REQUEST, "요청 값이 올바르지 않습니다."),
     EMPTY_REQUIRED_COLUMN(HttpStatus.BAD_REQUEST, "엑셀의 필수 컬럼에 값이 비어 있습니다: %s"),
     INVALID_CREDIT_COLUMN(HttpStatus.BAD_REQUEST, "기이수성적 엑셀의 학점 칼럼에 숫자 외의 값이 포함되어있습니다."),
 
