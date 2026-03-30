@@ -14,36 +14,28 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UncompletedCourseFilter {
 
-    private final CourseReplacementResolver courseReplacementResolver;
+    private final CourseEquivalenceRepository courseEquivalenceRepository;
 
     public List<GraduationCategoryResponse> filterUncompletedCourses(
         Integer admissionYear,
         List<GraduationCategoryResponse> categories,
         List<CompletedCourse> earnedCourses
     ) {
-        Set<String> earnedCuriNos = buildEarnedCuriNos(admissionYear, earnedCourses);
+        Set<String> earnedCuriNos = buildEarnedCuriNos(earnedCourses);
 
         return categories.stream()
             .map(category -> filterCategory(category, earnedCuriNos))
             .toList();
     }
 
-    private Set<String> buildEarnedCuriNos(Integer admissionYear, List<CompletedCourse> earnedCourses) {
+    private Set<String> buildEarnedCuriNos(List<CompletedCourse> earnedCourses) {
         Set<String> earnedCuriNos = new HashSet<>();
-        Set<String> earnedCuriNms = new HashSet<>();
 
         for (CompletedCourse completedCourse : earnedCourses) {
-            String curiNo = completedCourse.getCuriNo();
-            earnedCuriNos.add(curiNo);
-
-            String curiNm = completedCourse.getCuriNm();
-            String trimmedCuriNm = curiNm.trim();
-            if (!trimmedCuriNm.isBlank()) {
-                earnedCuriNms.add(trimmedCuriNm);
-            }
+            earnedCuriNos.add(completedCourse.getCuriNo());
         }
 
-        earnedCuriNos.addAll(courseReplacementResolver.resolveCurrentCuriNos(admissionYear, earnedCuriNms));
+        earnedCuriNos.addAll(courseEquivalenceRepository.findSameGroupCuriNos(earnedCuriNos));
 
         return earnedCuriNos;
     }
