@@ -1,8 +1,8 @@
 package kr.allcll.backend.domain.graduation.credit;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import kr.allcll.backend.domain.graduation.balance.dto.BalanceAreaCoursesResponse;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
 import kr.allcll.backend.domain.graduation.credit.dto.GraduationCategoryResponse;
@@ -17,7 +17,6 @@ public class UncompletedCourseFilter {
     private final CourseEquivalenceRepository courseEquivalenceRepository;
 
     public List<GraduationCategoryResponse> filterUncompletedCourses(
-        Integer admissionYear,
         List<GraduationCategoryResponse> categories,
         List<CompletedCourse> earnedCourses
     ) {
@@ -29,11 +28,9 @@ public class UncompletedCourseFilter {
     }
 
     private Set<String> buildEarnedCuriNos(List<CompletedCourse> earnedCourses) {
-        Set<String> earnedCuriNos = new HashSet<>();
-
-        for (CompletedCourse completedCourse : earnedCourses) {
-            earnedCuriNos.add(completedCourse.getCuriNo());
-        }
+        Set<String> earnedCuriNos = earnedCourses.stream()
+            .map(CompletedCourse::getCuriNo)
+            .collect(Collectors.toSet());
 
         earnedCuriNos.addAll(courseEquivalenceRepository.findSameGroupCuriNos(earnedCuriNos));
 
