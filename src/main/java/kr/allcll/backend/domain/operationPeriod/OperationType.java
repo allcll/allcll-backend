@@ -11,6 +11,7 @@ public enum OperationType {
     LIVE("live"),
     PRESEAT("preseat"),
     GRADUATION("graduation"),
+    REVIEW("review"),
     ;
 
     private final String value;
