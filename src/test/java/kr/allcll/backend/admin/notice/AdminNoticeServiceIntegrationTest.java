@@ -92,9 +92,12 @@ class AdminNoticeServiceIntegrationTest {
     @DisplayName("공지 수정 시 null이 아닌 필드만 실제로 변경된다")
     void updateNotice() {
         // given
-        Notice notice = noticeRepository.save(
-            Notice.of("기존 제목", "기존 내용", OperationType.GRADUATION)
-        );
+        Notice notice = Notice.of("기존 제목", "기존 내용", OperationType.GRADUATION);
+        LocalDateTime createdAt = LocalDateTime.of(2026, 4, 5, 10, 0);
+        LocalDateTime initialUpdatedAt = LocalDateTime.of(2026, 4, 5, 10, 0);
+        ReflectionTestUtils.setField(notice, "createdAt", createdAt);
+        ReflectionTestUtils.setField(notice, "updatedAt", initialUpdatedAt);
+        notice = noticeRepository.save(notice);
         UpdateNoticeRequest request = new UpdateNoticeRequest(
             "변경 제목",
             null,
@@ -108,9 +111,11 @@ class AdminNoticeServiceIntegrationTest {
         Notice updatedNotice = noticeRepository.findActiveById(notice.getId()).orElseThrow();
         assertAll(
             () -> assertThat(response.title()).isEqualTo("변경 제목"),
+            () -> assertThat(response.updatedAt()).isAfter(initialUpdatedAt),
             () -> assertThat(updatedNotice.getTitle()).isEqualTo("변경 제목"),
             () -> assertThat(updatedNotice.getContent()).isEqualTo("기존 내용"),
-            () -> assertThat(updatedNotice.getOperationType()).isEqualTo(OperationType.LIVE)
+            () -> assertThat(updatedNotice.getOperationType()).isEqualTo(OperationType.LIVE),
+            () -> assertThat(updatedNotice.getUpdatedAt()).isEqualTo(response.updatedAt())
         );
     }
 
