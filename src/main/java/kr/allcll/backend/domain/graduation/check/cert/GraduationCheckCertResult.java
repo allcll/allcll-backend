@@ -205,4 +205,8 @@ public class GraduationCheckCertResult {
         this.requiredPassCount = this.graduationCertRuleType.getRequiredPassCount();
         this.isSatisfied = this.graduationCertRuleType.isSatisfied(newPassedCount);
     }
+
+    public boolean isClassicsPassed() {
+        return Boolean.TRUE.equals(this.isClassicsCertPassed);
+    }
 }

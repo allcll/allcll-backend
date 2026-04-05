@@ -24,7 +24,7 @@ public class GraduationClassicsCertResolver {
     ) {
         ClassicsCounts fallbackCounts = ClassicsCounts.fallback(certResult);
 
-        if (isClassicsAlreadyPassed(certResult)) {
+        if (certResult.isClassicsPassed()) {
             return ClassicsResult.passedWith(fallbackCounts);
         }
 
@@ -50,12 +50,5 @@ public class GraduationClassicsCertResolver {
             log.error("[졸업요건검사] 고전인증 여부를 불러오지 못했습니다.", e);
             return ClassicsResult.failedWith(fallbackCounts);
         }
-    }
-
-    private boolean isClassicsAlreadyPassed(GraduationCheckCertResult certResult) {
-        if (certResult == null) {
-            return false;
-        }
-        return Boolean.TRUE.equals(certResult.getIsClassicsCertPassed());
     }
 }
