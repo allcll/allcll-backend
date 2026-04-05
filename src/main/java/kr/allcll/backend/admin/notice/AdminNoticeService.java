@@ -45,6 +45,7 @@ public class AdminNoticeService {
             updateNoticeRequest.content(),
             updateNoticeRequest.operationType()
         );
+        noticeRepository.flush();
         return UpdateNoticeResponse.from(notice);
     }
 
