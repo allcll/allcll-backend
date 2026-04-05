@@ -12,6 +12,7 @@ public abstract class BaseEntity {
 
     protected String semesterAt;
     protected LocalDateTime createdAt;
+    protected LocalDateTime updatedAt;
     protected LocalDateTime deletedAt;
     protected boolean isDeleted;
 
@@ -25,6 +26,16 @@ public abstract class BaseEntity {
         if (this.createdAt == null) {
             this.createdAt = createdAt;
         }
+    }
+
+    void setUpdatedAtIfAbsent(LocalDateTime updatedAt) {
+        if (this.updatedAt == null) {
+            this.updatedAt = updatedAt;
+        }
+    }
+
+    void updateUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     protected void delete() {
