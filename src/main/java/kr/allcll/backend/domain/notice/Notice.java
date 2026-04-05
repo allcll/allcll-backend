@@ -30,6 +30,7 @@ public class Notice extends BaseEntity {
     @Column(nullable = false, length = 1000)
     private String content;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private OperationType operationType;
 
