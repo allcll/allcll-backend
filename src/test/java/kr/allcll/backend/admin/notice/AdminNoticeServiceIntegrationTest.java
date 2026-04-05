@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import kr.allcll.backend.admin.notice.dto.CreateNoticeRequest;
 import kr.allcll.backend.admin.notice.dto.CreateNoticeResponse;
@@ -32,9 +31,6 @@ class AdminNoticeServiceIntegrationTest {
 
     @Autowired
     private NoticeRepository noticeRepository;
-
-    @Autowired
-    private EntityManager entityManager;
 
     @AfterEach
     void cleanUp() {
@@ -128,10 +124,9 @@ class AdminNoticeServiceIntegrationTest {
 
         // when
         adminNoticeService.deleteNotice(notice.getId());
-        entityManager.clear();
 
         // then
-        Notice deletedNotice = entityManager.find(Notice.class, notice.getId());
+        Notice deletedNotice = noticeRepository.findById(notice.getId()).orElseThrow();
         assertAll(
             () -> assertThat(deletedNotice.isDeleted()).isTrue(),
             () -> assertThat(noticeRepository.findActiveById(notice.getId())).isEmpty(),
