@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import kr.allcll.backend.admin.notice.dto.CreateNoticeRequest;
 import kr.allcll.backend.admin.notice.dto.CreateNoticeResponse;
 import kr.allcll.backend.admin.notice.dto.NoticesResponse;
@@ -93,8 +94,8 @@ class AdminNoticeServiceIntegrationTest {
     void updateNotice() {
         // given
         Notice notice = Notice.of("기존 제목", "기존 내용", OperationType.GRADUATION);
-        LocalDateTime createdAt = LocalDateTime.of(2026, 4, 5, 10, 0);
-        LocalDateTime initialUpdatedAt = LocalDateTime.of(2026, 4, 5, 10, 0);
+        LocalDateTime createdAt = LocalDateTime.of(2020, 4, 5, 10, 0);
+        LocalDateTime initialUpdatedAt = LocalDateTime.of(2020, 4, 5, 10, 0);
         ReflectionTestUtils.setField(notice, "createdAt", createdAt);
         ReflectionTestUtils.setField(notice, "updatedAt", initialUpdatedAt);
         notice = noticeRepository.save(notice);
@@ -115,7 +116,8 @@ class AdminNoticeServiceIntegrationTest {
             () -> assertThat(updatedNotice.getTitle()).isEqualTo("변경 제목"),
             () -> assertThat(updatedNotice.getContent()).isEqualTo("기존 내용"),
             () -> assertThat(updatedNotice.getOperationType()).isEqualTo(OperationType.LIVE),
-            () -> assertThat(updatedNotice.getUpdatedAt()).isEqualTo(response.updatedAt())
+            () -> assertThat(updatedNotice.getUpdatedAt().truncatedTo(ChronoUnit.MICROS))
+                .isEqualTo(response.updatedAt().truncatedTo(ChronoUnit.MICROS))
         );
     }
 
