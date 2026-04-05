@@ -42,7 +42,8 @@ public class GraduationClassicsCertResolver {
         try {
             ClassicsResult classicsResult = graduationClassicsCertFetcher.fetchClassics(client);
             if (classicsResult == null) {
-                return ClassicsResult.empty();
+                log.warn("[졸업요건검사] 고전인증 결과가 null입니다. fallback 값 사용");
+                return ClassicsResult.failedWith(fallbackCounts);
             }
             return classicsResult.withFallbackCounts(fallbackCounts);
         } catch (Exception e) {
