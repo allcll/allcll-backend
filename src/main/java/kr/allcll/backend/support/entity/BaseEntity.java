@@ -3,7 +3,9 @@ package kr.allcll.backend.support.entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
+import lombok.Getter;
 
+@Getter
 @MappedSuperclass
 @EntityListeners(value = {BaseEntityListener.class})
 public abstract class BaseEntity {
@@ -23,14 +25,6 @@ public abstract class BaseEntity {
         if (this.createdAt == null) {
             this.createdAt = createdAt;
         }
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public boolean isDeleted() {
-        return isDeleted;
     }
 
     protected void delete() {
