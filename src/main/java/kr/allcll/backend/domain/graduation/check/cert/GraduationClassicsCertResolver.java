@@ -23,11 +23,10 @@ public class GraduationClassicsCertResolver {
         OkHttpClient client,
         GraduationCheckCertResult certResult
     ) {
-        ClassicsCounts fallbackCounts = ClassicsCounts.fallback(certResult);
-
         if (certResult.isClassicsPassed()) {
-            return ClassicsResult.passedWith(fallbackCounts);
+            return ClassicsResult.passedWith(ClassicsCounts.fallback(certResult));
         }
+        ClassicsCounts fallbackCounts = ClassicsCounts.fallback(certResult);
 
         ClassicsResult classicsResult = fetchClassicsResultFromExternal(client, fallbackCounts);
         boolean isSatisfiedByCrawledResult = classicsResult.isSatisfiedByCrawledResult();

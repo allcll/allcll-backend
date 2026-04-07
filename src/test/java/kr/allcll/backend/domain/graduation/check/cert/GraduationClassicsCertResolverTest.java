@@ -39,14 +39,11 @@ class GraduationClassicsCertResolverTest {
     void resolve_whenAlreadyPassed() {
         // given
         GraduationCheckCertResult certResult = mock(GraduationCheckCertResult.class);
-        given(certResult.getIsClassicsCertPassed()).willReturn(true);
+        given(certResult.isClassicsPassed()).willReturn(true);
         given(certResult.getMyCountWestern()).willReturn(4);
         given(certResult.getMyCountEastern()).willReturn(2);
         given(certResult.getMyCountEasternAndWestern()).willReturn(2);
         given(certResult.getMyCountScience()).willReturn(1);
-
-        given(graduationClassicsCertFetcher.fetchClassics(client))
-            .willReturn(new ClassicsResult(false, new ClassicsCounts(1, 0, 0, 0)));
 
         // when
         ClassicsResult result = resolver.resolve(user, client, certResult);
