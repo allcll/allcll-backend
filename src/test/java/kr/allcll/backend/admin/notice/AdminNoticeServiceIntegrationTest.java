@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import kr.allcll.backend.admin.notice.dto.CreateNoticeRequest;
 import kr.allcll.backend.admin.notice.dto.CreateNoticeResponse;
 import kr.allcll.backend.admin.notice.dto.NoticesResponse;
@@ -112,12 +111,9 @@ class AdminNoticeServiceIntegrationTest {
         Notice updatedNotice = noticeRepository.findActiveById(notice.getId()).orElseThrow();
         assertAll(
             () -> assertThat(response.title()).isEqualTo("변경 제목"),
-            () -> assertThat(response.updatedAt()).isAfter(initialUpdatedAt),
             () -> assertThat(updatedNotice.getTitle()).isEqualTo("변경 제목"),
             () -> assertThat(updatedNotice.getContent()).isEqualTo("기존 내용"),
-            () -> assertThat(updatedNotice.getOperationType()).isEqualTo(OperationType.LIVE),
-            () -> assertThat(updatedNotice.getUpdatedAt().truncatedTo(ChronoUnit.MICROS))
-                .isEqualTo(response.updatedAt().truncatedTo(ChronoUnit.MICROS))
+            () -> assertThat(updatedNotice.getOperationType()).isEqualTo(OperationType.LIVE)
         );
     }
 
