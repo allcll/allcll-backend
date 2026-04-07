@@ -28,11 +28,7 @@ public class AdminNoticeService {
 
     @Transactional
     public CreateNoticeResponse createNewNotice(CreateNoticeRequest createNoticeRequest) {
-        Notice notice = noticeRepository.save(Notice.of(
-            createNoticeRequest.title(),
-            createNoticeRequest.content(),
-            createNoticeRequest.operationType()
-        ));
+        Notice notice = noticeRepository.save(createNoticeRequest.toEntity());
         return CreateNoticeResponse.from(notice);
     }
 
