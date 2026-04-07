@@ -3,7 +3,7 @@ package kr.allcll.backend.admin.notice;
 import java.util.List;
 import kr.allcll.backend.admin.notice.dto.CreateNoticeRequest;
 import kr.allcll.backend.admin.notice.dto.CreateNoticeResponse;
-import kr.allcll.backend.admin.notice.dto.NoticesResponse;
+import kr.allcll.backend.admin.notice.dto.AdminNoticesResponse;
 import kr.allcll.backend.admin.notice.dto.UpdateNoticeRequest;
 import kr.allcll.backend.admin.notice.dto.UpdateNoticeResponse;
 import kr.allcll.backend.domain.notice.Notice;
@@ -21,9 +21,9 @@ public class AdminNoticeService {
 
     private final NoticeRepository noticeRepository;
 
-    public NoticesResponse getAllNotice() {
+    public AdminNoticesResponse getAllNotice() {
         List<Notice> allNotices = noticeRepository.findAllOrderedByCreatedAt();
-        return NoticesResponse.from(allNotices);
+        return AdminNoticesResponse.from(allNotices);
     }
 
     @Transactional

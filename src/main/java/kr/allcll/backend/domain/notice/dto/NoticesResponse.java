@@ -1,4 +1,4 @@
-package kr.allcll.backend.admin.notice.dto;
+package kr.allcll.backend.domain.notice.dto;
 
 import java.util.List;
 import kr.allcll.backend.domain.notice.Notice;

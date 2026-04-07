@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import kr.allcll.backend.domain.notice.Notice;
 import kr.allcll.backend.domain.operationPeriod.OperationType;
 
-public record NoticeResponse(
+public record AdminNoticeResponse(
     long id,
     String title,
     String content,
@@ -12,8 +12,8 @@ public record NoticeResponse(
     LocalDateTime createdAt
 ) {
 
-    public static NoticeResponse from(Notice notice) {
-        return new NoticeResponse(
+    public static AdminNoticeResponse from(Notice notice) {
+        return new AdminNoticeResponse(
             notice.getId(),
             notice.getTitle(),
             notice.getContent(),

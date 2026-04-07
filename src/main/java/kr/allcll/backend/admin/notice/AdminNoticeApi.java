@@ -5,7 +5,7 @@ import jakarta.validation.Valid;
 import kr.allcll.backend.admin.AdminRequestValidator;
 import kr.allcll.backend.admin.notice.dto.CreateNoticeRequest;
 import kr.allcll.backend.admin.notice.dto.CreateNoticeResponse;
-import kr.allcll.backend.admin.notice.dto.NoticesResponse;
+import kr.allcll.backend.admin.notice.dto.AdminNoticesResponse;
 import kr.allcll.backend.admin.notice.dto.UpdateNoticeRequest;
 import kr.allcll.backend.admin.notice.dto.UpdateNoticeResponse;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +27,11 @@ public class AdminNoticeApi {
     private final AdminRequestValidator validator;
 
     @GetMapping("/api/admin/notices")
-    public ResponseEntity<NoticesResponse> getAllNotice(HttpServletRequest request) {
+    public ResponseEntity<AdminNoticesResponse> getAllNotice(HttpServletRequest request) {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
         }
-        NoticesResponse response = adminNoticeService.getAllNotice();
+        AdminNoticesResponse response = adminNoticeService.getAllNotice();
         return ResponseEntity.ok(response);
     }
 
