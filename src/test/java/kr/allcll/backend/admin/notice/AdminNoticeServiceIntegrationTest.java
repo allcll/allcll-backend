@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import java.time.LocalDateTime;
 import kr.allcll.backend.admin.notice.dto.CreateNoticeRequest;
 import kr.allcll.backend.admin.notice.dto.CreateNoticeResponse;
-import kr.allcll.backend.admin.notice.dto.NoticesResponse;
+import kr.allcll.backend.admin.notice.dto.AdminNoticesResponse;
 import kr.allcll.backend.admin.notice.dto.UpdateNoticeRequest;
 import kr.allcll.backend.admin.notice.dto.UpdateNoticeResponse;
 import kr.allcll.backend.domain.notice.Notice;
@@ -78,7 +78,7 @@ class AdminNoticeServiceIntegrationTest {
         adminNoticeService.deleteNotice(savedDeletedNotice.getId());
 
         // when
-        NoticesResponse response = adminNoticeService.getAllNotice();
+        AdminNoticesResponse response = adminNoticeService.getAllNotice();
 
         // then
         assertAll(

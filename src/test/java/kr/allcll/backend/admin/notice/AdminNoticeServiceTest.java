@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import kr.allcll.backend.admin.notice.dto.CreateNoticeRequest;
 import kr.allcll.backend.admin.notice.dto.CreateNoticeResponse;
-import kr.allcll.backend.admin.notice.dto.NoticesResponse;
+import kr.allcll.backend.admin.notice.dto.AdminNoticesResponse;
 import kr.allcll.backend.admin.notice.dto.UpdateNoticeRequest;
 import kr.allcll.backend.admin.notice.dto.UpdateNoticeResponse;
 import kr.allcll.backend.domain.notice.Notice;
@@ -48,7 +48,7 @@ class AdminNoticeServiceTest {
             .willReturn(List.of(firstNotice, secondNotice));
 
         // when
-        NoticesResponse response = adminNoticeService.getAllNotice();
+        AdminNoticesResponse response = adminNoticeService.getAllNotice();
 
         // then
         assertAll(
