@@ -45,6 +45,9 @@ class GraduationClassicsCertResolverTest {
         given(certResult.getMyCountEasternAndWestern()).willReturn(2);
         given(certResult.getMyCountScience()).willReturn(1);
 
+        given(graduationClassicsCertFetcher.fetchClassics(client))
+            .willReturn(new ClassicsResult(false, new ClassicsCounts(1, 0, 0, 0)));
+
         // when
         ClassicsResult result = resolver.resolve(user, client, certResult);
 
@@ -61,7 +64,7 @@ class GraduationClassicsCertResolverTest {
         given(classicAltCoursePolicy.isSatisfiedByAltCourse(user)).willReturn(false);
 
         // when
-        ClassicsResult result = resolver.resolve(user, client, null);
+        ClassicsResult result = resolver.resolve(user, client, GraduationCheckCertResult.empty());
 
         // then
         assertThat(result.passed()).isTrue();
@@ -76,7 +79,7 @@ class GraduationClassicsCertResolverTest {
         given(classicAltCoursePolicy.isSatisfiedByAltCourse(user)).willReturn(false);
 
         // when
-        ClassicsResult result = resolver.resolve(user, client, null);
+        ClassicsResult result = resolver.resolve(user, client, GraduationCheckCertResult.empty());
 
         // then
         assertThat(result.passed()).isTrue();
@@ -91,7 +94,7 @@ class GraduationClassicsCertResolverTest {
         given(classicAltCoursePolicy.isSatisfiedByAltCourse(user)).willReturn(true);
 
         // when
-        ClassicsResult result = resolver.resolve(user, client, null);
+        ClassicsResult result = resolver.resolve(user, client, GraduationCheckCertResult.empty());
 
         // then
         assertThat(result.passed()).isTrue();
@@ -106,7 +109,7 @@ class GraduationClassicsCertResolverTest {
         given(classicAltCoursePolicy.isSatisfiedByAltCourse(user)).willReturn(false);
 
         // when
-        ClassicsResult result = resolver.resolve(user, client, null);
+        ClassicsResult result = resolver.resolve(user, client, GraduationCheckCertResult.empty());
 
         // then
         assertThat(result.passed()).isFalse();
