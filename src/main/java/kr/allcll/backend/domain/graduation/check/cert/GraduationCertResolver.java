@@ -35,7 +35,7 @@ public class GraduationCertResolver {
         List<CompletedCourse> completedCourses = completedCourseRepository.findAllByUserId(user.getId());
 
         GraduationCheckCertResult certResult = graduationCheckCertResultRepository.findByUserId(user.getId())
-            .orElse(null);
+            .orElseGet(GraduationCheckCertResult::empty);
 
         boolean englishPassed = graduationEnglishCertResolver.resolve(
             user,

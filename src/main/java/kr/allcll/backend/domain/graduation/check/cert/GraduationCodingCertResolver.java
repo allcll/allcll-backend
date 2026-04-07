@@ -42,9 +42,6 @@ public class GraduationCodingCertResolver {
     }
 
     private boolean isCodingAlreadyPassed(GraduationCheckCertResult certResult) {
-        if (certResult == null) {
-            return false;
-        }
         return Boolean.TRUE.equals(certResult.getIsCodingCertPassed());
     }
 }

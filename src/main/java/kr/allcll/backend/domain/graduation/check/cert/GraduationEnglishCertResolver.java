@@ -1,5 +1,6 @@
 package kr.allcll.backend.domain.graduation.check.cert;
 
+import java.util.List;
 import kr.allcll.backend.domain.graduation.certification.GraduationCertificationAltCoursePolicy;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
@@ -8,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -20,11 +19,11 @@ public class GraduationEnglishCertResolver {
     private final GraduationCertificationAltCoursePolicy englishAltCoursePolicy;
 
     public boolean resolve(
-            User user,
-            OkHttpClient client,
-            GraduationDepartmentInfo userDept,
-            List<CompletedCourse> completedCourses,
-            GraduationCheckCertResult certResult
+        User user,
+        OkHttpClient client,
+        GraduationDepartmentInfo userDept,
+        List<CompletedCourse> completedCourses,
+        GraduationCheckCertResult certResult
     ) {
         if (isEnglishAlreadyPassed(certResult)) {
             return true;
@@ -43,9 +42,6 @@ public class GraduationEnglishCertResolver {
     }
 
     private boolean isEnglishAlreadyPassed(GraduationCheckCertResult certResult) {
-        if (certResult == null) {
-            return false;
-        }
         return Boolean.TRUE.equals(certResult.getIsEnglishCertPassed());
     }
 }

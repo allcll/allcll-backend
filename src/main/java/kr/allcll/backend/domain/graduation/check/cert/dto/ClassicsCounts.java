@@ -18,9 +18,6 @@ public record ClassicsCounts(
     }
 
     public static ClassicsCounts fallback(GraduationCheckCertResult certResult) {
-        if (certResult == null) {
-            return ClassicsCounts.empty();
-        }
         return new ClassicsCounts(
             certResult.getMyCountWestern(),
             certResult.getMyCountEastern(),
