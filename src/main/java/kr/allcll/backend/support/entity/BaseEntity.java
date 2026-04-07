@@ -3,13 +3,16 @@ package kr.allcll.backend.support.entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
+import lombok.Getter;
 
+@Getter
 @MappedSuperclass
 @EntityListeners(value = {BaseEntityListener.class})
 public abstract class BaseEntity {
 
     protected String semesterAt;
     protected LocalDateTime createdAt;
+    protected LocalDateTime updatedAt;
     protected LocalDateTime deletedAt;
     protected boolean isDeleted;
 
@@ -25,11 +28,18 @@ public abstract class BaseEntity {
         }
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    void setUpdatedAtIfAbsent(LocalDateTime updatedAt) {
+        if (this.updatedAt == null) {
+            this.updatedAt = updatedAt;
+        }
     }
 
-    public boolean isDeleted() {
-        return isDeleted;
+    void updateUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    protected void delete() {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
     }
 }

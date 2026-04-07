@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
@@ -36,6 +37,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleServletException(HttpServletRequest request,
         ServletException exception) {
         final AllcllErrorCode errorCode = AllcllErrorCode.NOT_FOUND_API;
+
+        log.info(LOG_FORMAT, request.getMethod(), request.getRequestURI(), getRequestBody(request),
+            exception.getMessage());
+        return ErrorResponse.of(errorCode);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
+        HttpServletRequest request,
+        MethodArgumentNotValidException exception
+    ) {
+        final AllcllErrorCode errorCode = AllcllErrorCode.INVALID_REQUEST_VALUE;
 
         log.info(LOG_FORMAT, request.getMethod(), request.getRequestURI(), getRequestBody(request),
             exception.getMessage());
