@@ -6,6 +6,8 @@ import java.net.SocketTimeoutException;
 import kr.allcll.backend.client.LoginProperties;
 import kr.allcll.backend.domain.user.dto.LoginRequest;
 import kr.allcll.backend.domain.user.dto.ToscResponse;
+import kr.allcll.backend.support.exception.AllcllErrorCode;
+import kr.allcll.backend.support.exception.AllcllException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.FormBody;
@@ -39,13 +41,13 @@ public class ToscAuthService {
             if (!response.isSuccessful()) {
                 log.error("[TOSC] HTTP 요청 실패 (상태 코드: {}, 학번: {})",
                     response.code(), loginRequest.studentId());
-                return;
+                throw new AllcllException(AllcllErrorCode.TOSC_LOGIN_FAIL);
             }
 
             ResponseBody responseBody = response.body();
             if (responseBody == null) {
                 log.error("[TOSC] 응답 본문이 비어있음 (학번: {})", loginRequest.studentId());
-                return;
+                throw new AllcllException(AllcllErrorCode.TOSC_LOGIN_FAIL);
             }
 
             String responseString = responseBody.string();
@@ -54,13 +56,14 @@ public class ToscAuthService {
             if (!toscResponse.success()) {
                 log.error("[TOSC] 로그인 실패 (학번: {}, 에러: {})",
                     loginRequest.studentId(), toscResponse.getErrorMessage());
+                throw new AllcllException(AllcllErrorCode.TOSC_LOGIN_FAIL);
             }
         } catch (SocketTimeoutException exception) {
             log.error("[TOSC] 타임아웃 발생 (학번: {})", loginRequest.studentId(), exception);
+            throw new AllcllException(AllcllErrorCode.TOSC_LOGIN_IO_ERROR);
         } catch (IOException exception) {
             log.error("[TOSC] I/O 오류 발생 (학번: {})", loginRequest.studentId(), exception);
-        } catch (Exception exception) {
-            log.error("[TOSC] 예상치 못한 오류 발생 (학번: {})", loginRequest.studentId(), exception);
+            throw new AllcllException(AllcllErrorCode.TOSC_LOGIN_IO_ERROR);
         }
     }
 }
