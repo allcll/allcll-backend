@@ -18,9 +18,6 @@ public record ClassicsCounts(
     }
 
     public static ClassicsCounts fallback(GraduationCheckCertResult certResult) {
-        if (certResult == null) {
-            return ClassicsCounts.empty();
-        }
         return new ClassicsCounts(
             certResult.getMyCountWestern(),
             certResult.getMyCountEastern(),
@@ -31,5 +28,12 @@ public record ClassicsCounts(
 
     public static ClassicsCounts empty() {
         return new ClassicsCounts(0, 0, 0, 0);
+    }
+
+    public boolean isPassed() {
+        return myCountWestern >= ClassicsArea.WESTERN.getMaxRecognizedCount() &&
+            myCountEastern >= ClassicsArea.EASTERN.getMaxRecognizedCount() &&
+            myCountEasternAndWestern >= ClassicsArea.EASTERN_AND_WESTERN.getMaxRecognizedCount() &&
+            myCountScience >= ClassicsArea.SCIENCE.getMaxRecognizedCount();
     }
 }
