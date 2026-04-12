@@ -1,8 +1,7 @@
 package kr.allcll.backend.admin.review;
 
 import java.util.List;
-import kr.allcll.backend.admin.review.dto.AdminUserReviewResponse;
-import kr.allcll.backend.admin.review.dto.AdminUserReviewResponses;
+import kr.allcll.backend.admin.review.dto.AdminUserReviewsResponse;
 import kr.allcll.backend.domain.review.UserReview;
 import kr.allcll.backend.domain.review.UserReviewRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,12 +15,8 @@ public class AdminUserReviewService {
 
     private final UserReviewRepository userReviewRepository;
 
-    public AdminUserReviewResponses getReview() {
+    public AdminUserReviewsResponse getReview() {
         List<UserReview> reviews = userReviewRepository.findAll();
-        return new AdminUserReviewResponses(
-            reviews.stream()
-                .map(AdminUserReviewResponse::from)
-                .toList()
-        );
+        return AdminUserReviewsResponse.from(reviews);
     }
 }
