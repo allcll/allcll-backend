@@ -2,7 +2,7 @@ package kr.allcll.backend.admin.notice.dto;
 
 import java.time.LocalDateTime;
 import kr.allcll.backend.domain.notice.Notice;
-import kr.allcll.backend.domain.operationPeriod.OperationType;
+import kr.allcll.backend.domain.operationperiod.OperationType;
 
 public record UpdateNoticeResponse(
     long id,

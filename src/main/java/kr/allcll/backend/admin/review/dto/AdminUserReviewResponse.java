@@ -1,6 +1,6 @@
 package kr.allcll.backend.admin.review.dto;
 
-import kr.allcll.backend.domain.operationPeriod.OperationType;
+import kr.allcll.backend.domain.operationperiod.OperationType;
 import kr.allcll.backend.domain.review.UserReview;
 
 public record AdminUserReviewResponse(

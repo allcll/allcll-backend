@@ -1,8 +1,8 @@
-package kr.allcll.backend.admin.operationPeriod.dto;
+package kr.allcll.backend.admin.operationperiod.dto;
 
 import java.time.LocalDateTime;
-import kr.allcll.backend.domain.operationPeriod.OperationPeriod;
-import kr.allcll.backend.domain.operationPeriod.OperationType;
+import kr.allcll.backend.domain.operationperiod.OperationPeriod;
+import kr.allcll.backend.domain.operationperiod.OperationType;
 import kr.allcll.backend.support.semester.Semester;
 
 public record OperationPeriodRequest(
