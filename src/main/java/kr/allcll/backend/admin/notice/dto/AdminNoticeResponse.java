@@ -9,7 +9,8 @@ public record AdminNoticeResponse(
     String title,
     String content,
     OperationType operationType,
-    LocalDateTime createdAt
+    LocalDateTime createdAt,
+    LocalDateTime updatedAt
 ) {
 
     public static AdminNoticeResponse from(Notice notice) {
@@ -18,7 +19,8 @@ public record AdminNoticeResponse(
             notice.getTitle(),
             notice.getContent(),
             notice.getOperationType(),
-            notice.getCreatedAt()
+            notice.getCreatedAt(),
+            notice.getUpdatedAt()
         );
     }
 }

@@ -9,6 +9,7 @@ public record UpdateNoticeResponse(
     String title,
     String content,
     OperationType operationType,
+    LocalDateTime createdAt,
     LocalDateTime updatedAt
 ) {
 
@@ -18,6 +19,7 @@ public record UpdateNoticeResponse(
             notice.getTitle(),
             notice.getContent(),
             notice.getOperationType(),
+            notice.getCreatedAt(),
             notice.getUpdatedAt()
         );
     }
