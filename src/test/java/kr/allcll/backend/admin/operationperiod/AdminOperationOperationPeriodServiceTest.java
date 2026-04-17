@@ -1,4 +1,4 @@
-package kr.allcll.backend.admin.operationPeriod;
+package kr.allcll.backend.admin.operationperiod;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -6,10 +6,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import kr.allcll.backend.admin.operationPeriod.dto.OperationPeriodRequest;
-import kr.allcll.backend.domain.operationPeriod.OperationPeriod;
-import kr.allcll.backend.domain.operationPeriod.OperationType;
-import kr.allcll.backend.domain.operationPeriod.OperationPeriodRepository;
+import kr.allcll.backend.admin.operationperiod.dto.OperationPeriodRequest;
+import kr.allcll.backend.domain.operationperiod.OperationPeriod;
+import kr.allcll.backend.domain.operationperiod.OperationType;
+import kr.allcll.backend.domain.operationperiod.OperationPeriodRepository;
 import kr.allcll.backend.support.semester.Semester;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;

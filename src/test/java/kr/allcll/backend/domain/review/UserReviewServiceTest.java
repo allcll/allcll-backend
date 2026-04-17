@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import java.util.List;
 import kr.allcll.backend.domain.graduation.certification.CodingTargetType;
 import kr.allcll.backend.domain.graduation.department.GraduationDepartmentInfo;
-import kr.allcll.backend.domain.operationPeriod.OperationType;
+import kr.allcll.backend.domain.operationperiod.OperationType;
 import kr.allcll.backend.domain.review.dto.UserReviewRequest;
 import kr.allcll.backend.domain.user.User;
 import kr.allcll.backend.domain.user.UserRepository;

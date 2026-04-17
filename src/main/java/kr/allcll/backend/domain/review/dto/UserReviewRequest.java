@@ -1,6 +1,6 @@
 package kr.allcll.backend.domain.review.dto;
 
-import kr.allcll.backend.domain.operationPeriod.OperationType;
+import kr.allcll.backend.domain.operationperiod.OperationType;
 
 public record UserReviewRequest(
     Short rate,

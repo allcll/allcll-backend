@@ -1,4 +1,4 @@
-package kr.allcll.backend.admin.operationPeriod;
+package kr.allcll.backend.admin.operationperiod;
 
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -10,8 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import kr.allcll.backend.admin.AdminRequestValidator;
-import kr.allcll.backend.admin.operationPeriod.dto.OperationPeriodRequest;
-import kr.allcll.backend.domain.operationPeriod.OperationType;
+import kr.allcll.backend.admin.operationperiod.dto.OperationPeriodRequest;
+import kr.allcll.backend.domain.operationperiod.OperationType;
 import kr.allcll.backend.support.semester.Semester;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

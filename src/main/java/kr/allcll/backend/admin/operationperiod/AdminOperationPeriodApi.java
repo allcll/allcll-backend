@@ -1,16 +1,15 @@
-package kr.allcll.backend.admin.operationPeriod;
+package kr.allcll.backend.admin.operationperiod;
 
 import jakarta.servlet.http.HttpServletRequest;
 import kr.allcll.backend.admin.AdminRequestValidator;
-import kr.allcll.backend.admin.operationPeriod.dto.OperationPeriodRequest;
-import kr.allcll.backend.domain.operationPeriod.OperationType;
+import kr.allcll.backend.admin.operationperiod.dto.OperationPeriodRequest;
+import kr.allcll.backend.domain.operationperiod.OperationType;
 import kr.allcll.backend.support.semester.Semester;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
