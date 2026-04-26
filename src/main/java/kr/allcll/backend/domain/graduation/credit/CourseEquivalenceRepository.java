@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface CourseEquivalenceRepository extends JpaRepository<CourseEquivalence, Long> {
 
     @Query("""
-        select e.curiNo from CourseEquivalence e
+        select distinct e.curiNo from CourseEquivalence e
         join CourseEquivalence e2 on e.groupCode = e2.groupCode
         where e2.curiNo in :curiNos
     """)
