@@ -21,7 +21,6 @@ public class UncompletedCourseFilter {
         List<CompletedCourse> earnedCourses
     ) {
         Set<String> earnedCuriNos = buildEarnedCuriNos(earnedCourses);
-
         return categories.stream()
             .map(category -> filterCategory(category, earnedCuriNos))
             .toList();
@@ -31,16 +30,16 @@ public class UncompletedCourseFilter {
         Set<String> earnedCuriNos = earnedCourses.stream()
             .map(CompletedCourse::getCuriNo)
             .collect(Collectors.toSet());
-
+        if (earnedCuriNos.isEmpty()) {
+            return Set.of();
+        }
         earnedCuriNos.addAll(courseEquivalenceRepository.findSameGroupCuriNos(earnedCuriNos));
-
         return earnedCuriNos;
     }
 
     private GraduationCategoryResponse filterCategory(GraduationCategoryResponse category, Set<String> earnedCuriNos) {
         List<RequiredCourseResponse> requiredCourses = filterCourses(category.requiredCourses(), earnedCuriNos);
         List<BalanceAreaCoursesResponse> balanceCourses = filterBalanceAreas(category, earnedCuriNos);
-
         return new GraduationCategoryResponse(
             category.majorScope(),
             category.categoryType(),
@@ -60,7 +59,6 @@ public class UncompletedCourseFilter {
         if (category.balanceAreaCourses() == null) {
             return null;
         }
-
         return category.balanceAreaCourses().stream()
             .map(balanceAreaCourse -> BalanceAreaCoursesResponse.of(
                 balanceAreaCourse.balanceRequiredArea(),
