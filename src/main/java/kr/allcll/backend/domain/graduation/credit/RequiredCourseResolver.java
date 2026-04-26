@@ -98,7 +98,6 @@ public class RequiredCourseResolver {
             return RequiredCourseResponse.of(requiredCourse.getCuriNo(), requiredCourse.getCuriNm());
         }
         return requiredCourseRepository.findCurrentCourseByGroupCode(requiredCourse.getGroupCode(), DEPRECATED)
-            .stream().findFirst()
             .map(currentCourse -> RequiredCourseResponse.of(currentCourse.getCuriNo(), currentCourse.getCuriNm()))
             .orElseGet(() -> {
                 log.error(
