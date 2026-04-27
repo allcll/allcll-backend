@@ -1,6 +1,7 @@
 package kr.allcll.backend.admin.session;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import java.util.List;
 import kr.allcll.backend.admin.AdminRequestValidator;
 import kr.allcll.backend.admin.session.dto.CredentialResponse;
@@ -26,7 +27,7 @@ public class AdminSessionApi {
 
     @PostMapping("/api/admin/session")
     public ResponseEntity<Void> setCredential(HttpServletRequest request,
-        @RequestBody SetCredentialRequest setCredentialRequest) {
+        @Valid @RequestBody SetCredentialRequest setCredentialRequest) {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
         }
