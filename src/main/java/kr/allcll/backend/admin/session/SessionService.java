@@ -32,10 +32,6 @@ public class SessionService {
     private final Map<String, LocalDateTime> sessionUpdatedTimes = new ConcurrentHashMap<>();
 
     public void setCredential(SetCredentialRequest request) {
-        boolean isValidRequest = isValidCredentialRequest(request);
-        if (!isValidRequest) {
-            return;
-        }
         Credential credential = request.toCredential();
         validateCredential(credential);
         credentials.addCredential(credential);
@@ -90,14 +86,6 @@ public class SessionService {
         threadPoolTaskScheduler.cancelAll();
         credentials.deleteAll();
         sessionUpdatedTimes.clear();
-    }
-
-    private boolean isValidCredentialRequest(SetCredentialRequest request) {
-        if (request.tokenJ() == null || request.tokenU() == null || request.tokenR() == null
-            || request.tokenL() == null) {
-            return false;
-        }
-        return true;
     }
 
     private boolean validateCredential(Credential credential) {
