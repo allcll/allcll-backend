@@ -29,6 +29,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-mysql'
 //    implementation 'io.micrometer:micrometer-registry-datadog'
     implementation 'org.springframework.retry:spring-retry'
     implementation 'org.springframework:spring-aspects'
