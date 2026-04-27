@@ -109,4 +109,17 @@ class AdminSessionApiTest {
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    @DisplayName("인증되지 않은 요청은 빈 body여도 401을 반환하고 서비스가 호출되지 않는다.")
+    void setCredential_unauthorized_emptyBody() throws Exception {
+        when(validator.isUnauthorized(any(HttpServletRequest.class))).thenReturn(true);
+
+        mockMvc.perform(post("/api/admin/session")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+            .andExpect(status().isUnauthorized());
+
+        verify(sessionService, never()).setCredential(any());
+    }
 }
