@@ -33,13 +33,13 @@ public class SessionService {
 
     public void setCredential(SetCredentialRequest request) {
         Credential credential = request.toCredential();
-        validateCredential(credential);
+        isSessionValid(credential);
         credentials.addCredential(credential);
     }
 
     public CredentialResponse getCredential(String userId) {
         Credential credential = credentials.findByUserId(userId);
-        boolean isValid = validateCredential(credential);
+        boolean isValid = isSessionValid(credential);
         if (isValid) {
             return CredentialResponse.fromCredential(credential);
         }
@@ -88,7 +88,7 @@ public class SessionService {
         sessionUpdatedTimes.clear();
     }
 
-    private boolean validateCredential(Credential credential) {
+    private boolean isSessionValid(Credential credential) {
         try {
             sessionClient.execute(credential, new EmptyPayload());
             return true;

@@ -9,7 +9,7 @@ public record SetCredentialRequest(
     String tokenL
 ) {
 
-    public boolean isValid() {
+    public boolean hasAllTokens() {
         return !isBlank(tokenJ) && !isBlank(tokenU) && !isBlank(tokenR) && !isBlank(tokenL);
     }
 
