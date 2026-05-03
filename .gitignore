@@ -35,7 +35,3 @@ out/
 
 ### VS Code ###
 .vscode/
-
-# AI 학습
-.claude/skills/
-.claude/docs/
