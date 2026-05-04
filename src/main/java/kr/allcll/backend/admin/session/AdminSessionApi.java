@@ -30,6 +30,9 @@ public class AdminSessionApi {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
         }
+        if (!setCredentialRequest.hasAllTokens()) {
+            return ResponseEntity.badRequest().build();
+        }
         sessionService.setCredential(setCredentialRequest);
         return ResponseEntity.ok().build();
     }
