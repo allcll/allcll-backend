@@ -53,6 +53,23 @@ public record GraduationCategory(
         );
     }
 
+    public double overflowCredits() {
+        return Math.max(earnedCredits - requiredCredits, 0);
+    }
+
+    public GraduationCategory withEarnedCredits(double credits) {
+        double remaining = Math.max(0, requiredCredits - credits);
+        boolean isSatisfied = credits >= requiredCredits;
+        return new GraduationCategory(
+            majorScope, categoryType, credits, requiredCredits, remaining,
+            null, null, null, isSatisfied
+        );
+    }
+
+    public GraduationCategory addCredits(double additional) {
+        return withEarnedCredits(earnedCredits + additional);
+    }
+
     private static GraduationCategory ofBalance(
         GraduationCheckCategoryResult balanceCategory,
         Set<BalanceRequiredArea> earnedAreas,
