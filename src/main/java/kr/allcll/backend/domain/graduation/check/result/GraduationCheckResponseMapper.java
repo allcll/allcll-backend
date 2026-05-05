@@ -121,11 +121,15 @@ public class GraduationCheckResponseMapper {
     }
 
     private List<GraduationCategory> reallocateCredits(List<GraduationCategory> graduationCategories) {
-        Map<MajorScope, List<GraduationCategory>> groupedReallocateTargets = graduationCategories.stream()
-            .filter(this::isReallocateTarget)
+        Map<MajorScope, List<GraduationCategory>> groupedMajorCategories = graduationCategories.stream()
+            .filter(category -> category.categoryType().isMajorCategory())
             .collect(groupingBy(GraduationCategory::majorScope));
 
-        if (groupedReallocateTargets.isEmpty()) {
+        List<GraduationCategory> generalCategories = graduationCategories.stream()
+            .filter(category -> category.categoryType() == CategoryType.GENERAL)
+            .toList();
+
+        if (groupedMajorCategories.isEmpty()) {
             return graduationCategories;
         }
 
@@ -136,26 +140,27 @@ public class GraduationCheckResponseMapper {
             }
         }
 
-        adjustReallocateTargetCredits(groupedReallocateTargets, finishReallocate);
+        double generalOverflowCredits = adjustMajorCategoryCredits(groupedMajorCategories, finishReallocate);
+        mergeGeneralCredits(generalCategories, generalOverflowCredits, finishReallocate);
 
         return finishReallocate;
     }
 
-    private void adjustReallocateTargetCredits(
-        Map<MajorScope, List<GraduationCategory>> groupedReallocateTargets,
+    private double adjustMajorCategoryCredits(
+        Map<MajorScope, List<GraduationCategory>> groupedMajorCategories,
         List<GraduationCategory> finishReallocate
     ) {
-        for (Map.Entry<MajorScope, List<GraduationCategory>> entry : groupedReallocateTargets.entrySet()) {
+        double totalGeneralOverflowCredits = 0;
+
+        for (Map.Entry<MajorScope, List<GraduationCategory>> entry : groupedMajorCategories.entrySet()) {
             MajorScope majorScope = entry.getKey();
             List<GraduationCategory> reallocateCategory = entry.getValue();
 
             GraduationCategory majorRequired = findCategoryOrEmpty(reallocateCategory, CategoryType.MAJOR_REQUIRED, majorScope);
             GraduationCategory majorElective = findCategoryOrEmpty(reallocateCategory, CategoryType.MAJOR_ELECTIVE, majorScope);
-            GraduationCategory general = findCategoryOrEmpty(reallocateCategory, CategoryType.GENERAL, majorScope);
 
             boolean hasMajorRequired = findCategory(reallocateCategory, CategoryType.MAJOR_REQUIRED) != null;
             boolean hasMajorElective = findCategory(reallocateCategory, CategoryType.MAJOR_ELECTIVE) != null;
-            boolean hasGeneral = findCategory(reallocateCategory, CategoryType.GENERAL) != null;
 
             double overMajorRequired = majorRequired.overflowCredits();
             GraduationCategory adjustedRequired = majorRequired.withEarnedCredits(
@@ -174,8 +179,7 @@ public class GraduationCheckResponseMapper {
                 overMajorElective = 0;
                 adjustedElective = electiveWithCarry;
             }
-
-            GraduationCategory adjustedGeneral = general.addCredits(overMajorElective);
+            totalGeneralOverflowCredits += overMajorElective;
 
             if (hasMajorRequired || adjustedRequired.earnedCredits() > 0) {
                 finishReallocate.add(adjustedRequired);
@@ -183,10 +187,46 @@ public class GraduationCheckResponseMapper {
             if (hasMajorElective || overMajorRequired > 0) {
                 finishReallocate.add(adjustedElective);
             }
-            if (hasGeneral || overMajorElective > 0) {
-                finishReallocate.add(adjustedGeneral);
-            }
         }
+
+        return totalGeneralOverflowCredits;
+    }
+
+    private void mergeGeneralCredits(
+        List<GraduationCategory> generalCategories,
+        double generalOverflowCredits,
+        List<GraduationCategory> finishReallocate
+    ) {
+        GraduationCategory mergedGeneral = mergeGeneralCategories(generalCategories);
+        if (mergedGeneral == null && generalOverflowCredits <= 0) {
+            return;
+        }
+
+        GraduationCategory baseGeneral = mergedGeneral;
+        if (baseGeneral == null) {
+            baseGeneral = GraduationCategory.createEmptyGraduationCategory(
+                MajorScope.PRIMARY,
+                CategoryType.GENERAL
+            );
+        }
+        finishReallocate.add(baseGeneral.addCredits(generalOverflowCredits));
+    }
+
+    private GraduationCategory mergeGeneralCategories(List<GraduationCategory> generalCategories) {
+        if (generalCategories.isEmpty()) {
+            return null;
+        }
+
+        GraduationCategory baseGeneral = generalCategories.stream()
+            .filter(category -> category.majorScope() == MajorScope.PRIMARY)
+            .findFirst()
+            .orElse(generalCategories.get(0));
+
+        double mergedEarnedCredits = generalCategories.stream()
+            .mapToDouble(GraduationCategory::earnedCredits)
+            .sum();
+
+        return baseGeneral.withEarnedCredits(mergedEarnedCredits);
     }
 
     private GraduationCategory findCategoryOrEmpty(
