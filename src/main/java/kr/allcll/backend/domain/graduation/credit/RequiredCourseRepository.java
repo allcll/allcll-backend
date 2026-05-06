@@ -1,6 +1,7 @@
 package kr.allcll.backend.domain.graduation.credit;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -20,4 +21,27 @@ public interface RequiredCourseRepository extends JpaRepository<RequiredCourse, 
             and r.categoryType = :categoryType
         """)
     List<RequiredCourse> findRequiredCourses(List<String> deptNms, Integer admissionYear, CategoryType categoryType);
+
+    @Query("""
+            select r from RequiredCourse r
+            where r.deptNm in :deptNms
+            and r.admissionYear = :admissionYear
+            and r.categoryType = :categoryType
+            and r.groupCode = :groupCode
+        """)
+    List<RequiredCourse> findRequiredCoursesByGroupCode(
+        List<String> deptNms,
+        Integer admissionYear,
+        CategoryType categoryType,
+        String groupCode
+    );
+
+    @Query("""
+            select r from RequiredCourse r
+            where r.groupCode = :groupCode
+            and r.curiNo != :deprecatedCuriNo
+            order by r.admissionYear desc
+            limit 1
+        """)
+    Optional<RequiredCourse> findCurrentCourseByGroupCode(String groupCode, String deprecatedCuriNo);
 }
