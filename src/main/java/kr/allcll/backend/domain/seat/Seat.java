@@ -30,7 +30,5 @@ public class Seat extends BaseEntity {
     @JoinColumn(name = "subject_id")
     private Subject subject;
 
-    private Integer seatNumber;
-
     private LocalDate createdDate;
 }
