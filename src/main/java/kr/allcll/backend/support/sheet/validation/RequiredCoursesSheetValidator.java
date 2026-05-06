@@ -20,6 +20,8 @@ public class RequiredCoursesSheetValidator implements GraduationSheetValidator {
         "category_type",
         "curi_no",
         "curi_nm",
+        "same_course_code",
+        "group_code",
         "required"
     );
 
