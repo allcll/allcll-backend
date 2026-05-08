@@ -1,5 +1,7 @@
 package kr.allcll.backend.domain.graduation.check.result;
 
+import static java.util.stream.Collectors.groupingBy;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -56,44 +58,18 @@ public class GraduationCheckResponseMapper {
         // 균형교양 이수 영역 조회
         Set<BalanceRequiredArea> earnedAreas = graduationCheckBalanceAreaResultRepository.findAllByUserId(userId)
             .stream()
-            .map(
-                kr.allcll.backend.domain.graduation.check.result.GraduationCheckBalanceAreaResult::getBalanceRequiredArea)
+            .map(GraduationCheckBalanceAreaResult::getBalanceRequiredArea)
             .collect(Collectors.toSet());
 
         // 균형교양 필요 영역 수 조회
         Integer requiredAreasCnt = findRequiredAreasCnt(userId);
 
         List<GraduationCategory> categories = categoryResults.stream()
-            .map(result -> {
-                if (result.getCategoryType() == CategoryType.BALANCE_REQUIRED) {
-                    return new GraduationCategory(
-                        result.getMajorScope(),
-                        result.getCategoryType(),
-                        result.getMyCredits(),
-                        result.getRequiredCredits(),
-                        result.getRemainingCredits(),
-                        earnedAreas.size(),
-                        requiredAreasCnt,
-                        earnedAreas,
-                        result.getIsSatisfied()
-                    );
-                }
-                return new GraduationCategory(
-                    result.getMajorScope(),
-                    result.getCategoryType(),
-                    result.getMyCredits(),
-                    result.getRequiredCredits(),
-                    result.getRemainingCredits(),
-                    null,
-                    null,
-                    null,
-                    result.getIsSatisfied()
-                );
-            })
+            .map(result -> GraduationCategory.of(result, earnedAreas, requiredAreasCnt))
             .toList();
 
-        // 2. 전필 초과 시 전선으로 학점 보정
-        List<GraduationCategory> adjustedCategories = adjustMajorCategories(categories);
+        // 2. 전필 초과 시 전선으로, 전선 초과 시 교양으로 학점 보정
+        List<GraduationCategory> adjustedCategories = reallocateCredits(categories);
 
         boolean adjustedGraduatable = calculateGraduatable(
             check.getCanGraduate(),
@@ -144,135 +120,126 @@ public class GraduationCheckResponseMapper {
         return rule.getRequiredAreasCnt();
     }
 
-    // 졸업인증 전체 기준 정보 생성
-    private GraduationCertifications toCertifications(CertResult certResult) {
-        return new GraduationCertifications(
-            new CertificationPolicy(certResult.ruleType(), certResult.requiredPassCount()),
-            certResult.passedCount(),
-            certResult.requiredPassCount(),
-            certResult.isSatisfied(),
-            toEnglishCertification(certResult),
-            toCodingCertification(certResult),
-            toClassicCertification(certResult)
-        );
-    }
+    private List<GraduationCategory> reallocateCredits(List<GraduationCategory> graduationCategories) {
+        Map<MajorScope, List<GraduationCategory>> groupedMajorCategories = graduationCategories.stream()
+            .filter(category -> category.categoryType().isMajorCategory())
+            .collect(groupingBy(GraduationCategory::majorScope));
 
-    private EnglishCertification toEnglishCertification(CertResult certResult) {
-        return new EnglishCertification(
-            isRequiredByCertRule(certResult.ruleType(), GraduationCertType.CERT_ENGLISH),
-            certResult.isEnglishCertPassed(),
-            EnglishTargetType.NON_MAJOR
-        );
-    }
+        List<GraduationCategory> generalCategories = graduationCategories.stream()
+            .filter(category -> category.categoryType() == CategoryType.GENERAL)
+            .toList();
 
-    private CodingCertification toCodingCertification(CertResult certResult) {
-        return new CodingCertification(
-            isRequiredByCertRule(certResult.ruleType(), GraduationCertType.CERT_CODING),
-            certResult.isCodingCertPassed(),
-            CodingTargetType.CODING_MAJOR
-        );
-    }
-
-    private ClassicCertification toClassicCertification(CertResult certResult) {
-        return new ClassicCertification(
-            isRequiredByCertRule(certResult.ruleType(), GraduationCertType.CERT_CLASSIC),
-            certResult.isClassicsCertPassed(),
-            certResult.classicsTotalRequiredCount(),
-            certResult.classicsTotalMyCount(),
-            List.of(
-                new ClassicDomainRequirement(
-                    "WESTERN_HISTORY_THOUGHT",
-                    certResult.requiredCountWestern(),
-                    certResult.myCountWestern(),
-                    certResult.isClassicsWesternCertPassed()
-                ),
-                new ClassicDomainRequirement(
-                    "EASTERN_HISTORY_THOUGHT",
-                    certResult.requiredCountEastern(),
-                    certResult.myCountEastern(),
-                    certResult.isClassicsEasternCertPassed()
-                ),
-                new ClassicDomainRequirement(
-                    "EAST_WEST_LITERATURE",
-                    certResult.requiredCountEasternAndWestern(),
-                    certResult.myCountEasternAndWestern(),
-                    certResult.isClassicsEasternAndWesternCertPassed()
-                ),
-                new ClassicDomainRequirement(
-                    "SCIENCE_THOUGHT",
-                    certResult.requiredCountScience(),
-                    certResult.myCountScience(),
-                    certResult.isClassicsScienceCertPassed()
-                )
-            )
-        );
-    }
-
-    private Boolean isRequiredByCertRule(String ruleTypeName, GraduationCertType certType) {
-        GraduationCertRuleType ruleType = GraduationCertRuleType.valueOf(ruleTypeName);
-        return ruleType.getGraduationCertTypes().contains(certType);
-    }
-
-    private List<GraduationCategory> adjustMajorCategories(List<GraduationCategory> graduationCategories) {
-        // MAJOR_REQUIRED/MAJOR_ELECTIVE 별 그룹화
-        Map<MajorScope, List<GraduationCategory>> majorByScope = graduationCategories.stream()
-            .filter(this::isMajorCategory)
-            .collect(Collectors.groupingBy(GraduationCategory::majorScope));
-
-        if (majorByScope.isEmpty()) {
+        if (groupedMajorCategories.isEmpty()) {
             return graduationCategories;
         }
 
-        // 비전공 카테고리 추가
-        List<GraduationCategory> result = new ArrayList<>();
+        List<GraduationCategory> finishReallocate = new ArrayList<>();
         for (GraduationCategory category : graduationCategories) {
-            if (!isMajorCategory(category)) {
-                result.add(category);
+            if (!isReallocateTarget(category)) {
+                finishReallocate.add(category);
             }
         }
 
-        // scope(주전공/복수전공)별로 전필/전선 찾고 학점 adjust
-        adjustMajorCreditsByScope(majorByScope, result);
+        double generalOverflowCredits = adjustMajorCategoryCredits(groupedMajorCategories, finishReallocate);
+        mergeGeneralCredits(generalCategories, generalOverflowCredits, finishReallocate);
 
-        return result;
+        return finishReallocate;
     }
 
-    private boolean isMajorCategory(GraduationCategory category) {
-        return category.categoryType().isMajorCategory();
-    }
-
-    private void adjustMajorCreditsByScope(
-        Map<MajorScope, List<GraduationCategory>> majorByScope,
-        List<GraduationCategory> result
+    private double adjustMajorCategoryCredits(
+        Map<MajorScope, List<GraduationCategory>> groupedMajorCategories,
+        List<GraduationCategory> finishReallocate
     ) {
-        for (Map.Entry<MajorScope, List<GraduationCategory>> entry : majorByScope.entrySet()) {
-            List<GraduationCategory> majorCategoriesByScope = entry.getValue();
+        double totalGeneralOverflowCredits = 0;
 
-            GraduationCategory majorRequiredCategory = findMajorRequired(majorCategoriesByScope);
-            GraduationCategory majorElectiveCategory = findMajorElective(majorCategoriesByScope);
+        for (Map.Entry<MajorScope, List<GraduationCategory>> entry : groupedMajorCategories.entrySet()) {
+            MajorScope majorScope = entry.getKey();
+            List<GraduationCategory> reallocateCategory = entry.getValue();
 
-            // 전공(전필/전선) 이 아니면 그대로 추가
-            if (majorRequiredCategory == null || majorElectiveCategory == null) {
-                result.addAll(majorCategoriesByScope);
-                continue;
+            GraduationCategory majorRequired = findCategoryOrEmpty(reallocateCategory, CategoryType.MAJOR_REQUIRED, majorScope);
+            GraduationCategory majorElective = findCategoryOrEmpty(reallocateCategory, CategoryType.MAJOR_ELECTIVE, majorScope);
+
+            boolean hasMajorRequired = findCategory(reallocateCategory, CategoryType.MAJOR_REQUIRED) != null;
+            boolean hasMajorElective = findCategory(reallocateCategory, CategoryType.MAJOR_ELECTIVE) != null;
+
+            double overMajorRequired = majorRequired.overflowCredits();
+            GraduationCategory adjustedRequired = majorRequired.withEarnedCredits(
+                Math.min(majorRequired.earnedCredits(), majorRequired.requiredCredits())
+            );
+
+            GraduationCategory electiveWithCarry = majorElective.addCredits(overMajorRequired);
+            double overMajorElective;
+            GraduationCategory adjustedElective;
+            if (hasMajorElective) {
+                overMajorElective = electiveWithCarry.overflowCredits();
+                adjustedElective = electiveWithCarry.withEarnedCredits(
+                    Math.min(electiveWithCarry.earnedCredits(), majorElective.requiredCredits())
+                );
+            } else {
+                overMajorElective = 0;
+                adjustedElective = electiveWithCarry;
             }
+            totalGeneralOverflowCredits += overMajorElective;
 
-            // 초과된 전필 학점
-            double majorRequiredOverflowCredits = Math.max(
-                0,
-                majorRequiredCategory.earnedCredits() - majorRequiredCategory.requiredCredits()
-            );
-
-            // 보정 된 전공(전필/전선) 학점 저장
-            double adjustedRequiredCredits = Math.min(
-                majorRequiredCategory.earnedCredits(),
-                majorRequiredCategory.requiredCredits()
-            );
-            double adjustedElectiveCredits = majorElectiveCategory.earnedCredits() + majorRequiredOverflowCredits;
-
-            result.add(createAdjustedMajorCategory(majorRequiredCategory, adjustedRequiredCredits));
-            result.add(createAdjustedMajorCategory(majorElectiveCategory, adjustedElectiveCredits));
+            if (hasMajorRequired || adjustedRequired.earnedCredits() > 0) {
+                finishReallocate.add(adjustedRequired);
+            }
+            if (hasMajorElective || overMajorRequired > 0) {
+                finishReallocate.add(adjustedElective);
+            }
         }
+
+        return totalGeneralOverflowCredits;
+    }
+
+    private void mergeGeneralCredits(
+        List<GraduationCategory> generalCategories,
+        double generalOverflowCredits,
+        List<GraduationCategory> finishReallocate
+    ) {
+        GraduationCategory mergedGeneral = mergeGeneralCategories(generalCategories);
+        if (mergedGeneral == null && generalOverflowCredits <= 0) {
+            return;
+        }
+
+        GraduationCategory baseGeneral = mergedGeneral;
+        if (baseGeneral == null) {
+            baseGeneral = GraduationCategory.createEmptyGraduationCategory(
+                MajorScope.PRIMARY,
+                CategoryType.GENERAL
+            );
+        }
+        finishReallocate.add(baseGeneral.addCredits(generalOverflowCredits));
+    }
+
+    private GraduationCategory mergeGeneralCategories(List<GraduationCategory> generalCategories) {
+        if (generalCategories.isEmpty()) {
+            return null;
+        }
+
+        GraduationCategory baseGeneral = generalCategories.stream()
+            .filter(category -> category.majorScope() == MajorScope.PRIMARY)
+            .findFirst()
+            .orElse(generalCategories.get(0));
+
+        double mergedEarnedCredits = generalCategories.stream()
+            .mapToDouble(GraduationCategory::earnedCredits)
+            .sum();
+
+        return baseGeneral.withEarnedCredits(mergedEarnedCredits);
+    }
+
+    private GraduationCategory findCategoryOrEmpty(
+        List<GraduationCategory> categories,
+        CategoryType categoryType,
+        MajorScope majorScope
+    ) {
+        GraduationCategory found = findCategory(categories, categoryType);
+        return found != null ? found : GraduationCategory.createEmptyGraduationCategory(majorScope, categoryType);
+    }
+
+    private boolean isReallocateTarget(GraduationCategory graduationCategory) {
+        return graduationCategory.categoryType().isReallocateTarget();
     }
 
     private boolean calculateGraduatable(boolean originalGraduatable, List<GraduationCategory> categories) {
@@ -281,42 +248,14 @@ public class GraduationCheckResponseMapper {
         return originalGraduatable && majorSatisfied;
     }
 
-    private GraduationCategory findMajorRequired(List<GraduationCategory> categories) {
-        for (GraduationCategory category : categories) {
-            if (CategoryType.MAJOR_REQUIRED.equals(category.categoryType())) {
-                return category;
-            }
-        }
-        return null;
-    }
-
-    private GraduationCategory findMajorElective(List<GraduationCategory> categories) {
-        for (GraduationCategory category : categories) {
-            if (CategoryType.MAJOR_ELECTIVE.equals(category.categoryType())) {
-                return category;
-            }
-        }
-        return null;
-    }
-
-    private GraduationCategory createAdjustedMajorCategory(
-        GraduationCategory graduationCategory,
-        double adjustedCredits
+    private GraduationCategory findCategory(
+        List<GraduationCategory> categories,
+        CategoryType categoryType
     ) {
-        double remainingCredits = Math.max(0, graduationCategory.requiredCredits() - adjustedCredits);
-        boolean isSatisfied = adjustedCredits >= graduationCategory.requiredCredits();
-
-        return new GraduationCategory(
-            graduationCategory.majorScope(),
-            graduationCategory.categoryType(),
-            adjustedCredits,
-            graduationCategory.requiredCredits(),
-            remainingCredits,
-            null,
-            null,
-            null,
-            isSatisfied
-        );
+        return categories.stream()
+            .filter(category -> category.categoryType() == categoryType)
+            .findFirst()
+            .orElse(null);
     }
 
     private EnglishTargetType parseEnglishTargetType(GraduationCertCriteriaResponse response) {
