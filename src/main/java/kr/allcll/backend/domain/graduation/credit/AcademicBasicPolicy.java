@@ -46,12 +46,12 @@ public class AcademicBasicPolicy {
         String departmentName,
         String curiNo
     ) {
-        return courseEquivalenceRepository.findGroupCodeByCuriNo(curiNo)
-            .map(groupCode -> requiredCourseResolver.findRequiredCourseInGroup(
+        return courseEquivalenceRepository.findSameCourseCodeByCuriNo(curiNo)
+            .map(sameCourseCode -> requiredCourseResolver.findRequiredCourseInGroup(
                 departmentName,
                 admissionYear,
                 CategoryType.ACADEMIC_BASIC,
-                groupCode
+                sameCourseCode
             ))
             .orElse(false);
     }

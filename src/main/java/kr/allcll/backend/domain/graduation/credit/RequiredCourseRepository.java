@@ -27,21 +27,21 @@ public interface RequiredCourseRepository extends JpaRepository<RequiredCourse, 
             where r.deptNm in :deptNms
             and r.admissionYear = :admissionYear
             and r.categoryType = :categoryType
-            and r.groupCode = :groupCode
+            and r.sameCourseCode = :sameCourseCode
         """)
-    List<RequiredCourse> findRequiredCoursesByGroupCode(
+    List<RequiredCourse> findRequiredCoursesBySameCourseCode(
         List<String> deptNms,
         Integer admissionYear,
         CategoryType categoryType,
-        String groupCode
+        String sameCourseCode
     );
 
     @Query("""
             select r from RequiredCourse r
-            where r.groupCode = :groupCode
+            where r.sameCourseCode = :sameCourseCode
             and r.curiNo != :deprecatedCuriNo
             order by r.admissionYear desc
             limit 1
         """)
-    Optional<RequiredCourse> findCurrentCourseByGroupCode(String groupCode, String deprecatedCuriNo);
+    Optional<RequiredCourse> findCurrentCourseBySameCourseCode(String sameCourseCode, String deprecatedCuriNo);
 }

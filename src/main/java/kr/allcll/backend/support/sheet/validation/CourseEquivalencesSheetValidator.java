@@ -12,7 +12,7 @@ public class CourseEquivalencesSheetValidator implements GraduationSheetValidato
     public static final String TAB_KEY = "course-equivalences";
 
     private static final List<String> REQUIRED_HEADERS = List.of(
-        "group_code",
+        "same_course_code",
         "curi_no",
         "curi_nm"
     );
@@ -33,7 +33,7 @@ public class CourseEquivalencesSheetValidator implements GraduationSheetValidato
         for (int rowIndex = 0; rowIndex < dataRows.size(); rowIndex++) {
             List<Object> dataRow = dataRows.get(rowIndex);
 
-            graduationSheetValidationSupport.requireString(TAB_KEY, sheetTable, dataRow, rowIndex, "group_code");
+            graduationSheetValidationSupport.requireString(TAB_KEY, sheetTable, dataRow, rowIndex, "same_course_code");
             graduationSheetValidationSupport.requireString(TAB_KEY, sheetTable, dataRow, rowIndex, "curi_no");
             graduationSheetValidationSupport.requireString(TAB_KEY, sheetTable, dataRow, rowIndex, "curi_nm");
         }

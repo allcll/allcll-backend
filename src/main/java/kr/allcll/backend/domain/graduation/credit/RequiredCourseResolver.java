@@ -21,14 +21,14 @@ public class RequiredCourseResolver {
         String departmentName,
         Integer admissionYear,
         CategoryType categoryType,
-        String groupCode
+        String sameCourseCode
     ) {
         List<RequiredCourse> requiredCourseCandidatesWithWildCard =
-            requiredCourseRepository.findRequiredCoursesByGroupCode(
+            requiredCourseRepository.findRequiredCoursesBySameCourseCode(
                 List.of(WILD_CARD_DEPT_NM, departmentName),
                 admissionYear,
                 categoryType,
-                groupCode
+                sameCourseCode
             );
 
         List<RequiredCourse> requiredCoursesWithStatus
@@ -97,11 +97,11 @@ public class RequiredCourseResolver {
         if (isNotDeprecated(requiredCourse.getCuriNo())) {
             return RequiredCourseResponse.of(requiredCourse.getCuriNo(), requiredCourse.getCuriNm());
         }
-        return requiredCourseRepository.findCurrentCourseByGroupCode(requiredCourse.getGroupCode(), DEPRECATED)
+        return requiredCourseRepository.findCurrentCourseBySameCourseCode(requiredCourse.getSameCourseCode(), DEPRECATED)
             .map(currentCourse -> RequiredCourseResponse.of(currentCourse.getCuriNo(), currentCourse.getCuriNm()))
             .orElseGet(() -> {
                 log.error(
-                    "[졸업요건] DEPRECATED된 과목의 현재 과목 조회에 실패했습니다. groupCode={}", requiredCourse.getGroupCode()
+                    "[졸업요건] DEPRECATED된 과목의 현재 과목 조회에 실패했습니다. sameCourseCode={}", requiredCourse.getSameCourseCode()
                 );
                 return RequiredCourseResponse.of(requiredCourse.getCuriNo(), requiredCourse.getCuriNm());
             });

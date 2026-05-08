@@ -21,8 +21,8 @@ public class CourseEquivalence extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "group_code", nullable = false)
-    private String groupCode; // 동일과목 그룹 번호
+    @Column(name = "same_course_code", nullable = false)
+    private String sameCourseCode; // 동일과목 그룹 번호
 
     @Column(name = "curi_no", nullable = false)
     private String curiNo; // 학수번호
@@ -30,8 +30,8 @@ public class CourseEquivalence extends BaseEntity {
     @Column(name = "curi_nm", nullable = false, length = 255)
     private String curiNm; // 과목명
 
-    public CourseEquivalence(String groupCode, String curiNo, String curiNm) {
-        this.groupCode = groupCode;
+    public CourseEquivalence(String sameCourseCode, String curiNo, String curiNm) {
+        this.sameCourseCode = sameCourseCode;
         this.curiNo = curiNo;
         this.curiNm = curiNm;
     }

@@ -178,8 +178,8 @@ public class AdminGraduationSyncService {
                 graduationSheetTable.getEnum(row, "category_type", CategoryType.class),
                 graduationSheetTable.getString(row, "curi_no"),
                 graduationSheetTable.getString(row, "curi_nm"),
+                graduationSheetTable.getString(row, "alt_group"),
                 graduationSheetTable.getString(row, "same_course_code"),
-                graduationSheetTable.getString(row, "group_code"),
                 graduationSheetTable.getBoolean(row, "required"),
                 graduationSheetTable.getString(row, "note")
             );
@@ -199,7 +199,7 @@ public class AdminGraduationSyncService {
         List<CourseEquivalence> courseEquivalenceList = new ArrayList<>();
         for (List<Object> row : graduationSheetTable.getDataRows()) {
             CourseEquivalence courseEquivalence = new CourseEquivalence(
-                graduationSheetTable.getString(row, "group_code"),
+                graduationSheetTable.getString(row, "same_course_code"),
                 graduationSheetTable.getString(row, "curi_no"),
                 graduationSheetTable.getString(row, "curi_nm")
             );
