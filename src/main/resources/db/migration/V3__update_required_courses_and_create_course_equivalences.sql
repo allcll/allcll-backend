@@ -1,12 +1,9 @@
 ALTER TABLE `required_courses`
-    RENAME COLUMN `alt_group` TO `same_course_code`;
-
-ALTER TABLE `required_courses`
-    ADD COLUMN `group_code` varchar(255) DEFAULT NULL;
+    RENAME COLUMN `group_code` TO `same_course_code`;
 
 CREATE TABLE `course_equivalences` (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `group_code` varchar(255) NOT NULL,
+  `same_course_code` varchar(255) NOT NULL,
   `curi_no` varchar(255) NOT NULL,
   `curi_nm` varchar(255) NOT NULL,
   `created_at` datetime(6) DEFAULT NULL,
