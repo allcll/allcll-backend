@@ -69,7 +69,7 @@ class AcademicBasicPolicyTest {
     void returnTrueWhenGroupCodeMatchesRequiredCourse() {
         // given
         String curiNo = "123456";
-        String groupCode = "1";
+        String sameCourseCode = "1";
         String departmentName = "컴퓨터공학과";
         Integer admissionYear = 2021;
         CompletedCourse course = createCompletedCourse(curiNo, "옛날공학설계기초", CategoryType.ACADEMIC_BASIC);
@@ -82,14 +82,14 @@ class AcademicBasicPolicyTest {
                 CategoryType.ACADEMIC_BASIC
             )
         ).willReturn(List.of());
-        given(courseEquivalenceRepository.findGroupCodeByCuriNo(curiNo))
-            .willReturn(Optional.of(groupCode));
+        given(courseEquivalenceRepository.findSameCourseCodeByCuriNo(curiNo))
+            .willReturn(Optional.of(sameCourseCode));
         given(
             requiredCourseResolver.findRequiredCourseInGroup(
                 departmentName,
                 admissionYear,
                 CategoryType.ACADEMIC_BASIC,
-                groupCode
+                sameCourseCode
             )
         ).willReturn(true);
 
@@ -104,7 +104,7 @@ class AcademicBasicPolicyTest {
     @DisplayName("과목명이 필수과목에 없고 동일과목 그룹에 속하지만, 해당 과의 이수 요건에 해당하지 않으면 false를 반환한다")
     void returnFalseWhenGroupCodeNotMatchesRequiredCourse() {
         String curiNo = "123456";
-        String groupCode = "1";
+        String sameCourseCode = "1";
         String departmentName = "컴퓨터공학과";
         Integer admissionYear = 2021;
         CompletedCourse course = createCompletedCourse(curiNo, "옛날공학설계기초", CategoryType.ACADEMIC_BASIC);
@@ -117,14 +117,14 @@ class AcademicBasicPolicyTest {
                 CategoryType.ACADEMIC_BASIC
             )
         ).willReturn(List.of());
-        given(courseEquivalenceRepository.findGroupCodeByCuriNo(curiNo))
-            .willReturn(Optional.of(groupCode));
+        given(courseEquivalenceRepository.findSameCourseCodeByCuriNo(curiNo))
+            .willReturn(Optional.of(sameCourseCode));
         given(
             requiredCourseResolver.findRequiredCourseInGroup(
                 departmentName,
                 admissionYear,
                 CategoryType.ACADEMIC_BASIC,
-                groupCode)
+                sameCourseCode)
         ).willReturn(false); //해당 학과의 지정 과목이 required=false인 경우
 
         // when
@@ -146,7 +146,7 @@ class AcademicBasicPolicyTest {
 
         given(requiredCourseResolver.findRequiredCourseNames(departmentName, admissionYear, CategoryType.ACADEMIC_BASIC))
             .willReturn(List.of());
-        given(courseEquivalenceRepository.findGroupCodeByCuriNo(curiNo))
+        given(courseEquivalenceRepository.findSameCourseCodeByCuriNo(curiNo))
             .willReturn(Optional.empty());
 
         // when
