@@ -12,9 +12,3 @@ CREATE TABLE `stars`
     KEY           `FK_stars_subject` (`subject_id`),
     CONSTRAINT `FK_stars_subject` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-ALTER TABLE `periods`
-    MODIFY COLUMN `operation_type` enum('ALL','BASKETS','GRADUATION','LIVE','PRESEAT','REVIEW','SIMULATION','TIMETABLE') DEFAULT NULL;
-
-ALTER TABLE `user_review`
-    MODIFY COLUMN `detail` varchar (1000) NOT NULL;
