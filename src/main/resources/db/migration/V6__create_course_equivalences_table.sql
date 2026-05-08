@@ -1,6 +1,3 @@
-ALTER TABLE `required_courses`
-    RENAME COLUMN `group_code` TO `same_course_code`;
-
 CREATE TABLE `course_equivalences` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `same_course_code` varchar(255) NOT NULL,
