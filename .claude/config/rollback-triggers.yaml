@@ -1,0 +1,15 @@
+auto_rollback:
+  immediate:                   # 즉시 롤백 (자동)
+    test_failure_count: 1      # 테스트 1개라도 실패하면
+    compile_error: true        # 컴파일 에러 발생 시
+    security_issue_detected: true
+    syntax_error: true
+
+  review_required:             # 수동 검토 후 롤백
+    performance_degradation: "> 10%"
+    api_response_time: "> 500ms"
+    error_rate_increase: "> 1%"
+
+skip_rollback:                 # 롤백 예외
+  draft_pr: true
+  labels: ["skip-rollback", "experimental"]

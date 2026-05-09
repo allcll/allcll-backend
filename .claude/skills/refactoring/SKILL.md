@@ -1,7 +1,7 @@
 ---
 name: allcll-refactoring
 description: allcll-backend에서 리팩토링·성능 개선·코드 구조 변경 작업 시 사용.
-  동작 보존이 중요한 수정에서 범위 준수와 테스트 무수정 통과를 보장.
+  동작 보존이 중요한 수정에서 범위 준수와 테스트 무수정 통과를 
 ---
 
 # allcll 리팩토링 가이드

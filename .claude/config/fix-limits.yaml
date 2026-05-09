@@ -1,0 +1,30 @@
+limits:
+  max_files_per_fix: 3        # 한 번에 최대 3개 파일
+  max_lines_per_file: 50      # 파일당 최대 50줄 수정
+  max_functions_modified: 2   # 최대 2개 함수 수정
+
+allowed_paths:                 # 수정 허용 경로
+  - "src/main/java/kr/allcll/backend/domain/**/*.java"
+  - "src/main/java/kr/allcll/backend/admin/**/*.java"
+  - "src/main/java/kr/allcll/backend/support/**/*.java"
+  - "src/test/java/kr/allcll/backend/**/*.java"
+
+forbidden_paths:               # 절대 수정 불가
+  - "src/main/java/kr/allcll/backend/config/**"
+  - "src/main/java/kr/allcll/backend/AllcllBackendApplication.java"
+  - "src/main/resources/application.yml"
+  - "src/main/resources/application-prod.yml"
+  - "src/main/resources/application-dev.yml"
+  - "**/*.sql"
+  - "**/*.env*"
+  - "**/resources/db/migration/**"
+  - "build.gradle"
+  - "settings.gradle"
+  - "allcll-crawler/**"
+
+forbidden_operations:          # 금지 작업
+  - "delete_file"
+  - "rename_file"
+  - "modify_build_gradle"
+  - "modify_database_schema"
+  - "modify_flyway_migration"
