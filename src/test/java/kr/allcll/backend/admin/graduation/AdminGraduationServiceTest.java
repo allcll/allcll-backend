@@ -55,7 +55,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-class AdminGraduationQueryServiceTest {
+class AdminGraduationServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -70,7 +70,7 @@ class AdminGraduationQueryServiceTest {
     private GraduationCertCriteriaService graduationCertCriteriaService;
 
     @InjectMocks
-    private AdminGraduationQueryService adminGraduationQueryService;
+    private AdminGraduationService adminGraduationService;
 
     @Test
     @DisplayName("학번으로 졸업요건 상세 정보를 조회하면 응답이 조립된다.")
@@ -93,7 +93,7 @@ class AdminGraduationQueryServiceTest {
         given(graduationCertCriteriaService.getGraduationCertCriteria(userId)).willReturn(certCriteria);
 
         // when
-        GraduationDetailResponse response = adminGraduationQueryService.getGraduationDetail(studentId);
+        GraduationDetailResponse response = adminGraduationService.getGraduationDetail(studentId);
 
         // then
         assertThat(response.user().studentId()).isEqualTo(studentId);
@@ -118,7 +118,7 @@ class AdminGraduationQueryServiceTest {
         given(userRepository.findByStudentId(notExistStudentId)).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> adminGraduationQueryService.getGraduationDetail(notExistStudentId))
+        assertThatThrownBy(() -> adminGraduationService.getGraduationDetail(notExistStudentId))
             .isInstanceOf(AllcllException.class)
             .hasMessage(AllcllErrorCode.USER_NOT_FOUND.getMessage());
     }
@@ -137,7 +137,7 @@ class AdminGraduationQueryServiceTest {
             .willThrow(new AllcllException(AllcllErrorCode.GRADUATION_CHECK_NOT_FOUND));
 
         // when & then
-        assertThatThrownBy(() -> adminGraduationQueryService.getGraduationDetail(studentId))
+        assertThatThrownBy(() -> adminGraduationService.getGraduationDetail(studentId))
             .isInstanceOf(AllcllException.class)
             .hasMessage(AllcllErrorCode.GRADUATION_CHECK_NOT_FOUND.getMessage());
     }

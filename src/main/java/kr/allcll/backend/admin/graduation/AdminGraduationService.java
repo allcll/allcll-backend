@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class AdminGraduationQueryService {
+public class AdminGraduationService {
 
     private final UserRepository userRepository;
     private final GraduationCheckService graduationCheckService;

@@ -16,7 +16,7 @@ public class AdminGraduationApi {
 
     private final AdminRequestValidator validator;
     private final AdminGraduationSyncService adminGraduationSyncService;
-    private final AdminGraduationQueryService adminGraduationQueryService;
+    private final AdminGraduationService adminGraduationService;
 
     @PostMapping("/api/admin/graduation/sync")
     public ResponseEntity<Void> syncGraduationRules(HttpServletRequest request) {
@@ -35,7 +35,7 @@ public class AdminGraduationApi {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
         }
-        GraduationDetailResponse graduationDetailResponse = adminGraduationQueryService.getGraduationDetail(studentId);
+        GraduationDetailResponse graduationDetailResponse = adminGraduationService.getGraduationDetail(studentId);
         return ResponseEntity.ok(graduationDetailResponse);
     }
 }
