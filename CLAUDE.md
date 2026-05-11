@@ -98,3 +98,10 @@ allcll-backend (세종대 수강신청 도우미) 작업 시 가이드.
 - 커스텀 예외: support/exception/ 하위에 정의
 - DTO 네이밍: 요청 *Request, 응답 *Response (예: SeatSearchRequest, SeatResponse)
 - 읽기 전용 메서드: @Transactional(readOnly = true) 명시 (동시성·읽기 부하 도메인이라 누락 시 성능 영향)
+
+## 변경 범위 가이드 (잠정 기준)
+
+- 한 PR에 파일 3개, 파일당 50줄, 함수 2개 이내 권장
+- 초과하면 분할 가능한지 먼저 검토. 분할 어려운 사유면 PR 설명에 명시
+- **초과해야 한다면 작업 전에 사용자에게 보고하고 승인 받기**
+- (다른 프로젝트 기준을 임시로 가져온 값. 어긋나는 케이스 누적되면 조정)
