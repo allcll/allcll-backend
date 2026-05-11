@@ -35,10 +35,10 @@ public class GraduationCertCriteriaService {
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
         int admissionYear = user.getAdmissionYear();
 
-        GraduationDepartmentInfo primaryuserDept = findDepartment(admissionYear, user.getDeptCd());
+        GraduationDepartmentInfo primaryUserDept = findDepartment(admissionYear, user.getDeptCd());
 
-        EnglishTargetType englishTargetType = primaryuserDept.getEnglishTargetType();
-        CodingTargetType codingTargetType = primaryuserDept.getCodingTargetType();
+        EnglishTargetType englishTargetType = primaryUserDept.getEnglishTargetType();
+        CodingTargetType codingTargetType = primaryUserDept.getCodingTargetType();
 
         GraduationCertRule graduationCertRule = graduationCertRuleRepository.findByAdmissionYear(admissionYear)
             .orElseThrow(() ->
