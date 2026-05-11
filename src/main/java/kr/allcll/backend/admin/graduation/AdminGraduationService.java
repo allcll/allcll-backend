@@ -1,6 +1,5 @@
 package kr.allcll.backend.admin.graduation;
 
-import kr.allcll.backend.admin.graduation.dto.GraduationCertificationCriteriaResponse;
 import kr.allcll.backend.admin.graduation.dto.GraduationDetailResponse;
 import kr.allcll.backend.admin.graduation.dto.GraduationUserResponse;
 import kr.allcll.backend.domain.graduation.certification.GraduationCertCriteriaService;
@@ -44,7 +43,7 @@ public class AdminGraduationService {
             checkData,
             courses,
             criteriaCategories,
-            GraduationCertificationCriteriaResponse.from(certCriteria)
+            certCriteria
         );
     }
 }
