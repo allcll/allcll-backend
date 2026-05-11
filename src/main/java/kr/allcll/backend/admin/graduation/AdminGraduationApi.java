@@ -1,7 +1,5 @@
 package kr.allcll.backend.admin.graduation;
 
-import jakarta.servlet.http.HttpServletRequest;
-import kr.allcll.backend.admin.AdminRequestValidator;
 import kr.allcll.backend.admin.graduation.dto.GraduationDetailResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,13 +22,7 @@ public class AdminGraduationApi {
     }
 
     @GetMapping("/api/admin/graduation/{studentId}")
-    public ResponseEntity<GraduationDetailResponse> getGraduationDetail(
-        HttpServletRequest request,
-        @PathVariable String studentId
-    ) {
-        if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
-            return ResponseEntity.status(401).build();
-        }
+    public ResponseEntity<GraduationDetailResponse> getGraduationDetail(@PathVariable String studentId) {
         GraduationDetailResponse graduationDetailResponse = adminGraduationService.getGraduationDetail(studentId);
         return ResponseEntity.ok(graduationDetailResponse);
     }
