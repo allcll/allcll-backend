@@ -23,11 +23,16 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 @WebMvcTest(AdminOperationPeriodApi.class)
 class AdminOperationOperationPeriodApiTest {
 
     private MockMvc mockMvc;
+
+    @Autowired
+    private WebApplicationContext context;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -37,6 +42,13 @@ class AdminOperationOperationPeriodApiTest {
 
     @MockitoBean
     private AdminRequestValidator validator;
+
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(context)
+            .addFilters(new AdminAuthFilter(validator))
+            .build();
+    }
 
     @Test
     @DisplayName("운영 기간을 저장한다.")
