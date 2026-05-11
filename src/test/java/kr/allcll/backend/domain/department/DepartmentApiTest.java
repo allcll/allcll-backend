@@ -6,8 +6,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
-import kr.allcll.backend.admin.AdminRequestValidator;
-import kr.allcll.backend.admin.department.AdminDepartmentService;
 import kr.allcll.backend.domain.department.dto.DepartmentResponse;
 import kr.allcll.backend.domain.department.dto.DepartmentsResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -26,10 +24,6 @@ class DepartmentApiTest {
 
     @MockitoBean
     private DepartmentService departmentService;
-    @MockitoBean
-    private AdminDepartmentService adminDepartmentService;
-    @MockitoBean
-    private AdminRequestValidator validator;
 
     @Test
     @DisplayName("과목 코드 전체 조회의 요청과 응답을 확인한다.")
