@@ -30,24 +30,24 @@ public class UserFixture {
 
     public static User singleMajorUser(
         int admissionYear,
-        GraduationDepartmentInfo primaryuserDept
+        GraduationDepartmentInfo primaryUserDept
     ) {
-        return singleMajorUser(DEFAULT_STUDENT_ID, admissionYear, primaryuserDept);
+        return singleMajorUser(DEFAULT_STUDENT_ID, admissionYear, primaryUserDept);
     }
 
     public static User singleMajorUser(
         String studentId,
         int admissionYear,
-        GraduationDepartmentInfo primaryuserDept
+        GraduationDepartmentInfo primaryUserDept
     ) {
         return new User(
             studentId,
             DEFAULT_NAME,
             admissionYear,
             MajorType.SINGLE,
-            primaryuserDept.getCollegeNm(),
-            primaryuserDept.getDeptNm(),
-            primaryuserDept.getDeptCd(),
+            primaryUserDept.getCollegeNm(),
+            primaryUserDept.getDeptNm(),
+            primaryUserDept.getDeptCd(),
             null,
             null,
             null
@@ -56,20 +56,20 @@ public class UserFixture {
 
     public static User doubleMajorUser(
         int admissionYear,
-        GraduationDepartmentInfo primaryuserDept,
-        GraduationDepartmentInfo doubleuserDept
+        GraduationDepartmentInfo primaryUserDept,
+        GraduationDepartmentInfo doubleUserDept
     ) {
         return new User(
             DEFAULT_STUDENT_ID,
             DEFAULT_NAME,
             admissionYear,
             MajorType.DOUBLE,
-            primaryuserDept.getCollegeNm(),
-            primaryuserDept.getDeptNm(),
-            primaryuserDept.getDeptCd(),
-            doubleuserDept.getCollegeNm(),
-            doubleuserDept.getDeptNm(),
-            doubleuserDept.getDeptCd()
+            primaryUserDept.getCollegeNm(),
+            primaryUserDept.getDeptNm(),
+            primaryUserDept.getDeptCd(),
+            doubleUserDept.getCollegeNm(),
+            doubleUserDept.getDeptNm(),
+            doubleUserDept.getDeptCd()
         );
     }
 }
