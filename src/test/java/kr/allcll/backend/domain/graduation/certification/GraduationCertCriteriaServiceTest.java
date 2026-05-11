@@ -292,7 +292,7 @@ class GraduationCertCriteriaServiceTest {
         // 정책
         certRuleRepository.saveAndFlush(new GraduationCertRule(admissionYear, 25, GraduationCertRuleType.TWO_OF_THREE));
 
-        GraduationDepartmentInfo primaryuserDept = departmentInfoRepository.saveAndFlush(
+        GraduationDepartmentInfo primaryUserDept = departmentInfoRepository.saveAndFlush(
             new GraduationDepartmentInfo(
                 admissionYear, 25,
                 "영어데이터융합전공", "2135",
@@ -304,7 +304,7 @@ class GraduationCertCriteriaServiceTest {
             )
         );
 
-        GraduationDepartmentInfo doubleuserDept = departmentInfoRepository.saveAndFlush(
+        GraduationDepartmentInfo doubleUserDept = departmentInfoRepository.saveAndFlush(
             new GraduationDepartmentInfo(
                 admissionYear, 25,
                 "콘텐츠소프트웨어학과", "3523",
@@ -316,7 +316,7 @@ class GraduationCertCriteriaServiceTest {
             )
         );
 
-        User user = userRepository.saveAndFlush(UserFixture.doubleMajorUser(admissionYear, primaryuserDept, doubleuserDept));
+        User user = userRepository.saveAndFlush(UserFixture.doubleMajorUser(admissionYear, primaryUserDept, doubleUserDept));
 
         englishCertCriterionRepository.saveAndFlush(
             EnglishCertCriterionFixture.createMajorEnglishCertCriterion(admissionYear)
