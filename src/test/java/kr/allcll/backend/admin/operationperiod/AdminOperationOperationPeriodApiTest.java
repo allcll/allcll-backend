@@ -10,10 +10,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import kr.allcll.backend.admin.AdminAuthFilter;
 import kr.allcll.backend.admin.AdminRequestValidator;
 import kr.allcll.backend.admin.operationperiod.dto.OperationPeriodRequest;
 import kr.allcll.backend.domain.operationperiod.OperationType;
 import kr.allcll.backend.support.semester.Semester;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +27,6 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest(AdminOperationPeriodApi.class)
 class AdminOperationOperationPeriodApiTest {
 
-    @Autowired
     private MockMvc mockMvc;
 
     @Autowired
@@ -108,7 +109,7 @@ class AdminOperationOperationPeriodApiTest {
                 .param("semesterCode", "SPRING_25")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isTooManyRequests());
     }
 
     @Test
@@ -146,7 +147,7 @@ class AdminOperationOperationPeriodApiTest {
     }
 
     @Test
-    @DisplayName("삭제 시 요청 제한에 걸린 경우 401을 반환한다.")
+    @DisplayName("삭제 시 요청 제한에 걸린 경우 429을 반환한다.")
     void deleteOperationPeriod_rateLimited() throws Exception {
         // given
         when(validator.isRateLimited(any(HttpServletRequest.class)))
@@ -158,6 +159,6 @@ class AdminOperationOperationPeriodApiTest {
         mockMvc.perform(delete("/api/admin/operation-period")
                 .param("semesterCode", "SPRING_25")
                 .param("operationType", "TIMETABLE"))
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isTooManyRequests());
     }
 }
