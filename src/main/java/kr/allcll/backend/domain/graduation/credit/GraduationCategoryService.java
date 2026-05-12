@@ -71,7 +71,6 @@ public class GraduationCategoryService {
     ) {
         List<CompletedCourse> earnedCourses = completedCourseRepository.findEarnedCourses(user.getId());
         return uncompletedCourseFilter.filterUncompletedCourses(
-            user.getAdmissionYear(),
             categories,
             earnedCourses
         );

@@ -32,9 +32,18 @@ public enum CategoryType { // 이수구분
         MAJOR_REQUIRED,
         MAJOR_ELECTIVE
     );
+    private static final Set<CategoryType> REALLOCATE_TARGET_CATEGORIES = EnumSet.of(
+        MAJOR_REQUIRED,
+        MAJOR_ELECTIVE,
+        GENERAL
+    );
 
     public boolean isMajorCategory() {
         return MAJOR_CATEGORIES.contains(this);
+    }
+
+    public boolean isReallocateTarget() {
+        return REALLOCATE_TARGET_CATEGORIES.contains(this);
     }
 
     public boolean isNonMajorCategory() {
@@ -64,7 +73,7 @@ public enum CategoryType { // 이수구분
     }
 
     private static CategoryType normalizeMajorBasic(int admissionYear) {
-        if (shouldConvertMajorBasicAsAcademicBasic(admissionYear)){
+        if (shouldConvertMajorBasicAsAcademicBasic(admissionYear)) {
             return ACADEMIC_BASIC;
         }
         return MAJOR_BASIC;

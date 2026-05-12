@@ -1,8 +1,8 @@
 package kr.allcll.backend.domain.graduation.credit;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import kr.allcll.backend.domain.graduation.balance.dto.BalanceAreaCoursesResponse;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
 import kr.allcll.backend.domain.graduation.credit.dto.GraduationCategoryResponse;
@@ -14,44 +14,32 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UncompletedCourseFilter {
 
-    private final CourseReplacementResolver courseReplacementResolver;
+    private final CourseEquivalenceRepository courseEquivalenceRepository;
 
     public List<GraduationCategoryResponse> filterUncompletedCourses(
-        Integer admissionYear,
         List<GraduationCategoryResponse> categories,
         List<CompletedCourse> earnedCourses
     ) {
-        Set<String> earnedCuriNos = buildEarnedCuriNos(admissionYear, earnedCourses);
-
+        Set<String> earnedCuriNos = buildEarnedCuriNos(earnedCourses);
         return categories.stream()
             .map(category -> filterCategory(category, earnedCuriNos))
             .toList();
     }
 
-    private Set<String> buildEarnedCuriNos(Integer admissionYear, List<CompletedCourse> earnedCourses) {
-        Set<String> earnedCuriNos = new HashSet<>();
-        Set<String> earnedCuriNms = new HashSet<>();
-
-        for (CompletedCourse completedCourse : earnedCourses) {
-            String curiNo = completedCourse.getCuriNo();
-            earnedCuriNos.add(curiNo);
-
-            String curiNm = completedCourse.getCuriNm();
-            String trimmedCuriNm = curiNm.trim();
-            if (!trimmedCuriNm.isBlank()) {
-                earnedCuriNms.add(trimmedCuriNm);
-            }
+    private Set<String> buildEarnedCuriNos(List<CompletedCourse> earnedCourses) {
+        Set<String> earnedCuriNos = earnedCourses.stream()
+            .map(CompletedCourse::getCuriNo)
+            .collect(Collectors.toSet());
+        if (earnedCuriNos.isEmpty()) {
+            return Set.of();
         }
-
-        earnedCuriNos.addAll(courseReplacementResolver.resolveCurrentCuriNos(admissionYear, earnedCuriNms));
-
+        earnedCuriNos.addAll(courseEquivalenceRepository.findSameGroupCuriNos(earnedCuriNos));
         return earnedCuriNos;
     }
 
     private GraduationCategoryResponse filterCategory(GraduationCategoryResponse category, Set<String> earnedCuriNos) {
         List<RequiredCourseResponse> requiredCourses = filterCourses(category.requiredCourses(), earnedCuriNos);
         List<BalanceAreaCoursesResponse> balanceCourses = filterBalanceAreas(category, earnedCuriNos);
-
         return new GraduationCategoryResponse(
             category.majorScope(),
             category.categoryType(),
@@ -71,7 +59,6 @@ public class UncompletedCourseFilter {
         if (category.balanceAreaCourses() == null) {
             return null;
         }
-
         return category.balanceAreaCourses().stream()
             .map(balanceAreaCourse -> BalanceAreaCoursesResponse.of(
                 balanceAreaCourse.balanceRequiredArea(),
