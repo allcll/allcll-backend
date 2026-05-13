@@ -23,6 +23,9 @@ public class AdminSessionApi {
 
     @PostMapping("/api/admin/session")
     public ResponseEntity<Void> setCredential(@RequestBody SetCredentialRequest setCredentialRequest) {
+        if (!setCredentialRequest.hasAllTokens()) {
+            return ResponseEntity.badRequest().build();
+        }
         sessionService.setCredential(setCredentialRequest);
         return ResponseEntity.ok().build();
     }
