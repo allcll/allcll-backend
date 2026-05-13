@@ -9,7 +9,15 @@ public record SetCredentialRequest(
     String tokenL
 ) {
 
+    public boolean hasAllTokens() {
+        return !isBlank(tokenJ) && !isBlank(tokenU) && !isBlank(tokenR) && !isBlank(tokenL);
+    }
+
     public Credential toCredential() {
         return Credential.of(tokenJ, tokenU, tokenR, tokenL);
+    }
+
+    private static boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 }
