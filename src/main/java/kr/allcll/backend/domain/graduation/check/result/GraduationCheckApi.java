@@ -43,11 +43,12 @@ public class GraduationCheckApi {
     }
 
     @PatchMapping("/api/graduation/check/certifications/english")
-    public ResponseEntity<Void> updateEnglishCertPass(
+    public ResponseEntity<GraduationCheckResponse> updateEnglishCertPass(
         @Auth Long userId,
         @Valid @RequestBody UpdateEnglishCertRequest updateEnglishCertRequest
     ) {
-        graduationCheckService.updateEnglishCertPass(userId, updateEnglishCertRequest);
-        return ResponseEntity.ok().build();
+        GraduationCheckResponse response = graduationCheckService
+            .updateEnglishCertPassAndGetCheckResult(userId, updateEnglishCertRequest);
+        return ResponseEntity.ok(response);
     }
 }

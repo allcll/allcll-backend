@@ -27,6 +27,7 @@ public class GraduationCheckService {
     private final GradeExcelParser gradeExcelParser;
     private final GraduationChecker graduationChecker;
     private final GraduationCheckRepository graduationCheckRepository;
+    private final GraduationCheckCategoryResultRepository graduationCheckCategoryResultRepository;
     private final GraduationCheckCertResultRepository graduationCheckCertResultRepository;
     private final GraduationCheckResponseMapper graduationCheckResponseMapper;
     private final CompletedCoursePersistenceService completedCoursePersistenceService;
@@ -72,10 +73,30 @@ public class GraduationCheckService {
     }
 
     @Transactional
-    public void updateEnglishCertPass(Long userId, UpdateEnglishCertRequest updateEnglishCertRequest) {
+    public GraduationCheckResponse updateEnglishCertPassAndGetCheckResult(
+        Long userId,
+        UpdateEnglishCertRequest updateEnglishCertRequest
+    ) {
+        updateEnglishCertPass(userId, updateEnglishCertRequest);
+        return getCheckResult(userId);
+    }
+
+    private void updateEnglishCertPass(Long userId, UpdateEnglishCertRequest updateEnglishCertRequest) {
         GraduationCheckCertResult graduationResult = graduationCheckCertResultRepository.findByUserId(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.GRADUATION_CERT_NOT_FOUND));
         graduationResult.updateEnglish(updateEnglishCertRequest.isPassed());
         graduationResult.reCalculate();
+        updateGraduationAvailability(userId, graduationResult);
+    }
+
+    private void updateGraduationAvailability(Long userId, GraduationCheckCertResult graduationResult) {
+        GraduationCheck graduationCheck = graduationCheckRepository.findByUserId(userId)
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.GRADUATION_CHECK_NOT_FOUND));
+
+        boolean allCategoriesSatisfied = graduationCheckCategoryResultRepository.findAllByUserId(userId)
+            .stream()
+            .allMatch(GraduationCheckCategoryResult::getIsSatisfied);
+
+        graduationCheck.update(allCategoriesSatisfied && graduationResult.getIsSatisfied());
     }
 }
