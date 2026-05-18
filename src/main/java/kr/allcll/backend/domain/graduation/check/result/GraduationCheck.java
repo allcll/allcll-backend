@@ -56,4 +56,8 @@ public class GraduationCheck extends BaseEntity {
         this.requiredTotalCredits = requiredTotalCredits;
         this.remainingCredits = remainingCredits;
     }
+
+    public void update(Boolean canGraduate) {
+        this.canGraduate = canGraduate;
+    }
 }
