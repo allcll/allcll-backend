@@ -1,8 +1,6 @@
 package kr.allcll.backend.admin.notice;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import kr.allcll.backend.admin.AdminRequestValidator;
 import kr.allcll.backend.admin.notice.dto.CreateNoticeRequest;
 import kr.allcll.backend.admin.notice.dto.CreateNoticeResponse;
 import kr.allcll.backend.admin.notice.dto.AdminNoticesResponse;
@@ -24,50 +22,32 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminNoticeApi {
 
     private final AdminNoticeService adminNoticeService;
-    private final AdminRequestValidator validator;
 
     @GetMapping("/api/admin/notices")
-    public ResponseEntity<AdminNoticesResponse> getAllNotice(HttpServletRequest request) {
-        if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
-            return ResponseEntity.status(401).build();
-        }
+    public ResponseEntity<AdminNoticesResponse> getAllNotice() {
         AdminNoticesResponse response = adminNoticeService.getAllNotice();
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/api/admin/notices")
     public ResponseEntity<CreateNoticeResponse> createNotice(
-        HttpServletRequest request,
         @Valid @RequestBody CreateNoticeRequest createNoticeRequest
     ) {
-        if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
-            return ResponseEntity.status(401).build();
-        }
         CreateNoticeResponse response = adminNoticeService.createNewNotice(createNoticeRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PatchMapping("/api/admin/notices/{id}")
     public ResponseEntity<UpdateNoticeResponse> modifyNotice(
-        HttpServletRequest request,
         @PathVariable Long id,
         @Valid @RequestBody UpdateNoticeRequest updateNoticeRequest
     ) {
-        if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
-            return ResponseEntity.status(401).build();
-        }
         UpdateNoticeResponse response = adminNoticeService.updateNotice(id, updateNoticeRequest);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/api/admin/notices/{id}")
-    public ResponseEntity<Void> deleteNotice(
-        HttpServletRequest request,
-        @PathVariable Long id
-    ) {
-        if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
-            return ResponseEntity.status(401).build();
-        }
+    public ResponseEntity<Void> deleteNotice(@PathVariable Long id) {
         adminNoticeService.deleteNotice(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

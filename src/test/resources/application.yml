@@ -61,7 +61,7 @@ google:
   sheets:
     application-name: "test-sync"
     spreadsheet-id: "test-id"
-    credentials-location: ${GOOGLE_SHEETS_CREDENTIALS_LOCATION}
+    credentials-location: "location-1"
     tabs:
       credit-criteria: "test"
       required-courses: "test"
