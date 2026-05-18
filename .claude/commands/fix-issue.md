@@ -46,7 +46,7 @@ gh issue view $ARGUMENTS --repo allcll/allcll-backend --json labels
 
 ### 4. 영향 분석 (제약 사전 체크)
 
-코드 수정 전에 `.claude/config/fix-limits.yaml` 제약을 기준으로 영향 분석:
+코드 수정 전에 `CLAUDE.md` 제약(CLAUDE.md:102)을 기준으로 영향 분석:
 
 1. **필요한 파일 목록 작성**: 이슈 해결에 필요한 모든 파일을 나열
 2. **제약 체크**:
@@ -99,8 +99,7 @@ git push -u origin {브랜치명}
 ```
 
 ### 9. PR 생성
-
-`.claude/skills/create-pr/instruction.md` 스킬을 따라 PR 생성.
+`.claude/commands/create-pr.md` 스킬을 따라 PR 생성.
 AI PR이므로 타이틀에 `[AI]` 포함.
 
 ### 10. PR 본문 갱신
