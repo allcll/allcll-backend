@@ -1,8 +1,6 @@
 package kr.allcll.backend.domain.graduation.check.result;
 
 import java.util.List;
-import kr.allcll.backend.domain.graduation.check.cert.GraduationCheckCertResult;
-import kr.allcll.backend.domain.graduation.check.cert.GraduationCheckCertResultRepository;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseDto;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCoursePersistenceService;
@@ -27,11 +25,10 @@ public class GraduationCheckService {
     private final GradeExcelParser gradeExcelParser;
     private final GraduationChecker graduationChecker;
     private final GraduationCheckRepository graduationCheckRepository;
-    private final GraduationCheckCategoryResultRepository graduationCheckCategoryResultRepository;
-    private final GraduationCheckCertResultRepository graduationCheckCertResultRepository;
     private final GraduationCheckResponseMapper graduationCheckResponseMapper;
     private final CompletedCoursePersistenceService completedCoursePersistenceService;
     private final GraduationCheckPersistenceService graduationCheckPersistenceService;
+    private final GraduationEnglishCertPassUpdateService graduationEnglishCertPassUpdateService;
 
     @Transactional
     public void checkGraduationRequirements(Long userId, MultipartFile gradeExcel) {
@@ -72,31 +69,11 @@ public class GraduationCheckService {
         return CompletedCoursesResponse.from(completedCourses);
     }
 
-    @Transactional
     public GraduationCheckResponse updateEnglishCertPassAndGetCheckResult(
         Long userId,
         UpdateEnglishCertRequest updateEnglishCertRequest
     ) {
-        updateEnglishCertPass(userId, updateEnglishCertRequest);
+        graduationEnglishCertPassUpdateService.updateEnglishCertPass(userId, updateEnglishCertRequest);
         return getCheckResult(userId);
-    }
-
-    private void updateEnglishCertPass(Long userId, UpdateEnglishCertRequest updateEnglishCertRequest) {
-        GraduationCheckCertResult graduationResult = graduationCheckCertResultRepository.findByUserId(userId)
-            .orElseThrow(() -> new AllcllException(AllcllErrorCode.GRADUATION_CERT_NOT_FOUND));
-        graduationResult.updateEnglish(updateEnglishCertRequest.isPassed());
-        graduationResult.reCalculate();
-        updateGraduationAvailability(userId, graduationResult);
-    }
-
-    private void updateGraduationAvailability(Long userId, GraduationCheckCertResult graduationResult) {
-        GraduationCheck graduationCheck = graduationCheckRepository.findByUserId(userId)
-            .orElseThrow(() -> new AllcllException(AllcllErrorCode.GRADUATION_CHECK_NOT_FOUND));
-
-        boolean allCategoriesSatisfied = graduationCheckCategoryResultRepository.findAllByUserId(userId)
-            .stream()
-            .allMatch(GraduationCheckCategoryResult::getIsSatisfied);
-
-        graduationCheck.update(allCategoriesSatisfied && graduationResult.getIsSatisfied());
     }
 }
