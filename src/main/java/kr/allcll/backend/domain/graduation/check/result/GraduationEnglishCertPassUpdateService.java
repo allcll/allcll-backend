@@ -20,14 +20,14 @@ public class GraduationEnglishCertPassUpdateService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void updateEnglishCertPass(Long userId, UpdateEnglishCertRequest updateEnglishCertRequest) {
-        GraduationCheckCertResult graduationResult = graduationCheckCertResultRepository.findByUserId(userId)
+        GraduationCheckCertResult graduationCertResult = graduationCheckCertResultRepository.findByUserId(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.GRADUATION_CERT_NOT_FOUND));
-        graduationResult.updateEnglish(updateEnglishCertRequest.isPassed());
-        graduationResult.reCalculate();
-        updateGraduationAvailability(userId, graduationResult);
+        graduationCertResult.updateEnglish(updateEnglishCertRequest.isPassed());
+        graduationCertResult.reCalculate();
+        updateGraduationAvailability(userId, graduationCertResult);
     }
 
-    private void updateGraduationAvailability(Long userId, GraduationCheckCertResult graduationResult) {
+    private void updateGraduationAvailability(Long userId, GraduationCheckCertResult graduationCertResult) {
         GraduationCheck graduationCheck = graduationCheckRepository.findByUserId(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.GRADUATION_CHECK_NOT_FOUND));
 
@@ -35,6 +35,6 @@ public class GraduationEnglishCertPassUpdateService {
             .stream()
             .allMatch(GraduationCheckCategoryResult::getIsSatisfied);
 
-        graduationCheck.update(allCategoriesSatisfied && graduationResult.getIsSatisfied());
+        graduationCheck.update(allCategoriesSatisfied && graduationCertResult.getIsSatisfied());
     }
 }
