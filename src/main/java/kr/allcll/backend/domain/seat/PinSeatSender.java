@@ -2,6 +2,7 @@ package kr.allcll.backend.domain.seat;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import kr.allcll.backend.domain.seat.dto.SeatDto;
 import kr.allcll.backend.domain.seat.pin.dto.PinSeatsResponse;
 import kr.allcll.backend.support.scheduler.ScheduledTaskHandler;
@@ -46,8 +47,9 @@ public class PinSeatSender {
         return () -> {
             List<String> tokens = sseService.getConnectedTokens();
             log.info("[PinSeatSender] 현재 연결된 토큰 수: {}, 토큰 목록: {}", tokens.size(), tokens);
+            Map<String, List<SeatDto>> pinSeatsByToken = seatService.getPinSeatsByTokens(tokens);
             tokens.forEach(token -> {
-                List<SeatDto> pinSeats = seatService.getPinSeats(token);
+                List<SeatDto> pinSeats = pinSeatsByToken.getOrDefault(token, List.of());
                 log.debug("[PinSeatSender] token: {}, 핀 과목 수: {}", token, pinSeats.size());
                 sseService.propagate(token, PIN_EVENT_NAME, PinSeatsResponse.from(pinSeats));
             });
