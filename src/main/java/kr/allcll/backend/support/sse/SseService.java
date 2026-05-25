@@ -1,6 +1,9 @@
 package kr.allcll.backend.support.sse;
 
+import jakarta.annotation.PreDestroy;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import kr.allcll.backend.support.sse.dto.SseStatusResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +17,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEvent
 public class SseService {
 
     private final SseEmitterStorage sseEmitterStorage;
+    private final ExecutorService sseSendExecutor = Executors.newVirtualThreadPerTaskExecutor();
 
     public SseEmitter connect(String token) {
         SseEmitter sseEmitter = createSseEmitter();
@@ -31,7 +35,7 @@ public class SseService {
         String sseEvent = SseEventBuilderFactory.serialize(data);
         sseEmitterStorage.getEmitters().forEach(emitter -> {
             SseEventBuilder eventBuilder = SseEventBuilderFactory.createSerialized(eventName, sseEvent);
-            sendEvent(emitter, eventBuilder);
+            sendEventAsync(emitter, eventBuilder);
         });
     }
 
@@ -39,16 +43,22 @@ public class SseService {
         sseEmitterStorage.getEmitter(token).ifPresentOrElse(
             emitter -> {
                 SseEventBuilder eventBuilder = SseEventBuilderFactory.create(eventName, data);
-                sendEvent(emitter, eventBuilder);
+                sendEventAsync(emitter, eventBuilder);
                 log.debug("[SSE-propagate] 이벤트 전송 완료. token: {}, eventName: {}", token, eventName);
             },
             () -> log.warn("[SSE-propagate] 이벤트 전송 실패 - Emitter가 Map에 없음. token: {}, eventName: {}", token, eventName)
         );
     }
 
+    private void sendEventAsync(SseEmitter sseEmitter, SseEventBuilder eventBuilder) {
+        sseSendExecutor.execute(() -> sendEvent(sseEmitter, eventBuilder));
+    }
+
     private void sendEvent(SseEmitter sseEmitter, SseEventBuilder eventBuilder) {
         try {
-            sseEmitter.send(eventBuilder);
+            synchronized (sseEmitter) {
+                sseEmitter.send(eventBuilder);
+            }
         } catch (Exception e) {
             log.warn("전송 실패 - SSE 연결이 끊겼습니다.: {}", e.getMessage());
             SseErrorHandler.handle(e);
@@ -62,5 +72,10 @@ public class SseService {
     public SseStatusResponse isConnected(String token) {
         boolean isConnected = sseEmitterStorage.getEmitter(token).isPresent();
         return SseStatusResponse.of(isConnected);
+    }
+
+    @PreDestroy
+    void shutdown() {
+        sseSendExecutor.shutdown();
     }
 }
