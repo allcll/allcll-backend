@@ -11,13 +11,25 @@ PR 번호를 받아 코드 리뷰를 수행합니다.
 /review-pr 91 request-changes  # PR #91 강제 변경 요청
 ```
 
+## 인자 파싱
+
+`$ARGUMENTS`에서 첫 번째 토큰은 PR 번호, 두 번째 토큰은 리뷰 모드(approve/comment/request-changes)로 분리한다.
+
+```bash
+PR_NUMBER=$(echo "$ARGUMENTS" | awk '{print $1}')
+MODE=$(echo "$ARGUMENTS" | awk '{print $2}')
+```
+
+- `PR_NUMBER`가 비어있으면 현재 브랜치의 PR을 자동 탐색
+- `MODE`가 비어있으면 3단계에서 자동 판단
+
 ## 실행 순서
 
 ### 1. PR 정보 수집
 
 ```bash
-gh pr view $ARGUMENTS --repo allcll/allcll-backend
-gh pr diff $ARGUMENTS --repo allcll/allcll-backend
+gh pr view $PR_NUMBER --repo allcll/allcll-backend
+gh pr diff $PR_NUMBER --repo allcll/allcll-backend
 ```
 
 ### 2. 변경 사항 분석
@@ -48,9 +60,22 @@ gh pr diff $ARGUMENTS --repo allcll/allcll-backend
 ### 4. 리뷰 제출
 
 ```bash
+# MODE 값에 따라 플래그 결정
 gh pr review $PR_NUMBER \
   --repo allcll/allcll-backend \
-  --{approve|comment|request-changes} \
+  --approve \
+  --body "리뷰 본문"
+
+# 또는
+gh pr review $PR_NUMBER \
+  --repo allcll/allcll-backend \
+  --comment \
+  --body "리뷰 본문"
+
+# 또는
+gh pr review $PR_NUMBER \
+  --repo allcll/allcll-backend \
+  --request-changes \
   --body "리뷰 본문"
 ```
 
