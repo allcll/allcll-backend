@@ -41,6 +41,21 @@ public class ScheduledTaskHandler {
         return taskId;
     }
 
+    public String scheduleWithFixedDelay(Runnable task, Duration delay) {
+        String taskId = UUID.randomUUID().toString();
+        return scheduleWithFixedDelay(taskId, task, delay);
+    }
+
+    public String scheduleWithFixedDelay(String taskId, Runnable task, Duration delay) {
+        if (tasks.containsKey(taskId)) {
+            log.warn("[ScheduledTaskHandler] Task ID {} 은 이미 스케줄러에 등록되어 있습니다.", taskId);
+            return taskId;
+        }
+        ScheduledFuture<?> future = scheduler.scheduleWithFixedDelay(task, delay);
+        tasks.put(taskId, future);
+        return taskId;
+    }
+
     public void cancel(String taskId) {
         ScheduledFuture<?> future = tasks.remove(taskId);
         if (future != null) {
