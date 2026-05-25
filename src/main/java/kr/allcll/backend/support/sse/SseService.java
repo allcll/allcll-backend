@@ -28,8 +28,9 @@ public class SseService {
     }
 
     public void propagate(String eventName, Object data) {
+        String sseEvent = SseEventBuilderFactory.serialize(data);
         sseEmitterStorage.getEmitters().forEach(emitter -> {
-            SseEventBuilder eventBuilder = SseEventBuilderFactory.create(eventName, data);
+            SseEventBuilder eventBuilder = SseEventBuilderFactory.createSerialized(eventName, sseEvent);
             sendEvent(emitter, eventBuilder);
         });
     }

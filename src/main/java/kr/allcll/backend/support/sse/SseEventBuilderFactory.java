@@ -20,11 +20,19 @@ public class SseEventBuilderFactory {
     }
 
     public static SseEventBuilder create(String eventName, Object value) {
+        String serializedData = serialize(value);
+        return createSerialized(eventName, serializedData);
+    }
+
+    static SseEventBuilder createSerialized(String eventName, String serializedData) {
+        return baseEvent()
+            .name(eventName)
+            .data(serializedData, MediaType.APPLICATION_JSON);
+    }
+
+    static String serialize(Object value) {
         try {
-            String sseEvent = objectMapper.writeValueAsString(value);
-            return baseEvent()
-                .name(eventName)
-                .data(sseEvent, MediaType.APPLICATION_JSON);
+            return objectMapper.writeValueAsString(value);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
