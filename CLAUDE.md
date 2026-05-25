@@ -1,81 +1,42 @@
-# allcll-backend
+# CLAUDE.md
 
-올클(allcll) — 대학교 수강신청 도우미 백엔드 서비스
+@docs/agent-harness/PROJECT.md
 
-## 기술 스택
+## Claude Code
 
-- **Language**: Java 21
-- **Framework**: Spring Boot 3.4.1
-- **Build**: Gradle (Wrapper)
-- **DB**: MySQL (운영), H2 (로컬/테스트)
-- **ORM**: Spring Data JPA + Hibernate + Flyway
-- **Testing**: JUnit 5, REST Assured 5.5.0, Spring Boot Test
-- **외부 연동**: Google Sheets API, OkHttp, JSoup, Apache POI
+이 파일은 Claude Code 전용 하네스 입구다. 프로젝트 공통 규칙은 위의 `@docs/agent-harness/PROJECT.md` 로 가져오며, 이 파일에는 Claude Code 에만 필요한 안내만 둔다.
 
-## 빌드 & 테스트 명령어
+## Claude 전용 위치
 
-```bash
-./gradlew clean build        # 전체 빌드 (테스트 포함)
-./gradlew compileJava        # 컴파일만
-./gradlew test               # 테스트만
-./gradlew bootRun            # 로컬 실행
-```
+- 권한 설정: `.claude/settings.json`
+- slash command wrapper: `.claude/commands/`
+- skill discovery wrapper: `.claude/skills/`
 
-## 디렉토리 구조
+## 공통 본문 위치
 
-```
-src/main/java/kr/allcll/backend/
-├── admin/           # 관리자 API (basket, department, graduation, notice, operationperiod, preseat, review, seat, session, sse, subject)
-├── client/          # 외부 API 클라이언트
-├── config/          # Spring 설정
-├── domain/          # 핵심 비즈니스 로직
-│   ├── basket/      # 장바구니 (star: 즐겨찾기)
-│   ├── department/  # 학과 정보
-│   ├── graduation/  # 졸업요건 (balance, certification, check, credit, department)
-│   ├── notice/      # 공지사항
-│   ├── operationperiod/  # 수강신청 운영 기간
-│   ├── review/      # 수강 후기
-│   ├── seat/        # 잔여석 실시간 조회 (pin, preseat)
-│   ├── subject/     # 교과목 정보 (subjectReport)
-│   ├── timetable/   # 시간표 (schedule)
-│   └── user/        # 사용자
-└── support/         # 공통 인프라
-    ├── batch/       # 배치 처리
-    ├── entity/      # 베이스 엔티티
-    ├── exception/   # 예외 처리
-    ├── graduation/  # 졸업 유틸
-    ├── scheduler/   # 스케줄러
-    ├── semester/    # 학기 유틸
-    ├── sheet/       # Google Sheets 연동
-    ├── sse/         # Server-Sent Events
-    └── web/         # 웹 유틸
+- 프로젝트 컨텍스트: `docs/agent-harness/PROJECT.md`
+- command 본문: `docs/agent-harness/commands/*.md`
+- skill 본문: `docs/agent-harness/skills/*/SKILL.md`
+- skill eval: `docs/agent-harness/skills/*/evals/evals.json`
 
-allcll-crawler/      # 크롤러 서브모듈 (별도 Gradle 프로젝트)
-```
+`.claude/commands/*.md` 와 `.claude/skills/*/SKILL.md` 는 Claude Code 가 command/skill 을 발견하기 위한 얇은 wrapper 다. 실제 절차나 가이드를 바꿀 때는 wrapper 를 길게 만들지 말고 `docs/agent-harness/` 아래의 공통 본문을 수정한다.
 
-## 브랜치 전략
+## Command 매핑
 
-- `main` — 메인 개발 브랜치 (PR 머지 시 dev 자동 배포)
-- `release-1.0` — 운영 배포 브랜치 (push 시 prod 자동 배포)
-- 피처 브랜치: `{username}/TSK-{번호}` 또는 `feat/*`, `fix/*`, `refactor/*`, `chore/*`
+- `/create-pr` → `.claude/commands/create-pr.md` → `docs/agent-harness/commands/create-pr.md`
+- `/create-issue` → `.claude/commands/create-issue.md` → `docs/agent-harness/commands/create-issue.md`
+- `/review-pr` → `.claude/commands/review-pr.md` → `docs/agent-harness/commands/review-pr.md`
 
-## PR 규칙
+## Skill 매핑
 
-- PR 타이틀 형식: `type: 설명` (예: `feat: 잔여석 알림 기능 추가`)
-- 허용 타입: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`
-- base 브랜치: `main`
-- 리뷰어 자동 배정 (auto_assign.yml)
+- `allcll-analysis` → `.claude/skills/analysis/SKILL.md` → `docs/agent-harness/skills/analysis/SKILL.md`
+- `allcll-bug-fix` → `.claude/skills/bug-fix/SKILL.md` → `docs/agent-harness/skills/bug-fix/SKILL.md`
+- `allcll-refactoring` → `.claude/skills/refactoring/SKILL.md` → `docs/agent-harness/skills/refactoring/SKILL.md`
+- `allcll-testing` → `.claude/skills/testing/SKILL.md` → `docs/agent-harness/skills/testing/SKILL.md`
 
-## 테스트
+## 수정 원칙
 
-- 테스트 DB: H2 인메모리 (create-drop)
-- 테스트 리소스: `src/test/resources/application.yml`
-- 테스트 패턴: `*Test.java`, `*IntegrationTest.java`, `*ApiTest.java`
-- 픽스처: `src/test/java/kr/allcll/backend/fixture/`
-
-## 주의사항
-
-- 이모지 사용 금지 (PR 타이틀, 코드, 커밋 메시지 모두)
-- `.env`, `credentials`, Google 서비스 계정 파일 절대 커밋 금지
-- `application-prod.yml`, `application-dev.yml`은 별도 설정 저장소에서 관리
-- 서브모듈(`allcll-crawler`)은 별도 빌드/관리
+- 공통 프로젝트 규칙은 `docs/agent-harness/PROJECT.md` 에 수정한다.
+- Claude Code 에만 필요한 설정은 `.claude/settings.json` 또는 이 파일에 수정한다.
+- command/skill 본문은 `docs/agent-harness/` 에서 한 번만 관리한다.
+- `.claude/` 아래 wrapper 에 공통 절차를 복사해 넣지 않는다.

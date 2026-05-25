@@ -1,0 +1,33 @@
+{
+  "skill_name": "allcll-refactoring",
+  "evals": [
+    {
+      "id": 1,
+      "name": "extract-syncgraduation-pattern",
+      "prompt": "admin/graduation/AdminGraduationSyncService 의 10개 sync 메서드(syncCreditCriteria 등) 가 모두 동일한 패턴으로 'fetch → for 루프로 엔티티 생성 → save' 를 반복하고 있어. 시트→엔티티 변환을 함수형 인터페이스로 받아서 공통 메서드로 추출해줘.",
+      "expected_output": "**범위 명시 + 사용자 사전 보고 (AGENTS.md 의 '파일 3개·50줄·함수 2개' 한도 초과)**. 작업 전에 '10개 다 한 번에 처리하면 한도 초과 → 우선 N개만 진행 후 검증, 그 다음 확장' 같이 사용자에게 분할 제안. 동작 보존 검증: 기존 통합 테스트 실행 명시. 테스트 무수정. 자가 보고 (변경 파일/라인/적용 안 한 개선점).",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "deduplicate-doublecredit-loop",
+      "prompt": "domain/graduation/credit/DoubleCreditCriterionResolver 의 resolve() 에서 findByPair 호출 + isEmpty 체크 + 반환 패턴이 3번 반복돼. 루프나 헬퍼로 정리해줘.",
+      "expected_output": "범위 명시 (이 메서드만). 동작 보존 — 3가지 경로(양쪽 일치 / primary만 / secondary만) 모두 동일한 우선순위로 반환되는지 명시. 테스트 부재 시 보고. 자가 보고.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "optional-chaining-balanceresolver",
+      "prompt": "domain/graduation/balance/BalanceRequiredResolver.resolve() 의 isEmpty/get 명령형 호출과 중첩 if 를 flatMap/map/orElseThrow 로 정리해줘. 동작은 그대로 유지.",
+      "expected_output": "동작 보존 명시 (3개 경로: rule 없음 / required=false / required=true). 호출자(NonMajorCategoryResolver) 영향 없음 점검. 테스트 부재 시 보고하고 검증 방법 제안. 자가 보고.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "perf-academicbasic-set-anymatch",
+      "prompt": "domain/graduation/credit/AcademicBasicPolicy 의 isHaveReplaceCourse() 에서 for 루프 + contains() 를 Stream.anyMatch 로 정리하고, academicBasicRequiredCourseNames 를 Set 으로 변경해서 O(n²)→O(n) 으로 개선해줘.",
+      "expected_output": "범위 명시. 호출자(isRecentMajorAcademicBasic) 시그니처 변경 여부 점검 — Set 변환을 isHaveReplaceCourse 안에서 할지 호출 측에서 할지 결정. 동작 보존: 3개 경로 (직접 일치 / 대체 일치 / 둘 다 아님). 테스트 명시. 자가 보고.",
+      "files": []
+    }
+  ]
+}
