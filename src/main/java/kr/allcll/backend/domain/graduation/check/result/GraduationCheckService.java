@@ -1,8 +1,6 @@
 package kr.allcll.backend.domain.graduation.check.result;
 
 import java.util.List;
-import kr.allcll.backend.domain.graduation.check.cert.GraduationCheckCertResult;
-import kr.allcll.backend.domain.graduation.check.cert.GraduationCheckCertResultRepository;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourseDto;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCoursePersistenceService;
@@ -27,10 +25,10 @@ public class GraduationCheckService {
     private final GradeExcelParser gradeExcelParser;
     private final GraduationChecker graduationChecker;
     private final GraduationCheckRepository graduationCheckRepository;
-    private final GraduationCheckCertResultRepository graduationCheckCertResultRepository;
     private final GraduationCheckResponseMapper graduationCheckResponseMapper;
     private final CompletedCoursePersistenceService completedCoursePersistenceService;
     private final GraduationCheckPersistenceService graduationCheckPersistenceService;
+    private final GraduationEnglishCertPassUpdateService graduationEnglishCertPassUpdateService;
 
     @Transactional
     public void checkGraduationRequirements(Long userId, MultipartFile gradeExcel) {
@@ -71,11 +69,11 @@ public class GraduationCheckService {
         return CompletedCoursesResponse.from(completedCourses);
     }
 
-    @Transactional
-    public void updateEnglishCertPass(Long userId, UpdateEnglishCertRequest updateEnglishCertRequest) {
-        GraduationCheckCertResult graduationResult = graduationCheckCertResultRepository.findByUserId(userId)
-            .orElseThrow(() -> new AllcllException(AllcllErrorCode.GRADUATION_CERT_NOT_FOUND));
-        graduationResult.updateEnglish(updateEnglishCertRequest.isPassed());
-        graduationResult.reCalculate();
+    public GraduationCheckResponse updateEnglishCertPassAndGetCheckResult(
+        Long userId,
+        UpdateEnglishCertRequest updateEnglishCertRequest
+    ) {
+        graduationEnglishCertPassUpdateService.updateEnglishCertPass(userId, updateEnglishCertRequest);
+        return getCheckResult(userId);
     }
 }

@@ -1,5 +1,6 @@
 package kr.allcll.backend.domain.review;
 
+import jakarta.validation.Valid;
 import kr.allcll.backend.domain.review.dto.UserReviewRequest;
 import kr.allcll.backend.support.web.Auth;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ public class UserReviewApi {
     @PostMapping("/api/review")
     public ResponseEntity<Void> createReview(
         @Auth Long userId,
-        @RequestBody UserReviewRequest userReviewRequest
+        @Valid @RequestBody UserReviewRequest userReviewRequest
     ) {
         userReviewService.createReview(userId, userReviewRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
