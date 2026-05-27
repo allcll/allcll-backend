@@ -3,10 +3,10 @@ package kr.allcll.backend.admin.preseat;
 import java.time.LocalDate;
 import java.util.List;
 import kr.allcll.backend.admin.preseat.dto.PreSeatResponse;
+import kr.allcll.backend.support.semester.Semester;
 import kr.allcll.crawler.client.SeatClient;
 import kr.allcll.crawler.client.model.SeatResponse;
 import kr.allcll.crawler.client.payload.SeatPayload;
-import kr.allcll.crawler.common.entity.CrawlerSemester;
 import kr.allcll.crawler.common.exception.CrawlerAllcllException;
 import kr.allcll.crawler.credential.Credential;
 import kr.allcll.crawler.credential.Credentials;
@@ -30,7 +30,8 @@ public class AdminPreSeatService {
 
     public void getAllPreSeat(String userId) {
         Credential credential = credentials.findByUserId(userId);
-        List<CrawlerSubject> crawlerSubjects = crawlerSubjectRepository.findAllBySemesterAt(CrawlerSemester.now());
+        List<CrawlerSubject> crawlerSubjects = crawlerSubjectRepository
+            .findAllBySemesterAt(Semester.getCurrentSemester());
         for (CrawlerSubject crawlerSubject : crawlerSubjects) {
             sendExternalPreSeatsRequest(crawlerSubject, credential);
         }
