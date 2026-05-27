@@ -9,13 +9,16 @@ import kr.allcll.backend.domain.graduation.check.excel.GradeExcelParser;
 import kr.allcll.backend.domain.graduation.check.result.dto.CheckResult;
 import kr.allcll.backend.domain.graduation.check.result.dto.CompletedCoursesResponse;
 import kr.allcll.backend.domain.graduation.check.result.dto.GraduationCheckResponse;
+import kr.allcll.backend.domain.graduation.check.result.dto.UpdateEnglishCertRequest;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class GraduationCheckService {
 
@@ -25,7 +28,9 @@ public class GraduationCheckService {
     private final GraduationCheckResponseMapper graduationCheckResponseMapper;
     private final CompletedCoursePersistenceService completedCoursePersistenceService;
     private final GraduationCheckPersistenceService graduationCheckPersistenceService;
+    private final GraduationEnglishCertPassUpdateService graduationEnglishCertPassUpdateService;
 
+    @Transactional
     public void checkGraduationRequirements(Long userId, MultipartFile gradeExcel) {
         validateExcelFile(gradeExcel);
 
@@ -62,5 +67,13 @@ public class GraduationCheckService {
         List<CompletedCourse> userCompletedCourses = completedCoursePersistenceService.getCompletedCourses(userId);
         CompletedCourses completedCourses = new CompletedCourses(userCompletedCourses);
         return CompletedCoursesResponse.from(completedCourses);
+    }
+
+    public GraduationCheckResponse updateEnglishCertPassAndGetCheckResult(
+        Long userId,
+        UpdateEnglishCertRequest updateEnglishCertRequest
+    ) {
+        graduationEnglishCertPassUpdateService.updateEnglishCertPass(userId, updateEnglishCertRequest);
+        return getCheckResult(userId);
     }
 }

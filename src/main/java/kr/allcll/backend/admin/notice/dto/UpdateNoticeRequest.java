@@ -1,7 +1,7 @@
 package kr.allcll.backend.admin.notice.dto;
 
 import jakarta.validation.constraints.Size;
-import kr.allcll.backend.domain.operationPeriod.OperationType;
+import kr.allcll.backend.domain.operationperiod.OperationType;
 
 public record UpdateNoticeRequest(
     @Size(max = 250)

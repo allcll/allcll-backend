@@ -1,0 +1,22 @@
+package kr.allcll.backend.domain.operationperiod;
+
+import lombok.Getter;
+
+@Getter
+public enum OperationType {
+    ALL("all"),
+    TIMETABLE("timetable"),
+    BASKETS("baskets"),
+    SIMULATION("simulation"),
+    LIVE("live"),
+    PRESEAT("preseat"),
+    GRADUATION("graduation"),
+    REVIEW("review"),
+    ;
+
+    private final String value;
+
+    OperationType(String value) {
+        this.value = value;
+    }
+}

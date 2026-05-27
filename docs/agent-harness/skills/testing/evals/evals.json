@@ -1,0 +1,33 @@
+{
+  "skill_name": "allcll-testing",
+  "evals": [
+    {
+      "id": 1,
+      "name": "green-A-unit-util",
+      "prompt": "support/graduation/KeyUtils 클래스에 단위 테스트 좀 추가해줘. generate() 메서드가 null 인자 필터링이랑 구분자 결합 잘 되는지 보고 싶어. 위치는 src/test/java/kr/allcll/backend/support/graduation/ 아래에 만들면 될 것 같아.",
+      "expected_output": "🟢-A 분류 명시 후 진행. 단위 테스트(@SpringBootTest 불필요)로 작성. AssertJ assertThat 사용. Given-When-Then + @DisplayName 한국어. @MockBean/Thread.sleep 등 금지 패턴 없음.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "green-B-crud-service",
+      "prompt": "domain/operationperiod/OperationPeriodService 의 findAll(LocalDate) 메서드에 대한 테스트가 아직 없어. 학기 판별 후 OperationPeriod 가 잘 조회되는지 검증하는 테스트 만들어줘. 픽스처는 필요하면 새로 만들어도 돼.",
+      "expected_output": "🟢-B 분류 명시. @SpringBootTest 통합 테스트. AssertJ + @AfterEach deleteAllInBatch. Fixture 정적 import 패턴. 새 fixture 필요하면 사용자에게 먼저 보고. @MockBean 금지.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "yellow-domain-format",
+      "prompt": "domain/graduation/check/excel/GradeExcelParser 단위 테스트 추가해줘. 특히 학점 파싱 부분이 제대로 되는지 검증하면 좋을 것 같아. Apache POI 의존성 있는 점 참고.",
+      "expected_output": "🟡 분류 명시. 호출부 grep으로 실제 엑셀 입력 형태(헤더, 컬럼 위치, 학점 표기 형식) 확인. 형태가 불확실하면 사용자에게 보고. 명확한 부분만 테스트 작성. 가짜 입력 추측해서 테스트 만들기 금지.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "red-external-parsing",
+      "prompt": "support/sheet/GraduationSheetFetcher 의 fetchAsTable 메서드 단위 테스트 좀 짜줘. Google Sheets API 호출 부분 mock 잘 처리해서 404 분기랑 정상 케이스 둘 다 검증하면 돼.",
+      "expected_output": "🔴 분류로 식별 후 작성 중단. 사용자에게 보고: 실제 Google Sheets 응답 샘플 필요, Mock으로 도메인 우회 위험, 통합 테스트 권장 등. 추측으로 테스트 코드 작성 금지.",
+      "files": []
+    }
+  ]
+}

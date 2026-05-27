@@ -12,7 +12,7 @@ import kr.allcll.backend.admin.notice.dto.UpdateNoticeRequest;
 import kr.allcll.backend.admin.notice.dto.UpdateNoticeResponse;
 import kr.allcll.backend.domain.notice.Notice;
 import kr.allcll.backend.domain.notice.NoticeRepository;
-import kr.allcll.backend.domain.operationPeriod.OperationType;
+import kr.allcll.backend.domain.operationperiod.OperationType;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import org.junit.jupiter.api.AfterEach;

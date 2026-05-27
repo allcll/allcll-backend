@@ -2,13 +2,14 @@ package kr.allcll.backend.admin.notice.dto;
 
 import java.time.LocalDateTime;
 import kr.allcll.backend.domain.notice.Notice;
-import kr.allcll.backend.domain.operationPeriod.OperationType;
+import kr.allcll.backend.domain.operationperiod.OperationType;
 
 public record UpdateNoticeResponse(
     long id,
     String title,
     String content,
     OperationType operationType,
+    LocalDateTime createdAt,
     LocalDateTime updatedAt
 ) {
 
@@ -18,6 +19,7 @@ public record UpdateNoticeResponse(
             notice.getTitle(),
             notice.getContent(),
             notice.getOperationType(),
+            notice.getCreatedAt(),
             notice.getUpdatedAt()
         );
     }

@@ -1,0 +1,92 @@
+name: Codex 리뷰 수집
+
+on:
+  pull_request:
+    types: [opened]
+    branches: [main]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  collect-codex-reviews:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+    steps:
+      - name: Codex 리뷰 대기
+        run: sleep 30
+
+      - name: 리뷰 스레드 수집
+        id: collect
+        run: |
+          RESULT=$(gh api graphql -f query='
+            query($owner: String!, $repo: String!, $number: Int!) {
+              repository(owner: $owner, name: $repo) {
+                pullRequest(number: $number) {
+                  reviewThreads(first: 50) {
+                    nodes {
+                      isResolved
+                      comments(first: 1) {
+                        nodes {
+                          body
+                          path
+                          line
+                          author { login }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ' -f owner="${{ github.repository_owner }}" \
+            -f repo="${{ github.event.repository.name }}" \
+            -F number="$PR_NUMBER")
+
+          REVIEWS=$(echo "$RESULT" | jq -r --arg author "$PR_AUTHOR" '
+            [
+              .data.repository.pullRequest.reviewThreads.nodes[]
+              | select(.isResolved == false)
+              | .comments.nodes[0]
+              | select(.author.login != $author)
+              | "- `\(.path):\(.line // "N/A")` -- \"\(.body | split("\n")[0])\""
+            ] | join("\n")
+          ')
+
+          if [ -z "$REVIEWS" ]; then
+            echo "has_reviews=false" >> "$GITHUB_OUTPUT"
+          else
+            {
+              echo "has_reviews=true"
+              echo "reviews<<REVIEWS_EOF"
+              echo "$REVIEWS"
+              echo "REVIEWS_EOF"
+            } >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: PR 본문에 Codex 리뷰 섹션 추가
+        if: steps.collect.outputs.has_reviews == 'true'
+        env:
+          REVIEWS: ${{ steps.collect.outputs.reviews }}
+        run: |
+          CURRENT_BODY=$(gh pr view "$PR_NUMBER" --json body -q '.body')
+
+          CODEX_SECTION=$(printf '\n\n---\n\n## Codex Review\n%s\n\n---\n- [ ] `/apply-codex` 커맨드를 로컬에서 실행하기\n' "$REVIEWS")
+
+          NEW_BODY="${CURRENT_BODY}${CODEX_SECTION}"
+
+          gh pr edit "$PR_NUMBER" --body "$NEW_BODY"
+
+      - name: Codex 리뷰 없음 -- 즉시 리뷰어 배정
+        if: steps.collect.outputs.has_reviews == 'false'
+        run: |
+          REVIEWERS='["boyekim","goldm0ng","haeyoon1","2Jin1031"]'
+          FILTERED=$(echo "$REVIEWERS" | jq --arg author "$PR_AUTHOR" '[.[] | select(. != $author)]')
+
+          gh api "repos/${{ github.repository }}/pulls/${PR_NUMBER}/requested_reviewers" \
+            --method POST \
+            --input <(echo "{\"reviewers\": $FILTERED}")

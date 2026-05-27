@@ -7,7 +7,7 @@ import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import kr.allcll.backend.domain.notice.Notice;
 import kr.allcll.backend.domain.notice.NoticeRepository;
-import kr.allcll.backend.domain.operationPeriod.OperationType;
+import kr.allcll.backend.domain.operationperiod.OperationType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

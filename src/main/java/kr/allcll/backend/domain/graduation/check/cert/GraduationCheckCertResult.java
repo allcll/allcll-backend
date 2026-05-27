@@ -210,6 +210,10 @@ public class GraduationCheckCertResult {
         return Boolean.TRUE.equals(this.isClassicsCertPassed);
     }
 
+    public void updateEnglish(boolean passed) {
+        isEnglishCertPassed = passed;
+    }
+
     public static GraduationCheckCertResult empty() {
         return new GraduationCheckCertResult(
             null,
