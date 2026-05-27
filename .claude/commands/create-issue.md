@@ -5,52 +5,6 @@ argument-hint: [ 이슈 제목 또는 설명 ]
 
 # 이슈 생성
 
-사용자가 이슈 생성을 요청하면 이 절차를 따른다.
+공통 본문은 `../../docs/agent-harness/commands/create-issue.md` 를 따른다.
 
-## 1단계: 이슈 타입 결정
-
-| 타입    | 라벨         | 설명        |
-|-------|------------|-----------|
-| 기능 추가 | `feat`     | 새로운 기능    |
-| 버그 수정 | `bug/fix`  | 버그 또는 수정  |
-| 리팩토링  | `refactor` | 코드 개선     |
-| 테스트   | `test`     | 테스트 추가/수정 |
-| CI/CD | `ci/cd`    | 빌드/배포 관련  |
-| 문서    | `docs`     | 문서 작성/수정  |
-
-사용자 요청에서 타입이 명확하지 않으면 한 번 묻는다.
-
-## 2단계: 본문 작성
-
-```markdown
-## Summary
-
-<!-- 이슈 요약 -->
-
-## TODO
-
-- [ ] 할 일 1
-- [ ] 할 일 2
-
-## 참고
-
-<!-- 관련 이슈, PR, 문서 링크 -->
-```
-
-## 3단계: 실행
-
-```bash
-gh issue create \
-  --repo allcll/allcll-backend \
-  --title "이슈 타이틀" \
-  --label "라벨" \
-  --assignee @me \
-  --body "본문"
-```
-
-## 규칙
-
-- 타이틀에 이모지 사용 금지
-- 라벨은 반드시 위 표에서 선택
-- `--assignee @me` 자동 설정
-- 생성 후 이슈 URL 을 사용자에게 보여줄 것
+@../../docs/agent-harness/commands/create-issue.md
