@@ -1,7 +1,7 @@
 package kr.allcll.backend.admin.subject;
 
 import java.util.List;
-import kr.allcll.crawler.common.entity.CrawlerSemester;
+import kr.allcll.backend.support.semester.Semester;
 import kr.allcll.crawler.common.exception.CrawlerAllcllException;
 import kr.allcll.crawler.subject.CrawlerSubject;
 import kr.allcll.crawler.subject.CrawlerSubjectRepository;
@@ -23,7 +23,7 @@ public class AdminSubjectService {
         List<CrawlerSubject> allCrawlerSubjects = subjectFetcher.fetchSubjects(userId, year, semesterCode);
         log.info("[SubjectService] 현재 학사 정보 전체 과목 수: {}", allCrawlerSubjects.size());
         List<CrawlerSubject> existingCrawlerSubjects = crawlerSubjectRepository
-            .findAllBySemesterAtIncludingDeleted(CrawlerSemester.now());
+            .findAllBySemesterAtIncludingDeleted(Semester.getCurrentSemester());
         log.info("[SubjectService] 기존 과목 수: {}", existingCrawlerSubjects.size());
         SubjectSyncResult syncResult = SubjectSyncProcessor.process(allCrawlerSubjects, existingCrawlerSubjects);
         saveAddedSubjects(syncResult);
@@ -59,7 +59,7 @@ public class AdminSubjectService {
                     updatedSubject.getDeptCd(),
                     updatedSubject.getClassName(),
                     updatedSubject.getSmtCd(),
-                    CrawlerSemester.now()
+                    Semester.getCurrentSemester()
                 ).orElseThrow(() -> new CrawlerAllcllException("SUBJECT_NOT_FOUND", "과목이 존재하지 않습니다."));
                 existingSubject.updateFrom(updatedSubject);
             }

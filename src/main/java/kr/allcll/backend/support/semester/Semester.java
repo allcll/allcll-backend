@@ -15,7 +15,8 @@ public enum Semester {
     SUMMER_25("2025-여름", LocalDate.of(2025, 6, 1), LocalDate.of(2025, 6, 30)),
     FALL_25("2025-2", LocalDate.of(2025, 8, 1), LocalDate.of(2025, 11, 30)),
     WINTER_25("2025-겨울", LocalDate.of(2025, 12, 1), LocalDate.of(2026, 1, 22)),
-    SPRING_26("2026-1", LocalDate.of(2026, 1, 23), LocalDate.of(2026, 6, 30)),
+    SPRING_26("2026-1", LocalDate.of(2026, 1, 23), LocalDate.of(2026, 5, 26)),
+    SUMMER_26("2026-여름", LocalDate.of(2026, 5, 27), LocalDate.of(2026, 7, 30)),
     ;
 
     private final String koreanName;
