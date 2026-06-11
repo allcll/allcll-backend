@@ -35,9 +35,11 @@ public class SeatService {
         }
         Set<String> activeTokens = Set.copyOf(tokens);
 
-        Map<String, List<Subject>> subjectsByToken = pinRepository.findAllBySemesterAt(Semester.getCurrentSemester())
+        Map<String, List<Subject>> subjectsByToken = pinRepository.findAllByTokenInAndSemesterAt(
+                activeTokens,
+                Semester.getCurrentSemester()
+            )
             .stream()
-            .filter(pin -> activeTokens.contains(pin.getToken()))
             .collect(Collectors.groupingBy(
                 Pin::getToken,
                 Collectors.mapping(Pin::getSubject, Collectors.toList())

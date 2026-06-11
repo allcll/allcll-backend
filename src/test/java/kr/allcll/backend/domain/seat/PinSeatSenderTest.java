@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import kr.allcll.backend.domain.seat.pin.PinRepository;
 import kr.allcll.backend.support.scheduler.ScheduledTaskHandler;
-import kr.allcll.backend.support.semester.Semester;
 import kr.allcll.backend.support.sse.SseService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,7 +44,7 @@ class PinSeatSenderTest {
         // given
         String token = "TEST_TOKEN";
         when(sseService.getConnectedTokens()).thenReturn(List.of(token));
-        when(pinRepository.findAllBySemesterAt(Semester.getCurrentSemester())).thenReturn(List.of());
+        when(pinRepository.findAllByTokenInAndSemesterAt(any(), any())).thenReturn(List.of());
         when(seatStorage.getSeats(any())).thenReturn(List.of());
 
         // when
@@ -62,7 +61,7 @@ class PinSeatSenderTest {
         // given
         String token = "TEST_TOKEN";
         when(sseService.getConnectedTokens()).thenReturn(List.of(token)).thenReturn(List.of());
-        when(pinRepository.findAllBySemesterAt(Semester.getCurrentSemester())).thenReturn(List.of());
+        when(pinRepository.findAllByTokenInAndSemesterAt(any(), any())).thenReturn(List.of());
         when(seatStorage.getSeats(any())).thenReturn(List.of());
 
         // when

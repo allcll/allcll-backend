@@ -2,6 +2,7 @@ package kr.allcll.backend.domain.seat.pin;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import kr.allcll.backend.domain.subject.Subject;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -25,6 +26,15 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
         and p.semesterAt = :semesterAt
         """)
     List<Pin> findAllBySemesterAt(String semesterAt);
+
+    @Query(""" 
+        select p from Pin p
+        join fetch p.subject s
+        where p.token in :tokens
+        and s.isDeleted = false
+        and p.semesterAt = :semesterAt
+        """)
+    List<Pin> findAllByTokenInAndSemesterAt(Set<String> tokens, String semesterAt);
 
     @Query(""" 
         select p from Pin p
