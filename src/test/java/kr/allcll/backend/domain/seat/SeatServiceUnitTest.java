@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import kr.allcll.backend.domain.seat.dto.SeatDto;
 import kr.allcll.backend.domain.seat.pin.Pin;
 import kr.allcll.backend.domain.seat.pin.PinRepository;
@@ -38,7 +39,7 @@ class SeatServiceUnitTest {
     private SeatService seatService;
 
     @Test
-    @DisplayName("여러 토큰의 핀 과목 여석을 한 번의 핀 조회로 그룹핑한다.")
+    @DisplayName("연결된 여러 토큰의 핀 과목 여석만 한 번에 조회해 그룹핑한다.")
     void getPinSeatsByTokens() {
         // given
         String firstToken = "FIRST_TOKEN";
@@ -46,13 +47,14 @@ class SeatServiceUnitTest {
         String inactiveToken = "INACTIVE_TOKEN";
         Subject firstSubject = createMajorSubject(1L, "컴퓨터네트워크", "000001", "001", "유재석");
         Subject secondSubject = createMajorSubject(2L, "운영체제", "000002", "001", "유재석");
-        Subject inactiveSubject = createMajorSubject(3L, "알고리즘", "000003", "001", "유재석");
 
-        given(pinRepository.findAllBySemesterAt(Semester.getCurrentSemester()))
+        given(pinRepository.findAllByTokenInAndSemesterAt(
+            Set.of(firstToken, secondToken),
+            Semester.getCurrentSemester()
+        ))
             .willReturn(List.of(
                 new Pin(firstToken, firstSubject),
-                new Pin(secondToken, secondSubject),
-                new Pin(inactiveToken, inactiveSubject)
+                new Pin(secondToken, secondSubject)
             ));
 
         LocalDateTime now = LocalDateTime.now();
@@ -69,7 +71,10 @@ class SeatServiceUnitTest {
             .containsEntry(firstToken, List.of(firstSeat))
             .containsEntry(secondToken, List.of(secondSeat))
             .doesNotContainKey(inactiveToken);
-        verify(pinRepository, times(1)).findAllBySemesterAt(Semester.getCurrentSemester());
+        verify(pinRepository, times(1)).findAllByTokenInAndSemesterAt(
+            Set.of(firstToken, secondToken),
+            Semester.getCurrentSemester()
+        );
         verify(pinRepository, never()).findAllByToken(anyString(), anyString());
         verify(seatStorage, times(2)).getSeats(any());
     }
