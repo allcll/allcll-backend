@@ -5,9 +5,12 @@ import static org.awaitility.Awaitility.await;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,20 +51,21 @@ class SseServiceUnitTest {
     }
 
     @Test
-    @DisplayName("같은 SseEmitter에 대한 전송은 동시에 실행하지 않는다.")
-    void sendSameEmitterSerially() {
+    @DisplayName("같은 SseEmitter에 대한 전송이 밀리면 최신 이벤트만 남긴다.")
+    void coalescePendingEventsForSameEmitter() {
         // given
         BlockingSseEmitter slowEmitter = new BlockingSseEmitter();
         sseEmitterStorage.add("token", slowEmitter);
 
         // when
-        sseService.propagate("token", "first", "first");
-        sseService.propagate("token", "second", "second");
-
-        // then
+        sseService.propagate("token", "message", "first");
         await()
             .atMost(Duration.ofSeconds(1))
             .untilAsserted(() -> assertThat(slowEmitter.started.getCount()).isZero());
+        sseService.propagate("token", "message", "second");
+        sseService.propagate("token", "message", "third");
+
+        // then
         assertThat(slowEmitter.maxConcurrent.get()).isEqualTo(1);
 
         slowEmitter.release();
@@ -69,6 +73,40 @@ class SseServiceUnitTest {
             .atMost(Duration.ofSeconds(1))
             .untilAsserted(() -> assertThat(slowEmitter.sendCount.get()).isEqualTo(2));
         assertThat(slowEmitter.maxConcurrent.get()).isEqualTo(1);
+        assertThat(slowEmitter.sentEvents)
+            .hasSize(2)
+            .anySatisfy(event -> assertThat(event).contains("event:message", "data:\"first\""))
+            .anySatisfy(event -> assertThat(event).contains("event:message", "data:\"third\""))
+            .noneSatisfy(event -> assertThat(event).contains("event:message", "data:\"second\""));
+    }
+
+    @Test
+    @DisplayName("같은 SseEmitter에 대한 전송이 밀려도 이벤트 종류별 최신 이벤트를 보존한다.")
+    void coalescePendingEventsByEventName() {
+        // given
+        BlockingSseEmitter slowEmitter = new BlockingSseEmitter();
+        sseEmitterStorage.add("token", slowEmitter);
+
+        // when
+        sseService.propagate("token", "message", "first");
+        await()
+            .atMost(Duration.ofSeconds(1))
+            .untilAsserted(() -> assertThat(slowEmitter.started.getCount()).isZero());
+        sseService.propagate("token", "pinSeats", "old-pin");
+        sseService.propagate("token", "nonMajorSeats", "general");
+        sseService.propagate("token", "pinSeats", "latest-pin");
+
+        // then
+        slowEmitter.release();
+        await()
+            .atMost(Duration.ofSeconds(1))
+            .untilAsserted(() -> assertThat(slowEmitter.sendCount.get()).isEqualTo(3));
+        assertThat(slowEmitter.sentEvents)
+            .hasSize(3)
+            .anySatisfy(event -> assertThat(event).contains("event:message", "data:\"first\""))
+            .anySatisfy(event -> assertThat(event).contains("event:pinSeats", "data:\"latest-pin\""))
+            .anySatisfy(event -> assertThat(event).contains("event:nonMajorSeats", "data:\"general\""))
+            .noneSatisfy(event -> assertThat(event).contains("event:pinSeats", "data:\"old-pin\""));
     }
 
     private static class BlockingSseEmitter extends SseEmitter {
@@ -78,6 +116,7 @@ class SseServiceUnitTest {
         private final AtomicInteger sendCount = new AtomicInteger();
         private final AtomicInteger concurrent = new AtomicInteger();
         private final AtomicInteger maxConcurrent = new AtomicInteger();
+        private final List<String> sentEvents = new CopyOnWriteArrayList<>();
 
         @Override
         public void send(SseEventBuilder builder) throws IOException {
@@ -89,6 +128,7 @@ class SseServiceUnitTest {
                     throw new IOException("send timed out");
                 }
                 sendCount.incrementAndGet();
+                sentEvents.add(eventToString(builder));
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new IOException(e);
@@ -99,6 +139,13 @@ class SseServiceUnitTest {
 
         void release() {
             release.countDown();
+        }
+
+        private String eventToString(SseEventBuilder eventBuilder) {
+            return eventBuilder.build().stream()
+                .map(DataWithMediaType::getData)
+                .map(Object::toString)
+                .collect(Collectors.joining(""));
         }
     }
 }
