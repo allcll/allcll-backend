@@ -1,0 +1,58 @@
+name: Codex 리뷰 후 리뷰어 배정
+
+on:
+  pull_request:
+    types: [edited]
+    branches: [main]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  assign-reviewers:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 체크박스 확인
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          BODY=$(gh pr view "$PR_NUMBER" --json body -q '.body')
+
+          if echo "$BODY" | grep -q '\- \[x\] `/apply-codex`'; then
+            echo "checked=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "checked=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: 기존 리뷰어 확인
+        if: steps.check.outputs.checked == 'true'
+        id: existing
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          REVIEWERS=$(gh pr view "$PR_NUMBER" --json reviewRequests -q '.reviewRequests[].login')
+
+          if [ -n "$REVIEWERS" ]; then
+            echo "already_assigned=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "already_assigned=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: 리뷰어 배정
+        if: steps.check.outputs.checked == 'true' && steps.existing.outputs.already_assigned == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          PR_AUTHOR=${{ github.event.pull_request.user.login }}
+
+          REVIEWERS='["boyekim","goldm0ng","haeyoon1","2Jin1031"]'
+          FILTERED=$(echo "$REVIEWERS" | jq --arg author "$PR_AUTHOR" '[.[] | select(. != $author)]')
+
+          gh api "repos/${{ github.repository }}/pulls/${PR_NUMBER}/requested_reviewers" \
+            --method POST \
+            --input <(echo "{\"reviewers\": $FILTERED}")

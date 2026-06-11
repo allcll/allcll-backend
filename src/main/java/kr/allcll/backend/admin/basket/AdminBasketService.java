@@ -1,11 +1,11 @@
 package kr.allcll.backend.admin.basket;
 
 import java.util.List;
+import kr.allcll.backend.support.semester.Semester;
 import kr.allcll.crawler.basket.CrawlerBasket;
 import kr.allcll.crawler.basket.CrawlerBasketRepository;
 import kr.allcll.crawler.client.BasketClient;
 import kr.allcll.crawler.client.payload.BasketPayload;
-import kr.allcll.crawler.common.entity.CrawlerSemester;
 import kr.allcll.crawler.credential.Credential;
 import kr.allcll.crawler.credential.Credentials;
 import kr.allcll.crawler.subject.CrawlerSubject;
@@ -26,7 +26,8 @@ public class AdminBasketService {
 
     public void fetchAndSaveBaskets(String userId) {
         Credential credential = credentials.findByUserId(userId);
-        List<CrawlerSubject> crawlerSubjects = crawlerSubjectRepository.findAllBySemesterAt(CrawlerSemester.now());
+        List<CrawlerSubject> crawlerSubjects = crawlerSubjectRepository
+            .findAllBySemesterAt(Semester.getCurrentSemester());
         for (CrawlerSubject crawlerSubject : crawlerSubjects) {
             List<CrawlerBasket> notDuplicatedCrawlerBaskets = fetchBaskets(crawlerSubject, credential);
             crawlerBasketRepository.saveAll(notDuplicatedCrawlerBaskets);
