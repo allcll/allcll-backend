@@ -2,6 +2,7 @@ package kr.allcll.backend.support.exception;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import io.sentry.Sentry;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.stream.Collectors;
@@ -70,6 +71,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleException(HttpServletRequest request, Exception exception) {
         final AllcllErrorCode errorCode = AllcllErrorCode.SERVER_ERROR;
 
+        Sentry.captureException(exception);
         log.error(LOG_FORMAT, request.getMethod(), request.getRequestURI(), getRequestBody(request),
             exception.getMessage(), exception);
         return ErrorResponse.of(errorCode);
