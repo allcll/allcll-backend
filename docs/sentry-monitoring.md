@@ -8,6 +8,40 @@
 - 기본 PII 수집은 `SentryOptions#setSendDefaultPii(false)`로 비활성화한다.
 - `beforeSend` 콜백에서 Sentry 이벤트의 user, request body, cookies, query string, headers를 제거한 뒤 전송한다.
 
+## 에러 수집 정책
+
+수집 대상:
+
+- 예상하지 못한 일반 서버 예외
+- HTTP 상태가 5xx인 `AllcllException`
+- 외부 시스템 장애를 의미하는 HTTP 502 `AllcllException`
+
+미수집 대상:
+
+- HTTP 4xx 비즈니스 예외
+- validation 오류
+- 인증 실패
+- 존재하지 않는 API 및 리소스
+- 정상적인 SSE timeout
+
+일반 `Exception`은 `SERVER_ERROR`와 HTTP 500으로 분류한다. `AllcllException`은
+`AllcllErrorCode#getHttpStatus()`가 5xx인지 판별하므로 500뿐 아니라 502 등 모든 서버 오류를 수집한다.
+
+## 이벤트 태그
+
+각 수집 이벤트에는 요청 단위 Sentry scope를 사용해 다음 태그만 추가한다.
+
+| 태그 | 값 |
+| --- | --- |
+| `method` | HTTP method |
+| `path` | query string을 제외한 request URI |
+| `status` | HTTP status code |
+| `errorCode` | `AllcllErrorCode` enum 이름 |
+| `exceptionType` | 예외 클래스의 simple name |
+
+태그 및 extra에는 사용자 ID, 인증 토큰, cookie, query parameter, request body를 넣지 않는다.
+요청 단위 scope를 사용하므로 한 요청의 태그가 다른 요청 이벤트로 유출되지 않는다.
+
 ## 환경변수
 
 | 이름 | 필수 | 기본값 | 설명 |
