@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import kr.allcll.backend.support.metrics.SeatPipelineMetrics;
 import kr.allcll.backend.support.sse.dto.SseStatusResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ public class SseService {
     private static final String INITIAL_EVENT_NAME = "connection";
 
     private final SseEmitterStorage sseEmitterStorage;
+    private final SeatPipelineMetrics seatPipelineMetrics;
     private final ExecutorService sseSendExecutor = Executors.newVirtualThreadPerTaskExecutor();
     private final Map<SseEmitter, SseSendState> sendStates = new ConcurrentHashMap<>();
 
@@ -82,7 +84,7 @@ public class SseService {
 
     private void sendEvent(SseEmitter sseEmitter, SseEventBuilder eventBuilder) {
         try {
-            sseEmitter.send(eventBuilder);
+            seatPipelineMetrics.recordSseSend(() -> sseEmitter.send(eventBuilder));
         } catch (Exception e) {
             log.warn("전송 실패 - SSE 연결이 끊겼습니다.: {}", e.getMessage());
             SseErrorHandler.handle(e);
