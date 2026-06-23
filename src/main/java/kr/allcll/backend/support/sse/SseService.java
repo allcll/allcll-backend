@@ -20,6 +20,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEvent
 @RequiredArgsConstructor
 public class SseService {
 
+    private static final String INITIAL_EVENT_NAME = "connection";
+
     private final SseEmitterStorage sseEmitterStorage;
     private final ExecutorService sseSendExecutor = Executors.newVirtualThreadPerTaskExecutor();
     private final Map<SseEmitter, SseSendState> sendStates = new ConcurrentHashMap<>();
@@ -30,8 +32,10 @@ public class SseService {
         sseEmitter.onTimeout(() -> sendStates.remove(sseEmitter));
         sseEmitter.onError(e -> sendStates.remove(sseEmitter));
         sseEmitter.onCompletion(() -> sendStates.remove(sseEmitter));
+
         SseEventBuilder initialEvent = SseEventBuilderFactory.createInitialEvent();
-        sendEvent(sseEmitter, initialEvent);
+        sendEventAsync(sseEmitter, INITIAL_EVENT_NAME, initialEvent);
+
         return sseEmitter;
     }
 
@@ -78,9 +82,7 @@ public class SseService {
 
     private void sendEvent(SseEmitter sseEmitter, SseEventBuilder eventBuilder) {
         try {
-            synchronized (sseEmitter) {
-                sseEmitter.send(eventBuilder);
-            }
+            sseEmitter.send(eventBuilder);
         } catch (Exception e) {
             log.warn("전송 실패 - SSE 연결이 끊겼습니다.: {}", e.getMessage());
             SseErrorHandler.handle(e);
