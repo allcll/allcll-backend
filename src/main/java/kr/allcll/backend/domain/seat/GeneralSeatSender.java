@@ -24,9 +24,9 @@ public class GeneralSeatSender {
     private final ScheduledTaskHandler scheduledTaskHandler;
 
     public GeneralSeatSender(
-            SseService sseService,
-            SeatStorage seatStorage,
-            @Qualifier("generalSeatTaskHandler") ScheduledTaskHandler scheduledTaskHandler
+        SseService sseService,
+        SeatStorage seatStorage,
+        @Qualifier("generalSeatTaskHandler") ScheduledTaskHandler scheduledTaskHandler
     ) {
         this.sseService = sseService;
         this.seatStorage = seatStorage;
