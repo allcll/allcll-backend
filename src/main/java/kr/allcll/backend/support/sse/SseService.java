@@ -52,9 +52,10 @@ public class SseService {
             emitter -> {
                 SseEventBuilder eventBuilder = SseEventBuilderFactory.create(eventName, data);
                 sendEventAsync(emitter, eventName, eventBuilder);
-                log.debug("[SSE-propagate] 이벤트 전송 완료. token: {}, eventName: {}", token, eventName);
+                log.debug("[SSE-propagate] 이벤트 전송 요청. token: {}, eventName: {}", token, eventName);
             },
-            () -> log.warn("[SSE-propagate] 이벤트 전송 실패 - Emitter가 Map에 없음. token: {}, eventName: {}", token, eventName)
+            () -> log.warn("[SSE-propagate] 이벤트 전송 요청 실패 - Emitter가 Map에 없음. token: {}, eventName: {}", token,
+                eventName)
         );
     }
 

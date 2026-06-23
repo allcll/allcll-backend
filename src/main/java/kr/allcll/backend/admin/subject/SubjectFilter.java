@@ -1,7 +1,7 @@
 package kr.allcll.backend.admin.subject;
 
 import java.util.List;
-import kr.allcll.crawler.common.entity.CrawlerSemester;
+import kr.allcll.backend.support.semester.Semester;
 import kr.allcll.crawler.common.properties.SjptProperties;
 import kr.allcll.crawler.subject.CrawlerSubject;
 import kr.allcll.crawler.subject.CrawlerSubjectRepository;
@@ -33,7 +33,7 @@ public class SubjectFilter {
      */
     public List<CrawlerSubject> loadTargetGeneralSubject() {
         return crawlerSubjectRepository
-            .findAllByDeptCd(sjptProperties.getGeneralDeptCd(), CrawlerSemester.now())
+            .findAllByDeptCd(sjptProperties.getGeneralDeptCd(), Semester.getCurrentSemester())
             .stream()
             .filter(this::includeSubject)
             .filter(this::includeRemark)
@@ -44,7 +44,8 @@ public class SubjectFilter {
     계절 학기 때에 전체 과목을 실시간 제공하고 싶을 때에 사용합니다.
      */
     public List<CrawlerSubject> loadAllSubjectToTarget() {
-        List<CrawlerSubject> crawlerSubjects = crawlerSubjectRepository.findAllBySemesterAt(CrawlerSemester.now());
+        List<CrawlerSubject> crawlerSubjects = crawlerSubjectRepository
+            .findAllBySemesterAt(Semester.getCurrentSemester());
         return crawlerSubjects.stream()
             .filter(this::includeSubject)
             .toList();

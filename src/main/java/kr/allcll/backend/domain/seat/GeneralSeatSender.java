@@ -16,7 +16,7 @@ public class GeneralSeatSender {
 
     private static final String EVENT_NAME = "nonMajorSeats";
     private static final int QUERY_LIMIT = 20;
-    private static final int SEASON_SEMESTER_QUERY_LIMIT = 40; // 2025-동계 전체 제공을 위한 쿼리 제한 수
+    private static final int SEASON_SEMESTER_QUERY_LIMIT = 40; // 2026-하계 전체 제공을 위한 쿼리 제한 수
     private static final Duration SENDING_PERIOD = Duration.ofSeconds(3);
 
     private final SseService sseService;
@@ -37,7 +37,7 @@ public class GeneralSeatSender {
         if (hasActiveSchedule()) {
             return;
         }
-        scheduledTaskHandler.scheduleWithFixedDelay(getGeneralSeatTask(), SENDING_PERIOD);
+scheduledTaskHandler.scheduleWithFixedDelay(getGeneralSeatTask(), SENDING_PERIOD);
     }
 
     public boolean hasActiveSchedule() {
