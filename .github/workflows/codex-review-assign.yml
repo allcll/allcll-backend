@@ -2,8 +2,8 @@ name: Codex 리뷰 후 리뷰어 배정
 
 on:
   pull_request:
-    types: [edited]
-    branches: [main]
+    types: [ edited ]
+    branches: [ main ]
 
 permissions:
   pull-requests: write
@@ -12,11 +12,12 @@ permissions:
 jobs:
   assign-reviewers:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
     steps:
       - name: 체크박스 확인
         id: check
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PR_NUMBER=${{ github.event.pull_request.number }}
           BODY=$(gh pr view "$PR_NUMBER" --json body -q '.body')
@@ -30,8 +31,6 @@ jobs:
       - name: 기존 리뷰어 확인
         if: steps.check.outputs.checked == 'true'
         id: existing
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PR_NUMBER=${{ github.event.pull_request.number }}
           REVIEWERS=$(gh pr view "$PR_NUMBER" --json reviewRequests -q '.reviewRequests[].login')
@@ -44,8 +43,6 @@ jobs:
 
       - name: 리뷰어 배정
         if: steps.check.outputs.checked == 'true' && steps.existing.outputs.already_assigned == 'false'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PR_NUMBER=${{ github.event.pull_request.number }}
           PR_AUTHOR=${{ github.event.pull_request.user.login }}
