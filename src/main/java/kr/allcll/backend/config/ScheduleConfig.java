@@ -14,7 +14,7 @@ public class ScheduleConfig {
     @Bean
     @Qualifier("generalSeatTaskHandler")
     public ScheduledTaskHandler generalSeatTaskHandler(MeterRegistry meterRegistry) {
-        return new ScheduledTaskHandler(2, "general-seat-sender", meterRegistry);
+        return new ScheduledTaskHandler(1, "general-seat-sender", meterRegistry);
     }
 
     @Bean

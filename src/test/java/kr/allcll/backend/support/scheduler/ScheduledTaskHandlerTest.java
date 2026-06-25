@@ -164,6 +164,31 @@ class ScheduledTaskHandlerTest {
         assertThat(scheduledTaskHandler.getTaskCount()).isEqualTo(1);
     }
 
+    @Test
+    @DisplayName("고정 지연 방식으로 스케줄링 작업을 등록한다.")
+    void scheduledTaskWithFixedDelay() {
+        // given
+        ScheduledTaskHandler scheduledTaskHandler = new ScheduledTaskHandler(
+            1,
+            "test-fixed-delay-task",
+            new LoggingMeterRegistry()
+        );
+
+        // when
+        AtomicInteger counter = new AtomicInteger();
+        scheduledTaskHandler.scheduleWithFixedDelay(counter::incrementAndGet, Duration.ofMillis(100));
+
+        // then
+        await()
+            .atMost(Duration.ofSeconds(1))
+            .untilAsserted(() -> {
+                assertThat(scheduledTaskHandler.getTaskCount()).isEqualTo(1);
+                assertThat(counter.get()).isGreaterThanOrEqualTo(1);
+            });
+
+        scheduledTaskHandler.cancelAll();
+    }
+
     private String scheduleTask(ScheduledTaskHandler scheduledTaskHandler, AtomicInteger counter) {
         return scheduledTaskHandler.scheduleAtFixedRate(
             () -> System.out.println("Task is running: " + counter.incrementAndGet()),
