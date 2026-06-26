@@ -3,6 +3,7 @@ package kr.allcll.backend.support.sse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import kr.allcll.backend.support.metrics.SeatPipelineMetrics;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,8 +20,10 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 class SseServiceUnitTest {
 
+    private final SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
+    private final SeatPipelineMetrics seatPipelineMetrics = new SeatPipelineMetrics(meterRegistry);
     private final SseEmitterStorage sseEmitterStorage = new SseEmitterStorage();
-    private final SseService sseService = new SseService(sseEmitterStorage);
+    private final SseService sseService = new SseService(sseEmitterStorage, seatPipelineMetrics);
 
     @AfterEach
     void tearDown() {
