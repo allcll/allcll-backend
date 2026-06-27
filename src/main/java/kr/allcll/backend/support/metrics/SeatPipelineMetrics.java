@@ -6,10 +6,10 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.Timer;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.IntSupplier;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -33,8 +33,8 @@ public class SeatPipelineMetrics {
         lastCrawledAtMillis.updateAndGet(previous -> Math.max(previous, epochMillis));
     }
 
-    public void registerBatchQueueSize(String type, IntSupplier queueSizeSupplier) {
-        Gauge.builder("seat.batch.queue.size", queueSizeSupplier, IntSupplier::getAsInt)
+    public void registerBatchQueueSize(String type, BlockingQueue<?> queue) {
+        Gauge.builder("seat.batch.queue.size", queue, BlockingQueue::size)
             .tags(TYPE_TAG, type)
             .register(meterRegistry);
     }
