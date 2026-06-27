@@ -2,8 +2,16 @@ name: Codex 리뷰 수집
 
 on:
   pull_request:
-    types: [opened]
-    branches: [main]
+    types: [ opened ]
+    branches: [ main ]
+  pull_request_review_comment:
+    types: [ created ]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Codex 리뷰를 다시 수집할 PR 번호
+        required: true
+        type: string
 
 permissions:
   pull-requests: write
@@ -14,10 +22,23 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      PR_NUMBER: ${{ github.event.pull_request.number }}
-      PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+      GH_REPO: ${{ github.repository }}
     steps:
+      - name: PR 컨텍스트 설정
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            PR_NUMBER="${{ inputs.pr_number }}"
+            PR_AUTHOR=$(gh pr view "$PR_NUMBER" --json author -q '.author.login')
+          else
+            PR_NUMBER="${{ github.event.pull_request.number }}"
+            PR_AUTHOR="${{ github.event.pull_request.user.login }}"
+          fi
+
+          echo "PR_NUMBER=$PR_NUMBER" >> "$GITHUB_ENV"
+          echo "PR_AUTHOR=$PR_AUTHOR" >> "$GITHUB_ENV"
+
       - name: Codex 리뷰 대기
+        if: github.event_name == 'pull_request'
         run: sleep 30
 
       - name: 리뷰 스레드 수집
@@ -75,6 +96,11 @@ jobs:
         run: |
           CURRENT_BODY=$(gh pr view "$PR_NUMBER" --json body -q '.body')
 
+          if echo "$CURRENT_BODY" | grep -q '## Codex Review'; then
+            echo "Codex Review 섹션이 이미 있어 추가하지 않습니다."
+            exit 0
+          fi
+
           CODEX_SECTION=$(printf '\n\n---\n\n## Codex Review\n%s\n\n---\n- [ ] `/apply-codex` 커맨드를 로컬에서 실행하기\n' "$REVIEWS")
 
           NEW_BODY="${CURRENT_BODY}${CODEX_SECTION}"
@@ -82,7 +108,7 @@ jobs:
           gh pr edit "$PR_NUMBER" --body "$NEW_BODY"
 
       - name: Codex 리뷰 없음 -- 즉시 리뷰어 배정
-        if: steps.collect.outputs.has_reviews == 'false'
+        if: github.event_name == 'pull_request' && steps.collect.outputs.has_reviews == 'false'
         run: |
           REVIEWERS='["boyekim","goldm0ng","haeyoon1","2Jin1031"]'
           FILTERED=$(echo "$REVIEWERS" | jq --arg author "$PR_AUTHOR" '[.[] | select(. != $author)]')
