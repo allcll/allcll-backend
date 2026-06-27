@@ -118,9 +118,9 @@ public class AdminSeatService {
     private void crawlPinSeatAndBuffer(CrawlerSubject pinSubject, Credential credential) {
         try {
             CrawlerSeat crawlerSeat = sendExternalSeatRequest(pinSubject, credential);
-            batchService.savePinSeatBatch(crawlerSeat);
-
             recordCrawlingSuccess();
+
+            batchService.savePinSeatBatch(crawlerSeat);
         } catch (CrawlerAllcllException e) {
             log.error(
                 "[핀 과목 여석] 외부 API 호출에 실패했습니다. 과목: "
@@ -132,9 +132,9 @@ public class AdminSeatService {
     private void crawlGeneralSeatAndBuffer(CrawlerSubject generalSubject, Credential credential) {
         try {
             CrawlerSeat crawlerSeat = sendExternalSeatRequest(generalSubject, credential);
-            batchService.saveGeneralSeatBatch(crawlerSeat);
-
             recordCrawlingSuccess();
+
+            batchService.saveGeneralSeatBatch(crawlerSeat);
         } catch (CrawlerAllcllException e) {
             log.error(
                 "[교양 과목 여석] 외부 API 호출에 실패했습니다. 과목: "
