@@ -67,7 +67,11 @@ public class SseService {
 
     private void sendEventAsync(SseEmitter sseEmitter, String eventName, SseEventBuilder eventBuilder) {
         SseSendState sendState = sendStates.computeIfAbsent(sseEmitter, ignored -> new SseSendState());
-        if (sendState.updatePending(eventName, eventBuilder)) {
+        SsePendingUpdate pendingUpdate = sendState.updatePending(eventName, eventBuilder);
+        if (pendingUpdate.coalesced()) {
+            seatPipelineMetrics.recordSseEventCoalesced(eventName);
+        }
+        if (pendingUpdate.shouldSchedule()) {
             sseSendExecutor.execute(() -> drainEvents(sseEmitter, sendState));
         }
     }
@@ -110,13 +114,14 @@ public class SseService {
         private boolean sending;
         private final Map<String, SseEventBuilder> pendingEvents = new LinkedHashMap<>();
 
-        synchronized boolean updatePending(String eventName, SseEventBuilder eventBuilder) {
+        synchronized SsePendingUpdate updatePending(String eventName, SseEventBuilder eventBuilder) {
+            boolean coalesced = sending && pendingEvents.containsKey(eventName);
             pendingEvents.put(eventName, eventBuilder);
             if (sending) {
-                return false;
+                return new SsePendingUpdate(false, coalesced);
             }
             sending = true;
-            return true;
+            return new SsePendingUpdate(true, false);
         }
 
         synchronized List<SseEventBuilder> pollPending() {
@@ -128,5 +133,8 @@ public class SseService {
             pendingEvents.clear();
             return eventBuilders;
         }
+    }
+
+    private record SsePendingUpdate(boolean shouldSchedule, boolean coalesced) {
     }
 }

@@ -8,6 +8,9 @@ import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import kr.allcll.backend.support.metrics.SeatPipelineMetrics;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,11 +52,66 @@ class SseServiceMetricsTest {
             });
     }
 
+    @Test
+    @DisplayName("SSE 전송 중 같은 이벤트가 최신 값으로 병합되면 coalesced counter가 증가한다.")
+    void sseEventCoalescedCount() {
+        // given
+        BlockingSseEmitter slowEmitter = new BlockingSseEmitter();
+        sseEmitterStorage.add("token", slowEmitter);
+
+        // when
+        sseService.propagate("token", "pinSeats", "first");
+        await()
+            .atMost(Duration.ofSeconds(1))
+            .untilAsserted(() -> assertThat(slowEmitter.started.getCount()).isZero());
+        sseService.propagate("token", "pinSeats", "second");
+        sseService.propagate("token", "pinSeats", "third");
+
+        // then
+        slowEmitter.release();
+        await()
+            .atMost(Duration.ofSeconds(1))
+            .untilAsserted(() -> {
+                Counter coalescedCounter = meterRegistry.find("sse.event.coalesced")
+                    .tag("event", "pinSeats")
+                    .counter();
+
+                assertThat(coalescedCounter).isNotNull();
+                assertThat(coalescedCounter.count()).isEqualTo(1.0);
+                assertThat(slowEmitter.sendCount.get()).isEqualTo(2);
+            });
+    }
+
     private static class FailingSseEmitter extends SseEmitter {
 
         @Override
         public void send(SseEventBuilder builder) throws IOException {
             throw new IOException("send failed");
+        }
+    }
+
+    private static class BlockingSseEmitter extends SseEmitter {
+
+        private final CountDownLatch started = new CountDownLatch(1);
+        private final CountDownLatch release = new CountDownLatch(1);
+        private final AtomicInteger sendCount = new AtomicInteger();
+
+        @Override
+        public void send(SseEventBuilder builder) throws IOException {
+            started.countDown();
+            try {
+                if (!release.await(1, TimeUnit.SECONDS)) {
+                    throw new IOException("send timed out");
+                }
+                sendCount.incrementAndGet();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IOException(e);
+            }
+        }
+
+        void release() {
+            release.countDown();
         }
     }
 }

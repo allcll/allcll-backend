@@ -17,6 +17,7 @@ public class SeatPipelineMetrics {
 
     private static final String TYPE_TAG = "type";
     private static final String TASK_TAG = "task";
+    private static final String EVENT_TAG = "event";
 
     private final MeterRegistry meterRegistry;
     private final AtomicLong lastCrawledAtMillis = new AtomicLong(0);
@@ -71,6 +72,13 @@ public class SeatPipelineMetrics {
                 .publishPercentileHistogram()
                 .register(meterRegistry));
         }
+    }
+
+    public void recordSseEventCoalesced(String eventName) {
+        Counter.builder("sse.event.coalesced")
+            .tags(EVENT_TAG, eventName)
+            .register(meterRegistry)
+            .increment();
     }
 
     public void recordSchedulerTaskSuccess(String task) {
