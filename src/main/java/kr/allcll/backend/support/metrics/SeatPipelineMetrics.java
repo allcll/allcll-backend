@@ -33,10 +33,6 @@ public class SeatPipelineMetrics {
         lastCrawledAtMillis.updateAndGet(previous -> Math.max(previous, epochMillis));
     }
 
-    public long getLastCrawledAtMillis() {
-        return lastCrawledAtMillis.get();
-    }
-
     public void registerBatchQueueSize(String type, IntSupplier queueSizeSupplier) {
         Gauge.builder("seat.batch.queue.size", queueSizeSupplier, IntSupplier::getAsInt)
             .tags(TYPE_TAG, type)
@@ -107,6 +103,7 @@ public class SeatPipelineMetrics {
 
     @FunctionalInterface
     public interface ThrowingRunnable {
+
         void run() throws Exception;
     }
 }
