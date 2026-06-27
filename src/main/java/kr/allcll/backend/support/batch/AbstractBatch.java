@@ -22,7 +22,7 @@ public abstract class AbstractBatch<T> {
         this.lock = new Object();
         this.seatPipelineMetrics = seatPipelineMetrics;
         this.type = type;
-        this.seatPipelineMetrics.registerBatchQueueSize(type, queue::size);
+        this.seatPipelineMetrics.registerBatchQueueSize(type, queue);
     }
 
     public void add(T item) {
