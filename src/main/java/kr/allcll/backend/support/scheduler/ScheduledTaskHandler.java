@@ -65,7 +65,7 @@ public class ScheduledTaskHandler {
             log.warn("[ScheduledTaskHandler] Task ID {} 은 이미 스케줄러에 등록되어 있습니다.", taskId);
             return taskId;
         }
-        ScheduledFuture<?> future = scheduler.scheduleWithFixedDelay(task, delay);
+        ScheduledFuture<?> future = scheduler.scheduleWithFixedDelay(() -> runWithMetrics(task), delay);
         tasks.put(taskId, future);
         return taskId;
     }
