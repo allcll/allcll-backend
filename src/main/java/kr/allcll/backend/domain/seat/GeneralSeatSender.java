@@ -37,7 +37,7 @@ public class GeneralSeatSender {
         if (hasActiveSchedule()) {
             return;
         }
-scheduledTaskHandler.scheduleWithFixedDelay(getGeneralSeatTask(), SENDING_PERIOD);
+        scheduledTaskHandler.scheduleWithFixedDelay(getGeneralSeatTask(), SENDING_PERIOD);
     }
 
     public boolean hasActiveSchedule() {

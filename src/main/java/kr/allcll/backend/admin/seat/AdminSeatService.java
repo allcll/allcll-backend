@@ -13,6 +13,7 @@ import kr.allcll.backend.domain.subject.SubjectRepository;
 import kr.allcll.backend.support.batch.BatchService;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
+import kr.allcll.backend.support.metrics.SeatPipelineMetrics;
 import kr.allcll.backend.support.semester.Semester;
 import kr.allcll.backend.support.web.PrefixParser;
 import kr.allcll.backend.support.web.TokenProvider;
@@ -45,6 +46,7 @@ public class AdminSeatService {
     private final AtomicLong lastSuccessCrawlingTime = new AtomicLong(0);
     private final BatchService batchService;
     private final SubjectRepository subjectRepository;
+    private final SeatPipelineMetrics seatPipelineMetrics;
 
     public void getAllSeatPeriodically(String userId) {
         Credential credential = credentials.findByUserId(userId);
@@ -116,11 +118,9 @@ public class AdminSeatService {
     private void crawlPinSeatAndBuffer(CrawlerSubject pinSubject, Credential credential) {
         try {
             CrawlerSeat crawlerSeat = sendExternalSeatRequest(pinSubject, credential);
-            batchService.savePinSeatBatch(crawlerSeat);
+            recordCrawlingSuccess();
 
-            lastSuccessCrawlingTime.updateAndGet(
-                previousSuccessTime -> Math.max(previousSuccessTime, System.currentTimeMillis())
-            );
+            batchService.savePinSeatBatch(crawlerSeat);
         } catch (CrawlerAllcllException e) {
             log.error(
                 "[핀 과목 여석] 외부 API 호출에 실패했습니다. 과목: "
@@ -132,11 +132,9 @@ public class AdminSeatService {
     private void crawlGeneralSeatAndBuffer(CrawlerSubject generalSubject, Credential credential) {
         try {
             CrawlerSeat crawlerSeat = sendExternalSeatRequest(generalSubject, credential);
-            batchService.saveGeneralSeatBatch(crawlerSeat);
+            recordCrawlingSuccess();
 
-            lastSuccessCrawlingTime.updateAndGet(
-                previousSuccessTime -> Math.max(previousSuccessTime, System.currentTimeMillis())
-            );
+            batchService.saveGeneralSeatBatch(crawlerSeat);
         } catch (CrawlerAllcllException e) {
             log.error(
                 "[교양 과목 여석] 외부 API 호출에 실패했습니다. 과목: "
@@ -162,6 +160,12 @@ public class AdminSeatService {
             )
         );
         return renewedCrawlerSeat;
+    }
+
+    private void recordCrawlingSuccess() {
+        long now = System.currentTimeMillis();
+        lastSuccessCrawlingTime.updateAndGet(previousSuccessTime -> Math.max(previousSuccessTime, now));
+        seatPipelineMetrics.recordCrawlingSuccess(now);
     }
 
     private boolean isSeatCrawlingActive() {

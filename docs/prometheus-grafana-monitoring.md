@@ -106,23 +106,43 @@ management:
 `SeatStorageLogger`, `ExternalPreInvoker` 같은 별도 scheduled method에 해당하므로, 여석 전송 상태를 판단하는 기본 패널에는 포함하지
 않는다.
 
-## 후속 커스텀 메트릭 후보
+## SSE 커스텀 메트릭
 
-이번 단계는 Spring Boot Actuator와 Micrometer 기본 지표를 Prometheus가 수집할 수 있게 만드는 작업이다. SSE 전송 지연이나
-backpressure 여부를 더 자세히 보려면 후속 PR에서 커스텀 메트릭을 추가한다.
+Spring Boot Actuator와 Micrometer 기본 지표만으로는 SSE 전송 지연이나 backpressure 완화 동작을 직접 확인하기 어렵다.
+여석 파이프라인 메트릭에서는 SSE 전송 시간과 이벤트 병합 횟수를 커스텀 메트릭으로 노출한다.
 
 현재 `SseService`는 emitter별 전송 상태를 두고, 전송 중 같은 event name의 새 이벤트가 들어오면 pending 이벤트를 최신 값으로 덮어쓴다.
-즉 느린 SSE 연결이 전체 전송 흐름을 막지 않도록 하는 coalescing 기반 backpressure 완화 로직은 있다. 다만 이 동작을 별도 지표로
-노출하지는 않으므로 현재 대시보드에서는 실제 병합 빈도를 확인할 수 없다.
+즉 느린 SSE 연결이 전체 전송 흐름을 막지 않도록 하는 coalescing 기반 backpressure 완화 로직이 있다.
 
-후속 후보:
+추가 지표:
 
 - `sse.send.duration`: SSE `send` 호출에 걸리는 시간. Prometheus에서는 `sse_send_duration_seconds`로 확인한다.
 - `sse.event.coalesced`: backpressure 완화를 위해 같은 event name의 pending 이벤트를 최신 값으로 덮어쓴 횟수.
   Prometheus에서는 `sse_event_coalesced_total{event=~"pinSeats|nonMajorSeats"}`로 확인한다.
 
-두 지표는 커스텀 메트릭이므로 기본 수집 구성을 다루는 이번 PR에는 포함하지 않고, 여석 파이프라인 커스텀 메트릭을 다루는
-`feat/seat-pipeline-metrics` 브랜치에서 구현한다.
+두 지표는 커스텀 메트릭이므로 기본 수집 구성을 다루는 Prometheus/Grafana 설정 PR이 아니라, 여석 파이프라인 커스텀 메트릭을
+다루는 `feat/seat-pipeline-metrics` 브랜치에서 구현한다.
+
+## 여석 파이프라인 커스텀 메트릭
+
+Micrometer meter name은 dot 표기지만 Prometheus에서는 underscore 표기로 노출된다. 예를 들어 `seat.batch.flush.duration` timer는 `seat_batch_flush_duration_seconds_bucket`, `seat_batch_flush_duration_seconds_count`, `seat_batch_flush_duration_seconds_sum`으로 확인한다.
+
+| Prometheus metric | 의미 | 주요 tag | 장애 판단 기준 | PromQL 예시 |
+| --- | --- | --- | --- | --- |
+| `seat_last_crawled_age_seconds` | 마지막 여석 크롤링 성공 이후 경과 시간 | 없음 | 값이 계속 증가하면 학교 서버 호출, 크롤러 인증, 대상 과목 순회 지연 가능성이 높다. | `seat_last_crawled_age_seconds` |
+| `seat_batch_queue_size` | DB 저장 전 batch queue에 쌓인 여석 개수 | `type=general\|pin` | queue가 flush limit 근처에서 계속 유지되면 DB 저장 처리나 flush 호출 지연을 의심한다. | `seat_batch_queue_size{type="general"}` |
+| `seat_batch_flush_duration_seconds` | batch flush와 DB 저장 처리 시간 | `type=general\|pin` | p95가 증가하면 DB write, transaction, repository saveAll 병목 가능성이 높다. | `histogram_quantile(0.95, sum by (le, type) (rate(seat_batch_flush_duration_seconds_bucket[5m])))` |
+| `seat_batch_flush_failure_count_total` | batch flush 실패 누적 횟수 | `type=general\|pin` | 5분 rate가 0보다 크면 저장 실패가 발생한 상태다. | `rate(seat_batch_flush_failure_count_total[5m])` |
+| `sse_send_duration_seconds` | SSE emitter send 처리 시간 | 없음 | p95가 증가하면 연결 수 증가, 느린 클라이언트, 네트워크 송신 지연을 의심한다. | `histogram_quantile(0.95, sum by (le) (rate(sse_send_duration_seconds_bucket[5m])))` |
+| `sse_event_coalesced_total` | 전송 중 같은 event name의 pending SSE 이벤트가 최신 값으로 병합된 횟수 | `event=pinSeats\|nonMajorSeats` | rate가 증가하면 느린 클라이언트나 네트워크 송신 지연으로 backpressure 완화가 자주 작동한 상태다. | `rate(sse_event_coalesced_total{event=~"pinSeats\|nonMajorSeats"}[5m])` |
+| `sse_send_failure_count_total` | SSE send 실패 누적 횟수 | 없음 | rate가 증가하면 끊긴 연결, client abort, 전송 예외가 늘어난 상태다. | `rate(sse_send_failure_count_total[5m])` |
+| `scheduler_task_last_success_timestamp` | 스케줄러 작업의 마지막 성공 epoch seconds | `task=general-seat\|pin-seat` | 현재 시각과 차이가 계속 커지면 SSE push 스케줄러가 멈췄거나 작업 예외가 반복될 수 있다. | `time() - scheduler_task_last_success_timestamp{task="general-seat"}` |
+
+stale 원인 구분 흐름:
+
+1. `/live` 데이터가 오래되면 먼저 `seat_last_crawled_age_seconds`를 확인한다.
+2. freshness는 정상인데 화면 갱신이 늦으면 `seat_batch_queue_size`, `seat_batch_flush_duration_seconds`, `seat_batch_flush_failure_count_total`로 DB 저장 지연 여부를 본다.
+3. DB 저장도 정상인데 사용자 화면만 늦으면 `sse_send_duration_seconds`, `sse_event_coalesced_total`, `sse_send_failure_count_total`, `scheduler_task_last_success_timestamp`를 확인한다.
 
 ## 로컬 Prometheus scrape
 

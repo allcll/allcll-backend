@@ -2,17 +2,24 @@ package kr.allcll.backend.admin.seat;
 
 import java.util.List;
 import kr.allcll.backend.support.batch.AbstractBatch;
+import kr.allcll.backend.support.metrics.SeatPipelineMetrics;
 import kr.allcll.crawler.seat.CrawlerSeat;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class PinSeatBatch extends AbstractBatch<CrawlerSeat> {
 
     private static final int FLUSH_LIMIT = 10;
 
     private final SeatPersistenceService seatPersistenceService;
+
+    public PinSeatBatch(
+        SeatPersistenceService seatPersistenceService,
+        SeatPipelineMetrics seatPipelineMetrics
+    ) {
+        super(seatPipelineMetrics, "pin");
+        this.seatPersistenceService = seatPersistenceService;
+    }
 
     @Override
     protected int getFlushLimit() {

@@ -4,19 +4,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import kr.allcll.backend.support.metrics.SeatPipelineMetrics;
 
 public abstract class AbstractBatch<T> {
 
     private final BlockingQueue<T> queue;
     private final Object lock;
+    private final SeatPipelineMetrics seatPipelineMetrics;
+    private final String type;
 
     protected abstract int getFlushLimit();
 
     protected abstract void saveAll(List<T> batch);
 
-    public AbstractBatch() {
+    public AbstractBatch(SeatPipelineMetrics seatPipelineMetrics, String type) {
         this.queue = new LinkedBlockingQueue<>();
         this.lock = new Object();
+        this.seatPipelineMetrics = seatPipelineMetrics;
+        this.type = type;
+        this.seatPipelineMetrics.registerBatchQueueSize(type, queue);
     }
 
     public void add(T item) {
@@ -40,6 +46,6 @@ public abstract class AbstractBatch<T> {
                 return;
             }
         }
-        saveAll(batch);
+        seatPipelineMetrics.recordBatchFlush(type, () -> saveAll(batch));
     }
 }

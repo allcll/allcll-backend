@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import kr.allcll.backend.support.metrics.SeatPipelineMetrics;
 import kr.allcll.backend.support.sse.dto.SseStatusResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ public class SseService {
     private static final String INITIAL_EVENT_NAME = "connection";
 
     private final SseEmitterStorage sseEmitterStorage;
+    private final SeatPipelineMetrics seatPipelineMetrics;
     private final ExecutorService sseSendExecutor = Executors.newVirtualThreadPerTaskExecutor();
     private final Map<SseEmitter, SseSendState> sendStates = new ConcurrentHashMap<>();
 
@@ -65,7 +67,11 @@ public class SseService {
 
     private void sendEventAsync(SseEmitter sseEmitter, String eventName, SseEventBuilder eventBuilder) {
         SseSendState sendState = sendStates.computeIfAbsent(sseEmitter, ignored -> new SseSendState());
-        if (sendState.updatePending(eventName, eventBuilder)) {
+        SsePendingUpdate pendingUpdate = sendState.updatePending(eventName, eventBuilder);
+        if (pendingUpdate.coalesced()) {
+            seatPipelineMetrics.recordSseEventCoalesced(eventName);
+        }
+        if (pendingUpdate.shouldSchedule()) {
             sseSendExecutor.execute(() -> drainEvents(sseEmitter, sendState));
         }
     }
@@ -82,7 +88,7 @@ public class SseService {
 
     private void sendEvent(SseEmitter sseEmitter, SseEventBuilder eventBuilder) {
         try {
-            sseEmitter.send(eventBuilder);
+            seatPipelineMetrics.recordSseSend(() -> sseEmitter.send(eventBuilder));
         } catch (Exception e) {
             log.warn("전송 실패 - SSE 연결이 끊겼습니다.: {}", e.getMessage());
             SseErrorHandler.handle(e);
@@ -108,13 +114,14 @@ public class SseService {
         private boolean sending;
         private final Map<String, SseEventBuilder> pendingEvents = new LinkedHashMap<>();
 
-        synchronized boolean updatePending(String eventName, SseEventBuilder eventBuilder) {
+        synchronized SsePendingUpdate updatePending(String eventName, SseEventBuilder eventBuilder) {
+            boolean coalesced = sending && pendingEvents.containsKey(eventName);
             pendingEvents.put(eventName, eventBuilder);
             if (sending) {
-                return false;
+                return new SsePendingUpdate(false, coalesced);
             }
             sending = true;
-            return true;
+            return new SsePendingUpdate(true, false);
         }
 
         synchronized List<SseEventBuilder> pollPending() {
@@ -126,5 +133,8 @@ public class SseService {
             pendingEvents.clear();
             return eventBuilders;
         }
+    }
+
+    private record SsePendingUpdate(boolean shouldSchedule, boolean coalesced) {
     }
 }

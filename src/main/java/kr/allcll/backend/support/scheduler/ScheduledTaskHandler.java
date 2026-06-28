@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
+import kr.allcll.backend.support.metrics.SeatPipelineMetrics;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
@@ -15,13 +16,26 @@ public class ScheduledTaskHandler {
 
     private final ThreadPoolTaskScheduler scheduler;
     private final Map<String, ScheduledFuture<?>> tasks = new ConcurrentHashMap<>();
+    private final SeatPipelineMetrics seatPipelineMetrics;
+    private final String taskName;
 
     public ScheduledTaskHandler(int poolSize, String namePrefix, MeterRegistry meterRegistry) {
+        this(poolSize, namePrefix, meterRegistry, null);
+    }
+
+    public ScheduledTaskHandler(
+        int poolSize,
+        String namePrefix,
+        MeterRegistry meterRegistry,
+        SeatPipelineMetrics seatPipelineMetrics
+    ) {
         scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(poolSize);
         scheduler.setThreadNamePrefix(namePrefix);
         scheduler.setRemoveOnCancelPolicy(true);
         scheduler.initialize();
+        this.seatPipelineMetrics = seatPipelineMetrics;
+        this.taskName = resolveTaskName(namePrefix);
 
         ExecutorServiceMetrics.monitor(meterRegistry, scheduler.getScheduledExecutor(), namePrefix);
     }
@@ -36,7 +50,7 @@ public class ScheduledTaskHandler {
             log.warn("[ScheduledTaskHandler] Task ID {} 은 이미 스케줄러에 등록되어 있습니다.", taskId);
             return taskId;
         }
-        ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(task, period);
+        ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(() -> runWithMetrics(task), period);
         tasks.put(taskId, future);
         return taskId;
     }
@@ -51,7 +65,7 @@ public class ScheduledTaskHandler {
             log.warn("[ScheduledTaskHandler] Task ID {} 은 이미 스케줄러에 등록되어 있습니다.", taskId);
             return taskId;
         }
-        ScheduledFuture<?> future = scheduler.scheduleWithFixedDelay(task, delay);
+        ScheduledFuture<?> future = scheduler.scheduleWithFixedDelay(() -> runWithMetrics(task), delay);
         tasks.put(taskId, future);
         return taskId;
     }
@@ -74,5 +88,22 @@ public class ScheduledTaskHandler {
 
     public int getTaskCount() {
         return tasks.size();
+    }
+
+    private void runWithMetrics(Runnable task) {
+        task.run();
+        if (seatPipelineMetrics != null) {
+            seatPipelineMetrics.recordSchedulerTaskSuccess(taskName);
+        }
+    }
+
+    private String resolveTaskName(String namePrefix) {
+        if ("general-seat-sender".equals(namePrefix)) {
+            return "general-seat";
+        }
+        if ("pin-seat-sender".equals(namePrefix)) {
+            return "pin-seat";
+        }
+        return namePrefix;
     }
 }
