@@ -4,9 +4,9 @@
 
 ## Purpose
 
-Phase 3A에서 개선한 `allcll-analysis` skill이 실제 trigger/routing/safety/execution 기준을 개선했는지 최소 smoke benchmark로 확인하기 위한 실행 준비 문서다.
+Phase 3A에서 개선한 `allcll-analysis` skill이 실제 trigger/routing/safety/execution 기준에서 regression 없이 동작하는지 최소 smoke benchmark로 확인하기 위한 문서다.
 
-이번 단계는 runner나 grader를 구현하지 않는다. fresh session에서 수동으로 prompt를 실행하고, 아래 scoring sheet에 baseline/candidate 결과를 기록한다.
+이번 단계는 runner나 grader를 구현하지 않는다. fresh session에서 수동으로 prompt를 실행하고, 아래 scoring sheet에 baseline/candidate 결과를 기록한다. 개선 효과 입증이 아니라 regression check를 목표로 한다.
 
 ## Baseline And Candidate
 
@@ -18,17 +18,17 @@ Baseline:
 
 Candidate:
 
-- 기준: 현재 working tree의 Phase 3A 변경
+- 기준: Phase 3A candidate commit
 - 변경 파일:
   - `.agents/skills/analysis/SKILL.md`
   - `.claude/skills/analysis/SKILL.md`
   - `docs/agent-harness/skills/analysis/SKILL.md`
-- 상태: 아직 commit되지 않은 working tree snapshot
+- 상태: manual smoke candidate로 고정된 commit
 
 주의:
 
-- candidate가 commit되기 전까지 benchmark 결과는 commit hash가 아니라 working tree snapshot에 묶인다.
-- 재현 가능한 benchmark artifact로 승격하려면 candidate를 commit한 뒤 이 문서의 candidate 기준을 commit hash로 갱신한다.
+- 이 smoke suite는 1회 수동 실행 결과이므로 pass rate나 개선율을 일반화하지 않는다.
+- measured improvement는 미확정이며, 개선 효과 입증에는 더 어려운 eval 또는 반복 validation이 필요하다.
 
 ## Selected Suite Scope
 
@@ -92,10 +92,18 @@ Candidate:
 현재 상태:
 
 - benchmark design: ready
-- fresh-session execution: not run
-- measured improvement: unknown
+- automatic `codex exec` execution: blocked by privacy/approval policy; see `evidence/run-blocked.md`
+- manual fresh-session smoke execution: completed separately
+- manual smoke executed cases: 6 cases x baseline/candidate = 12 runs
+- baseline pass count: 6 / 6
+- candidate pass count: 6 / 6
+- tied cases: 6
+- regressed cases: 0
+- safety failures: 0
+- measured improvement: 미확정
 
 현재 말할 수 있는 결론:
 
-- 측정 준비는 완료했다.
-- 아직 baseline/candidate 실행 결과가 없으므로 Phase 3A가 실제로 개선됐다는 수치나 pass rate는 말할 수 없다.
+- Phase 3A candidate는 smoke suite에서 regression 없이 통과했다.
+- baseline도 6개 case를 모두 통과했으므로, 이 smoke 결과만으로 개선 효과를 수치로 입증하지는 못했다.
+- 다음 단계는 이 closeout artifact를 커밋하고 PR을 준비하거나, improvement 입증을 위한 harder analysis eval/반복 validation을 설계하는 것이다.
