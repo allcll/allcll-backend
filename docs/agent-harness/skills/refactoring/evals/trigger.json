@@ -1,0 +1,273 @@
+{
+  "schema_version": "phase-2b-1.5.v1",
+  "skill_name": "allcll-refactoring",
+  "suite": "trigger",
+  "description": "Trigger suite for allcll-refactoring. Refactoring should trigger for behavior-preserving cleanup, deduplication, structure improvements, and behavior-preserving performance optimization, and should not trigger as primary for behavior-changing fixes, analysis-only diagnosis, tests-only requests, or large redesigns.",
+  "source": "phase-1-audit",
+  "evals": [
+    {
+      "id": "refactoring-trigger-001",
+      "name": "behavior-preserving-cleanup",
+      "prompt": "BalanceRequiredResolver.resolve()의 중첩 if와 Optional get 호출을 flatMap/map/orElseThrow로 정리해줘. 결과 동작은 그대로 유지해.",
+      "expected_output": "동작 보존 cleanup 요청이므로 allcll-refactoring이 primary로 선택되어야 한다.",
+      "files": [],
+      "intent": "refactoring",
+      "expected_skills": ["allcll-refactoring"],
+      "expected_primary_skill": "allcll-refactoring",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-analysis", "allcll-bug-fix", "allcll-testing"],
+      "forbidden_skills": ["allcll-bug-fix"],
+      "expected_decision": "proceed",
+      "expectations": [
+        {
+          "text": "동작 보존 cleanup으로 allcll-refactoring이 primary로 선택된다.",
+          "category": "trigger",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "selected_skills.json 또는 routing-decision.json에 allcll-refactoring primary가 기록되어야 한다.",
+          "failure_type": "trigger_false_negative"
+        },
+        {
+          "text": "bug-fix primary로 오분류하지 않는다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "allcll-bug-fix가 primary로 표시되지 않아야 한다.",
+          "failure_type": "wrong_skill"
+        }
+      ],
+      "tags": ["should-trigger", "cleanup", "behavior-preserving", "optional"]
+    },
+    {
+      "id": "refactoring-trigger-002",
+      "name": "deduplicate-graduation-resolver",
+      "prompt": "DoubleCreditCriterionResolver.resolve()에서 findByPair 호출과 반환 패턴이 반복돼. 같은 동작을 유지하면서 헬퍼나 루프로 중복을 줄여줘.",
+      "expected_output": "중복 제거 refactoring 요청이므로 allcll-refactoring이 primary로 선택되어야 한다.",
+      "files": [],
+      "intent": "refactoring",
+      "expected_skills": ["allcll-refactoring"],
+      "expected_primary_skill": "allcll-refactoring",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-analysis", "allcll-bug-fix", "allcll-testing"],
+      "forbidden_skills": ["allcll-bug-fix"],
+      "expected_decision": "proceed",
+      "expectations": [
+        {
+          "text": "중복 제거 요청으로 allcll-refactoring이 primary로 선택된다.",
+          "category": "trigger",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "selected_skills.json에 allcll-refactoring primary가 기록되어야 한다.",
+          "failure_type": "trigger_false_negative"
+        },
+        {
+          "text": "동작 변경 fix로 라우팅하지 않는다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "allcll-bug-fix가 primary가 아니어야 한다.",
+          "failure_type": "wrong_skill"
+        }
+      ],
+      "tags": ["should-trigger", "deduplication", "graduation"]
+    },
+    {
+      "id": "refactoring-trigger-003",
+      "name": "stream-structure-improvement",
+      "prompt": "AcademicBasicPolicy의 반복문을 Stream.anyMatch 기반으로 읽기 쉽게 정리해줘. 외부 결과와 예외 메시지는 그대로 둬.",
+      "expected_output": "구조 개선 refactoring 요청이므로 allcll-refactoring이 primary로 선택되어야 한다.",
+      "files": [],
+      "intent": "refactoring",
+      "expected_skills": ["allcll-refactoring"],
+      "expected_primary_skill": "allcll-refactoring",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-analysis", "allcll-bug-fix", "allcll-testing"],
+      "forbidden_skills": ["allcll-bug-fix"],
+      "expected_decision": "proceed",
+      "expectations": [
+        {
+          "text": "구조 개선 요청으로 allcll-refactoring이 primary로 선택된다.",
+          "category": "trigger",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "routing-decision.json에 allcll-refactoring primary가 기록되어야 한다.",
+          "failure_type": "trigger_false_negative"
+        },
+        {
+          "text": "외부 동작 보존 조건을 routing 근거에 포함한다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "routing-decision.json 또는 plan에 behavior-preserving 근거가 있어야 한다.",
+          "failure_type": "process_skip"
+        }
+      ],
+      "tags": ["should-trigger", "stream", "structure"]
+    },
+    {
+      "id": "refactoring-trigger-004",
+      "name": "behavior-preserving-performance-optimization",
+      "prompt": "AcademicBasicPolicy.isHaveReplaceCourse()의 O(n²) contains 반복을 Set 기반으로 줄여줘. 반환 결과와 호출자 계약은 바꾸지 마.",
+      "expected_output": "동작 보존 성능 최적화 요청이므로 allcll-refactoring이 primary로 선택되어야 한다.",
+      "files": [],
+      "intent": "refactoring",
+      "expected_skills": ["allcll-refactoring"],
+      "expected_primary_skill": "allcll-refactoring",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-analysis", "allcll-bug-fix", "allcll-testing"],
+      "forbidden_skills": ["allcll-bug-fix"],
+      "expected_decision": "proceed",
+      "expectations": [
+        {
+          "text": "동작 보존 성능 최적화로 allcll-refactoring이 primary로 선택된다.",
+          "category": "trigger",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "selected_skills.json에 allcll-refactoring primary가 기록되어야 한다.",
+          "failure_type": "trigger_false_negative"
+        },
+        {
+          "text": "성능 진단만 하는 analysis-only 요청으로 오분류하지 않는다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "expected_decision이 proceed이고 allcll-analysis가 primary가 아니어야 한다.",
+          "failure_type": "wrong_skill"
+        }
+      ],
+      "tags": ["should-trigger", "performance", "behavior-preserving"]
+    },
+    {
+      "id": "refactoring-trigger-005",
+      "name": "pure-bug-fix-negative",
+      "prompt": "LoginRequest의 studentId와 password가 빈 문자열이면 로그인 API가 400을 반환하도록 고쳐줘.",
+      "expected_output": "외부 동작 변경 요청이므로 allcll-bug-fix가 primary이고 refactoring은 primary가 아니어야 한다.",
+      "files": [],
+      "intent": "bug-fix",
+      "expected_skills": ["allcll-bug-fix"],
+      "expected_primary_skill": "allcll-bug-fix",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-refactoring", "allcll-analysis"],
+      "forbidden_skills": ["allcll-refactoring"],
+      "expected_decision": "route-to-other-skill",
+      "expectations": [
+        {
+          "text": "allcll-refactoring이 behavior-changing fix의 primary가 되지 않는다.",
+          "category": "trigger",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "selected_skills.json에서 allcll-refactoring이 primary가 아니어야 한다.",
+          "failure_type": "trigger_false_positive"
+        },
+        {
+          "text": "외부 동작 변경 요청을 allcll-bug-fix로 라우팅한다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "routing-decision.json에 allcll-bug-fix primary가 기록되어야 한다.",
+          "failure_type": "wrong_skill"
+        }
+      ],
+      "tags": ["should-not-trigger", "hard-negative", "bug-fix", "behavior-change"]
+    },
+    {
+      "id": "refactoring-trigger-006",
+      "name": "analysis-only-performance-diagnosis-negative",
+      "prompt": "SSE push가 느린 원인을 분석만 해줘. SeatStorage, SseService, scheduler 흐름에서 병목 후보와 확인 지표만 정리하고 코드는 수정하지 마.",
+      "expected_output": "performance diagnosis 분석 요청이므로 allcll-analysis가 primary이고 refactoring은 primary가 아니어야 한다.",
+      "files": [],
+      "intent": "analysis-only",
+      "expected_skills": ["allcll-analysis"],
+      "expected_primary_skill": "allcll-analysis",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-refactoring", "allcll-bug-fix", "allcll-testing"],
+      "forbidden_skills": ["allcll-refactoring", "allcll-bug-fix", "allcll-testing"],
+      "expected_decision": "route-to-other-skill",
+      "expectations": [
+        {
+          "text": "analysis-only 성능 진단에서 allcll-refactoring을 primary로 선택하지 않는다.",
+          "category": "trigger",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "selected_skills.json에서 allcll-refactoring이 primary가 아니어야 한다.",
+          "failure_type": "trigger_false_positive"
+        },
+        {
+          "text": "코드 수정 없이 allcll-analysis로 라우팅한다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "routing-decision.json에 allcll-analysis primary와 no-edit decision이 기록되어야 한다.",
+          "failure_type": "wrong_skill"
+        }
+      ],
+      "tags": ["should-not-trigger", "hard-negative", "analysis-only", "performance"]
+    },
+    {
+      "id": "refactoring-trigger-007",
+      "name": "tests-only-negative",
+      "prompt": "Graduation resolver의 기존 동작을 검증하는 테스트만 추가해줘. 프로덕션 코드는 건드리지 마.",
+      "expected_output": "tests-only 요청이므로 allcll-testing이 primary이고 refactoring은 primary가 아니어야 한다.",
+      "files": [],
+      "intent": "tests-only",
+      "expected_skills": ["allcll-testing"],
+      "expected_primary_skill": "allcll-testing",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-refactoring", "allcll-analysis", "allcll-bug-fix"],
+      "forbidden_skills": ["allcll-refactoring", "allcll-analysis", "allcll-bug-fix"],
+      "expected_decision": "route-to-other-skill",
+      "expectations": [
+        {
+          "text": "tests-only 요청에서 allcll-refactoring이 primary가 되지 않는다.",
+          "category": "trigger",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "selected_skills.json에서 allcll-refactoring이 primary가 아니어야 한다.",
+          "failure_type": "trigger_false_positive"
+        },
+        {
+          "text": "테스트 작성 요청을 allcll-testing으로 라우팅한다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "routing-decision.json에 allcll-testing primary가 기록되어야 한다.",
+          "failure_type": "wrong_skill"
+        }
+      ],
+      "tags": ["should-not-trigger", "hard-negative", "testing"]
+    },
+    {
+      "id": "refactoring-trigger-008",
+      "name": "large-redesign-negative",
+      "prompt": "졸업요건 계산 구조를 정책 엔진으로 전면 재설계하고 domain/graduation 모델을 새로 나눠줘.",
+      "expected_output": "큰 재설계/도메인 모델 변경은 refactoring primary로 자동 진행하지 않고 사용자 확인 또는 설계 단계로 멈춰야 한다.",
+      "files": [],
+      "intent": "large-redesign",
+      "expected_skills": [],
+      "expected_primary_skill": "none",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-refactoring", "allcll-bug-fix", "allcll-analysis", "allcll-testing"],
+      "forbidden_skills": ["allcll-refactoring", "allcll-bug-fix", "allcll-testing"],
+      "expected_decision": "ask-user",
+      "expectations": [
+        {
+          "text": "allcll-refactoring을 단독 primary로 자동 진행하지 않는다.",
+          "category": "trigger",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "selected_skills.json에 allcll-refactoring primary가 없거나, 있더라도 decision이 proceed가 아니어야 한다.",
+          "failure_type": "trigger_false_positive"
+        },
+        {
+          "text": "큰 도메인 재설계는 사용자 확인 또는 설계 단계로 멈춘다.",
+          "category": "safety",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "expected_decision 또는 final response가 ask-user/stop-and-report여야 한다.",
+          "failure_type": "decision_boundary_violation"
+        }
+      ],
+      "tags": ["should-not-trigger", "hard-negative", "large-redesign", "domain-model"]
+    }
+  ]
+}

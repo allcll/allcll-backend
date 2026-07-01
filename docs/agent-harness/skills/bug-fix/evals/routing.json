@@ -1,0 +1,207 @@
+{
+  "schema_version": "phase-2b-1.5.v1",
+  "skill_name": "allcll-bug-fix",
+  "suite": "routing",
+  "description": "Routing suite for allcll-bug-fix versus analysis, refactoring, and testing.",
+  "source": "phase-1-audit",
+  "evals": [
+    {
+      "id": "bug-fix-routing-001",
+      "name": "pure-bug-fix-primary",
+      "prompt": "LoginRequest의 studentId와 password에 빈 값 검증을 추가하고, 로그인 API에서 빈 값이면 400이 되게 고쳐줘.",
+      "expected_output": "pure bug-fix 요청이므로 allcll-bug-fix가 primary이고, 현재/기대 동작 차이와 검증 계획을 잡아야 한다.",
+      "files": [],
+      "intent": "bug-fix",
+      "expected_skills": ["allcll-bug-fix"],
+      "expected_primary_skill": "allcll-bug-fix",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-analysis", "allcll-refactoring", "allcll-testing"],
+      "forbidden_skills": ["allcll-refactoring"],
+      "expected_decision": "proceed",
+      "expectations": [
+        {
+          "text": "동작 변경 요청을 allcll-bug-fix primary로 라우팅한다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "routing-decision.json에 allcll-bug-fix primary가 기록되어야 한다.",
+          "failure_type": "wrong_skill"
+        },
+        {
+          "text": "현재 동작과 기대 동작의 차이를 수정 기준으로 잡는다.",
+          "category": "execution",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "transcript.md 또는 plan에 current behavior와 expected behavior가 분리되어 있어야 한다.",
+          "failure_type": "process_skip"
+        }
+      ],
+      "tags": ["pure-bug-fix", "validation"]
+    },
+    {
+      "id": "bug-fix-routing-002",
+      "name": "analysis-to-bug-fix",
+      "prompt": "핀 여석 알림이 누락되는 것 같아. 먼저 SeatStorage에서 Pin 데이터가 어떻게 흐르는지 원인을 확인하고, 실제 버그가 맞으면 고쳐줘.",
+      "expected_output": "분석을 먼저 수행하고, 결함이 확인될 때 allcll-bug-fix 후속 단계로 라우팅해야 한다.",
+      "files": [],
+      "intent": "mixed-analysis-to-bug-fix",
+      "expected_skills": ["allcll-analysis", "allcll-bug-fix"],
+      "expected_primary_skill": "allcll-analysis",
+      "expected_companion_skills": ["allcll-bug-fix"],
+      "forbidden_primary_skills": ["allcll-bug-fix", "allcll-refactoring", "allcll-testing"],
+      "forbidden_skills": ["allcll-refactoring"],
+      "expected_decision": "proceed",
+      "expectations": [
+        {
+          "text": "원인 분석이 선행되는 요청은 allcll-analysis가 primary가 된다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "routing-decision.json에 allcll-analysis primary가 기록되어야 한다.",
+          "failure_type": "wrong_skill"
+        },
+        {
+          "text": "결함 확인 후 allcll-bug-fix 후속 단계로 분리한다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "expected_companion_skills 또는 plan에 allcll-bug-fix 후속 작업이 포함되어야 한다.",
+          "failure_type": "missing_companion_skill"
+        }
+      ],
+      "tags": ["analysis-to-bug-fix", "pin", "seat-storage"]
+    },
+    {
+      "id": "bug-fix-routing-003",
+      "name": "tests-only-testing-primary",
+      "prompt": "SeatStorage 필터링 로직의 테스트만 추가해줘. 프로덕션 코드는 수정하지 말아줘.",
+      "expected_output": "tests-only 요청이므로 allcll-testing이 primary이고 bug-fix는 primary가 아니어야 한다.",
+      "files": [],
+      "intent": "tests-only",
+      "expected_skills": ["allcll-testing"],
+      "expected_primary_skill": "allcll-testing",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-bug-fix", "allcll-analysis", "allcll-refactoring"],
+      "forbidden_skills": ["allcll-bug-fix", "allcll-analysis", "allcll-refactoring"],
+      "expected_decision": "route-to-other-skill",
+      "expectations": [
+        {
+          "text": "tests-only 요청을 allcll-testing primary로 라우팅한다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "routing-decision.json에 allcll-testing primary가 기록되어야 한다.",
+          "failure_type": "wrong_skill"
+        },
+        {
+          "text": "allcll-bug-fix를 primary로 선택하지 않는다.",
+          "category": "trigger",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "selected_skills.json에서 allcll-bug-fix가 primary가 아니어야 한다.",
+          "failure_type": "trigger_false_positive"
+        }
+      ],
+      "tags": ["tests-only", "testing-primary"]
+    },
+    {
+      "id": "bug-fix-routing-004",
+      "name": "behavior-preserving-cleanup-refactoring-primary",
+      "prompt": "AcademicBasicPolicy의 isHaveReplaceCourse에서 contains 반복을 줄이도록 Set 기반으로 정리해줘. 결과 동작은 그대로 유지해야 해.",
+      "expected_output": "동작 보존 cleanup이므로 allcll-refactoring이 primary이고 bug-fix는 primary가 아니어야 한다.",
+      "files": [],
+      "intent": "refactoring",
+      "expected_skills": ["allcll-refactoring"],
+      "expected_primary_skill": "allcll-refactoring",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-bug-fix", "allcll-analysis", "allcll-testing"],
+      "forbidden_skills": ["allcll-bug-fix"],
+      "expected_decision": "route-to-other-skill",
+      "expectations": [
+        {
+          "text": "동작 보존 cleanup은 allcll-refactoring primary로 라우팅한다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "routing-decision.json에 allcll-refactoring primary가 기록되어야 한다.",
+          "failure_type": "wrong_skill"
+        },
+        {
+          "text": "bug-fix workflow로 구현을 시작하지 않는다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "allcll-bug-fix가 primary가 아니어야 한다.",
+          "failure_type": "trigger_false_positive"
+        }
+      ],
+      "tags": ["refactoring-primary", "behavior-preserving", "performance"]
+    },
+    {
+      "id": "bug-fix-routing-005",
+      "name": "large-feature-ask-user",
+      "prompt": "졸업요건 계산 기능을 새 정책 엔진으로 교체하고 여러 도메인 모델도 바꿔서 바로 구현해줘.",
+      "expected_output": "큰 기능/도메인 모델 변경은 bug-fix primary로 진행하지 않고 사용자 확인 또는 설계 단계로 멈춰야 한다.",
+      "files": [],
+      "intent": "large-feature",
+      "expected_skills": [],
+      "expected_primary_skill": "none",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-bug-fix", "allcll-analysis", "allcll-refactoring", "allcll-testing"],
+      "forbidden_skills": ["allcll-bug-fix", "allcll-refactoring", "allcll-testing"],
+      "expected_decision": "ask-user",
+      "expectations": [
+        {
+          "text": "큰 기능 요청을 bug-fix primary로 자동 진행하지 않는다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "routing-decision.json에 expected_primary_skill none 또는 ask-user/stop decision이 있어야 한다.",
+          "failure_type": "decision_boundary_violation"
+        },
+        {
+          "text": "도메인 모델 변경의 영향 범위를 사용자 결정 사항으로 분리한다.",
+          "category": "reporting",
+          "type": "rubric",
+          "required": true,
+          "evidence": "final response가 설계/정책/모델 변경 합의 필요성을 설명해야 한다.",
+          "failure_type": "process_skip"
+        }
+      ],
+      "tags": ["large-feature", "ask-user", "domain-model"]
+    },
+    {
+      "id": "bug-fix-routing-006",
+      "name": "validation-change-testing-companion",
+      "prompt": "UpdateNoticeRequest의 title, content에 @NotBlank를 추가해서 빈 값 update 요청이 400이 되게 고쳐줘. CreateNoticeRequest와 비대칭이야.",
+      "expected_output": "bug-fix primary로 진행하되, validation 동작 변경이므로 testing companion 또는 구체 검증 expectation을 포함해야 한다.",
+      "files": [],
+      "intent": "bug-fix-with-verification",
+      "expected_skills": ["allcll-bug-fix", "allcll-testing"],
+      "expected_primary_skill": "allcll-bug-fix",
+      "expected_companion_skills": ["allcll-testing"],
+      "forbidden_primary_skills": ["allcll-analysis", "allcll-refactoring", "allcll-testing"],
+      "forbidden_skills": ["allcll-refactoring"],
+      "expected_decision": "proceed",
+      "expectations": [
+        {
+          "text": "validation 동작 변경은 allcll-bug-fix primary로 라우팅한다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "routing-decision.json에 allcll-bug-fix primary가 기록되어야 한다.",
+          "failure_type": "wrong_skill"
+        },
+        {
+          "text": "재현 테스트 또는 관련 API 검증을 companion 검증으로 요구한다.",
+          "category": "execution",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "expected_companion_skills에 allcll-testing이 있거나 plan에 빈 값 400 재현 테스트/검증 명령이 있어야 한다.",
+          "failure_type": "missing_verification"
+        }
+      ],
+      "tags": ["validation", "testing-companion", "verification"]
+    }
+  ]
+}
