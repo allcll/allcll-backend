@@ -46,13 +46,12 @@ public class AcademicBasicPolicy {
         String departmentName,
         String curiNo
     ) {
-        return courseEquivalenceRepository.findSameCourseCodeByCuriNo(curiNo)
-            .map(sameCourseCode -> requiredCourseResolver.findRequiredCourseInGroup(
+        return courseEquivalenceRepository.findSameCourseCodesByCuriNo(curiNo).stream()
+            .anyMatch(sameCourseCode -> requiredCourseResolver.findRequiredCourseInGroup(
                 departmentName,
                 admissionYear,
                 CategoryType.ACADEMIC_BASIC,
                 sameCourseCode
-            ))
-            .orElse(false);
+            ));
     }
 }
