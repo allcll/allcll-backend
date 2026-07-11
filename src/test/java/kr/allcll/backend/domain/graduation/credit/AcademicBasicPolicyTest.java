@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 import java.util.List;
-import java.util.Optional;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -82,14 +81,60 @@ class AcademicBasicPolicyTest {
                 CategoryType.ACADEMIC_BASIC
             )
         ).willReturn(List.of());
-        given(courseEquivalenceRepository.findSameCourseCodeByCuriNo(curiNo))
-            .willReturn(Optional.of(sameCourseCode));
+        given(courseEquivalenceRepository.findSameCourseCodesByCuriNo(curiNo))
+            .willReturn(List.of(sameCourseCode));
         given(
             requiredCourseResolver.findRequiredCourseInGroup(
                 departmentName,
                 admissionYear,
                 CategoryType.ACADEMIC_BASIC,
                 sameCourseCode
+            )
+        ).willReturn(true);
+
+        // when
+        boolean result = academicBasicPolicy.isRecentMajorAcademicBasic(course, criterion);
+
+        // then
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("여러 동일과목 그룹에 속한 과목은 그중 하나라도 필수과목을 포함하면 true를 반환한다")
+    void returnTrueWhenAnyOfMultipleGroupsMatchesRequiredCourse() {
+        // given
+        String curiNo = "009960";
+        String firstGroupCode = "1";
+        String secondGroupCode = "2";
+        String departmentName = "컴퓨터공학과";
+        String curiNm = "Capstone디자인(산학협력프로젝트)";
+        Integer admissionYear = 2021;
+        CompletedCourse course = createCompletedCourse(curiNo, curiNm, CategoryType.ACADEMIC_BASIC);
+        CreditCriterion criterion = createAcademicBasicCriterion(departmentName, admissionYear);
+
+        given(
+            requiredCourseResolver.findRequiredCourseNames(
+                departmentName,
+                admissionYear,
+                CategoryType.ACADEMIC_BASIC
+            )
+        ).willReturn(List.of());
+        given(courseEquivalenceRepository.findSameCourseCodesByCuriNo(curiNo))
+            .willReturn(List.of(firstGroupCode, secondGroupCode));
+        given(
+            requiredCourseResolver.findRequiredCourseInGroup(
+                departmentName,
+                admissionYear,
+                CategoryType.ACADEMIC_BASIC,
+                firstGroupCode
+            )
+        ).willReturn(false);
+        given(
+            requiredCourseResolver.findRequiredCourseInGroup(
+                departmentName,
+                admissionYear,
+                CategoryType.ACADEMIC_BASIC,
+                secondGroupCode
             )
         ).willReturn(true);
 
@@ -117,8 +162,8 @@ class AcademicBasicPolicyTest {
                 CategoryType.ACADEMIC_BASIC
             )
         ).willReturn(List.of());
-        given(courseEquivalenceRepository.findSameCourseCodeByCuriNo(curiNo))
-            .willReturn(Optional.of(sameCourseCode));
+        given(courseEquivalenceRepository.findSameCourseCodesByCuriNo(curiNo))
+            .willReturn(List.of(sameCourseCode));
         given(
             requiredCourseResolver.findRequiredCourseInGroup(
                 departmentName,
@@ -146,8 +191,8 @@ class AcademicBasicPolicyTest {
 
         given(requiredCourseResolver.findRequiredCourseNames(departmentName, admissionYear, CategoryType.ACADEMIC_BASIC))
             .willReturn(List.of());
-        given(courseEquivalenceRepository.findSameCourseCodeByCuriNo(curiNo))
-            .willReturn(Optional.empty());
+        given(courseEquivalenceRepository.findSameCourseCodesByCuriNo(curiNo))
+            .willReturn(List.of());
 
         // when
         boolean result = academicBasicPolicy.isRecentMajorAcademicBasic(course, criterion);
