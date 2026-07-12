@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum BalanceRequiredArea {
     HISTORY_THOUGHT("역사와사상"),
-    NATURE_SCIENCE("자연과학"),
+    NATURE_SCIENCE("자연과과학"),
     ECONOMY_SOCIETY("경제와사회"),
     CULTURE_ARTS("문화와예술"),
     CONVERGENCE_AND_CREATIVITY("융합과창의");
