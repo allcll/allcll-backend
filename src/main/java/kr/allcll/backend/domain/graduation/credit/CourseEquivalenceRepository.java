@@ -1,7 +1,6 @@
 package kr.allcll.backend.domain.graduation.credit;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,8 +15,8 @@ public interface CourseEquivalenceRepository extends JpaRepository<CourseEquival
     List<String> findSameGroupCuriNos(Set<String> curiNos);
 
     @Query("""
-        select e.sameCourseCode from CourseEquivalence e
+        select distinct e.sameCourseCode from CourseEquivalence e
         where e.curiNo = :curiNo
     """)
-    Optional<String> findSameCourseCodeByCuriNo(String curiNo);
+    List<String> findSameCourseCodesByCuriNo(String curiNo);
 }
