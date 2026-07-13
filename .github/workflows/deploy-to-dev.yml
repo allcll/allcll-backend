@@ -16,6 +16,7 @@ jobs:
       EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
       GOOGLE_ACCOUNT_JSON: ${{ secrets.GOOGLE_ACCOUNT_JSON }}
       GOOGLE_SHEETS_CREDENTIALS_LOCATION: file:/opt/secrets/google-service-account.json
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
     defaults:
       run:
