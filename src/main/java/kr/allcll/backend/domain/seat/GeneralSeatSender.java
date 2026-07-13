@@ -24,9 +24,9 @@ public class GeneralSeatSender {
     private final ScheduledTaskHandler scheduledTaskHandler;
 
     public GeneralSeatSender(
-            SseService sseService,
-            SeatStorage seatStorage,
-            @Qualifier("generalSeatTaskHandler") ScheduledTaskHandler scheduledTaskHandler
+        SseService sseService,
+        SeatStorage seatStorage,
+        @Qualifier("generalSeatTaskHandler") ScheduledTaskHandler scheduledTaskHandler
     ) {
         this.sseService = sseService;
         this.seatStorage = seatStorage;
@@ -37,7 +37,7 @@ public class GeneralSeatSender {
         if (hasActiveSchedule()) {
             return;
         }
-        scheduledTaskHandler.scheduleAtFixedRate(getAllSeatTaskAtSeasonSemester(), SENDING_PERIOD);
+        scheduledTaskHandler.scheduleWithFixedDelay(getGeneralSeatTask(), SENDING_PERIOD);
     }
 
     public boolean hasActiveSchedule() {

@@ -3,6 +3,7 @@ package kr.allcll.backend.client;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import kr.allcll.backend.admin.seat.dto.PinSubjectUpdateRequest;
 import kr.allcll.backend.admin.seat.dto.PinSubjectUpdateRequest.PinSubject;
@@ -30,7 +31,7 @@ public class ExternalService {
     }
 
     private PinSubjectUpdateRequest getPinSubjects() {
-        List<String> activeSseTokens = sseEmitterStorage.getUserTokens();
+        Set<String> activeSseTokens = Set.copyOf(sseEmitterStorage.getUserTokens());
         List<Pin> currentSemesterPins = pinRepository.findAllBySemesterAt(Semester.getCurrentSemester());
 
         List<Pin> activePins = currentSemesterPins.stream()

@@ -1,5 +1,6 @@
 package kr.allcll.backend.support.exception;
 
+import io.sentry.Sentry;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
@@ -28,6 +29,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAllcllException(HttpServletRequest request, AllcllException exception) {
         final AllcllErrorCode errorCode = exception.getErrorCode();
 
+        if (errorCode.getHttpStatus().is5xxServerError()) {
+            captureException(request, exception, errorCode);
+        }
         log.warn(LOG_FORMAT, request.getMethod(), request.getRequestURI(), getRequestBody(request),
             exception.getMessage());
         return ErrorResponse.of(errorCode);
@@ -70,9 +74,25 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleException(HttpServletRequest request, Exception exception) {
         final AllcllErrorCode errorCode = AllcllErrorCode.SERVER_ERROR;
 
+        captureException(request, exception, errorCode);
         log.error(LOG_FORMAT, request.getMethod(), request.getRequestURI(), getRequestBody(request),
             exception.getMessage(), exception);
         return ErrorResponse.of(errorCode);
+    }
+
+    private void captureException(
+        HttpServletRequest request,
+        Exception exception,
+        AllcllErrorCode errorCode
+    ) {
+        Sentry.withScope(scope -> {
+            scope.setTag("method", request.getMethod());
+            scope.setTag("path", request.getRequestURI());
+            scope.setTag("status", String.valueOf(errorCode.getHttpStatus().value()));
+            scope.setTag("errorCode", errorCode.name());
+            scope.setTag("exceptionType", exception.getClass().getSimpleName());
+            Sentry.captureException(exception);
+        });
     }
 
     private String getRequestBody(HttpServletRequest request) {

@@ -4,8 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 import io.micrometer.core.instrument.logging.LoggingMeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
+import kr.allcll.backend.support.metrics.SeatPipelineMetrics;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -162,6 +164,64 @@ class ScheduledTaskHandlerTest {
 
         // then
         assertThat(scheduledTaskHandler.getTaskCount()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("고정 지연 방식으로 스케줄링 작업을 등록한다.")
+    void scheduledTaskWithFixedDelay() {
+        // given
+        ScheduledTaskHandler scheduledTaskHandler = new ScheduledTaskHandler(
+            1,
+            "test-fixed-delay-task",
+            new LoggingMeterRegistry()
+        );
+
+        // when
+        AtomicInteger counter = new AtomicInteger();
+        scheduledTaskHandler.scheduleWithFixedDelay(counter::incrementAndGet, Duration.ofMillis(100));
+
+        // then
+        await()
+            .atMost(Duration.ofSeconds(1))
+            .untilAsserted(() -> {
+                assertThat(scheduledTaskHandler.getTaskCount()).isEqualTo(1);
+                assertThat(counter.get()).isGreaterThanOrEqualTo(1);
+            });
+
+        scheduledTaskHandler.cancelAll();
+    }
+
+    @Test
+    @DisplayName("고정 지연 방식 스케줄링 작업도 마지막 성공 시각 gauge를 기록한다.")
+    void scheduledTaskWithFixedDelayRecordsLastSuccessTimestamp() {
+        // given
+        SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
+        SeatPipelineMetrics seatPipelineMetrics = new SeatPipelineMetrics(meterRegistry);
+        ScheduledTaskHandler scheduledTaskHandler = new ScheduledTaskHandler(
+            1,
+            "general-seat-sender",
+            meterRegistry,
+            seatPipelineMetrics
+        );
+
+        // when
+        AtomicInteger counter = new AtomicInteger();
+        scheduledTaskHandler.scheduleWithFixedDelay(counter::incrementAndGet, Duration.ofMillis(100));
+
+        // then
+        await()
+            .atMost(Duration.ofSeconds(1))
+            .untilAsserted(() -> {
+                double lastSuccessTimestamp = meterRegistry.get("scheduler.task.last.success.timestamp")
+                    .tag("task", "general-seat")
+                    .gauge()
+                    .value();
+
+                assertThat(counter.get()).isGreaterThanOrEqualTo(1);
+                assertThat(lastSuccessTimestamp).isPositive();
+            });
+
+        scheduledTaskHandler.cancelAll();
     }
 
     private String scheduleTask(ScheduledTaskHandler scheduledTaskHandler, AtomicInteger counter) {
