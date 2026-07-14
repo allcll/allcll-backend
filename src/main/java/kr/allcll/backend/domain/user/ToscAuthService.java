@@ -26,7 +26,9 @@ public class ToscAuthService {
     private final LoginProperties properties;
     private final ObjectMapper objectMapper;
 
-    public void loginTosc(OkHttpClient client, LoginRequest loginRequest) {
+    public void loginTosc(LoginRequest loginRequest) {
+        OkHttpClient client = new OkHttpClient();
+
         RequestBody body = new FormBody.Builder()
             .add("email", loginRequest.studentId())
             .add("password", loginRequest.password())

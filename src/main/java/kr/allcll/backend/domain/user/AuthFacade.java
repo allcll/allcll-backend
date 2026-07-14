@@ -30,7 +30,7 @@ public class AuthFacade {
 
         boolean toscLoginFailed = false;
         try {
-            toscAuthService.loginTosc(client, loginRequest);
+            toscAuthService.loginTosc(loginRequest);
         } catch (Exception exception) {
             toscLoginFailed = true;
             log.error("[TOSC] 로그인 실패, TOSC 정보 업데이트 불가 (학번: {}): {}",
