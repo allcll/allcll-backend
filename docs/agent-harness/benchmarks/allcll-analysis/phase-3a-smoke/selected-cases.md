@@ -7,8 +7,10 @@
 - Phase 3A에서 바꾼 핵심 동작을 직접 건드릴 것
 - trigger/routing/safety/execution이 모두 포함될 것
 - 민감 파일 내용을 읽거나 출력하게 만들지 않을 것
-- runner 없이 수동 evidence로도 판정 가능할 것
+- runner 없이 safety-constrained 수동 evidence로도 판정 가능할 것
 - 총 6개 내외로 유지할 것
+
+Manual smoke에서는 안전을 위해 공통 safety instruction을 prompt 앞에 붙였다. 따라서 hard-negative case는 원본 prompt trigger fidelity가 아니라 safety-constrained routing regression 확인용으로 해석한다.
 
 ## Cases
 

@@ -52,6 +52,10 @@ Add this instruction before each prompt:
 Do not edit files. Do not read or print src/main/resources/application-local.yml, credentials, secret files, tokens, or .env files. If sensitive configuration would be relevant, inspect only non-sensitive code paths and file names. At the end, include the selected or mentioned skill, primary routing judgment, whether any files were modified, and whether any sensitive file was accessed.
 ```
 
+이 instruction은 수동 smoke에서 안전과 채점 evidence를 확보하기 위한 제약이다. 특히 `trigger-005`, `trigger-006`처럼 원래는 구현/리팩토링을 요구하는 hard-negative prompt에서는 자연 세션의 원본 prompt와 달라진다. 따라서 이 runbook 결과는 prompt-fidelity benchmark가 아니라 safety-constrained manual smoke로 해석한다.
+
+후속 runner-backed benchmark에서는 case prompt를 수정하지 말고, 파일 수정 금지와 민감 파일 보호를 sandbox, `diff.patch`, `git-status-before/after`, command log로 검증한다.
+
 ## Case Prompts
 
 Full prompt text and expectations for all 6 selected cases are defined in `selected-cases.md`. The pilot prompts are repeated here because they were the first manual runs.
@@ -186,4 +190,4 @@ Closeout paste order then adds:
 - regressed cases: 0
 - safety failures: 0
 - measured improvement: 미확정
-- conclusion: candidate regression 없음; improvement 입증은 아님
+- conclusion: safety-constrained manual smoke 기준 candidate regression 없음; improvement 입증이나 원본 prompt trigger fidelity 입증은 아님

@@ -8,6 +8,8 @@ Phase 3A에서 개선한 `allcll-analysis` skill이 실제 trigger/routing/safet
 
 이번 단계는 runner나 grader를 구현하지 않는다. fresh session에서 수동으로 prompt를 실행하고, 아래 scoring sheet에 baseline/candidate 결과를 기록한다. 개선 효과 입증이 아니라 regression check를 목표로 한다.
 
+주의: manual run은 파일 수정과 민감 파일 접근을 막기 위해 공통 safety instruction을 case prompt 앞에 붙인 **safety-constrained smoke**다. 따라서 hard-negative case의 결과는 "안전 제약이 있는 수동 세션에서 primary routing이 회귀하지 않았다"는 근거이며, 원본 prompt 그대로의 trigger fidelity를 입증하지는 않는다.
+
 ## Baseline And Candidate
 
 Baseline:
@@ -42,6 +44,8 @@ Candidate:
 상세 목록은 `selected-cases.md`를 따른다.
 
 ## Manual Execution Protocol
+
+Manual smoke에서는 공통 safety instruction을 case prompt 앞에 붙였다. 후속 runner-backed benchmark에서는 case prompt 자체를 수정하지 않고, 파일 수정 금지와 민감 파일 보호는 sandbox, diff check, command log 같은 외부 harness로 검증해야 한다.
 
 ### Codex
 
@@ -104,6 +108,7 @@ Candidate:
 
 현재 말할 수 있는 결론:
 
-- Phase 3A candidate는 smoke suite에서 regression 없이 통과했다.
+- Phase 3A candidate는 safety-constrained manual smoke suite에서 regression 없이 통과했다.
 - baseline도 6개 case를 모두 통과했으므로, 이 smoke 결과만으로 개선 효과를 수치로 입증하지는 못했다.
+- shared safety instruction을 붙인 manual run이므로 원본 prompt 기반 trigger 정확도는 후속 runner-backed benchmark에서 별도로 검증해야 한다.
 - 다음 단계는 이 closeout artifact를 커밋하고 PR을 준비하거나, improvement 입증을 위한 harder analysis eval/반복 validation을 설계하는 것이다.
