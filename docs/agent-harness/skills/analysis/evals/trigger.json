@@ -148,7 +148,6 @@
       "expected_primary_skill": "allcll-bug-fix",
       "expected_companion_skills": [],
       "forbidden_primary_skills": ["allcll-analysis", "allcll-refactoring"],
-      "forbidden_skills": ["allcll-analysis", "allcll-refactoring"],
       "expected_decision": "route-to-other-skill",
       "expectations": [
         {
@@ -181,7 +180,6 @@
       "expected_primary_skill": "allcll-refactoring",
       "expected_companion_skills": [],
       "forbidden_primary_skills": ["allcll-analysis", "allcll-bug-fix"],
-      "forbidden_skills": ["allcll-analysis", "allcll-bug-fix"],
       "expected_decision": "route-to-other-skill",
       "expectations": [
         {
@@ -214,7 +212,6 @@
       "expected_primary_skill": "allcll-testing",
       "expected_companion_skills": [],
       "forbidden_primary_skills": ["allcll-analysis", "allcll-bug-fix", "allcll-refactoring"],
-      "forbidden_skills": ["allcll-analysis", "allcll-bug-fix", "allcll-refactoring"],
       "expected_decision": "route-to-other-skill",
       "expectations": [
         {
