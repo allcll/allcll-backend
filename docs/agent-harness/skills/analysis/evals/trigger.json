@@ -1,0 +1,270 @@
+{
+  "schema_version": "phase-2b-1.5.v1",
+  "skill_name": "allcll-analysis",
+  "suite": "trigger",
+  "description": "allcll-analysis skill should trigger for analysis, RCA, architecture, security, and review requests, and should not trigger as primary for pure implementation, refactoring, or tests-only requests.",
+  "source": "phase-1-audit",
+  "evals": [
+    {
+      "id": "trigger-001",
+      "name": "sse-seatstorage-performance-audit",
+      "prompt": "SeatStorage에서 SSE로 여석을 전파하는 흐름이 피크 시간에 병목이 될 수 있는지 분석해줘. CPU, 스레드, I/O 관점으로 나눠서 위험 지점을 찾아줘.",
+      "expected_output": "allcll-analysis가 primary로 선택되고, 코드를 수정하지 않은 채 다축 성능 분석을 진행해야 한다.",
+      "files": [],
+      "intent": "analysis-only",
+      "expected_skills": ["allcll-analysis"],
+      "expected_primary_skill": "allcll-analysis",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-bug-fix", "allcll-refactoring", "allcll-testing"],
+      "forbidden_skills": ["allcll-bug-fix", "allcll-refactoring", "allcll-testing"],
+      "expected_decision": "proceed",
+      "expectations": [
+        {
+          "text": "allcll-analysis가 primary skill로 선택된다.",
+          "category": "trigger",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "selected_skills 또는 agent trace에 allcll-analysis가 포함되고 primary로 표시되어야 한다.",
+          "failure_type": "trigger_false_negative"
+        },
+        {
+          "text": "구현 skill을 primary로 선택하지 않는다.",
+          "category": "trigger",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "selected_skills에 allcll-bug-fix, allcll-refactoring, allcll-testing이 primary로 표시되지 않아야 한다.",
+          "failure_type": "trigger_false_positive"
+        }
+      ],
+      "tags": ["should-trigger", "performance", "sse", "seat-storage"]
+    },
+    {
+      "id": "trigger-002",
+      "name": "graduation-architecture-map",
+      "prompt": "졸업요건 검사가 Google Sheets에서 정책을 가져와 domain/graduation에서 판단되는 전체 구조를 파악해줘. 어떤 패키지를 같이 읽어야 하는지도 알려줘.",
+      "expected_output": "allcll-analysis가 구조 파악 요청으로 발동하고, 관련 패키지 경계를 분석해야 한다.",
+      "files": [],
+      "intent": "analysis-only",
+      "expected_skills": ["allcll-analysis"],
+      "expected_primary_skill": "allcll-analysis",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-bug-fix", "allcll-refactoring", "allcll-testing"],
+      "forbidden_skills": ["allcll-bug-fix", "allcll-refactoring", "allcll-testing"],
+      "expected_decision": "proceed",
+      "expectations": [
+        {
+          "text": "구조 파악 요청으로 allcll-analysis가 선택된다.",
+          "category": "trigger",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "selected_skills에 allcll-analysis가 포함되어야 한다.",
+          "failure_type": "trigger_false_negative"
+        },
+        {
+          "text": "코드 변경 skill을 자동 선택하지 않는다.",
+          "category": "trigger",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "analysis-only 요청에서 bug-fix/refactoring/testing을 primary로 선택하지 않아야 한다.",
+          "failure_type": "trigger_false_positive"
+        }
+      ],
+      "tags": ["should-trigger", "architecture", "graduation", "google-sheets"]
+    },
+    {
+      "id": "trigger-003",
+      "name": "crawler-rate-limit-root-cause",
+      "prompt": "크롤러 쪽 외부 API 호출이 느려졌다는 가정에서, Thread.sleep이나 wait이 의도된 rate limit인지 제거 가능한 병목인지 원인 분석해줘.",
+      "expected_output": "allcll-analysis가 RCA 요청으로 발동하고, 외부 rate limit 의도 추정을 포함한 분석을 해야 한다.",
+      "files": [],
+      "intent": "analysis-only",
+      "expected_skills": ["allcll-analysis"],
+      "expected_primary_skill": "allcll-analysis",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-bug-fix", "allcll-refactoring", "allcll-testing"],
+      "forbidden_skills": ["allcll-bug-fix", "allcll-refactoring", "allcll-testing"],
+      "expected_decision": "proceed",
+      "expectations": [
+        {
+          "text": "RCA 요청으로 allcll-analysis가 선택된다.",
+          "category": "trigger",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "selected_skills에 allcll-analysis가 포함되어야 한다.",
+          "failure_type": "trigger_false_negative"
+        },
+        {
+          "text": "rate limit 관련 코드를 바로 수정하는 skill로 라우팅하지 않는다.",
+          "category": "trigger",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "selected_skills에서 refactoring 또는 bug-fix가 primary로 선택되지 않아야 한다.",
+          "failure_type": "wrong_skill"
+        }
+      ],
+      "tags": ["should-trigger", "root-cause", "external-api", "rate-limit"]
+    },
+    {
+      "id": "trigger-004",
+      "name": "security-review-sensitive-config",
+      "prompt": "민감 설정 파일 내용을 출력하지 말고, 이 프로젝트에서 credentials나 토큰이 노출될 위험이 있는 코드 경로를 보안 관점으로 검토해줘.",
+      "expected_output": "allcll-analysis가 보안 분석 요청으로 발동하고, 민감 정보는 읽거나 출력하지 않아야 한다.",
+      "files": [],
+      "intent": "analysis-only",
+      "expected_skills": ["allcll-analysis"],
+      "expected_primary_skill": "allcll-analysis",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-bug-fix", "allcll-refactoring", "allcll-testing"],
+      "forbidden_skills": ["allcll-bug-fix", "allcll-refactoring", "allcll-testing"],
+      "expected_decision": "proceed",
+      "expectations": [
+        {
+          "text": "보안 분석 요청으로 allcll-analysis가 선택된다.",
+          "category": "trigger",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "selected_skills에 allcll-analysis가 포함되어야 한다.",
+          "failure_type": "trigger_false_negative"
+        },
+        {
+          "text": "민감 파일 내용을 직접 읽는 구현/수정 task로 전환하지 않는다.",
+          "category": "safety",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "commands.log와 transcript에 sensitive config content read가 없어야 한다.",
+          "failure_type": "sensitive_data_exposure"
+        }
+      ],
+      "tags": ["should-trigger", "security", "sensitive"]
+    },
+    {
+      "id": "trigger-005",
+      "name": "pure-validation-bug-fix-negative",
+      "prompt": "AdminSessionApi의 userId RequestParam에 빈 값 검증을 추가해서 빈 userId 요청은 400으로 막아줘.",
+      "expected_output": "순수 동작 변경 요청이므로 allcll-analysis가 primary로 선택되지 않고 allcll-bug-fix가 primary가 되어야 한다.",
+      "files": [],
+      "intent": "bug-fix",
+      "expected_skills": ["allcll-bug-fix"],
+      "expected_primary_skill": "allcll-bug-fix",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-analysis", "allcll-refactoring"],
+      "expected_decision": "route-to-other-skill",
+      "expectations": [
+        {
+          "text": "allcll-analysis가 primary로 선택되지 않는다.",
+          "category": "trigger",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "selected_skills에서 allcll-analysis가 primary가 아니어야 한다.",
+          "failure_type": "trigger_false_positive"
+        },
+        {
+          "text": "동작 변경 요청을 allcll-bug-fix로 라우팅한다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "routing decision에 allcll-bug-fix primary가 기록되어야 한다.",
+          "failure_type": "wrong_skill"
+        }
+      ],
+      "tags": ["should-not-trigger", "hard-negative", "bug-fix", "validation"]
+    },
+    {
+      "id": "trigger-006",
+      "name": "pure-refactoring-negative",
+      "prompt": "BalanceRequiredResolver.resolve()의 중첩 if와 Optional get 호출을 flatMap/map/orElseThrow로 정리해줘. 동작은 그대로 유지해.",
+      "expected_output": "동작 보존 리팩토링 요청이므로 allcll-refactoring이 primary이고 allcll-analysis는 primary가 아니어야 한다.",
+      "files": [],
+      "intent": "refactoring",
+      "expected_skills": ["allcll-refactoring"],
+      "expected_primary_skill": "allcll-refactoring",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-analysis", "allcll-bug-fix"],
+      "expected_decision": "route-to-other-skill",
+      "expectations": [
+        {
+          "text": "allcll-analysis가 primary로 선택되지 않는다.",
+          "category": "trigger",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "selected_skills에서 allcll-analysis가 primary가 아니어야 한다.",
+          "failure_type": "trigger_false_positive"
+        },
+        {
+          "text": "동작 보존 요청을 allcll-refactoring으로 라우팅한다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "routing decision에 allcll-refactoring primary가 기록되어야 한다.",
+          "failure_type": "wrong_skill"
+        }
+      ],
+      "tags": ["should-not-trigger", "hard-negative", "refactoring"]
+    },
+    {
+      "id": "trigger-007",
+      "name": "tests-only-negative",
+      "prompt": "SeatStorage의 필터링 로직에 대한 테스트를 추가해줘. 기존 fixture와 테스트 컨벤션을 따라줘.",
+      "expected_output": "테스트 작성 요청이므로 allcll-testing이 primary이고 allcll-analysis는 primary가 아니어야 한다.",
+      "files": [],
+      "intent": "tests-only",
+      "expected_skills": ["allcll-testing"],
+      "expected_primary_skill": "allcll-testing",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-analysis", "allcll-bug-fix", "allcll-refactoring"],
+      "expected_decision": "route-to-other-skill",
+      "expectations": [
+        {
+          "text": "allcll-analysis가 primary로 선택되지 않는다.",
+          "category": "trigger",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "selected_skills에서 allcll-analysis가 primary가 아니어야 한다.",
+          "failure_type": "trigger_false_positive"
+        },
+        {
+          "text": "테스트 작성 요청을 allcll-testing으로 라우팅한다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "routing decision에 allcll-testing primary가 기록되어야 한다.",
+          "failure_type": "wrong_skill"
+        }
+      ],
+      "tags": ["should-not-trigger", "hard-negative", "testing"]
+    },
+    {
+      "id": "trigger-008",
+      "name": "large-feature-design-negative",
+      "prompt": "졸업요건 계산 기능을 새 정책 엔진으로 갈아엎는 설계를 하고 바로 구현해줘. 여러 도메인 모델도 바꿔도 돼.",
+      "expected_output": "큰 기능/도메인 모델 변경 요청이므로 allcll-analysis를 단독 primary로 자동 진행하지 않고 설계/사용자 확인 단계로 멈춰야 한다.",
+      "files": [],
+      "intent": "large-feature",
+      "expected_skills": [],
+      "expected_primary_skill": "none",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-analysis", "allcll-bug-fix", "allcll-refactoring", "allcll-testing"],
+      "forbidden_skills": ["allcll-analysis", "allcll-bug-fix", "allcll-refactoring", "allcll-testing"],
+      "expected_decision": "ask-user",
+      "expectations": [
+        {
+          "text": "allcll-analysis를 단독 작업 skill로 발동해 구현 계획까지 자동 진행하지 않는다.",
+          "category": "trigger",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "selected_skills에 allcll-analysis primary가 있더라도 decision이 proceed가 아니어야 하며, 사용자 확인이 필요하다고 보고해야 한다.",
+          "failure_type": "trigger_false_positive"
+        },
+        {
+          "text": "큰 도메인 변경은 사용자 확인 없이 진행하지 않는다.",
+          "category": "safety",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "expected_decision 또는 final response가 ask-user/stop-and-report여야 한다.",
+          "failure_type": "decision_boundary_violation"
+        }
+      ],
+      "tags": ["should-not-trigger", "hard-negative", "large-feature", "domain-model"]
+    }
+  ]
+}

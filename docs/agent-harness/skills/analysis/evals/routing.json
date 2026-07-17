@@ -1,0 +1,204 @@
+{
+  "schema_version": "phase-2b-1.5.v1",
+  "skill_name": "allcll-analysis",
+  "suite": "routing",
+  "description": "Routing suite for allcll-analysis versus bug-fix, refactoring, and testing in common allcll backend workflows.",
+  "source": "phase-1-audit",
+  "evals": [
+    {
+      "id": "routing-001",
+      "name": "analysis-only-sse-bottleneck",
+      "prompt": "SSE push가 느려지는 원인을 찾고 싶어. SeatStorage, SseService, scheduler 흐름을 읽고 병목 후보와 확인해야 할 지표만 정리해줘. 아직 수정하지는 마.",
+      "expected_output": "analysis-only 요청이므로 allcll-analysis가 primary이며 파일 수정 없이 병목 후보와 확인 지표를 정리해야 한다.",
+      "files": [],
+      "intent": "analysis-only",
+      "expected_skills": ["allcll-analysis"],
+      "expected_primary_skill": "allcll-analysis",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-bug-fix", "allcll-refactoring", "allcll-testing"],
+      "forbidden_skills": ["allcll-bug-fix", "allcll-refactoring", "allcll-testing"],
+      "expected_decision": "proceed",
+      "expectations": [
+        {
+          "text": "allcll-analysis를 primary로 선택한다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "routing decision 또는 selected_skills에 allcll-analysis primary가 기록되어야 한다.",
+          "failure_type": "wrong_skill"
+        },
+        {
+          "text": "수정 요청이 없으므로 구현 skill로 진행하지 않는다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "allcll-bug-fix/refactoring/testing이 primary로 선택되지 않아야 한다.",
+          "failure_type": "unnecessary_skill"
+        }
+      ],
+      "tags": ["analysis-only", "sse", "performance"]
+    },
+    {
+      "id": "routing-002",
+      "name": "analysis-to-bug-fix",
+      "prompt": "핀 여석 알림이 누락되는 것 같아. 먼저 SeatStorage에서 Pin 관련 데이터가 어떻게 흘러가는지 원인을 분석하고, 실제 버그가 맞으면 그 다음 수정 방향까지 제안해줘.",
+      "expected_output": "analysis를 먼저 수행하고, 버그가 확인될 때만 allcll-bug-fix 후속 단계로 라우팅해야 한다.",
+      "files": [],
+      "intent": "mixed-analysis-to-bug-fix",
+      "expected_skills": ["allcll-analysis", "allcll-bug-fix"],
+      "expected_primary_skill": "allcll-analysis",
+      "expected_companion_skills": ["allcll-bug-fix"],
+      "forbidden_primary_skills": ["allcll-bug-fix", "allcll-refactoring", "allcll-testing"],
+      "forbidden_skills": ["allcll-refactoring"],
+      "expected_decision": "proceed",
+      "expectations": [
+        {
+          "text": "초기 primary는 allcll-analysis로 선택한다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "routing decision에 원인 분석을 먼저 수행한다고 기록되어야 한다.",
+          "failure_type": "wrong_skill"
+        },
+        {
+          "text": "버그 수정은 확인 후 후속 allcll-bug-fix 단계로 분리한다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "final response 또는 plan에 bug-fix는 결함 확인 후 진행한다고 명시되어야 한다.",
+          "failure_type": "missing_companion_skill"
+        }
+      ],
+      "tags": ["analysis-to-bug-fix", "pin", "seat-storage"]
+    },
+    {
+      "id": "routing-003",
+      "name": "analysis-to-refactoring",
+      "prompt": "졸업요건 resolver들이 중복이 많은지 먼저 구조 분석해줘. 동작 보존으로 정리할 수 있는 후보가 있으면 refactoring 후보와 검증 방법만 제안해줘.",
+      "expected_output": "analysis를 먼저 수행하고, 실제 변경은 allcll-refactoring 후속 작업으로 제안해야 한다.",
+      "files": [],
+      "intent": "mixed-analysis-to-refactoring",
+      "expected_skills": ["allcll-analysis", "allcll-refactoring"],
+      "expected_primary_skill": "allcll-analysis",
+      "expected_companion_skills": ["allcll-refactoring"],
+      "forbidden_primary_skills": ["allcll-bug-fix", "allcll-refactoring", "allcll-testing"],
+      "forbidden_skills": ["allcll-bug-fix"],
+      "expected_decision": "proceed",
+      "expectations": [
+        {
+          "text": "구조 분석은 allcll-analysis로 시작한다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "selected_skills 또는 plan에 allcll-analysis가 먼저 기록되어야 한다.",
+          "failure_type": "wrong_skill"
+        },
+        {
+          "text": "동작 보존 변경은 allcll-refactoring 후속으로 분리한다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "final response에 refactoring 후보와 검증 방법이 제안되고 즉시 구현하지 않아야 한다.",
+          "failure_type": "missing_companion_skill"
+        }
+      ],
+      "tags": ["analysis-to-refactoring", "graduation", "structure"]
+    },
+    {
+      "id": "routing-004",
+      "name": "tests-only-testing-primary",
+      "prompt": "SseService.propagate 동작을 검증하는 테스트를 추가해줘. 비동기 검증이면 Awaitility를 써줘.",
+      "expected_output": "tests-only 요청이므로 allcll-testing이 primary이고 allcll-analysis는 primary가 아니어야 한다.",
+      "files": [],
+      "intent": "tests-only",
+      "expected_skills": ["allcll-testing"],
+      "expected_primary_skill": "allcll-testing",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-analysis", "allcll-bug-fix", "allcll-refactoring"],
+      "expected_decision": "route-to-other-skill",
+      "expectations": [
+        {
+          "text": "테스트 작성 요청을 allcll-testing으로 라우팅한다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "routing decision에 allcll-testing primary가 기록되어야 한다.",
+          "failure_type": "wrong_skill"
+        },
+        {
+          "text": "allcll-analysis를 primary로 선택하지 않는다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "selected_skills에서 allcll-analysis가 primary가 아니어야 한다.",
+          "failure_type": "trigger_false_positive"
+        }
+      ],
+      "tags": ["tests-only", "testing-primary", "sse"]
+    },
+    {
+      "id": "routing-005",
+      "name": "pure-bug-fix-primary",
+      "prompt": "LoginRequest의 studentId와 password에 빈 값 검증을 추가하고, 로그인 API에서 빈 값이면 400이 되게 고쳐줘.",
+      "expected_output": "pure bug-fix 요청이므로 allcll-bug-fix가 primary이고 allcll-analysis는 primary가 아니어야 한다.",
+      "files": [],
+      "intent": "bug-fix",
+      "expected_skills": ["allcll-bug-fix"],
+      "expected_primary_skill": "allcll-bug-fix",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-analysis", "allcll-refactoring"],
+      "expected_decision": "route-to-other-skill",
+      "expectations": [
+        {
+          "text": "동작 변경 요청을 allcll-bug-fix로 라우팅한다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "routing decision에 allcll-bug-fix primary가 기록되어야 한다.",
+          "failure_type": "wrong_skill"
+        },
+        {
+          "text": "allcll-analysis를 primary로 선택하지 않는다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "selected_skills에서 allcll-analysis가 primary가 아니어야 한다.",
+          "failure_type": "trigger_false_positive"
+        }
+      ],
+      "tags": ["pure-bug-fix", "validation"]
+    },
+    {
+      "id": "routing-006",
+      "name": "pure-refactoring-primary",
+      "prompt": "AcademicBasicPolicy의 isHaveReplaceCourse에서 contains 반복을 줄이도록 Set 기반으로 정리해줘. 결과 동작은 그대로 유지해야 해.",
+      "expected_output": "pure refactoring 요청이므로 allcll-refactoring이 primary이고 allcll-analysis는 primary가 아니어야 한다.",
+      "files": [],
+      "intent": "refactoring",
+      "expected_skills": ["allcll-refactoring"],
+      "expected_primary_skill": "allcll-refactoring",
+      "expected_companion_skills": [],
+      "forbidden_primary_skills": ["allcll-analysis", "allcll-bug-fix"],
+      "expected_decision": "route-to-other-skill",
+      "expectations": [
+        {
+          "text": "동작 보존 성능 정리 요청을 allcll-refactoring으로 라우팅한다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "routing decision에 allcll-refactoring primary가 기록되어야 한다.",
+          "failure_type": "wrong_skill"
+        },
+        {
+          "text": "allcll-analysis를 primary로 선택하지 않는다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "selected_skills에서 allcll-analysis가 primary가 아니어야 한다.",
+          "failure_type": "trigger_false_positive"
+        }
+      ],
+      "tags": ["pure-refactoring", "performance"]
+    }
+  ]
+}
