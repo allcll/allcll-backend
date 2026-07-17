@@ -56,5 +56,24 @@ dependencies {
 }
 
 tasks.named('test') {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        excludeTags 'qa-tool' // QA 수동 도구 (스냅샷·케이스 export·리플레이) 는 CI 제외 — qaTool 태스크로 실행
+    }
+}
+
+// 졸업요건 QA 검증 도구 — 로컬 DB 대상 수동 실행 전용.
+// 예: ./gradlew qaTool --tests "kr.allcll.backend.qa.QaSnapshotRunner" -Dqa.ids=ALL -Dqa.label=before
+tasks.register('qaTool', Test) {
+    description = '졸업요건 QA 도구 (qa-snapshots/qa-cases 생성·리플레이). -Dqa.* 시스템 프로퍼티로 제어'
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform {
+        includeTags 'qa-tool'
+    }
+    // -Dqa.* / -Dspring.* 를 테스트 JVM 으로 전달 (gradle 은 기본적으로 미전달)
+    systemProperties System.properties.findAll { k, v ->
+        k.toString().startsWith('qa.') || k.toString().startsWith('spring.') || k.toString().startsWith('QA_')
+    }
+    outputs.upToDateWhen { false }
 }
