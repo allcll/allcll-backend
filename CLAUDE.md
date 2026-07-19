@@ -37,7 +37,7 @@
 - `allcll-refactoring` → `.claude/skills/refactoring/SKILL.md` → `docs/agent-harness/skills/refactoring/SKILL.md`
 - `allcll-testing` → `.claude/skills/testing/SKILL.md` → `docs/agent-harness/skills/testing/SKILL.md`
 - `allcll-graduation-qa` → `.claude/skills/graduation-qa/SKILL.md` → `docs/agent-harness/skills/graduation-qa/SKILL.md`
-- `graduation-backend` → `.claude/skills/graduation-backend/SKILL.md` (wrapper 단독 — 졸업요건 코드 게이트)
+- `graduation-backend` → `.claude/skills/graduation-backend/SKILL.md` → `docs/agent-harness/skills/graduation-backend/SKILL.md` (졸업요건 코드 게이트)
 
 ## 수정 원칙
 
