@@ -96,6 +96,29 @@ class CategoryTypeTest {
     }
 
     @Test
+    @DisplayName("24학번 이상에서 '복기'는 '전기'로 매핑된다.")
+    void fromRaw_mapsDoubleMajorBasic_whenAdmissionYearGte2024() {
+        // given
+        String CategoryTypeRaw = "복기";
+
+        // when && then
+        assertThat(CategoryType.fromRaw(CategoryTypeRaw, 2024)).isEqualTo(CategoryType.MAJOR_BASIC);
+        assertThat(CategoryType.fromRaw(CategoryTypeRaw, 2025)).isEqualTo(CategoryType.MAJOR_BASIC);
+        assertThat(CategoryType.fromRaw(CategoryTypeRaw, 2026)).isEqualTo(CategoryType.MAJOR_BASIC);
+    }
+
+    @Test
+    @DisplayName("23학번 이하에서 '복기'는 '전기'와 동일하게 '기필'로 보정된다.")
+    void fromRaw_normalizesDoubleMajorBasic_whenAdmissionYearBefore2024() {
+        // given
+        String CategoryTypeRaw = "복기";
+
+        // when && then
+        assertThat(CategoryType.fromRaw(CategoryTypeRaw, 2020)).isEqualTo(CategoryType.ACADEMIC_BASIC);
+        assertThat(CategoryType.fromRaw(CategoryTypeRaw, 2023)).isEqualTo(CategoryType.ACADEMIC_BASIC);
+    }
+
+    @Test
     @DisplayName("전필/전선만 전공 카테고리로 판단한다.")
     void isMajorCategory() {
         //when && then

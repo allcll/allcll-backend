@@ -61,7 +61,7 @@ public record CompletedCourseDto(
             throw new AllcllException(AllcllErrorCode.EMPTY_REQUIRED_COLUMN);
         }
         String stripped = categoryTypeRaw.strip();
-        if (stripped.contains("복선") || stripped.contains("복필")) {
+        if (stripped.contains("복선") || stripped.contains("복필") || stripped.contains("복기")) {
             return MajorScope.SECONDARY;
         }
         return MajorScope.PRIMARY;
