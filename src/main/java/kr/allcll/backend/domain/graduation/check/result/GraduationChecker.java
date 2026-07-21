@@ -16,6 +16,7 @@ import kr.allcll.backend.domain.graduation.credit.CreditCriterion;
 import kr.allcll.backend.domain.graduation.credit.CreditCriterionRepository;
 import kr.allcll.backend.domain.graduation.credit.DoubleCreditCriterion;
 import kr.allcll.backend.domain.graduation.credit.DoubleCreditCriterionRepository;
+import kr.allcll.backend.domain.graduation.credit.GeneralElectivePolicy;
 import kr.allcll.backend.domain.user.User;
 import kr.allcll.backend.domain.user.UserRepository;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
@@ -29,6 +30,7 @@ public class GraduationChecker {
 
     private final CategoryCreditCalculator categoryCalculator;
     private final CertificationChecker certificationChecker;
+    private final GeneralElectivePolicy generalElectivePolicy;
 
     private final UserRepository userRepository;
     private final CreditCriterionRepository creditCriterionRepository;
@@ -40,7 +42,9 @@ public class GraduationChecker {
             .toList();
 
         // 사용자의 졸업 요건 기준 조회
-        List<CreditCriterion> creditCriteria = resolveCreditCriteria(userId);
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
+        List<CreditCriterion> creditCriteria = resolveCreditCriteria(user);
 
         // 이수구분별 학점 계산
         List<GraduationCategory> categoryResults = categoryCalculator.calculateCategoryResults(
@@ -48,6 +52,7 @@ public class GraduationChecker {
             earnedCourses,
             creditCriteria
         );
+        applyGeneralElectiveRequiredCourseResult(user, earnedCourses, categoryResults);
 
         // 총 학점 정보 추출 (엑셀에서 직접 합산)
         TotalSummary totalSummary = summarizeTotalCredits(earnedCourses, categoryResults);
@@ -66,9 +71,7 @@ public class GraduationChecker {
         );
     }
 
-    private List<CreditCriterion> resolveCreditCriteria(Long userId) {
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
+    private List<CreditCriterion> resolveCreditCriteria(User user) {
         if (MajorType.DOUBLE.equals(user.getMajorType())) {
             return buildDoubleMajorCriteria(
                 user,
@@ -82,6 +85,30 @@ public class GraduationChecker {
                 user.getDeptNm(),
                 List.of(MajorType.ALL, MajorType.SINGLE)
             );
+    }
+
+    private void applyGeneralElectiveRequiredCourseResult(
+        User user,
+        List<CompletedCourse> earnedCourses,
+        List<GraduationCategory> categories
+    ) {
+        boolean requiredCoursesSatisfied = generalElectivePolicy.areRequiredCoursesSatisfied(user, earnedCourses);
+        for (int index = 0; index < categories.size(); index++) {
+            GraduationCategory category = categories.get(index);
+            if (category.categoryType() == CategoryType.GENERAL_ELECTIVE) {
+                categories.set(index, new GraduationCategory(
+                    category.majorScope(),
+                    category.categoryType(),
+                    category.earnedCredits(),
+                    category.requiredCredits(),
+                    category.remainingCredits(),
+                    category.earnedAreasCnt(),
+                    category.requiredAreasCnt(),
+                    category.earnedAreas(),
+                    category.satisfied() && requiredCoursesSatisfied
+                ));
+            }
+        }
     }
 
     private List<CreditCriterion> buildDoubleMajorCriteria(
