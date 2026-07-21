@@ -105,7 +105,9 @@ public class CategoryCreditCalculator {
             .mapToDouble(CompletedCourse::getCredits)
             .sum();
 
-        int requiredCredits = criterion.getRequiredCredits();
+        int requiredCredits = isGeneralElectiveCreditRequirementAbolished(criterion)
+            ? 0
+            : criterion.getRequiredCredits();
         double remainingCredits = calculateRemainingCredits(requiredCredits, earnedCredits);
         boolean isSatisfied = remainingCredits <= 0;
 
@@ -127,6 +129,12 @@ public class CategoryCreditCalculator {
             return MajorScope.PRIMARY.equals(criterionScope);
         }
         return course.getMajorScope() == criterionScope;
+    }
+
+    private boolean isGeneralElectiveCreditRequirementAbolished(CreditCriterion criterion) {
+        return criterion.getCategoryType() == CategoryType.GENERAL_ELECTIVE
+            && criterion.getAdmissionYear() >= 2018
+            && criterion.getAdmissionYear() <= 2021;
     }
 
     private void addBalanceRequiredIfNeeded(
