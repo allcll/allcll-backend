@@ -45,8 +45,8 @@ class CategoryCreditCalculatorTest {
     private CategoryCreditCalculator calculator;
 
     @Test
-    @DisplayName("18~21학번 교양선택은 이수 학점과 관계없이 학점 요건을 적용하지 않는다")
-    void doesNotApplyGeneralElectiveCreditRequirementForAdmissionYears2018To2021() {
+    @DisplayName("2021학번 교양선택도 시트에서 내려온 학점 요건을 적용한다")
+    void appliesGeneralElectiveCreditRequirementFromCriterionForAdmissionYear2021() {
         // given
         int admissionYear = 2021;
         GraduationDepartmentInfo department = GraduationDepartmentInfoFixture.createDepartmentInfo(
@@ -74,14 +74,14 @@ class CategoryCreditCalculatorTest {
                 GraduationCategory::remainingCredits,
                 GraduationCategory::satisfied
             )
-            .containsExactly(0, 0.0, true);
+            .containsExactly(21, 21.0, false);
     }
 
     @Test
-    @DisplayName("22학번 이후 교양선택은 기존 학점 요건을 유지한다")
-    void appliesGeneralElectiveCreditRequirementForAdmissionYearsAfter2021() {
+    @DisplayName("시트에서 교양선택 학점 요건을 0으로 내려주면 이수 학점과 관계없이 충족한다")
+    void satisfiesGeneralElectiveWhenCriterionRequiredCreditsIsZero() {
         // given
-        int admissionYear = 2022;
+        int admissionYear = 2021;
         GraduationDepartmentInfo department = GraduationDepartmentInfoFixture.createDepartmentInfo(
             admissionYear,
             CodingTargetType.NON_MAJOR
@@ -95,7 +95,7 @@ class CategoryCreditCalculatorTest {
         given(balanceRequiredRuleRepository.findByAdmissionYearAndDeptNm(admissionYear, "ALL"))
             .willReturn(java.util.Optional.empty());
 
-        CreditCriterion criterion = criterion(admissionYear, CategoryType.GENERAL_ELECTIVE, 21);
+        CreditCriterion criterion = criterion(admissionYear, CategoryType.GENERAL_ELECTIVE, 0);
 
         // when
         GraduationCategory result = calculator.calculateCategoryResults(1L, List.of(), List.of(criterion)).getFirst();
@@ -107,7 +107,7 @@ class CategoryCreditCalculatorTest {
                 GraduationCategory::remainingCredits,
                 GraduationCategory::satisfied
             )
-            .containsExactly(21, 21.0, false);
+            .containsExactly(0, 0.0, true);
     }
 
     private CreditCriterion criterion(int admissionYear, CategoryType categoryType, int requiredCredits) {
