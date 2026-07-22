@@ -70,6 +70,7 @@ public enum AllcllErrorCode {
     SEJONG_LOGIN_IO_ERROR(HttpStatus.BAD_GATEWAY, "세종포털 로그인 서버와 통신 중 오류가 발생했습니다."),
     TOSC_LOGIN_IO_ERROR(HttpStatus.BAD_GATEWAY, "TOSC 로그인 서버와 통신 중 오류가 발생했습니다."),
     USER_INFO_FETCH_IO_ERROR(HttpStatus.BAD_GATEWAY, "세종포털 사용자 정보 조회에 실패하였습니다."),
+    SSO_USER_INFO_PARSE_FAIL(HttpStatus.BAD_GATEWAY, "수강신청 시스템의 사용자 정보 응답을 해석하지 못했습니다."),
     ENGLISH_INFO_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "영어 인증 정보를 불러오지 못했습니다."),
     CODING_INFO_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "코딩 인증 정보를 불러오지 못했습니다."),
     CLASSIC_INFO_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "고전독서 인증 정보를 불러오지 못했습니다."),
