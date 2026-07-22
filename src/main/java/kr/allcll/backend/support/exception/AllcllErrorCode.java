@@ -57,6 +57,7 @@ public enum AllcllErrorCode {
     DUPLICATE_SCHEDULE(HttpStatus.CONFLICT, "이미 시간표에 등록된 일정입니다."),
     SEAT_CRAWLING_ALREADY_IN_PROGRESS(HttpStatus.CONFLICT, "이미 다른 계정으로 여석 크롤링이 진행중입니다."),
     SEAT_CRAWLING_IN_MULTIPLE_ACCOUNTS(HttpStatus.CONFLICT, "두 개 이상의 계정으로 여석 크롤링이 진행중입니다."),
+    SSO_REGISTRATION_IN_PROGRESS(HttpStatus.CONFLICT, "이미 인증 정보 등록이 진행중입니다. 완료 후 다시 시도해주세요."),
 
     //500
     SEMESTER_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "현재 학기 정보가 없습니다. 관리자에게 문의해주세요."),

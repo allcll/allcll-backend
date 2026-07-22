@@ -6,6 +6,8 @@ import kr.allcll.backend.admin.AdminRequestValidator;
 import kr.allcll.backend.admin.session.dto.CredentialResponse;
 import kr.allcll.backend.admin.session.dto.SessionStatusResponse;
 import kr.allcll.backend.admin.session.dto.SetCredentialRequest;
+import kr.allcll.backend.admin.session.dto.SsoLoginRequest;
+import kr.allcll.backend.admin.session.dto.SsoLoginResponse;
 import kr.allcll.backend.admin.session.dto.UserSessionsStatusResponse;
 import kr.allcll.crawler.credential.Credentials;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,19 @@ public class AdminSessionApi {
         }
         sessionService.setCredential(setCredentialRequest);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/api/admin/session/sso")
+    public ResponseEntity<SsoLoginResponse> registerBySso(HttpServletRequest request,
+        @RequestBody SsoLoginRequest ssoLoginRequest) {
+        if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
+            return ResponseEntity.status(401).build();
+        }
+        if (!ssoLoginRequest.hasCredential()) {
+            return ResponseEntity.badRequest().build();
+        }
+        String userId = sessionService.registerBySso(ssoLoginRequest.studentId(), ssoLoginRequest.password());
+        return ResponseEntity.ok(new SsoLoginResponse(userId));
     }
 
     @GetMapping("/api/admin/session")
