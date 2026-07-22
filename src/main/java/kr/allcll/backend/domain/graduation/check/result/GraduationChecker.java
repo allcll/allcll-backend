@@ -16,6 +16,7 @@ import kr.allcll.backend.domain.graduation.credit.CreditCriterion;
 import kr.allcll.backend.domain.graduation.credit.CreditCriterionRepository;
 import kr.allcll.backend.domain.graduation.credit.DoubleCreditCriterion;
 import kr.allcll.backend.domain.graduation.credit.DoubleCreditCriterionRepository;
+import kr.allcll.backend.domain.graduation.credit.GeneralElectiveRequiredCourseChecker;
 import kr.allcll.backend.domain.user.User;
 import kr.allcll.backend.domain.user.UserRepository;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
@@ -29,6 +30,7 @@ public class GraduationChecker {
 
     private final CategoryCreditCalculator categoryCalculator;
     private final CertificationChecker certificationChecker;
+    private final GeneralElectiveRequiredCourseChecker generalElectiveRequiredCourseChecker;
 
     private final UserRepository userRepository;
     private final CreditCriterionRepository creditCriterionRepository;
@@ -40,7 +42,8 @@ public class GraduationChecker {
             .toList();
 
         // 사용자의 졸업 요건 기준 조회
-        List<CreditCriterion> creditCriteria = resolveCreditCriteria(userId);
+        User user = findUser(userId);
+        List<CreditCriterion> creditCriteria = resolveCreditCriteria(user);
 
         // 이수구분별 학점 계산
         List<GraduationCategory> categoryResults = categoryCalculator.calculateCategoryResults(
@@ -54,7 +57,11 @@ public class GraduationChecker {
 
         // 졸업인증제도 검사
         CertResult certResult = certificationChecker.checkAndUpdate(userId, earnedCourses);
-        boolean isGraduatable = canGraduate(categoryResults, certResult);
+        boolean isGraduatable = canGraduate(
+            categoryResults,
+            certResult,
+            generalElectiveRequiredCourseChecker.isSatisfied(user, earnedCourses)
+        );
 
         return new CheckResult(
             isGraduatable,
@@ -66,9 +73,12 @@ public class GraduationChecker {
         );
     }
 
-    private List<CreditCriterion> resolveCreditCriteria(Long userId) {
-        User user = userRepository.findById(userId)
+    private User findUser(Long userId) {
+        return userRepository.findById(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
+    }
+
+    private List<CreditCriterion> resolveCreditCriteria(User user) {
         if (MajorType.DOUBLE.equals(user.getMajorType())) {
             return buildDoubleMajorCriteria(
                 user,
@@ -191,9 +201,11 @@ public class GraduationChecker {
 
     private boolean canGraduate(
         List<GraduationCategory> categories,
-        CertResult certResult
+        CertResult certResult,
+        boolean isGeneralElectiveRequiredCourseSatisfied
     ) {
-        return categories.stream().allMatch(GraduationCategory::satisfied)
+        return isGeneralElectiveRequiredCourseSatisfied
+            && categories.stream().allMatch(GraduationCategory::satisfied)
             && certResult.isSatisfied();
     }
 }
