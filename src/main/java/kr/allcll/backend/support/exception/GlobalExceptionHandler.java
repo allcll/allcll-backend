@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,19 @@ import org.springframework.web.context.request.async.AsyncRequestTimeoutExceptio
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    /**
+     * 자격 증명을 본문으로 받는 경로. 예외 발생 시 본문을 그대로 로깅하면 비밀번호와 세션 토큰이 로그와 Sentry 에 남는다.
+     * <p>
+     * 주의: 크롤러 모듈의 {@code CrawlerGlobalExceptionHandler} 도 같은 컨텍스트에 스캔되어 본문을 로깅한다. 그쪽은 수정할 수 없으므로, 자격 증명을 다루는 코드는 크롤러 예외를 그대로
+     * 흘려보내지 말고 {@link AllcllException} 으로 변환해 이 핸들러가 처리하게 해야 한다.
+     */
+    private static final Set<String> CREDENTIAL_REQUEST_URIS = Set.of(
+        "/api/auth/login",
+        "/api/admin/session",
+        "/api/admin/session/sso"
+    );
+    private static final String MASKED_BODY = "[redacted]";
 
     private static final String LOG_FORMAT = """
         \n\t{
@@ -96,6 +110,9 @@ public class GlobalExceptionHandler {
     }
 
     private String getRequestBody(HttpServletRequest request) {
+        if (CREDENTIAL_REQUEST_URIS.contains(request.getRequestURI())) {
+            return MASKED_BODY;
+        }
         String contentType = request.getContentType();
         if (contentType != null && contentType.startsWith("multipart/")) {
             return "[multipart/form-data]";
