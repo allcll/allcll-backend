@@ -1,0 +1,21 @@
+# QA 검증 도구 전용 프로필 — 실 데이터 DB(로컬 복원본) 대상.
+# 실행: ./gradlew qaTool ... -Dspring.profiles.active=qa [-Dspring.datasource.url=...]
+#
+# ⚠ 기본 테스트 설정(application.yml)은 ddl-auto=create-drop 이라 실 DB 에 직결하면 테이블이 날아간다.
+#    qaTool 은 반드시 이 프로필로. 운영 DB 직결 금지 — mysqldump 로컬 복원본만 사용.
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${QA_DB_URL:jdbc:mysql://localhost:3306/allcll_qa}
+    username: ${QA_DB_USER:root}
+    password: ${QA_DB_PASSWORD:}
+  flyway:
+    enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: none   # 절대 변경 금지 — 스키마 불변
+    database-platform: org.hibernate.dialect.MySQLDialect
+    properties:
+      hibernate:
+        format_sql: false
+        show_sql: false
