@@ -4,7 +4,7 @@
 
 분석 요청은 **read-only by default**다. 사용자가 "분석만", "원인 파악", "구조 파악", "보안 검토", "리뷰처럼 봐줘"라고 요청하면 production/test/docs 파일을 수정하지 않는다. 발견한 문제를 고치고 싶어도 먼저 위치, 현상, 의도 추정, 수정 전 확인 사항을 보고한다.
 
-수정까지 섞인 요청도 먼저 분석한다. 분석 결과가 외부 동작 변경이면 `allcll-bug-fix` 후속 작업으로 분리하고, 동작 보존 정리면 `allcll-refactoring` 후속 작업으로 분리한다. 테스트 작성 자체가 목표면 `allcll-testing`이 primary다.
+수정까지 섞인 요청도 먼저 분석 결과를 만든다. 결함이 확인되어 외부 동작을 바꿔야 하면 `allcll-bug-fix` 후속 작업으로 분리하고, 동작 보존 정리라면 `allcll-refactoring` 후속 작업으로 분리한다. 테스트 작성 자체가 목표면 `allcll-testing`이 primary다.
 
 ## 언제 사용하나
 
@@ -23,21 +23,39 @@ Do not use as primary for:
 - "테스트 추가/수정해줘" 같은 tests-only 요청
 - 큰 기능, 정책 엔진, 도메인 모델 재설계처럼 별도 설계 결정이 필요한 요청
 
+## Reference 선택
+
+`SKILL.md`는 routing과 safety gate만 담는다. 아래 세부 rubric은 요청 유형에 맞을 때만 읽고, 한 작업에서 불필요한 reference를 모두 열지 않는다.
+
+- 성능 병목, 처리량, 지연, 피크 타임 분석: `references/performance-analysis.md`
+- 보안 위험, 민감정보 노출, credential/token 경로 검토: `references/security-analysis.md`
+- PR 리뷰형 결함 분석, RCA, "왜 깨지는지" 원인 분석: `references/review-rca-analysis.md`
+- 패키지 책임, 데이터 흐름, 큰 구조 파악, 변경 영향 지도: `references/architecture-analysis.md`
+- 분석 후 수정, scheduler/batch/SSE/concurrency, security, subagent 요약, benchmark 주장처럼 실수 비용이 큰 경우: `references/gotchas.md`
+
 ## 실행 순서
 
 1. **요청 의도와 경계 판단**
    - analysis-only면 수정 금지.
-   - analysis -> bug-fix면 원인 분석 후 결함 확인 조건과 bug-fix 후속 단계를 제안.
-   - analysis -> refactoring이면 구조 분석 후 동작 보존 후보와 검증 방법을 제안.
+   - "분석 후 고쳐줘"처럼 섞인 요청은 먼저 finding artifact를 만들고, 결함/정리 성격을 판정한 뒤 companion skill로 전환한다.
+   - analysis -> bug-fix면 현재/기대 동작, 재현 조건, 결함 확인 기준, bug-fix 후속 단계를 제안.
+   - analysis -> refactoring이면 보존해야 할 동작, baseline/recheck 후보, refactoring 후속 단계를 제안.
    - tests-only, pure bug-fix, pure refactoring이면 해당 skill이 primary임을 보고.
    - 큰 기능/도메인 변경은 사용자 확인 또는 설계 단계가 필요하다고 멈춘다.
 
-2. **증거 수집**
+2. **세부 rubric 선택**
+   - 요청의 주된 분석 축에 맞는 reference만 읽는다.
+   - 여러 축이 섞이면 가장 위험한 축부터 읽는다. 예: credential 노출이 포함되면 security를 먼저 읽고, 실제 성능 진단이 필요할 때 performance를 추가로 읽는다.
+   - reference는 판단을 보강하는 도구다. reference를 읽었다는 이유만으로 파일 수정, secret 열람, benchmark 없는 수치 단정을 하지 않는다.
+
+3. **증거 수집**
    - 관련 파일을 좁혀 읽고, 핵심 호출자/데이터 흐름을 함께 본다.
    - 주요 finding마다 파일:라인 또는 식별 가능한 메서드 근거를 남긴다.
    - 민감 설정 파일, credentials, service account 내용은 읽거나 출력하지 않는다. 보안 분석은 파일명, 저장 위치, 설정 범주, 접근 패턴, 커밋 정책 수준으로 제한한다.
+   - 사용자 기존 변경이 있는 파일은 되돌리지 않는다. 분석에 꼭 필요하고 민감 파일이 아니면 먼저 현재 diff 범위를 확인해 사용자 변경과 base 코드를 구분한다.
+   - finding으로 보고할 수 있는 최소 증거는 위치, 근거, 실패 시나리오, 수정 전 확인 사항이다. 이 중 하나가 없으면 finding이 아니라 "확인 필요"로 남긴다.
 
-3. **여러 축으로 분석**
+4. **여러 축으로 분석**
    성능·품질 분석 시 가능한 한 아래 축을 함께 점검한다.
 
    - CPU: 직렬화, 정렬, 계산 반복
@@ -46,16 +64,34 @@ Do not use as primary for:
    - N+1: 루프 내 쿼리, 컬렉션 순회 중 개별 조회
    - 도메인: 수강신청 피크, SSE 실시간성, 크롤러/스케줄러/배치 흐름, 졸업요건 정책 의존
 
-4. **의도와 불확실성 분리**
+5. **의도와 불확실성 분리**
    - 현재 코드가 왜 이렇게 작성됐는지 추정한다.
    - `Thread.sleep`, `wait`, scheduler 주기, 외부 API rate limit, TODO 주석은 의도적 제약일 수 있으므로 바로 제거/수정 대상으로 단정하지 않는다.
    - 벤치마크나 부하 테스트 없이 동접 가능 여부, 퍼센트 개선율, 정책 값, 외부 시트 내용을 단정하지 않는다.
    - 근거가 부족하면 "확인 필요"와 필요한 측정 조건을 적는다.
 
-5. **결론과 다음 단계 정리**
+6. **결론과 다음 단계 정리**
    - 분석-only 요청이면 수정하지 않고 findings, 확인 지표, 추천 후속 작업만 보고한다.
    - 버그 가능성이 확인되면 `allcll-bug-fix` 후속으로 현재/기대 동작, 재현 조건, 검증 방향을 제안한다.
    - 동작 보존 정리 후보가 확인되면 `allcll-refactoring` 후속으로 범위, baseline/recheck 테스트, 보존해야 할 동작을 제안한다.
+
+## 완료 조건과 실패 시 행동
+
+완료로 보고하려면 아래를 만족해야 한다.
+
+- 요청이 analysis primary인지, 다른 skill primary인지, 또는 ask-user/stop인지 판단했다.
+- 필요한 reference만 읽었고, 읽은 reference의 핵심 축을 다뤘거나 제외 이유를 적었다.
+- 주요 finding마다 위치, 근거, 시나리오, 의도 추정, 수정 전 확인 사항이 있다.
+- analysis-only 요청에서 새 diff를 만들지 않았다.
+- 근거 없는 수치, 동접 가능 여부, 정책 값, 외부 서비스 동작을 단정하지 않았다.
+- 다음 단계가 bug-fix/refactoring/testing/ask-user 중 무엇인지와 그 이유를 적었다.
+
+아래 상황에서는 결론을 축소하거나 멈춘다.
+
+- 증거가 부족하면 "가능성"과 "확인 필요"로 남기고 수정 제안만 확정하지 않는다.
+- 민감 파일을 읽어야만 판단할 수 있으면 파일을 열지 말고 필요한 redacted evidence를 요청한다.
+- 큰 도메인/정책/외부 mock 결정이 필요하면 설계 질문으로 멈춘다.
+- subagent 요약이 근거를 생략했으면 직접 핵심 파일/라인을 확인하기 전 finding으로 채택하지 않는다.
 
 ## 서브 에이전트 사용 시 주의
 
