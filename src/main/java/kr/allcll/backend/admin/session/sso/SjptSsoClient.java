@@ -69,13 +69,13 @@ public class SjptSsoClient {
         String jSessionId = extractSessionId(cookieManager);
 
         SjptUserInfoResponse userInfo = SjptUserInfoResponse.from(
-            call(client, withAddParam(INIT_USER_INFO_URL, SjptRunContext.empty()), "",
-                SJPT_BASE_URL, "mf___subMainUserInfoInit")
+            verifyAuthenticated(call(client, withAddParam(INIT_USER_INFO_URL, SjptRunContext.empty()), "",
+                SJPT_BASE_URL, "mf___subMainUserInfoInit"))
         );
 
         SjptRunContext session = SjptRunContext.of(userInfo);
-        call(client, withAddParam(LIST_MENU_URL, session), MENU_REQUEST_BODY,
-            SJPT_BASE_URL, "mf_subUserMenuListLeft");
+        verifyAuthenticated(call(client, withAddParam(LIST_MENU_URL, session), MENU_REQUEST_BODY,
+            SJPT_BASE_URL, "mf_subUserMenuListLeft"));
 
         for (SjptCrawlerProgram program : SjptCrawlerProgram.values()) {
             registerProgramRole(client, session, program);
@@ -102,7 +102,21 @@ public class SjptSsoClient {
         SjptRunContext context = session.forProgram(program.getProgramKey(), program.isForceLogin());
         String body = call(client, withAddParam(INIT_USER_ROLE_URL, context), context.toJson(), SJPT_BASE_URL,
             "mf_tabMainCon_contents_" + program.getProgramKey() + "_body___subMainRoleInit");
-        SjptUserRoleResponse.from(body).validateRegisteredFor(program.getProgramKey());
+        SjptUserRoleResponse.from(verifyAuthenticated(body)).validateRegisteredFor(program.getProgramKey());
+    }
+
+    /**
+     * 잘못된 학번이나 비밀번호로도 포털과 수강신청 시스템은 200 과 세션 쿠키를 돌려준다. 인증되지 않았다는 사실은 이후 요청의 오류 봉투에서만 드러나므로 여기서 걸러낸다.
+     */
+    private String verifyAuthenticated(String responseBody) {
+        SjptSubmitError.find(responseBody).ifPresent(error -> {
+            if (error.isNotAuthenticated()) {
+                throw new AllcllException(AllcllErrorCode.SEJONG_LOGIN_FAIL);
+            }
+            log.warn("수강신청 시스템이 요청을 거절했습니다: type={}, message={}", error.errorType(), error.message());
+            throw new AllcllException(AllcllErrorCode.SSO_SESSION_ESTABLISH_FAIL);
+        });
+        return responseBody;
     }
 
     private String call(OkHttpClient client, String url, String body, String referer, String submissionId) {
