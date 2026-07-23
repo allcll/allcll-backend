@@ -1,5 +1,6 @@
 package kr.allcll.backend.admin.operationperiod;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -9,10 +10,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import kr.allcll.backend.admin.AdminAuthFilter;
 import kr.allcll.backend.admin.AdminRequestValidator;
 import kr.allcll.backend.admin.operationperiod.dto.OperationPeriodRequest;
 import kr.allcll.backend.domain.operationperiod.OperationType;
 import kr.allcll.backend.support.semester.Semester;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +23,16 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 @WebMvcTest(AdminOperationPeriodApi.class)
 class AdminOperationOperationPeriodApiTest {
 
-    @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private WebApplicationContext context;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -35,6 +42,13 @@ class AdminOperationOperationPeriodApiTest {
 
     @MockitoBean
     private AdminRequestValidator validator;
+
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(context)
+            .addFilters(new AdminAuthFilter(validator))
+            .build();
+    }
 
     @Test
     @DisplayName("운영 기간을 저장한다.")
@@ -47,9 +61,9 @@ class AdminOperationOperationPeriodApiTest {
             "2025-1학기 수강신청 기간"
         );
 
-        when(validator.isRateLimited(org.mockito.ArgumentMatchers.any(HttpServletRequest.class)))
+        when(validator.isRateLimited(any(HttpServletRequest.class)))
             .thenReturn(false);
-        when(validator.isUnauthorized(org.mockito.ArgumentMatchers.any(HttpServletRequest.class)))
+        when(validator.isUnauthorized(any(HttpServletRequest.class)))
             .thenReturn(false);
         doNothing().when(operationPeriodService)
             .saveOperationPeriod(Semester.SPRING_25, request);
@@ -73,9 +87,9 @@ class AdminOperationOperationPeriodApiTest {
             "2025-1학기 수강신청 기간"
         );
 
-        when(validator.isRateLimited(org.mockito.ArgumentMatchers.any(HttpServletRequest.class)))
+        when(validator.isRateLimited(any(HttpServletRequest.class)))
             .thenReturn(false);
-        when(validator.isUnauthorized(org.mockito.ArgumentMatchers.any(HttpServletRequest.class)))
+        when(validator.isUnauthorized(any(HttpServletRequest.class)))
             .thenReturn(true);
 
         // when, then
@@ -87,7 +101,7 @@ class AdminOperationOperationPeriodApiTest {
     }
 
     @Test
-    @DisplayName("요청 제한에 걸린 경우 401을 반환한다.")
+    @DisplayName("요청 제한에 걸린 경우 429을 반환한다.")
     void saveOperationPeriod_rateLimited() throws Exception {
         // given
         OperationPeriodRequest request = new OperationPeriodRequest(
@@ -97,9 +111,9 @@ class AdminOperationOperationPeriodApiTest {
             "2025-1학기 수강신청 기간"
         );
 
-        when(validator.isRateLimited(org.mockito.ArgumentMatchers.any(HttpServletRequest.class)))
+        when(validator.isRateLimited(any(HttpServletRequest.class)))
             .thenReturn(true);
-        when(validator.isUnauthorized(org.mockito.ArgumentMatchers.any(HttpServletRequest.class)))
+        when(validator.isUnauthorized(any(HttpServletRequest.class)))
             .thenReturn(false);
 
         // when, then
@@ -107,16 +121,16 @@ class AdminOperationOperationPeriodApiTest {
                 .param("semesterCode", "SPRING_25")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isTooManyRequests());
     }
 
     @Test
     @DisplayName("운영 기간을 삭제한다.")
     void deleteOperationPeriod() throws Exception {
         // given
-        when(validator.isRateLimited(org.mockito.ArgumentMatchers.any(HttpServletRequest.class)))
+        when(validator.isRateLimited(any(HttpServletRequest.class)))
             .thenReturn(false);
-        when(validator.isUnauthorized(org.mockito.ArgumentMatchers.any(HttpServletRequest.class)))
+        when(validator.isUnauthorized(any(HttpServletRequest.class)))
             .thenReturn(false);
         doNothing().when(operationPeriodService)
             .deleteOperationPeriod(Semester.SPRING_25, OperationType.TIMETABLE);
@@ -132,9 +146,9 @@ class AdminOperationOperationPeriodApiTest {
     @DisplayName("삭제 시 인증되지 않은 요청은 401을 반환한다.")
     void deleteOperationPeriod_unauthorized() throws Exception {
         // given
-        when(validator.isRateLimited(org.mockito.ArgumentMatchers.any(HttpServletRequest.class)))
+        when(validator.isRateLimited(any(HttpServletRequest.class)))
             .thenReturn(false);
-        when(validator.isUnauthorized(org.mockito.ArgumentMatchers.any(HttpServletRequest.class)))
+        when(validator.isUnauthorized(any(HttpServletRequest.class)))
             .thenReturn(true);
 
         // when, then
@@ -145,18 +159,18 @@ class AdminOperationOperationPeriodApiTest {
     }
 
     @Test
-    @DisplayName("삭제 시 요청 제한에 걸린 경우 401을 반환한다.")
+    @DisplayName("삭제 시 요청 제한에 걸린 경우 429을 반환한다.")
     void deleteOperationPeriod_rateLimited() throws Exception {
         // given
-        when(validator.isRateLimited(org.mockito.ArgumentMatchers.any(HttpServletRequest.class)))
+        when(validator.isRateLimited(any(HttpServletRequest.class)))
             .thenReturn(true);
-        when(validator.isUnauthorized(org.mockito.ArgumentMatchers.any(HttpServletRequest.class)))
+        when(validator.isUnauthorized(any(HttpServletRequest.class)))
             .thenReturn(false);
 
         // when, then
         mockMvc.perform(delete("/api/admin/operation-period")
                 .param("semesterCode", "SPRING_25")
                 .param("operationType", "TIMETABLE"))
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isTooManyRequests());
     }
 }
