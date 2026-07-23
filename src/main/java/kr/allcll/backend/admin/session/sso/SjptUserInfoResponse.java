@@ -12,9 +12,9 @@ import kr.allcll.crawler.credential.Credential;
  * <p>
  * 응답은 데이터셋별로 나뉘어 있고, 필요한 값 셋이 서로 다른 데이터셋에 흩어져 있다.
  * <pre>
- * dm_UserInfo.INTG_USR_NO    -&gt; tokenU (_runIntgUsrNo)
- * dm_UserInfo.RUNNING_SEJONG -&gt; tokenR (_runningSejong)
- * dm_UserInfoGam.LOGIN_DT    -&gt; tokenL (_runPgLoginDt)
+ * dm_UserInfo.INTG_USR_NO          tokenU (_runIntgUsrNo)
+ * dm_UserInfo.RUNNING_SEJONG       tokenR (_runningSejong)
+ * dm_UserInfoGam.LOGIN_DT          tokenL (_runPgLoginDt)
  * </pre>
  * tokenJ(JSESSIONID) 는 이 응답이 아니라 doSsoLogin.do 의 쿠키에서 나온다.
  */

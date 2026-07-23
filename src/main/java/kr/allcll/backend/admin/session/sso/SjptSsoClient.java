@@ -7,7 +7,9 @@ import java.net.HttpCookie;
 import java.time.Duration;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
+import kr.allcll.backend.client.LoginProperties;
 import kr.allcll.crawler.credential.Credential;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.FormBody;
 import okhttp3.JavaNetCookieJar;
@@ -23,7 +25,7 @@ import org.springframework.stereotype.Component;
  * <p>
  * 브라우저가 수강신청 페이지에 진입할 때 서버 세션에 만들어 두는 상태를 코드로 재현한다. 순서를 지켜야 하며, 특히 메뉴 로드는 권한 등록의 선행 조건이다.
  * <pre>
- * 포털 로그인 -&gt; doSsoLogin -&gt; initUserInfo -&gt; 메뉴 로드 -&gt; 프로그램별 권한 등록
+ * 포털 로그인 -> doSsoLogin -> initUserInfo -> 메뉴 로드 -> 프로그램별 권한 등록
  * </pre>
  * 성공 판정은 응답 값 객체에 맡긴다. 이 시스템은 실패해도 HTTP 200 과 HTML 을 돌려주고 성공 응답에도 "실패", "error" 문자열이 들어 있어, 상태 코드나 본문 문자열로는 판정할 수
  * 없다(실계정 캡처로 확인).
@@ -32,9 +34,9 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class SjptSsoClient {
 
-    private static final String PORTAL_LOGIN_URL = "https://portal.sejong.ac.kr/jsp/login/login_action.jsp";
     private static final String PORTAL_LOGIN_REFERER = "https://portal.sejong.ac.kr/jsp/login/loginSSL.jsp";
     private static final String PORTAL_REFERER = "https://portal.sejong.ac.kr/";
 
@@ -51,6 +53,8 @@ public class SjptSsoClient {
     private static final String MENU_REQUEST_BODY =
         "{\"dm_ReqLeftMenu\":{\"MENU_SYS_ID\":\"SELF_STUD\",\"SYSTEM_DIV\":\"SCH\",\"MENU_SYS_NM\":\"학부생학사정보\"}}";
     private static final Duration TIMEOUT = Duration.ofSeconds(10);
+
+    private final LoginProperties loginProperties;
 
     /**
      * 로그인부터 권한 등록까지 수행하고 크롤러가 쓸 인증 정보를 만든다. 비밀번호는 이 메서드 밖으로 나가지 않는다.
@@ -91,7 +95,7 @@ public class SjptSsoClient {
             .add("password", password)
             .build();
         Request request = new Request.Builder()
-            .url(PORTAL_LOGIN_URL)
+            .url(loginProperties.portalLoginUrl())
             .post(form)
             .header("Referer", PORTAL_LOGIN_REFERER)
             .build();
