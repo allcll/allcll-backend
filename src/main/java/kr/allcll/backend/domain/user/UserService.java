@@ -28,6 +28,11 @@ public class UserService {
             .orElseGet(() -> save(userInfo));
     }
 
+    public User getByStudentId(String studentId) {
+        return userRepository.findByStudentId(studentId)
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_INFO_FETCH_FAIL));
+    }
+
     private User save(UserInfo userInfo) {
         int admissionYear = extractAdmissionYear(userInfo.studentId());
         GraduationDepartmentInfo departmentInfo = departmentInfoRepository.findByAdmissionYearAndDeptNm(admissionYear,
