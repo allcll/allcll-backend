@@ -2,7 +2,7 @@ name: 올클 CI
 
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "feat/**", "fix/**", "refactor/**" ]
     paths:
       - 'src/**'
 
