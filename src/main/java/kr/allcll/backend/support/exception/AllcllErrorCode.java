@@ -57,6 +57,7 @@ public enum AllcllErrorCode {
     DUPLICATE_SCHEDULE(HttpStatus.CONFLICT, "이미 시간표에 등록된 일정입니다."),
     SEAT_CRAWLING_ALREADY_IN_PROGRESS(HttpStatus.CONFLICT, "이미 다른 계정으로 여석 크롤링이 진행중입니다."),
     SEAT_CRAWLING_IN_MULTIPLE_ACCOUNTS(HttpStatus.CONFLICT, "두 개 이상의 계정으로 여석 크롤링이 진행중입니다."),
+    SSO_REGISTRATION_IN_PROGRESS(HttpStatus.CONFLICT, "이미 인증 정보 등록이 진행중입니다. 완료 후 다시 시도해주세요."),
 
     //500
     SEMESTER_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "현재 학기 정보가 없습니다. 관리자에게 문의해주세요."),
@@ -70,6 +71,9 @@ public enum AllcllErrorCode {
     SEJONG_LOGIN_IO_ERROR(HttpStatus.BAD_GATEWAY, "세종포털 로그인 서버와 통신 중 오류가 발생했습니다."),
     TOSC_LOGIN_IO_ERROR(HttpStatus.BAD_GATEWAY, "TOSC 로그인 서버와 통신 중 오류가 발생했습니다."),
     USER_INFO_FETCH_IO_ERROR(HttpStatus.BAD_GATEWAY, "세종포털 사용자 정보 조회에 실패하였습니다."),
+    SSO_USER_INFO_PARSE_FAIL(HttpStatus.BAD_GATEWAY, "수강신청 시스템의 사용자 정보 응답을 해석하지 못했습니다."),
+    SSO_PROGRAM_ROLE_REGISTER_FAIL(HttpStatus.BAD_GATEWAY, "수강신청 시스템의 프로그램 권한 등록에 실패했습니다."),
+    SSO_SESSION_ESTABLISH_FAIL(HttpStatus.BAD_GATEWAY, "수강신청 시스템 세션 수립에 실패했습니다."),
     ENGLISH_INFO_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "영어 인증 정보를 불러오지 못했습니다."),
     CODING_INFO_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "코딩 인증 정보를 불러오지 못했습니다."),
     CLASSIC_INFO_FETCH_FAIL(HttpStatus.BAD_GATEWAY, "고전독서 인증 정보를 불러오지 못했습니다."),
