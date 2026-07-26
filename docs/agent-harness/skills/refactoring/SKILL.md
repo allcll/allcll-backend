@@ -99,4 +99,4 @@ SSE 직렬화 리팩토링 → Spring 내부 동작 발견 → 전략 전환 →
 - **공통**: without_skill 은 자가 보고 4·5 항목 누락 빈번 → "해당 없음" 명시 강제
 - **eval-2 동률**: 단순 케이스 (사용자 힌트 풍부) 는 스킬 가치 적음 — 정상
 
-자세한 측정 결과: `docs/agent-harness/skills/refactoring-workspace/iteration-1/benchmark.json`
+자세한 iteration-1 benchmark artifact는 현재 저장소에 커밋되어 있지 않다. 새 측정은 `docs/agent-harness/benchmarks/artifact-policy.md`에 맞춰 재현 가능한 benchmark artifact로 남긴다.

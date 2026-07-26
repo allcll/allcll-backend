@@ -120,9 +120,37 @@ $refs
 EOF
 }
 
+check_skill_reference_links() {
+  local dir="$ROOT/docs/agent-harness/skills"
+
+  while IFS= read -r file; do
+    local rel="${file#$ROOT/}"
+    local refs
+    refs="$(grep -Eoh 'references/[^`[:space:])]+\.md' "$file" 2>/dev/null || true)"
+
+    if [ -z "$refs" ]; then
+      continue
+    fi
+
+    while IFS= read -r ref; do
+      [ -z "$ref" ] && continue
+      if [ -f "$(dirname "$file")/$ref" ]; then
+        pass "$rel reference exists: $ref"
+      else
+        fail "$rel reference missing: $ref"
+      fi
+    done <<EOF
+$refs
+EOF
+  done <<EOF
+$(find "$dir" -mindepth 2 -maxdepth 2 -name SKILL.md | sort)
+EOF
+}
+
 check_surface ".agents"
 check_surface ".claude"
 check_canonical_bodies
+check_skill_reference_links
 check_benchmark_references
 
 if [ "$FAILURES" -eq 0 ]; then

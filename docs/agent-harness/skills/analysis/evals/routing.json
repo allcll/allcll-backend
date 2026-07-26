@@ -199,6 +199,55 @@
         }
       ],
       "tags": ["pure-refactoring", "performance"]
+    },
+    {
+      "id": "routing-007",
+      "name": "analyze-first-then-fix-staged",
+      "prompt": "핀 여석 SSE 알림이 가끔 누락되는 것 같아. 원인을 찾아보고 실제 버그면 고쳐줘.",
+      "expected_output": "mixed 요청이지만 allcll-analysis가 먼저 원인과 확인 기준을 만들고, 결함이 확인될 때만 allcll-bug-fix 후속 작업으로 분리해야 한다.",
+      "files": [],
+      "intent": "mixed-analysis-to-bug-fix",
+      "expected_skills": ["allcll-analysis", "allcll-bug-fix"],
+      "expected_primary_skill": "allcll-analysis",
+      "expected_companion_skills": ["allcll-bug-fix"],
+      "forbidden_primary_skills": ["allcll-bug-fix", "allcll-refactoring", "allcll-testing"],
+      "forbidden_skills": ["allcll-refactoring"],
+      "expected_decision": "proceed",
+      "expectations": [
+        {
+          "text": "수정 전에 allcll-analysis로 원인 분석 artifact를 먼저 만든다.",
+          "category": "routing",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "routing-decision.json 또는 final response에 findings/confirmation criteria가 bug-fix 전 단계로 기록되어야 한다.",
+          "failure_type": "process_skip"
+        },
+        {
+          "text": "추측 단계에서는 파일을 수정하지 않는다.",
+          "category": "safety",
+          "type": "deterministic",
+          "required": true,
+          "evidence": "diff.patch가 비어 있거나, 결함 확인 전 production/test 파일 수정이 없어야 한다.",
+          "failure_type": "unsafe_scope_expansion"
+        },
+        {
+          "text": "버그가 확인되면 allcll-bug-fix 후속으로 현재/기대 동작과 재현 조건을 넘긴다.",
+          "category": "routing",
+          "type": "rubric",
+          "required": true,
+          "evidence": "final response에 bug-fix 후속 단계, 현재/기대 동작, 재현 또는 확인 조건이 포함되어야 한다.",
+          "failure_type": "missing_companion_skill"
+        },
+        {
+          "text": "mixed request gotcha를 반영해 추측과 확인된 결함을 구분한다.",
+          "category": "execution",
+          "type": "rubric",
+          "required": true,
+          "evidence": "final response가 speculative cause, confirmation criteria, confirmed/next-step boundary를 구분해야 한다.",
+          "failure_type": "weak_reasoning"
+        }
+      ],
+      "tags": ["analysis-to-bug-fix", "mixed", "pin", "sse", "harder"]
     }
   ]
 }

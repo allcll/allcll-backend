@@ -173,4 +173,4 @@ baseline 관찰: 이미 잘 됨 (HttpMessageNotReadable 처리 분리 보고).
 - **eval-3**: `*Update*Request` 6개 전수 grep 으로 비대칭 1개만임을 확정 → 전수 grep 의무로 박제
 - **공통**: without_skill 은 자가 보고 4·5 항목 누락 빈번 → "해당 없음" 명시 강제로 보강
 
-자세한 측정 결과: `docs/agent-harness/skills/bug-fix-workspace/iteration-1/benchmark.json`
+자세한 iteration-1 benchmark artifact는 현재 저장소에 커밋되어 있지 않다. 새 측정은 `docs/agent-harness/benchmarks/artifact-policy.md`에 맞춰 재현 가능한 benchmark artifact로 남긴다.
