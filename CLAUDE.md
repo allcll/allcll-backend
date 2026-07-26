@@ -34,6 +34,7 @@
 
 - `allcll-analysis` → `.claude/skills/analysis/SKILL.md` → `docs/agent-harness/skills/analysis/SKILL.md`
 - `allcll-bug-fix` → `.claude/skills/bug-fix/SKILL.md` → `docs/agent-harness/skills/bug-fix/SKILL.md`
+- `allcll-commit` → `.claude/skills/commit/SKILL.md` → `docs/agent-harness/skills/commit/SKILL.md`
 - `allcll-refactoring` → `.claude/skills/refactoring/SKILL.md` → `docs/agent-harness/skills/refactoring/SKILL.md`
 - `allcll-testing` → `.claude/skills/testing/SKILL.md` → `docs/agent-harness/skills/testing/SKILL.md`
 - `allcll-graduation-qa` → `.claude/skills/graduation-qa/SKILL.md` → `docs/agent-harness/skills/graduation-qa/SKILL.md`

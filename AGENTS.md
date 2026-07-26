@@ -32,6 +32,7 @@ Codex 는 Claude Code 의 slash command 시스템을 직접 실행하지 않는�
 
 - `allcll-analysis` → `.agents/skills/analysis/SKILL.md` → `docs/agent-harness/skills/analysis/SKILL.md`
 - `allcll-bug-fix` → `.agents/skills/bug-fix/SKILL.md` → `docs/agent-harness/skills/bug-fix/SKILL.md`
+- `allcll-commit` → `.agents/skills/commit/SKILL.md` → `docs/agent-harness/skills/commit/SKILL.md`
 - `allcll-refactoring` → `.agents/skills/refactoring/SKILL.md` → `docs/agent-harness/skills/refactoring/SKILL.md`
 - `allcll-testing` → `.agents/skills/testing/SKILL.md` → `docs/agent-harness/skills/testing/SKILL.md`
 
