@@ -1,9 +1,12 @@
 package kr.allcll.backend.domain.graduation.credit;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import kr.allcll.backend.domain.graduation.credit.dto.RequiredCourseResponse;
+import kr.allcll.backend.support.graduation.KeyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -15,7 +18,37 @@ public class RequiredCourseResolver {
 
     private static final String DEPRECATED = "DEPRECATED";
     private static final String WILD_CARD_DEPT_NM = "ALL";
+    private static final String WILD_CARD_DEPT_CD = "0";
     private final RequiredCourseRepository requiredCourseRepository;
+
+    public Map<CategoryType, List<RequiredCourseResponse>> resolveRequiredCourses(
+        Integer admissionYear,
+        String deptCd
+    ) {
+        return resolveRequiredCourses(requiredCourseRepository.findByAdmissionYearAndDepts(
+            admissionYear,
+            List.of(WILD_CARD_DEPT_CD, deptCd)
+        ));
+    }
+
+    private Map<CategoryType, List<RequiredCourseResponse>> resolveRequiredCourses(List<RequiredCourse> courses) {
+        Map<String, RequiredCourse> selectedByCourseKey = new LinkedHashMap<>();
+        for (RequiredCourse course : courses) {
+            String courseKey = KeyUtils.generate(course.getCategoryType(), course.getCuriNm());
+            if (WILD_CARD_DEPT_CD.equals(course.getDeptCd())) {
+                selectedByCourseKey.putIfAbsent(courseKey, course);
+                continue;
+            }
+            selectedByCourseKey.put(courseKey, course);
+        }
+
+        return selectedByCourseKey.values().stream()
+            .filter(RequiredCourse::getRequired)
+            .collect(Collectors.groupingBy(
+                RequiredCourse::getCategoryType,
+                Collectors.collectingAndThen(Collectors.toList(), this::resolveDeprecatedCourses)
+            ));
+    }
 
     public boolean findRequiredCourseInGroup(
         String departmentName,

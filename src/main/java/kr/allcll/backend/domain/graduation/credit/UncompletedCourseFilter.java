@@ -26,6 +26,13 @@ public class UncompletedCourseFilter {
             .toList();
     }
 
+    public List<RequiredCourseResponse> filterUncompletedRequiredCourses(
+        List<RequiredCourseResponse> requiredCourses,
+        List<CompletedCourse> earnedCourses
+    ) {
+        return filterCourses(requiredCourses, buildEarnedCuriNos(earnedCourses));
+    }
+
     private Set<String> buildEarnedCuriNos(List<CompletedCourse> earnedCourses) {
         Set<String> earnedCuriNos = earnedCourses.stream()
             .map(CompletedCourse::getCuriNo)
