@@ -36,6 +36,9 @@ allcll-backend (세종대 수강신청 도우미) 작업 시 가이드.
    가 분리** — push 만 켜고 끌 수 있음.
 
 별도 축: 졸업 요건은 `support/sheet` 가 Google Sheets 에서 정책 끌어와 `domain/graduation` 이 검사.
+정책 정본(수강편람 인용) 은 **별도 레포 `allcll-graduation-wiki`** (타입 2). 시트↔편람 drift 발견 시
+`graduation-wiki@v<tag> reports/audits/*.md` 참조. 코드 특수 케이스 카탈로그는
+`docs/agent-harness/knowledge/graduation/edge-cases.md` (EC-001~), 두 레포는 태그 박힌 포인터로만 연결 (서브모듈 X).
 
 ## 패키지 경계 (네이밍과 책임 주의)
 

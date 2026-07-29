@@ -17,7 +17,7 @@ public enum CategoryType { // 이수구분
     GENERAL(List.of("교양")),                             // 교양
     MAJOR_REQUIRED(List.of("전필", "복필")),                   // 전공필수
     MAJOR_ELECTIVE(List.of("전선", "복선")),                   // 전공선택
-    MAJOR_BASIC(List.of("전기")),                         // 전공기초
+    MAJOR_BASIC(List.of("전기", "복기")),                  // 전공기초
     TOTAL_COMPLETION(List.of());                             // 전체 이수
 
 
