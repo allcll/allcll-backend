@@ -87,6 +87,13 @@ jobs:
       - name: Test with Gradle Wrapper
         run: ./gradlew build
 
+      - name: Validate Observability Secrets
+        run: |
+          if [ -z "${GRAFANA_ADMIN_PASSWORD}" ]; then
+            echo "GRAFANA_ADMIN_PASSWORD secret is required."
+            exit 1
+          fi
+
       - name: Copy JAR to Local
         run: |
           mkdir -p ${{ secrets.APP_DIR }}
@@ -119,11 +126,6 @@ jobs:
 
       - name: Deploy Observability
         run: |
-          if [ -z "${GRAFANA_ADMIN_PASSWORD}" ]; then
-            echo "GRAFANA_ADMIN_PASSWORD secret is required."
-            exit 1
-          fi
-
           mkdir -p ${{ secrets.APP_DIR }}/observability
           cp -R observability/. ${{ secrets.APP_DIR }}/observability/
           printf 'GRAFANA_ADMIN_PASSWORD=%s\n' "${GRAFANA_ADMIN_PASSWORD}" > ${{ secrets.APP_DIR }}/observability/.env
