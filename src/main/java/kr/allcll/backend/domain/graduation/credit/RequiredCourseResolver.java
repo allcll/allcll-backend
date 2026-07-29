@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import kr.allcll.backend.domain.graduation.credit.dto.RequiredCourseResponse;
 import kr.allcll.backend.support.graduation.KeyUtils;
@@ -48,6 +49,17 @@ public class RequiredCourseResolver {
                 RequiredCourse::getCategoryType,
                 Collectors.collectingAndThen(Collectors.toList(), this::resolveDeprecatedCourses)
             ));
+    }
+
+    public Map<String, CategoryType> buildCategoryByCuriNo(Integer admissionYear, String deptCd) {
+        Map<CategoryType, List<RequiredCourseResponse>> resolved = resolveRequiredCourses(admissionYear, deptCd);
+        Map<String, CategoryType> categoryByCuriNo = new HashMap<>();
+        for (Entry<CategoryType, List<RequiredCourseResponse>> entry : resolved.entrySet()) {
+            for (RequiredCourseResponse course : entry.getValue()) {
+                categoryByCuriNo.put(course.curiNo(), entry.getKey());
+            }
+        }
+        return categoryByCuriNo;
     }
 
     public boolean findRequiredCourseInGroup(

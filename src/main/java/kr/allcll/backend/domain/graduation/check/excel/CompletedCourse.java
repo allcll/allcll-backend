@@ -76,8 +76,7 @@ public class CompletedCourse extends BaseEntity {
         this.isEarned = isEarned;
     }
 
-    public CompletedCourse updateAcademicBasic() {
-        this.categoryType = CategoryType.ACADEMIC_BASIC;
-        return this;
+    public void reclassifyCategory(CategoryType categoryType) {
+        this.categoryType = categoryType;
     }
 }

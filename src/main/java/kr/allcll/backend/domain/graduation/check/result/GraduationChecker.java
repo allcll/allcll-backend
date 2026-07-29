@@ -17,6 +17,7 @@ import kr.allcll.backend.domain.graduation.credit.CreditCriterionRepository;
 import kr.allcll.backend.domain.graduation.credit.DoubleCreditCriterion;
 import kr.allcll.backend.domain.graduation.credit.DoubleCreditCriterionRepository;
 import kr.allcll.backend.domain.graduation.credit.GeneralElectivePolicy;
+import kr.allcll.backend.domain.graduation.credit.RequiredCourseResolver;
 import kr.allcll.backend.domain.user.User;
 import kr.allcll.backend.domain.user.UserRepository;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
@@ -31,6 +32,7 @@ public class GraduationChecker {
     private final CategoryCreditCalculator categoryCalculator;
     private final CertificationChecker certificationChecker;
     private final GeneralElectivePolicy generalElectivePolicy;
+    private final RequiredCourseResolver requiredCourseResolver;
 
     private final UserRepository userRepository;
     private final CreditCriterionRepository creditCriterionRepository;
@@ -45,6 +47,9 @@ public class GraduationChecker {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
         List<CreditCriterion> creditCriteria = resolveCreditCriteria(user);
+
+        // required_courses 시트 기준으로 이수구분 재분류
+        reclassifyByRequiredCourses(earnedCourses, user);
 
         // 이수구분별 학점 계산
         List<GraduationCategory> categoryResults = categoryCalculator.calculateCategoryResults(
@@ -214,6 +219,18 @@ public class GraduationChecker {
         return completedCourses.stream()
             .mapToDouble(CompletedCourse::getCredits)
             .sum();
+    }
+
+    private void reclassifyByRequiredCourses(List<CompletedCourse> earnedCourses, User user) {
+        Map<String, CategoryType> categoryByCuriNo = requiredCourseResolver.buildCategoryByCuriNo(
+            user.getAdmissionYear(), user.getDeptCd()
+        );
+        for (CompletedCourse course : earnedCourses) {
+            CategoryType sheetCategory = categoryByCuriNo.get(course.getCuriNo());
+            if (sheetCategory != null && sheetCategory != course.getCategoryType()) {
+                course.reclassifyCategory(sheetCategory);
+            }
+        }
     }
 
     private boolean canGraduate(
