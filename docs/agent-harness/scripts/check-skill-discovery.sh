@@ -126,7 +126,7 @@ check_skill_reference_links() {
   while IFS= read -r file; do
     local rel="${file#$ROOT/}"
     local refs
-    refs="$(grep -Eoh 'references/[^`[:space:])]+\.md' "$file" 2>/dev/null || true)"
+    refs="$(grep -Eoh '((\.\./)?(references|shared)/[^`[:space:])]+\.md)' "$file" 2>/dev/null | sort -u || true)"
 
     if [ -z "$refs" ]; then
       continue
