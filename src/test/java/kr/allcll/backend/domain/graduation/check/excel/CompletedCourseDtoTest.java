@@ -60,4 +60,36 @@ class CompletedCourseDtoTest {
         assertThat(entity.getCategoryType()).isEqualTo(CategoryType.ACADEMIC_BASIC);
         assertThat(entity.getMajorScope()).isEqualTo(MajorScope.SECONDARY);
     }
+
+    @Test
+    @DisplayName("이수구분 'ROTC' 과목은 엔티티 변환에 성공한다.")
+    void toEntity_rotcCourse() {
+        // given: B8 신고(23010678) 성적표 5행 — 2026-1학기 조직리더십(010655) ROTC
+        CompletedCourseDto dto = CompletedCourseDto.of(
+            "010655", "조직리더십", "ROTC", "", 3.0, "B+");
+
+        // when
+        CompletedCourse entity = dto.toEntity(1L, 2023);
+
+        // then
+        assertThat(entity.getCategoryType()).isEqualTo(CategoryType.ROTC);
+        assertThat(entity.getMajorScope()).isEqualTo(MajorScope.PRIMARY);
+        assertThat(entity.isEarned()).isTrue();
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 이수구분 과목은 ETC 로 fallback 되어 엔티티 변환에 성공한다.")
+    void toEntity_unknownCategoryFallsBackToEtc() {
+        // given: alias 미등록 이수구분 (예: 교직) — 업로드 전체 실패 대신 ETC 수용
+        CompletedCourseDto dto = CompletedCourseDto.of(
+            "999999", "교육학개론", "교직", "", 2.0, "A0");
+
+        // when
+        CompletedCourse entity = dto.toEntity(1L, 2023);
+
+        // then
+        assertThat(entity.getCategoryType()).isEqualTo(CategoryType.ETC);
+        assertThat(entity.getMajorScope()).isEqualTo(MajorScope.PRIMARY);
+        assertThat(entity.isEarned()).isTrue();
+    }
 }

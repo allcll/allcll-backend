@@ -1,10 +1,7 @@
 package kr.allcll.backend.domain.graduation.credit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import kr.allcll.backend.support.exception.AllcllErrorCode;
-import kr.allcll.backend.support.exception.AllcllException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,16 +10,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 class CategoryTypeTest {
 
     @Test
-    @DisplayName("정의된 이수구분과 매핑되지 않는 값이면 예외을 반환한다.")
+    @DisplayName("정의된 이수구분과 매핑되지 않는 값이면 업로드가 실패하지 않도록 ETC로 fallback 한다.")
     void fromRaw_whenUnknownCategoryTypeRaw() {
         // given
         String CategoryTypeRaw = "UNKNOWN";
         int admissionYear = 2025;
 
-        // when && then
-        assertThatThrownBy(() -> CategoryType.fromRaw(CategoryTypeRaw, admissionYear))
-            .isInstanceOf(AllcllException.class)
-            .hasMessage(AllcllErrorCode.CATEGORY_TYPE_NOT_FOUND.getMessage());
+        // when
+        CategoryType result = CategoryType.fromRaw(CategoryTypeRaw, admissionYear);
+
+        // then
+        assertThat(result).isEqualTo(CategoryType.ETC);
     }
 
     @Test
@@ -118,6 +116,17 @@ class CategoryTypeTest {
     }
 
     @Test
+    @DisplayName("ROTC 이수구분은 학번과 무관하게 ROTC 카테고리로 매핑된다.")
+    void fromRaw_whenRotc() {
+        // given
+        String CategoryTypeRaw = "ROTC";
+
+        // when && then
+        assertThat(CategoryType.fromRaw(CategoryTypeRaw, 2023)).isEqualTo(CategoryType.ROTC);
+        assertThat(CategoryType.fromRaw(CategoryTypeRaw, 2024)).isEqualTo(CategoryType.ROTC);
+    }
+
+    @Test
     @DisplayName("전필/전선만 전공 카테고리로 판단한다.")
     void isMajorCategory() {
         //when && then
@@ -129,6 +138,7 @@ class CategoryTypeTest {
         assertThat(CategoryType.BALANCE_REQUIRED.isMajorCategory()).isFalse();
         assertThat(CategoryType.GENERAL_ELECTIVE.isMajorCategory()).isFalse();
         assertThat(CategoryType.GENERAL.isMajorCategory()).isFalse();
+        assertThat(CategoryType.ROTC.isMajorCategory()).isFalse();
         assertThat(CategoryType.TOTAL_COMPLETION.isMajorCategory()).isFalse();
     }
 }

@@ -4,7 +4,7 @@
 
 EC 번호는 한 번 부여되면 폐기되어도 재사용 금지. 폐기된 케이스는 `상태: 폐기` 한 줄 추가.
 
-마지막 갱신: 2026-07-21 (EC-001·EC-002 복기 alias 추가 — 2026-07 QA B8 20011143 업로드 실패 건, graduation-wiki reports/qa/2026-07/triage.md B8 판정)
+마지막 갱신: 2026-07-29 (EC-002 ROTC alias + 미지 이수구분 ETC fallback 추가 — 2026-07 QA B8 23010678 업로드 실패 건, graduation-wiki reports/qa/2026-07/cases.csv B8)
 
 ---
 
@@ -31,8 +31,21 @@ EC 번호는 한 번 부여되면 폐기되어도 재사용 금지. 폐기된 �
 ## EC-002: CategoryType 별칭 매핑
 
 - **조건**: 시트·성적표 엑셀의 raw 문자열 → enum 변환
-- **별칭**: COMMON_REQUIRED (교필, 공필), MAJOR_REQUIRED (전필, 복필), MAJOR_ELECTIVE (전선, 복선), GENERAL_ELECTIVE (교선, 교선1, 교선2), ACADEMIC_BASIC (기교, 기필), MAJOR_BASIC (전기, 복기)
+- **별칭**: COMMON_REQUIRED (교필, 공필), MAJOR_REQUIRED (전필, 복필), MAJOR_ELECTIVE (전선, 복선), GENERAL_ELECTIVE (교선, 교선1, 교선2), ACADEMIC_BASIC (기교, 기필), MAJOR_BASIC (전기, 복기), ROTC (ROTC)
 - **함정**: 복필/복선/복기가 MAJOR_REQUIRED/MAJOR_ELECTIVE/MAJOR_BASIC 로 흡수 — 어느 전공의 필수인지는 categoryType만 봐서는 불명 (전공 구분은 CompletedCourse.majorScope 가 담당)
+- **ROTC (군사학)**: 학번 보정 없음, 카테고리 기준(CreditCriterion) 없음 → 전체 이수 학점(TOTAL)에만 합산.
+    - 정책 근거: 신고자(23010678) 학군단 안내 확인 — "수강신청 학점 제한 초과 신청 가능 + 졸업학점 포함(계절학기 포함) 인정".
+      전자는 수강편람 2026-1 "무관후보생교육(학군단) 수강신청학점제한 제외과목"(학사내규 제7조 제2항의 5) 조항과 교차 일치. 임관 조건 언급 없음 → 무조건 산입.
+    - 이력: 2026-03-05(47963a6f)까지 미지 이수구분은 `default -> null` 관용 처리(NULL 카테고리로 저장, TOTAL 만 산입) →
+      2026-03-06(c0059ce6) `CATEGORY_TYPE_NOT_FOUND` throw 로 변경되며 업로드 전체 실패 회귀. 복기(B8 20011143)·ROTC(B8 23010678) 신고가 같은 뿌리.
+      alias 추가 방식은 과거 NULL 동작을 명시적 타입으로 복원한 것.
+- **함정 (DDL 동반 필수)**: 운영 `completed_courses.category_type` 은 MySQL **ENUM 컬럼** — `CategoryType` 에 새 값을 추가하면
+  Flyway 마이그레이션(enum 값 추가)을 반드시 동반해야 한다. H2 테스트는 엔티티로 스키마를 재생성해 이 불일치를 못 잡는다
+  (2026-07-29 ROTC/ETC 추가 시 QA DB 리플레이로 발견 — V9 마이그레이션. DDL 없이 배포하면 업로드가 Data truncated 500 으로 실패).
+- **미지 이수구분 fallback (`ETC`)**: alias 에 없는 raw 값은 throw 하지 않고 `ETC` 로 저장 (2026-07-29, B8 재발 방지).
+    - 동작: 카테고리 기준 없음 → TOTAL 만 산입. `fromRaw` 가 WARN 로그("미지의 이수구분 ...")를 남긴다.
+    - **함정**: 새 raw 값이 실카테고리(전필 등)여야 하는 경우 조용히 오판됨(해당 카테고리 과소집계) — **WARN 로그를 보면 반드시 alias 추가 검토**.
+      로그→모니터링(Sentry) 연동 여부는 별도 확인 필요.
 - **검수 상태**: 코드 일치
 
 ## EC-003: DoubleCreditCriterion 3단계 fallback
