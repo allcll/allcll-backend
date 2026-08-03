@@ -4,10 +4,10 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
-import kr.allcll.backend.support.exception.AllcllErrorCode;
-import kr.allcll.backend.support.exception.AllcllException;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Getter
 public enum CategoryType { // 이수구분
     COMMON_REQUIRED(List.of("교필", "공필")),                  // 공통교양필수
@@ -17,7 +17,9 @@ public enum CategoryType { // 이수구분
     GENERAL(List.of("교양")),                             // 교양
     MAJOR_REQUIRED(List.of("전필", "복필")),                   // 전공필수
     MAJOR_ELECTIVE(List.of("전선", "복선")),                   // 전공선택
-    MAJOR_BASIC(List.of("전기")),                         // 전공기초
+    MAJOR_BASIC(List.of("전기", "복기")),                      // 전공기초
+    ROTC(List.of("ROTC")),                               // 군사학
+    ETC(List.of()),                                          // 존재하지 않는 이수구분
     TOTAL_COMPLETION(List.of());                             // 전체 이수
 
 
@@ -57,15 +59,21 @@ public enum CategoryType { // 이수구분
         CategoryType categoryType = Arrays.stream(values())
             .filter(type -> type.aliases.contains(stripped))
             .findFirst()
-            .orElseThrow(() -> new AllcllException(AllcllErrorCode.CATEGORY_TYPE_NOT_FOUND));
+            .orElseGet(() -> fallbackToEtc(stripped, admissionYear));
 
-        if (isMajorBasic(categoryType)) {
-            return normalizeMajorBasic(admissionYear);
+        if (isNotMajorBasic(categoryType)) {
+            return categoryType;
         }
-        if (isBalanceRequired(categoryType)) {
-            return normalizeBalanceRequired(admissionYear);
-        }
-        return categoryType;
+        return normalizeMajorBasic(admissionYear);
+    }
+
+    private static CategoryType fallbackToEtc(String categoryTypeRaw, int admissionYear) {
+        log.error("존재하지 않는 이수구분 '{}', 학번 {} - CategoryType alias 추가 검토 필요", categoryTypeRaw, admissionYear);
+        return ETC;
+    }
+
+    private static boolean isNotMajorBasic(CategoryType categoryType) {
+        return !isMajorBasic(categoryType);
     }
 
     private static boolean isMajorBasic(CategoryType categoryType) {

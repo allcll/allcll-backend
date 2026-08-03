@@ -35,3 +35,10 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# QA 검증 도구 산출물 — 사용자 성적(개인정보) 포함, 커밋 금지
+qa-cases/
+qa-snapshots/
+
+# QA 운영 DB 접속 정보 (크레덴셜 — 커밋 금지)
+.env.qa

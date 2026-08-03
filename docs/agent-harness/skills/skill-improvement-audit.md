@@ -471,6 +471,27 @@ Phase 2A created the evaluation foundation documents and static audit script:
 - `docs/agent-harness/benchmarks/artifact-policy.md`
 - `docs/agent-harness/scripts/check-skill-discovery.sh`
 
+## Phase 3B Direction
+
+Phase 3A smoke proved non-regression but not measured improvement: baseline and candidate both passed 6/6 safety-constrained manual cases. Phase 3B therefore should not add more general checklist text to `SKILL.md`; it should make hard cases harder and add selective procedural depth where the model is likely to skip evidence.
+
+Compared strategies:
+
+- Single `allcll-analysis` with a stronger body: simple, but likely to become a long checklist that agents skim or over-apply.
+- Single wrapper plus domain references: preserves trigger stability while adding deeper rubrics only when performance, security, RCA/review, or architecture analysis actually needs them.
+- Split into `performance-analysis`, `security-analysis`, `code-review-analysis`, `architecture-analysis`, and `root-cause-analysis`: clearer specialization, but current trigger/eval infrastructure is not strong enough to avoid duplicate or missed triggers.
+
+Chosen approach: keep one discoverable `allcll-analysis` skill and add one-level references under `docs/agent-harness/skills/analysis/references/`. This follows progressive disclosure, keeps wrapper descriptions as the trigger surface, and lets evals verify reference-backed behaviors without multiplying skill names.
+
+Expected improvement:
+
+- analysis-only requests remain no-edit by default.
+- mixed "analyze then fix" requests produce a finding artifact before companion skill handoff.
+- performance analysis has required CPU/thread/I/O/N+1/domain axes and measurement guardrails.
+- security analysis can review exposure paths without reading secret files.
+- PR review/RCA outputs require location, severity, scenario, intent inference, pre-fix checks, and candidate-cause comparison.
+- architecture analysis maps data ownership and stop/ask boundaries before large domain changes.
+
 ## Risks And Deferred Items
 
 - Current session proves the common bodies are readable, but not that fresh-session automatic trigger works from every cwd.
