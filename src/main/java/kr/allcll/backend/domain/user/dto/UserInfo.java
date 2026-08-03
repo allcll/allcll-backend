@@ -10,6 +10,7 @@ public record UserInfo(
 ) {
 
     private static final String FILM_ART_DEPARTMENT = "영화예술학과";
+    private static final String PAINTING_DEPARTMENT = "회화과";
 
     public UserInfo {
         deptNm = normalizeDeptNm(deptNm);
@@ -26,6 +27,9 @@ public record UserInfo(
     private static String normalizeDeptNm(String deptNm) {
         if ("연기예술".equals(deptNm) || "연출제작".equals(deptNm)) {
             return FILM_ART_DEPARTMENT;
+        }
+        if ("서양화".equals(deptNm) || "한국화".equals(deptNm)) {
+            return PAINTING_DEPARTMENT;
         }
         return deptNm;
     }

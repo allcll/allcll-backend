@@ -24,6 +24,21 @@ class UserInfoTest {
         assertThat(userInfo.deptNm()).isEqualTo("영화예술학과");
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"서양화", "한국화"})
+    @DisplayName("회화과의 세부 전공명은 회화과로 정규화한다.")
+    void normalizePaintingDepartment(String deptNm) {
+        // given
+        String studentId = "22012731";
+        String name = "홍길동";
+
+        // when
+        UserInfo userInfo = UserInfo.of(studentId, name, deptNm);
+
+        // then
+        assertThat(userInfo.deptNm()).isEqualTo("회화과");
+    }
+
     @Test
     @DisplayName("일반 학과명은 변경하지 않는다.")
     void preserveDepartmentName() {
