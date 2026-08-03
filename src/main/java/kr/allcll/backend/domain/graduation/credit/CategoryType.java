@@ -30,6 +30,7 @@ public enum CategoryType { // 이수구분
     }
 
     private static final int MAJOR_BASIC_INTRODUCED_ADMISSION_YEAR = 2024;
+    private static final int BALANCE_REQUIRED_INTRODUCED_ADMISSION_YEAR = 2022;
     private static final Set<CategoryType> MAJOR_CATEGORIES = EnumSet.of(
         MAJOR_REQUIRED,
         MAJOR_ELECTIVE
@@ -79,14 +80,21 @@ public enum CategoryType { // 이수구분
         return MAJOR_BASIC.equals(categoryType);
     }
 
+    private static boolean isBalanceRequired(CategoryType categoryType) {
+        return BALANCE_REQUIRED.equals(categoryType);
+    }
+
     private static CategoryType normalizeMajorBasic(int admissionYear) {
-        if (shouldConvertMajorBasicAsAcademicBasic(admissionYear)) {
+        if (admissionYear < MAJOR_BASIC_INTRODUCED_ADMISSION_YEAR) {
             return ACADEMIC_BASIC;
         }
         return MAJOR_BASIC;
     }
 
-    private static boolean shouldConvertMajorBasicAsAcademicBasic(int admissionYear) {
-        return admissionYear < MAJOR_BASIC_INTRODUCED_ADMISSION_YEAR;
+    private static CategoryType normalizeBalanceRequired(int admissionYear) {
+        if (admissionYear < BALANCE_REQUIRED_INTRODUCED_ADMISSION_YEAR) {
+            return GENERAL_ELECTIVE;
+        }
+        return BALANCE_REQUIRED;
     }
 }
