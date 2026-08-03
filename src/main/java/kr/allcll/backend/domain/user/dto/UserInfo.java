@@ -11,6 +11,9 @@ public record UserInfo(
 
     private static final String FILM_ART_DEPARTMENT = "영화예술학과";
     private static final String PAINTING_DEPARTMENT = "회화과";
+    private static final String MUSIC_DEPARTMENT = "음악과";
+    private static final String PHYSICAL_EDUCATION_DEPARTMENT = "체육학과";
+    private static final String DANCE_DEPARTMENT = "무용과";
 
     public UserInfo {
         deptNm = normalizeDeptNm(deptNm);
@@ -25,12 +28,18 @@ public record UserInfo(
     }
 
     private static String normalizeDeptNm(String deptNm) {
-        if ("연기예술".equals(deptNm) || "연출제작".equals(deptNm)) {
-            return FILM_ART_DEPARTMENT;
+        if (deptNm == null) {
+            return null;
         }
-        if ("서양화".equals(deptNm) || "한국화".equals(deptNm)) {
-            return PAINTING_DEPARTMENT;
-        }
-        return deptNm;
+        return switch (deptNm) {
+            case "연기예술", "연출제작" -> FILM_ART_DEPARTMENT;
+            case "서양화", "한국화" -> PAINTING_DEPARTMENT;
+            case "성악", "피아노", "플루트", "클라리넷", "바이올린", "비올라", "첼로" ->
+                MUSIC_DEPARTMENT;
+            case "골프", "태권도", "축구", "리듬체조", "에어로빅체조", "사격", "수영", "양궁" ->
+                PHYSICAL_EDUCATION_DEPARTMENT;
+            case "발레", "한국무용", "현대무용" -> DANCE_DEPARTMENT;
+            default -> deptNm;
+        };
     }
 }
