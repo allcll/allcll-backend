@@ -64,7 +64,7 @@ public class UserFetcher {
             switch (label) {
                 case "학번" -> studentId = value;
                 case "이름" -> name = value;
-                case "학과명" -> dept = value;
+                case "학과명" -> dept = value.replaceAll("\\s+", "");
             }
         }
 
