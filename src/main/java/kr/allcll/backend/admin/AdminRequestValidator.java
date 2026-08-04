@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.GetMapping;
-
 @Component
 public class AdminRequestValidator {
 
@@ -21,7 +19,17 @@ public class AdminRequestValidator {
 
     public boolean isUnauthorized(HttpServletRequest request) {
         String token = request.getHeader(AUTH_HEADER);
-        return !adminToken.equals(token);
+        return !isTokenEqual(token);
+    }
+
+    private boolean isTokenEqual(String token) {
+        if (token == null) {
+            return false;
+        }
+        return java.security.MessageDigest.isEqual(
+            token.getBytes(java.nio.charset.StandardCharsets.UTF_8),
+            adminToken.getBytes(java.nio.charset.StandardCharsets.UTF_8)
+        );
     }
 
     public boolean isRateLimited(HttpServletRequest request) {

@@ -9,9 +9,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
+import kr.allcll.backend.admin.AdminAuthFilter;
 import kr.allcll.backend.admin.AdminRequestValidator;
 import kr.allcll.backend.admin.session.dto.SetCredentialRequest;
 import kr.allcll.crawler.credential.Credentials;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +21,16 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 @WebMvcTest(AdminSessionApi.class)
 class AdminSessionApiTest {
 
-    @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private WebApplicationContext context;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -37,6 +43,13 @@ class AdminSessionApiTest {
 
     @MockitoBean
     private Credentials credentials;
+
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(context)
+            .addFilters(new AdminAuthFilter(validator))
+            .build();
+    }
 
     @Test
     @DisplayName("정상 요청은 자격 증명을 저장하고 200을 반환한다.")

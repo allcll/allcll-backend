@@ -1,7 +1,5 @@
 package kr.allcll.backend.admin.seat;
 
-import jakarta.servlet.http.HttpServletRequest;
-import kr.allcll.backend.admin.AdminRequestValidator;
 import kr.allcll.backend.admin.seat.dto.SeatStatusResponse;
 import kr.allcll.backend.support.batch.BatchService;
 import lombok.RequiredArgsConstructor;
@@ -18,15 +16,9 @@ public class AdminSeatApi {
     private final AdminSeatService adminSeatService;
     private final BatchService batchService;
     private final TargetSubjectService targetSubjectService;
-    private final AdminRequestValidator validator;
 
     @PostMapping("/api/admin/seat/start")
-    public ResponseEntity<Void> getSeatPeriodically(HttpServletRequest request,
-        @RequestParam(required = false) String userId) {
-        if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
-            return ResponseEntity.status(401).build();
-        }
-
+    public ResponseEntity<Void> getSeatPeriodically(@RequestParam(required = false) String userId) {
         targetSubjectService.loadGeneralSubjects();
         adminSeatService.getAllSeatPeriodically(userId);
 
@@ -34,12 +26,7 @@ public class AdminSeatApi {
     }
 
     @PostMapping("/api/admin/season-seat/start")
-    public ResponseEntity<Void> seasonSeatStart(HttpServletRequest request,
-        @RequestParam(required = false) String userId) {
-        if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
-            return ResponseEntity.status(401).build();
-        }
-
+    public ResponseEntity<Void> seasonSeatStart(@RequestParam(required = false) String userId) {
         targetSubjectService.loadAllSubjects();
         adminSeatService.getSeasonSeatPeriodically(userId);
 
@@ -47,19 +34,13 @@ public class AdminSeatApi {
     }
 
     @GetMapping("/api/admin/seat/check")
-    public ResponseEntity<SeatStatusResponse> getSeatStatus(HttpServletRequest request) {
-        if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
-            return ResponseEntity.status(401).build();
-        }
+    public ResponseEntity<SeatStatusResponse> getSeatStatus() {
         SeatStatusResponse seatStatusResponse = adminSeatService.getSeatCrawlerStatus();
         return ResponseEntity.ok(seatStatusResponse);
     }
 
     @PostMapping("/api/admin/seat/cancel")
-    public ResponseEntity<Void> cancelSeatScheduling(HttpServletRequest request) {
-        if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
-            return ResponseEntity.status(401).build();
-        }
+    public ResponseEntity<Void> cancelSeatScheduling() {
         adminSeatService.cancelSeatScheduling();
         batchService.flushAllBatch();
 
