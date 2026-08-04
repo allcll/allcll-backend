@@ -3,7 +3,6 @@ package kr.allcll.backend.domain.user;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.HttpCookie;
@@ -40,7 +39,7 @@ class ToscAuthServiceTest {
             "https://portal.sejong.ac.kr/englishInfo",
             "https://portal.sejong.ac.kr/codingInfo"
         );
-        toscAuthService = new ToscAuthService(properties, new ObjectMapper());
+        toscAuthService = new ToscAuthService(properties);
         portalCookieManager = new CookieManager();
         portalCookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
     }
@@ -51,8 +50,8 @@ class ToscAuthServiceTest {
     }
 
     @Test
-    @DisplayName("TOSC 로그인 실패 시에도 포털 세션 쿠키에 영향을 주지 않는다")
-    void toscLoginFailureDoesNotAffectPortalCookieJar() {
+    @DisplayName("TOSC HTTP 실패 시 예외를 던지고 포털 세션 쿠키에 영향을 주지 않는다")
+    void toscHttpFailureThrowsExceptionAndDoesNotAffectPortalCookieJar() {
         // given
         URI portalUri = URI.create("https://portal.sejong.ac.kr");
         HttpCookie sessionCookie = new HttpCookie("JSESSIONID", "portal-session-abc123");
@@ -65,12 +64,10 @@ class ToscAuthServiceTest {
         );
 
         toscServer.enqueue(new MockResponse()
-            .setResponseCode(200)
-            .addHeader("Set-Cookie", "TOSC_SESSION=tosc-session-xyz; Path=/; Domain=localhost")
-            .setBody("{\"success\": false, \"errors\": {\"password\": \"패스워드가 일치하지 않습니다.\"}}")
+            .setResponseCode(500)
         );
 
-        LoginRequest loginRequest = new LoginRequest("22011114", "wrong-password");
+        LoginRequest loginRequest = new LoginRequest("22011114", "correct-password");
 
         // when
         assertThatThrownBy(() -> toscAuthService.loginTosc(loginRequest))
