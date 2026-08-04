@@ -59,6 +59,9 @@ public class AuthService {
     }
 
     private boolean isSuccessful(Response response) throws IOException {
+        if (!response.isSuccessful()) {
+            return false;
+        }
         // 세종대 포털은 로그인 실패에도 200을 반환하므로 응답 본문의 result 값으로 판단
         String responseBody = response.body() != null ? response.body().string() : "";
         return responseBody.contains(RESULT_OK);
