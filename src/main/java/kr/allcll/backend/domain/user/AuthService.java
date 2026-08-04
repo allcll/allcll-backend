@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
 
+    public static final String RESULT_OK = "var result = 'OK'";
     private final LoginProperties properties;
 
     public OkHttpClient login(LoginRequest loginRequest) {
@@ -47,7 +48,7 @@ public class AuthService {
                 .build();
 
             try (Response response = client.newCall(request).execute()) {
-                if (!response.isSuccessful()) {
+                if (!isSuccessful(response)) {
                     throw new AllcllException(AllcllErrorCode.SEJONG_LOGIN_FAIL);
                 }
                 return client;
@@ -55,5 +56,14 @@ public class AuthService {
         } catch (IOException exception) {
             throw new AllcllException(AllcllErrorCode.SEJONG_LOGIN_IO_ERROR, exception);
         }
+    }
+
+    private boolean isSuccessful(Response response) throws IOException {
+        if (!response.isSuccessful()) {
+            return false;
+        }
+        // 세종대 포털은 로그인 실패에도 200을 반환하므로 응답 본문의 result 값으로 판단
+        String responseBody = response.body() != null ? response.body().string() : "";
+        return responseBody.contains(RESULT_OK);
     }
 }

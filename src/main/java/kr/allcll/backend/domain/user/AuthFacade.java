@@ -6,8 +6,6 @@ import kr.allcll.backend.domain.graduation.check.cert.dto.GraduationCertInfo;
 import kr.allcll.backend.domain.user.dto.LoginRequest;
 import kr.allcll.backend.domain.user.dto.LoginResult;
 import kr.allcll.backend.domain.user.dto.UserInfo;
-import kr.allcll.backend.support.exception.AllcllErrorCode;
-import kr.allcll.backend.support.exception.AllcllException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
@@ -39,15 +37,8 @@ public class AuthFacade {
                 loginRequest.studentId(), exception.getMessage());
         }
 
-        User user;
-        try {
-            UserInfo userInfo = userFetcher.fetch(client);
-            user = userService.findOrCreate(userInfo);
-        } catch (Exception exception) {
-            log.error("[UserFetcher] 사용자 정보 조회 실패, 기존 유저 조회 시도 (학번: {}): {}",
-                loginRequest.studentId(), exception.getMessage());
-            user = userService.getByStudentId(loginRequest.studentId());
-        }
+        UserInfo userInfo = userFetcher.fetch(client);
+        User user = userService.findOrCreate(userInfo);
 
         try {
             GraduationCertInfo certInfo = graduationCertResolver.resolve(user, client);
