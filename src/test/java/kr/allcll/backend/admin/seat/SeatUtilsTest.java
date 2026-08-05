@@ -2,8 +2,10 @@ package kr.allcll.backend.admin.seat;
 
 import static kr.allcll.backend.fixture.CrawlerSeatFixture.createCrawlerSeatWithLimits;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.stream.Stream;
+import kr.allcll.backend.support.exception.AllcllException;
 import kr.allcll.crawler.seat.CrawlerSeat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,6 +40,18 @@ class SeatUtilsTest {
 
         // then
         assertThat(remainSeat).isZero();
+    }
+
+    @Test
+    @DisplayName("지원하지 않는 여석 계산 기준이면 예외가 발생한다.")
+    void getRemainSeatWithUnsupportedSeatUtilsType() {
+        // given
+        CrawlerSeat crawlerSeat = createCrawlerSeatWithLimits(50, 40, 30, 20, 60, 10);
+
+        // when & then
+        assertThatThrownBy(() -> SeatUtils.getRemainSeat(crawlerSeat, null))
+            .isInstanceOf(AllcllException.class)
+            .hasMessage("지원하지 않는 여석 계산 기준입니다.");
     }
 
     private static Stream<Arguments> seatLimitTypes() {
