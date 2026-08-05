@@ -6,6 +6,7 @@ import kr.allcll.backend.domain.user.dto.UserInfo;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -14,6 +15,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserFetcher {
@@ -29,12 +31,18 @@ public class UserFetcher {
 
             try (Response response = client.newCall(request).execute()) {
                 if (!response.isSuccessful()) {
+                    log.error("[UserFetcher] HTTP 실패 (상태 코드: {})", response.code());
                     throw new AllcllException(AllcllErrorCode.USER_INFO_FETCH_FAIL);
                 }
 
                 Document document = Jsoup.parse(response.body().string());
 
-                return parseUserInfo(document);
+                try {
+                    return parseUserInfo(document);
+                } catch (AllcllException exception) {
+                    log.error("[UserFetcher] 사용자 정보 파싱 실패 (페이지 title: {})", document.title());
+                    throw exception;
+                }
             }
         } catch (IOException exception) {
             throw new AllcllException(AllcllErrorCode.USER_INFO_FETCH_IO_ERROR);
@@ -56,12 +64,12 @@ public class UserFetcher {
             switch (label) {
                 case "학번" -> studentId = value;
                 case "이름" -> name = value;
-                case "학과명" -> dept = value;
+                case "학과명" -> dept = value.replaceAll("\\s+", "");
             }
         }
 
         if (studentId == null || name == null || dept == null) {
-            throw new AllcllException(AllcllErrorCode.USER_INFO_FETCH_FAIL);
+            throw new AllcllException(AllcllErrorCode.USER_INFO_FETCH_FAIL, "studentId: " + studentId + ", name: " + name + ", dept: " + dept);
         }
 
         return UserInfo.of(studentId, name, dept);

@@ -82,6 +82,7 @@ public enum AllcllErrorCode {
     /* ================= 시스템 / 인프라 에러 ================= */
     ASYNC_REQUEST_TIMEOUT(HttpStatus.INTERNAL_SERVER_ERROR, "요청 처리 중 시간이 초과되었습니다."),
     SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 에러가 발생하였습니다."),
+    UNSUPPORTED_SEAT_LIMIT_TYPE(HttpStatus.INTERNAL_SERVER_ERROR, "지원하지 않는 여석 계산 기준입니다."),
     ;
 
     private final HttpStatus httpStatus;

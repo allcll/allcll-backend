@@ -22,26 +22,29 @@ public class AdminSeatApi {
 
     @PostMapping("/api/admin/seat/start")
     public ResponseEntity<Void> getSeatPeriodically(HttpServletRequest request,
-        @RequestParam(required = false) String userId) {
+        @RequestParam(required = false) String userId,
+        @RequestParam SeatUtilsType seatUtilsType) {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
         }
 
         targetSubjectService.loadGeneralSubjects();
-        adminSeatService.getAllSeatPeriodically(userId);
+        adminSeatService.getAllSeatPeriodically(userId, seatUtilsType);
 
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/api/admin/season-seat/start")
     public ResponseEntity<Void> seasonSeatStart(HttpServletRequest request,
-        @RequestParam(required = false) String userId) {
+        @RequestParam(required = false) String userId,
+        @RequestParam SeatUtilsType seatUtilsType
+    ) {
         if (validator.isRateLimited(request) || validator.isUnauthorized(request)) {
             return ResponseEntity.status(401).build();
         }
 
         targetSubjectService.loadAllSubjects();
-        adminSeatService.getSeasonSeatPeriodically(userId);
+        adminSeatService.getSeasonSeatPeriodically(userId, seatUtilsType);
 
         return ResponseEntity.ok().build();
     }

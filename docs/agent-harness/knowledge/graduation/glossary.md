@@ -56,7 +56,9 @@ graduation 도메인의 모든 작업에서 참조할 단일 용어 사전. **�
 | `GENERAL` | 교양 | 교양 |
 | `MAJOR_REQUIRED` | 전공필수 | 전필, 복필 |
 | `MAJOR_ELECTIVE` | 전공선택 | 전선, 복선 |
-| `MAJOR_BASIC` | 전공기초 | 전기 |
+| `MAJOR_BASIC` | 전공기초 | 전기, 복기 |
+| `ROTC` | 군사학(학군사관) | ROTC |
+| `ETC` | 미지 이수구분 fallback | (별칭 없음 — 매핑 실패 시 수용용) |
 | `TOTAL_COMPLETION` | 전체 이수 | (별칭 없음, 합계용) |
 
 별칭은 시트·성적표 엑셀의 raw 문자열 → enum 변환 시 사용 (`CategoryType.fromRaw`).

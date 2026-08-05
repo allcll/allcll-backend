@@ -4,10 +4,10 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
-import kr.allcll.backend.support.exception.AllcllErrorCode;
-import kr.allcll.backend.support.exception.AllcllException;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Getter
 public enum CategoryType { // 이수구분
     COMMON_REQUIRED(List.of("교필", "공필")),                  // 공통교양필수
@@ -17,7 +17,9 @@ public enum CategoryType { // 이수구분
     GENERAL(List.of("교양")),                             // 교양
     MAJOR_REQUIRED(List.of("전필", "복필")),                   // 전공필수
     MAJOR_ELECTIVE(List.of("전선", "복선")),                   // 전공선택
-    MAJOR_BASIC(List.of("전기", "복기")),                  // 전공기초
+    MAJOR_BASIC(List.of("전기", "복기")),                      // 전공기초
+    ROTC(List.of("ROTC")),                               // 군사학
+    ETC(List.of()),                                          // 존재하지 않는 이수구분
     TOTAL_COMPLETION(List.of());                             // 전체 이수
 
 
@@ -28,6 +30,7 @@ public enum CategoryType { // 이수구분
     }
 
     private static final int MAJOR_BASIC_INTRODUCED_ADMISSION_YEAR = 2024;
+    private static final int BALANCE_REQUIRED_INTRODUCED_ADMISSION_YEAR = 2022;
     private static final Set<CategoryType> MAJOR_CATEGORIES = EnumSet.of(
         MAJOR_REQUIRED,
         MAJOR_ELECTIVE
@@ -56,12 +59,17 @@ public enum CategoryType { // 이수구분
         CategoryType categoryType = Arrays.stream(values())
             .filter(type -> type.aliases.contains(stripped))
             .findFirst()
-            .orElseThrow(() -> new AllcllException(AllcllErrorCode.CATEGORY_TYPE_NOT_FOUND));
+            .orElseGet(() -> fallbackToEtc(stripped, admissionYear));
 
         if (isNotMajorBasic(categoryType)) {
             return categoryType;
         }
         return normalizeMajorBasic(admissionYear);
+    }
+
+    private static CategoryType fallbackToEtc(String categoryTypeRaw, int admissionYear) {
+        log.error("존재하지 않는 이수구분 '{}', 학번 {} - CategoryType alias 추가 검토 필요", categoryTypeRaw, admissionYear);
+        return ETC;
     }
 
     private static boolean isNotMajorBasic(CategoryType categoryType) {
@@ -72,14 +80,21 @@ public enum CategoryType { // 이수구분
         return MAJOR_BASIC.equals(categoryType);
     }
 
+    private static boolean isBalanceRequired(CategoryType categoryType) {
+        return BALANCE_REQUIRED.equals(categoryType);
+    }
+
     private static CategoryType normalizeMajorBasic(int admissionYear) {
-        if (shouldConvertMajorBasicAsAcademicBasic(admissionYear)) {
+        if (admissionYear < MAJOR_BASIC_INTRODUCED_ADMISSION_YEAR) {
             return ACADEMIC_BASIC;
         }
         return MAJOR_BASIC;
     }
 
-    private static boolean shouldConvertMajorBasicAsAcademicBasic(int admissionYear) {
-        return admissionYear < MAJOR_BASIC_INTRODUCED_ADMISSION_YEAR;
+    private static CategoryType normalizeBalanceRequired(int admissionYear) {
+        if (admissionYear < BALANCE_REQUIRED_INTRODUCED_ADMISSION_YEAR) {
+            return GENERAL_ELECTIVE;
+        }
+        return BALANCE_REQUIRED;
     }
 }
