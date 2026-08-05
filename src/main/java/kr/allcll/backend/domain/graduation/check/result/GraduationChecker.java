@@ -227,10 +227,14 @@ public class GraduationChecker {
         );
         for (CompletedCourse course : earnedCourses) {
             CategoryType sheetCategory = categoryByCuriNo.get(course.getCuriNo());
-            if (sheetCategory != null && sheetCategory != course.getCategoryType()) {
+            if (hasDifferentCategory(course, sheetCategory)) {
                 course.reclassifyCategory(sheetCategory);
             }
         }
+    }
+
+    private boolean hasDifferentCategory(CompletedCourse course, CategoryType sheetCategory) {
+        return sheetCategory != null && sheetCategory != course.getCategoryType();
     }
 
     private boolean canGraduate(
