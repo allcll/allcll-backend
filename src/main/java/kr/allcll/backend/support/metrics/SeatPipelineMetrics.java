@@ -20,14 +20,25 @@ public class SeatPipelineMetrics {
     private static final String EVENT_TAG = "event";
 
     private final MeterRegistry meterRegistry;
+    private final AtomicLong seatCrawlerActive = new AtomicLong(0);
     private final AtomicLong lastCrawledAtMillis = new AtomicLong(0);
     private final Map<String, AtomicLong> schedulerLastSuccessEpochSeconds = new ConcurrentHashMap<>();
 
     public SeatPipelineMetrics(MeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;
+        Gauge.builder("seat.crawler.active", seatCrawlerActive, AtomicLong::get)
+            .register(meterRegistry);
         Gauge.builder("seat.last.crawled.age", lastCrawledAtMillis, this::getLastCrawledAgeSeconds)
             .baseUnit("seconds")
             .register(meterRegistry);
+    }
+
+    public void recordSeatCrawlerStarted() {
+        seatCrawlerActive.set(1);
+    }
+
+    public void recordSeatCrawlerStopped() {
+        seatCrawlerActive.set(0);
     }
 
     public void recordCrawlingSuccess(long epochMillis) {

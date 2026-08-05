@@ -52,16 +52,19 @@ public class AdminSeatService {
         Credential credential = credentials.findByUserId(userId);
         fetchPinSeat(credential);
         fetchGeneralSeat(credential);
+        seatPipelineMetrics.recordSeatCrawlerStarted();
     }
 
     public void getSeasonSeatPeriodically(String userId) {
         Credential credential = credentials.findByUserId(userId);
         fetchPinSeat(credential);
         fetchGeneralSeat(credential);
+        seatPipelineMetrics.recordSeatCrawlerStarted();
     }
 
     public void cancelSeatScheduling() {
         seatScheduler.cancelAll();
+        seatPipelineMetrics.recordSeatCrawlerStopped();
     }
 
     public SeatStatusResponse getSeatCrawlerStatus() {
