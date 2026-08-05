@@ -1,7 +1,6 @@
 package kr.allcll.backend.domain.graduation.credit;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,7 +32,7 @@ public class RequiredCourseResolver {
     }
 
     private Map<CategoryType, List<RequiredCourseResponse>> resolveRequiredCourses(List<RequiredCourse> courses) {
-        Map<String, RequiredCourse> selectedByCourseKey = new LinkedHashMap<>();
+        Map<String, RequiredCourse> selectedByCourseKey = new HashMap<>();
         for (RequiredCourse course : courses) {
             String courseKey = KeyUtils.generate(course.getCategoryType(), course.getCuriNm());
             if (WILD_CARD_DEPT_CD.equals(course.getDeptCd())) {
@@ -142,7 +141,8 @@ public class RequiredCourseResolver {
         if (isNotDeprecated(requiredCourse.getCuriNo())) {
             return RequiredCourseResponse.of(requiredCourse.getCuriNo(), requiredCourse.getCuriNm());
         }
-        return requiredCourseRepository.findCurrentCourseBySameCourseCode(requiredCourse.getSameCourseCode(), DEPRECATED)
+        return requiredCourseRepository.findCurrentCourseBySameCourseCode(requiredCourse.getSameCourseCode(),
+                DEPRECATED)
             .map(currentCourse -> RequiredCourseResponse.of(currentCourse.getCuriNo(), currentCourse.getCuriNm()))
             .orElseGet(() -> {
                 log.error(
