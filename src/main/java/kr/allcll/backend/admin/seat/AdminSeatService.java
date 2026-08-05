@@ -48,16 +48,16 @@ public class AdminSeatService {
     private final SubjectRepository subjectRepository;
     private final SeatPipelineMetrics seatPipelineMetrics;
 
-    public void getAllSeatPeriodically(String userId) {
+    public void getAllSeatPeriodically(String userId, SeatUtilsType seatUtilsType) {
         Credential credential = credentials.findByUserId(userId);
-        fetchPinSeat(credential);
-        fetchGeneralSeat(credential);
+        fetchPinSeat(credential, seatUtilsType);
+        fetchGeneralSeat(credential, seatUtilsType);
     }
 
-    public void getSeasonSeatPeriodically(String userId) {
+    public void getSeasonSeatPeriodically(String userId, SeatUtilsType seatUtilsType) {
         Credential credential = credentials.findByUserId(userId);
-        fetchPinSeat(credential);
-        fetchGeneralSeat(credential);
+        fetchPinSeat(credential, seatUtilsType);
+        fetchGeneralSeat(credential, seatUtilsType);
     }
 
     public void cancelSeatScheduling() {
@@ -77,73 +77,78 @@ public class AdminSeatService {
         return SeatStatusResponse.of(userIds.getFirst(), isActive);
     }
 
-    private void fetchPinSeat(Credential credential) {
+    private void fetchPinSeat(Credential credential, SeatUtilsType seatUtilsType) {
         int pinSubjectRequestPerSecondCount = sjptProperties.getPinSubjectRequestPerSecondCount();
         String prefixId = credential.makeUserIdPrefix();
         for (int i = 0; i < pinSubjectRequestPerSecondCount; i++) {
             seatScheduler.scheduleAtFixedRate(
                 prefixId + TokenProvider.create(),
-                () -> sendPinSubjectRequest(credential),
+                () -> sendPinSubjectRequest(credential, seatUtilsType),
                 Duration.ofSeconds(1)
             );
         }
     }
 
-    private void fetchGeneralSeat(Credential credential) {
+    private void fetchGeneralSeat(Credential credential, SeatUtilsType seatUtilsType) {
         int requestPerSecondCount = sjptProperties.getRequestPerSecondCount();
         int pinSubjectRequestPerSecondCount = sjptProperties.getPinSubjectRequestPerSecondCount();
         String prefixId = credential.makeUserIdPrefix();
         for (int i = 0; i < requestPerSecondCount - pinSubjectRequestPerSecondCount; i++) {
             seatScheduler.scheduleAtFixedRate(
                 prefixId + TokenProvider.create(),
-                () -> sendGeneralSubjectRequest(credential),
+                () -> sendGeneralSubjectRequest(credential, seatUtilsType),
                 Duration.ofSeconds(1)
             );
         }
     }
 
-    private void sendPinSubjectRequest(Credential credential) {
+    private void sendPinSubjectRequest(Credential credential, SeatUtilsType seatUtilsType) {
         CrawlerSubject crawlerSubject = targetSubjectStorage.getNextPinTarget();
         if (crawlerSubject == null) {
             return;
         }
-        crawlPinSeatAndBuffer(crawlerSubject, credential);
+        crawlPinSeatAndBuffer(crawlerSubject, credential, seatUtilsType);
     }
 
-    private void sendGeneralSubjectRequest(Credential credential) {
+    private void sendGeneralSubjectRequest(Credential credential, SeatUtilsType seatUtilsType) {
         CrawlerSubject crawlerSubject = targetSubjectStorage.getNextGeneralTarget();
-        crawlGeneralSeatAndBuffer(crawlerSubject, credential);
+        crawlGeneralSeatAndBuffer(crawlerSubject, credential, seatUtilsType);
     }
 
-    private void crawlPinSeatAndBuffer(CrawlerSubject pinSubject, Credential credential) {
+    private void crawlPinSeatAndBuffer(CrawlerSubject pinSubject, Credential credential, SeatUtilsType seatUtilsType) {
         try {
-            CrawlerSeat crawlerSeat = sendExternalSeatRequest(pinSubject, credential);
+            CrawlerSeat crawlerSeat = sendExternalSeatRequest(pinSubject, credential, seatUtilsType);
             recordCrawlingSuccess();
 
             batchService.savePinSeatBatch(crawlerSeat);
         } catch (CrawlerAllcllException e) {
             log.error(
                 "[핀 과목 여석] 외부 API 호출에 실패했습니다. 과목: "
-                    + pinSubject.getCuriNo() + "-"
-                    + pinSubject.getClassName());
+                + pinSubject.getCuriNo() + "-"
+                + pinSubject.getClassName());
         }
     }
 
-    private void crawlGeneralSeatAndBuffer(CrawlerSubject generalSubject, Credential credential) {
+    private void crawlGeneralSeatAndBuffer(CrawlerSubject generalSubject, Credential credential,
+        SeatUtilsType seatUtilsType) {
         try {
-            CrawlerSeat crawlerSeat = sendExternalSeatRequest(generalSubject, credential);
+            CrawlerSeat crawlerSeat = sendExternalSeatRequest(generalSubject, credential, seatUtilsType);
             recordCrawlingSuccess();
 
             batchService.saveGeneralSeatBatch(crawlerSeat);
         } catch (CrawlerAllcllException e) {
             log.error(
                 "[교양 과목 여석] 외부 API 호출에 실패했습니다. 과목: "
-                    + generalSubject.getCuriNo() + "-"
-                    + generalSubject.getClassName());
+                + generalSubject.getCuriNo() + "-"
+                + generalSubject.getClassName());
         }
     }
 
-    private CrawlerSeat sendExternalSeatRequest(CrawlerSubject crawlerSubject, Credential credential) {
+    private CrawlerSeat sendExternalSeatRequest(
+        CrawlerSubject crawlerSubject,
+        Credential credential,
+        SeatUtilsType seatUtilsType
+    ) {
         log.info("[AdminSeatService] [학교 서버] 요청 시도 과목: {}", crawlerSubject);
         SeatPayload requestPayload = SeatPayload.from(crawlerSubject);
         SeatResponse response = seatClient.execute(credential, requestPayload);
@@ -155,7 +160,7 @@ public class AdminSeatService {
         seatStorage.add(
             new SeatDto(
                 subject,
-                SeatUtils.getRemainSeat(renewedCrawlerSeat),
+                SeatUtils.getRemainSeat(renewedCrawlerSeat, seatUtilsType),
                 LocalDateTime.now()
             )
         );
