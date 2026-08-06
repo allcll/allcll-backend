@@ -9,6 +9,26 @@ import org.junit.jupiter.api.Test;
 class SeatPipelineMetricsTest {
 
     @Test
+    @DisplayName("크롤러 시작과 중지에 따라 active gauge가 갱신된다.")
+    void seatCrawlerActiveGauge() {
+        // given
+        SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
+        SeatPipelineMetrics seatPipelineMetrics = new SeatPipelineMetrics(meterRegistry);
+
+        // when
+        seatPipelineMetrics.recordSeatCrawlerStarted();
+
+        // then
+        assertThat(meterRegistry.get("seat.crawler.active").gauge().value()).isEqualTo(1.0);
+
+        // when
+        seatPipelineMetrics.recordSeatCrawlerStopped();
+
+        // then
+        assertThat(meterRegistry.get("seat.crawler.active").gauge().value()).isZero();
+    }
+
+    @Test
     @DisplayName("크롤링 성공 시 last crawled age gauge가 갱신된다.")
     void lastCrawledAgeGauge() {
         // given
