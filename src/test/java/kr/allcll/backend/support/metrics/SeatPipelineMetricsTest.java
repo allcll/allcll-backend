@@ -29,6 +29,26 @@ class SeatPipelineMetricsTest {
     }
 
     @Test
+    @DisplayName("SSE 스케줄러 시작과 중지에 따라 active gauge가 갱신된다.")
+    void seatSseSchedulerActiveGauge() {
+        // given
+        SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
+        SeatPipelineMetrics seatPipelineMetrics = new SeatPipelineMetrics(meterRegistry);
+
+        // when
+        seatPipelineMetrics.recordSeatSseSchedulerStarted();
+
+        // then
+        assertThat(meterRegistry.get("seat.sse.scheduler.active").gauge().value()).isEqualTo(1.0);
+
+        // when
+        seatPipelineMetrics.recordSeatSseSchedulerStopped();
+
+        // then
+        assertThat(meterRegistry.get("seat.sse.scheduler.active").gauge().value()).isZero();
+    }
+
+    @Test
     @DisplayName("크롤링 성공 시 last crawled age gauge가 갱신된다.")
     void lastCrawledAgeGauge() {
         // given
