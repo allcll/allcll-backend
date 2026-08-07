@@ -62,6 +62,13 @@ public class SeatPipelineMetrics {
             .register(meterRegistry);
     }
 
+    public void registerBatchOldestPendingAge(String type, AtomicLong oldestPendingAtMillis) {
+        Gauge.builder("seat.batch.oldest.pending.age", oldestPendingAtMillis, this::getPendingAgeSeconds)
+            .tags(TYPE_TAG, type)
+            .baseUnit("seconds")
+            .register(meterRegistry);
+    }
+
     public void recordBatchFlush(String type, ThrowingRunnable runnable) {
         Timer.Sample sample = Timer.start(meterRegistry);
         try {
@@ -122,6 +129,14 @@ public class SeatPipelineMetrics {
             return TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
         }
         return (System.currentTimeMillis() - lastCrawledAt) / 1000.0;
+    }
+
+    private double getPendingAgeSeconds(AtomicLong oldestPendingAtMillis) {
+        long oldestPendingAt = oldestPendingAtMillis.get();
+        if (oldestPendingAt == 0) {
+            return 0;
+        }
+        return (System.currentTimeMillis() - oldestPendingAt) / 1000.0;
     }
 
     private void throwAsUnchecked(Exception e) {
