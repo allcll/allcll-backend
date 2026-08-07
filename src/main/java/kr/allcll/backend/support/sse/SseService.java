@@ -58,10 +58,9 @@ public class SseService {
             emitter -> {
                 SseEventBuilder eventBuilder = SseEventBuilderFactory.create(eventName, data);
                 sendEventAsync(emitter, eventName, eventBuilder);
-                log.debug("[SSE-propagate] 이벤트 전송 요청. token: {}, eventName: {}", token, eventName);
+                log.debug("[SSE-propagate] 이벤트 전송 요청. eventName={}", eventName);
             },
-            () -> log.warn("[SSE-propagate] 이벤트 전송 요청 실패 - Emitter가 Map에 없음. token: {}, eventName: {}", token,
-                eventName)
+            () -> log.warn("[SSE-propagate] 이벤트 전송 요청 실패 - Emitter가 Map에 없음. eventName={}", eventName)
         );
     }
 
@@ -90,7 +89,7 @@ public class SseService {
         try {
             seatPipelineMetrics.recordSseSend(() -> sseEmitter.send(eventBuilder));
         } catch (Exception e) {
-            log.warn("전송 실패 - SSE 연결이 끊겼습니다.: {}", e.getMessage());
+            log.warn("전송 실패 - SSE 연결이 끊겼습니다. exceptionType={}", e.getClass().getSimpleName());
             SseErrorHandler.handle(e);
         }
     }
