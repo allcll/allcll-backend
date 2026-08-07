@@ -2,8 +2,10 @@ package kr.allcll.backend.support.batch;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.awaitility.Awaitility.await;
 
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import kr.allcll.backend.support.metrics.SeatPipelineMetrics;
@@ -28,6 +30,34 @@ class AbstractBatchMetricsTest {
             .gauge()
             .value();
         assertThat(queueSize).isEqualTo(1.0);
+    }
+
+    @Test
+    @DisplayName("batch에 대기 항목이 있으면 가장 오래 대기한 시간 gauge가 증가하고 flush 후 초기화된다.")
+    void batchOldestPendingAgeGauge() {
+        // given
+        SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
+        TestBatch batch = new TestBatch(new SeatPipelineMetrics(meterRegistry), "general");
+
+        // when
+        batch.add("seat");
+
+        // then
+        await()
+            .atMost(Duration.ofSeconds(2))
+            .untilAsserted(() -> assertThat(meterRegistry.get("seat.batch.oldest.pending.age")
+                .tag("type", "general")
+                .gauge()
+                .value()).isGreaterThanOrEqualTo(1.0));
+
+        // when
+        batch.flush();
+
+        // then
+        assertThat(meterRegistry.get("seat.batch.oldest.pending.age")
+            .tag("type", "general")
+            .gauge()
+            .value()).isZero();
     }
 
     @Test
