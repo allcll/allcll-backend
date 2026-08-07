@@ -3,27 +3,20 @@ package kr.allcll.backend.support.exception;
 import io.sentry.Sentry;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
+import org.springframework.web.servlet.HandlerMapping;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final String LOG_FORMAT = """
-        \n\t{
-            "RequestURI": "{} {}",
-            "RequestBody": {},
-            "ErrorMessage": "{}"
-        \t}
-        """;
+    private static final String LOG_FORMAT =
+        "Request failed: method={} route={} status={} errorCode={} exceptionType={}";
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleAllcllException(HttpServletRequest request, AllcllException exception) {
@@ -32,8 +25,8 @@ public class GlobalExceptionHandler {
         if (errorCode.getHttpStatus().is5xxServerError()) {
             captureException(request, exception, errorCode);
         }
-        log.warn(LOG_FORMAT, request.getMethod(), request.getRequestURI(), getRequestBody(request),
-            exception.getMessage());
+        log.warn(LOG_FORMAT, request.getMethod(), routeTemplate(request), errorCode.getHttpStatus().value(),
+            errorCode.name(), exception.getClass().getSimpleName());
         return ErrorResponse.of(errorCode);
     }
 
@@ -42,8 +35,8 @@ public class GlobalExceptionHandler {
         ServletException exception) {
         final AllcllErrorCode errorCode = AllcllErrorCode.NOT_FOUND_API;
 
-        log.info(LOG_FORMAT, request.getMethod(), request.getRequestURI(), getRequestBody(request),
-            exception.getMessage());
+        log.info(LOG_FORMAT, request.getMethod(), routeTemplate(request), errorCode.getHttpStatus().value(),
+            errorCode.name(), exception.getClass().getSimpleName());
         return ErrorResponse.of(errorCode);
     }
 
@@ -54,8 +47,8 @@ public class GlobalExceptionHandler {
     ) {
         final AllcllErrorCode errorCode = AllcllErrorCode.INVALID_REQUEST_VALUE;
 
-        log.info(LOG_FORMAT, request.getMethod(), request.getRequestURI(), getRequestBody(request),
-            exception.getMessage());
+        log.info(LOG_FORMAT, request.getMethod(), routeTemplate(request), errorCode.getHttpStatus().value(),
+            errorCode.name(), exception.getClass().getSimpleName());
         return ErrorResponse.of(errorCode);
     }
 
@@ -64,7 +57,8 @@ public class GlobalExceptionHandler {
         final AllcllErrorCode errorCode = AllcllErrorCode.ASYNC_REQUEST_TIMEOUT;
 
         if (request.getHeader("ALLCLL-SSE-CONNECT") != null) {
-            log.info("SSE connection timed out (normal close) - {} {}", request.getMethod(), request.getRequestURI());
+            log.info("SSE connection timed out (normal close): method={} route={} status={} errorCode={}",
+                request.getMethod(), routeTemplate(request), errorCode.getHttpStatus().value(), errorCode.name());
             return ResponseEntity.noContent().build();
         }
         return ErrorResponse.of(errorCode);
@@ -75,8 +69,8 @@ public class GlobalExceptionHandler {
         final AllcllErrorCode errorCode = AllcllErrorCode.SERVER_ERROR;
 
         captureException(request, exception, errorCode);
-        log.error(LOG_FORMAT, request.getMethod(), request.getRequestURI(), getRequestBody(request),
-            exception.getMessage(), exception);
+        log.error(LOG_FORMAT, request.getMethod(), routeTemplate(request), errorCode.getHttpStatus().value(),
+            errorCode.name(), exception.getClass().getSimpleName());
         return ErrorResponse.of(errorCode);
     }
 
@@ -87,7 +81,7 @@ public class GlobalExceptionHandler {
     ) {
         Sentry.withScope(scope -> {
             scope.setTag("method", request.getMethod());
-            scope.setTag("path", request.getRequestURI());
+            scope.setTag("path", routeTemplate(request));
             scope.setTag("status", String.valueOf(errorCode.getHttpStatus().value()));
             scope.setTag("errorCode", errorCode.name());
             scope.setTag("exceptionType", exception.getClass().getSimpleName());
@@ -95,16 +89,11 @@ public class GlobalExceptionHandler {
         });
     }
 
-    private String getRequestBody(HttpServletRequest request) {
-        String contentType = request.getContentType();
-        if (contentType != null && contentType.startsWith("multipart/")) {
-            return "[multipart/form-data]";
+    private String routeTemplate(HttpServletRequest request) {
+        Object pattern = request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        if (pattern instanceof String routeTemplate) {
+            return routeTemplate;
         }
-        try (BufferedReader reader = request.getReader()) {
-            return reader.lines().collect(Collectors.joining(System.lineSeparator() + "\t"));
-        } catch (IOException | java.io.UncheckedIOException e) {
-            log.error("Failed to read request body", e);
-            return "";
-        }
+        return "[unmatched]";
     }
 }
