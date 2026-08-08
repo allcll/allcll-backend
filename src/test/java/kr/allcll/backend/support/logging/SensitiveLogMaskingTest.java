@@ -153,7 +153,7 @@ class SensitiveLogMaskingTest {
         User user = mock(User.class);
         LoggerCapture capture = capture(AuthFacade.class);
         when(authService.login(loginRequest)).thenReturn(new OkHttpClient());
-        doThrow(new IllegalStateException(externalMessage)).when(toscAuthService).loginTosc(any(), eq(loginRequest));
+        doThrow(new IllegalStateException(externalMessage)).when(toscAuthService).loginTosc(eq(loginRequest));
         when(userFetcher.fetch(any())).thenReturn(UserInfo.of(studentId, "name", "department"));
         when(userService.findOrCreate(any())).thenReturn(user);
         when(user.getId()).thenReturn(userId);
