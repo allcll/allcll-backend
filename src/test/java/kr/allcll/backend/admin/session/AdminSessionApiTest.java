@@ -5,12 +5,14 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import kr.allcll.backend.admin.AdminRequestValidator;
 import kr.allcll.backend.admin.session.dto.SetCredentialRequest;
+import kr.allcll.backend.admin.session.dto.SsoLoginRequest;
 import kr.allcll.crawler.credential.Credentials;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -95,6 +97,49 @@ class AdminSessionApiTest {
             .andExpect(status().isBadRequest());
 
         verify(sessionService, never()).setCredential(any());
+    }
+
+    @Test
+    @DisplayName("SSO 로그인 요청은 세션을 수립하고 사용자 식별자를 반환한다.")
+    void registerBySso() throws Exception {
+        SsoLoginRequest request = new SsoLoginRequest("21011138", "pw");
+        when(validator.isRateLimited(any(HttpServletRequest.class))).thenReturn(false);
+        when(validator.isUnauthorized(any(HttpServletRequest.class))).thenReturn(false);
+        when(sessionService.registerBySso("21011138", "pw")).thenReturn("21011138");
+
+        mockMvc.perform(post("/api/admin/session/sso")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.userId").value("21011138"));
+    }
+
+    @Test
+    @DisplayName("학번이나 비밀번호가 없는 SSO 요청은 400을 반환하고 서비스가 호출되지 않는다.")
+    void registerBySso_missingCredential() throws Exception {
+        when(validator.isRateLimited(any(HttpServletRequest.class))).thenReturn(false);
+        when(validator.isUnauthorized(any(HttpServletRequest.class))).thenReturn(false);
+
+        mockMvc.perform(post("/api/admin/session/sso")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"studentId\":\"21011138\"}"))
+            .andExpect(status().isBadRequest());
+
+        verify(sessionService, never()).registerBySso(any(), any());
+    }
+
+    @Test
+    @DisplayName("인증되지 않은 SSO 요청은 401을 반환하고 서비스가 호출되지 않는다.")
+    void registerBySso_unauthorized() throws Exception {
+        SsoLoginRequest request = new SsoLoginRequest("21011138", "pw");
+        when(validator.isUnauthorized(any(HttpServletRequest.class))).thenReturn(true);
+
+        mockMvc.perform(post("/api/admin/session/sso")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isUnauthorized());
+
+        verify(sessionService, never()).registerBySso(any(), any());
     }
 
     @Test
