@@ -26,19 +26,19 @@ public class SseEmitterStorage {
 
     public void add(String token, SseEmitter sseEmitter) {
         emitters.put(token, sseEmitter);
-        log.info("[SSE] 새로운 연결이 추가되었습니다. token: {}, 현재 연결 수: {}", token, emitters.size());
+        log.info("[SSE] 새로운 연결이 추가되었습니다. 현재 연결 수: {}", emitters.size());
         sseEmitter.onTimeout(() -> {
             emitters.remove(token, sseEmitter);
-            log.info("[SSE-onTimeout] 연결이 타임아웃으로 종료되었습니다. token: {}, 현재 연결 수: {}", token, emitters.size());
+            log.info("[SSE-onTimeout] 연결이 타임아웃으로 종료되었습니다. 현재 연결 수: {}", emitters.size());
         });
         sseEmitter.onError(e -> {
             emitters.remove(token, sseEmitter);
-            log.info("[SSE-onError] 연결이 에러로 종료되었습니다. token: {}, error: {}, 현재 연결 수: {}", token, e.getMessage(),
-                emitters.size());
+            log.info("[SSE-onError] 연결이 에러로 종료되었습니다. exceptionType={}, 현재 연결 수: {}",
+                e.getClass().getSimpleName(), emitters.size());
         });
         sseEmitter.onCompletion(() -> {
             emitters.remove(token, sseEmitter);
-            log.info("[SSE-onCompletion] 연결이 정상 완료되었습니다. token: {}, 현재 연결 수: {}", token, emitters.size());
+            log.info("[SSE-onCompletion] 연결이 정상 완료되었습니다. 현재 연결 수: {}", emitters.size());
         });
     }
 

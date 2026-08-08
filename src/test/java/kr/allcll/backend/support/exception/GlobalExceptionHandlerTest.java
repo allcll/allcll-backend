@@ -14,6 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.servlet.HandlerMapping;
 
 class GlobalExceptionHandlerTest {
 
@@ -105,6 +106,7 @@ class GlobalExceptionHandlerTest {
         request.addHeader("Authorization", "Bearer secret");
         request.setCookies(new jakarta.servlet.http.Cookie("accessToken", "secret"));
         request.setContent("{\"password\":\"secret\"}".getBytes());
+        request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, "/api/test");
         return request;
     }
 }
