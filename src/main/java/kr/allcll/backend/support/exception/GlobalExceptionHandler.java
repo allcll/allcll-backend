@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -44,6 +45,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
         HttpServletRequest request,
         MethodArgumentNotValidException exception
+    ) {
+        final AllcllErrorCode errorCode = AllcllErrorCode.INVALID_REQUEST_VALUE;
+
+        log.info(LOG_FORMAT, request.getMethod(), routeTemplate(request), errorCode.getHttpStatus().value(),
+            errorCode.name(), exception.getClass().getSimpleName());
+        return ErrorResponse.of(errorCode);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
+        HttpServletRequest request,
+        HttpMessageNotReadableException exception
     ) {
         final AllcllErrorCode errorCode = AllcllErrorCode.INVALID_REQUEST_VALUE;
 
