@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicLong;
 import kr.allcll.backend.support.metrics.SeatPipelineMetrics;
 
 public abstract class AbstractBatch<T> {
@@ -12,6 +13,7 @@ public abstract class AbstractBatch<T> {
     private final Object lock;
     private final SeatPipelineMetrics seatPipelineMetrics;
     private final String type;
+    private final AtomicLong oldestPendingAtMillis;
 
     protected abstract int getFlushLimit();
 
@@ -22,11 +24,18 @@ public abstract class AbstractBatch<T> {
         this.lock = new Object();
         this.seatPipelineMetrics = seatPipelineMetrics;
         this.type = type;
+        this.oldestPendingAtMillis = new AtomicLong(0);
         this.seatPipelineMetrics.registerBatchQueueSize(type, queue);
+        this.seatPipelineMetrics.registerBatchOldestPendingAge(type, oldestPendingAtMillis);
     }
 
     public void add(T item) {
-        queue.add(item);
+        synchronized (lock) {
+            if (queue.isEmpty()) {
+                oldestPendingAtMillis.set(System.currentTimeMillis());
+            }
+            queue.add(item);
+        }
         if (queue.size() >= getFlushLimit()) {
             flush();
         }
@@ -42,6 +51,7 @@ public abstract class AbstractBatch<T> {
         List<T> batch;
         synchronized (lock) {
             batch = getAll();
+            oldestPendingAtMillis.set(0);
             if (batch.isEmpty()) {
                 return;
             }

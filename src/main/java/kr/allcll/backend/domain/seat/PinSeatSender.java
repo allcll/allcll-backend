@@ -46,11 +46,11 @@ public class PinSeatSender {
     private Runnable getPinSeatTask() {
         return () -> {
             List<String> tokens = sseService.getConnectedTokens();
-            log.info("[PinSeatSender] 현재 연결된 토큰 수: {}, 토큰 목록: {}", tokens.size(), tokens);
+            log.info("[PinSeatSender] 현재 연결된 토큰 수: {}", tokens.size());
             Map<String, List<SeatDto>> pinSeatsByToken = seatService.getPinSeatsByTokens(tokens);
             tokens.forEach(token -> {
                 List<SeatDto> pinSeats = pinSeatsByToken.getOrDefault(token, List.of());
-                log.debug("[PinSeatSender] token: {}, 핀 과목 수: {}", token, pinSeats.size());
+                log.debug("[PinSeatSender] 핀 과목 전송 준비. pinSeatCount={}", pinSeats.size());
                 sseService.propagate(token, PIN_EVENT_NAME, PinSeatsResponse.from(pinSeats));
             });
         };

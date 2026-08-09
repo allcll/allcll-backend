@@ -21,12 +21,15 @@ public class SeatPipelineMetrics {
 
     private final MeterRegistry meterRegistry;
     private final AtomicLong seatCrawlerActive = new AtomicLong(0);
+    private final AtomicLong seatSseSchedulerActive = new AtomicLong(0);
     private final AtomicLong lastCrawledAtMillis = new AtomicLong(0);
     private final Map<String, AtomicLong> schedulerLastSuccessEpochSeconds = new ConcurrentHashMap<>();
 
     public SeatPipelineMetrics(MeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;
         Gauge.builder("seat.crawler.active", seatCrawlerActive, AtomicLong::get)
+            .register(meterRegistry);
+        Gauge.builder("seat.sse.scheduler.active", seatSseSchedulerActive, AtomicLong::get)
             .register(meterRegistry);
         Gauge.builder("seat.last.crawled.age", lastCrawledAtMillis, this::getLastCrawledAgeSeconds)
             .baseUnit("seconds")
@@ -41,6 +44,14 @@ public class SeatPipelineMetrics {
         seatCrawlerActive.set(0);
     }
 
+    public void recordSeatSseSchedulerStarted() {
+        seatSseSchedulerActive.set(1);
+    }
+
+    public void recordSeatSseSchedulerStopped() {
+        seatSseSchedulerActive.set(0);
+    }
+
     public void recordCrawlingSuccess(long epochMillis) {
         lastCrawledAtMillis.updateAndGet(previous -> Math.max(previous, epochMillis));
     }
@@ -48,6 +59,13 @@ public class SeatPipelineMetrics {
     public void registerBatchQueueSize(String type, BlockingQueue<?> queue) {
         Gauge.builder("seat.batch.queue.size", queue, BlockingQueue::size)
             .tags(TYPE_TAG, type)
+            .register(meterRegistry);
+    }
+
+    public void registerBatchOldestPendingAge(String type, AtomicLong oldestPendingAtMillis) {
+        Gauge.builder("seat.batch.oldest.pending.age", oldestPendingAtMillis, this::getPendingAgeSeconds)
+            .tags(TYPE_TAG, type)
+            .baseUnit("seconds")
             .register(meterRegistry);
     }
 
@@ -111,6 +129,14 @@ public class SeatPipelineMetrics {
             return TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
         }
         return (System.currentTimeMillis() - lastCrawledAt) / 1000.0;
+    }
+
+    private double getPendingAgeSeconds(AtomicLong oldestPendingAtMillis) {
+        long oldestPendingAt = oldestPendingAtMillis.get();
+        if (oldestPendingAt == 0) {
+            return 0;
+        }
+        return (System.currentTimeMillis() - oldestPendingAt) / 1000.0;
     }
 
     private void throwAsUnchecked(Exception e) {
