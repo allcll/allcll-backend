@@ -116,6 +116,23 @@ jobs:
           cd ${{ secrets.APP_DIR }}/observability
           docker compose -f compose.prod.yml up -d
 
+      - name: Wait for Loki and Alloy
+        run: |
+          for attempt in {1..30}; do
+            if docker exec allcll-loki /busybox/wget -q --spider http://127.0.0.1:3100/ready \
+              && docker exec allcll-alloy /usr/bin/timeout 2 /usr/bin/bash -c \
+                'exec 3<>/dev/tcp/127.0.0.1/12345 && printf "GET /-/healthy HTTP/1.0\r\n\r\n" >&3 && grep -q "200 OK" <&3'; then
+              echo "Loki and Alloy are ready."
+              exit 0
+            fi
+            sleep 2
+          done
+
+          echo "Loki or Alloy did not become ready."
+          docker logs allcll-loki || true
+          docker logs allcll-alloy || true
+          exit 1
+
       - name: Stop Existing Application
         run: |
           set -x
