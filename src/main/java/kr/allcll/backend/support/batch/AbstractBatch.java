@@ -27,6 +27,7 @@ public abstract class AbstractBatch<T> {
         this.oldestPendingAtMillis = new AtomicLong(0);
         this.seatPipelineMetrics.registerBatchQueueSize(type, queue);
         this.seatPipelineMetrics.registerBatchOldestPendingAge(type, oldestPendingAtMillis);
+        this.seatPipelineMetrics.registerBatchFlushMetrics(type);
     }
 
     public void add(T item) {
