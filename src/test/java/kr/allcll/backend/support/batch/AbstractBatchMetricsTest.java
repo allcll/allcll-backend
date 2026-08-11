@@ -15,6 +15,26 @@ import org.junit.jupiter.api.Test;
 class AbstractBatchMetricsTest {
 
     @Test
+    @DisplayName("batch flush 메트릭은 첫 flush 전부터 0으로 등록된다.")
+    void initializesBatchFlushMetrics() {
+        // given
+        SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
+
+        // when
+        new TestBatch(new SeatPipelineMetrics(meterRegistry), "general");
+
+        // then
+        assertThat(meterRegistry.get("seat.batch.flush.failure.count")
+            .tag("type", "general")
+            .counter()
+            .count()).isZero();
+        assertThat(meterRegistry.get("seat.batch.flush.duration")
+            .tag("type", "general")
+            .timer()
+            .count()).isZero();
+    }
+
+    @Test
     @DisplayName("batch queue size gauge는 현재 큐 크기를 반영한다.")
     void batchQueueSizeGauge() {
         // given
