@@ -32,7 +32,36 @@ services:
       - grafana-data:/var/lib/grafana
     depends_on:
       - prometheus
+      - loki
+
+  loki:
+    image: grafana/loki:3.2.0
+    container_name: allcll-loki
+    restart: unless-stopped
+    command:
+      - "-config.file=/etc/loki/config.yml"
+    volumes:
+      - ./loki/config.yml:/etc/loki/config.yml:ro
+      - loki-data:/loki
+
+  alloy:
+    image: grafana/alloy:v1.5.1
+    container_name: allcll-alloy
+    restart: unless-stopped
+    command:
+      - run
+      - /etc/alloy/config.alloy
+      - --storage.path=/var/lib/alloy/data
+      - --server.http.listen-addr=127.0.0.1:12345
+    volumes:
+      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - ../logs:/var/log/allcll:ro
+      - alloy-data:/var/lib/alloy/data
+    depends_on:
+      - loki
 
 volumes:
   prometheus-data:
   grafana-data:
+  loki-data:
+  alloy-data:

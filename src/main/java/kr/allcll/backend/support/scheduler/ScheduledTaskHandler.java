@@ -36,6 +36,9 @@ public class ScheduledTaskHandler {
         scheduler.initialize();
         this.seatPipelineMetrics = seatPipelineMetrics;
         this.taskName = resolveTaskName(namePrefix);
+        if (seatPipelineMetrics != null) {
+            seatPipelineMetrics.registerSchedulerTask(taskName);
+        }
 
         ExecutorServiceMetrics.monitor(meterRegistry, scheduler.getScheduledExecutor(), namePrefix);
     }

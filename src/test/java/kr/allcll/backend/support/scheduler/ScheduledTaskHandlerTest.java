@@ -14,6 +14,28 @@ import org.junit.jupiter.api.Test;
 class ScheduledTaskHandlerTest {
 
     @Test
+    @DisplayName("스케줄러 handler 생성 시 마지막 성공 시각 gauge를 미리 등록한다.")
+    void initializesLastSuccessTimestampGauge() {
+        // given
+        SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
+        SeatPipelineMetrics seatPipelineMetrics = new SeatPipelineMetrics(meterRegistry);
+
+        // when
+        new ScheduledTaskHandler(1, "general-seat-sender", meterRegistry, seatPipelineMetrics);
+        new ScheduledTaskHandler(20, "pin-seat-sender", meterRegistry, seatPipelineMetrics);
+
+        // then
+        assertThat(meterRegistry.get("scheduler.task.last.success.timestamp")
+            .tag("task", "general-seat")
+            .gauge()
+            .value()).isZero();
+        assertThat(meterRegistry.get("scheduler.task.last.success.timestamp")
+            .tag("task", "pin-seat")
+            .gauge()
+            .value()).isZero();
+    }
+
+    @Test
     @DisplayName("스케줄링 작업을 등록한다.")
     void scheduledTask() {
         // given
