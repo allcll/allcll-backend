@@ -110,6 +110,10 @@ public class SeatPipelineMetrics {
             .increment();
     }
 
+    public void registerSchedulerTask(String task) {
+        schedulerLastSuccessEpochSeconds.computeIfAbsent(task, this::registerSchedulerGauge);
+    }
+
     public void recordSchedulerTaskSuccess(String task) {
         AtomicLong lastSuccess = schedulerLastSuccessEpochSeconds.computeIfAbsent(task, this::registerSchedulerGauge);
         lastSuccess.set(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
