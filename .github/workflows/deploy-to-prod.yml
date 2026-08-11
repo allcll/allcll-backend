@@ -99,6 +99,23 @@ jobs:
           mkdir -p ${{ secrets.APP_DIR }}
           cp build/libs/*-SNAPSHOT.jar ${{ secrets.APP_DIR }}/server.jar
 
+      - name: Prepare Application Logs
+        run: |
+          sudo mkdir -p "${{ secrets.APP_DIR }}/logs"
+          if [ ! -f "${{ secrets.APP_DIR }}/logs/spring-boot-application-error.log" ]; then
+            sudo touch "${{ secrets.APP_DIR }}/logs/spring-boot-application-error.log"
+          fi
+
+      - name: Deploy Observability
+        run: |
+          mkdir -p ${{ secrets.APP_DIR }}/observability
+          cp -R observability/. ${{ secrets.APP_DIR }}/observability/
+          printf 'GRAFANA_ADMIN_PASSWORD=%s\n' "${GRAFANA_ADMIN_PASSWORD}" > ${{ secrets.APP_DIR }}/observability/.env
+          chmod 600 ${{ secrets.APP_DIR }}/observability/.env
+
+          cd ${{ secrets.APP_DIR }}/observability
+          docker compose -f compose.prod.yml up -d
+
       - name: Stop Existing Application
         run: |
           set -x
@@ -112,9 +129,6 @@ jobs:
 
       - name: Run Application
         run: |
-          echo "Creating logs directory..."
-          mkdir -p ${{ secrets.APP_DIR }}/logs
-          
           echo "Starting new application..."
           sudo -E nohup java \
           -Dspring.profiles.active=prod \
@@ -123,13 +137,3 @@ jobs:
           -Dlogging.file.path=${{ secrets.APP_DIR }}/logs \
           -DEMAIL_PASSWORD="${EMAIL_PASSWORD}" \
           -jar ${{ secrets.APP_DIR }}/server.jar & 
-
-      - name: Deploy Observability
-        run: |
-          mkdir -p ${{ secrets.APP_DIR }}/observability
-          cp -R observability/. ${{ secrets.APP_DIR }}/observability/
-          printf 'GRAFANA_ADMIN_PASSWORD=%s\n' "${GRAFANA_ADMIN_PASSWORD}" > ${{ secrets.APP_DIR }}/observability/.env
-          chmod 600 ${{ secrets.APP_DIR }}/observability/.env
-
-          cd ${{ secrets.APP_DIR }}/observability
-          docker compose -f compose.prod.yml up -d
