@@ -114,7 +114,7 @@ jobs:
           chmod 600 ${{ secrets.APP_DIR }}/observability/.env
 
           cd ${{ secrets.APP_DIR }}/observability
-          docker compose -f compose.prod.yml up -d
+          docker compose -p monitoring -f compose.prod.yml up -d
 
       - name: Wait for Loki and Alloy
         run: |
