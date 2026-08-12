@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import kr.allcll.backend.domain.graduation.MajorScope;
 import kr.allcll.backend.domain.graduation.MajorType;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
 import kr.allcll.backend.domain.graduation.check.result.dto.CertResult;
@@ -222,15 +223,36 @@ public class GraduationChecker {
     }
 
     private void reclassifyByRequiredCourses(List<CompletedCourse> earnedCourses, User user) {
-        Map<String, CategoryType> categoryByCuriNo = requiredCourseResolver.buildCategoryByCuriNo(
+        Map<String, CategoryType> primaryMap = requiredCourseResolver.buildCategoryByCuriNo(
             user.getAdmissionYear(), user.getDeptCd()
         );
+        Map<String, CategoryType> secondaryMap = buildSecondaryCategoryMap(user);
+
         for (CompletedCourse course : earnedCourses) {
-            CategoryType sheetCategory = categoryByCuriNo.get(course.getCuriNo());
+            Map<String, CategoryType> targetMap = selectCategoryMap(course, primaryMap, secondaryMap);
+            CategoryType sheetCategory = targetMap.get(course.getCuriNo());
             if (hasDifferentCategory(course, sheetCategory)) {
                 course.reclassifyCategory(sheetCategory);
             }
         }
+    }
+
+    private Map<String, CategoryType> selectCategoryMap(
+        CompletedCourse course,
+        Map<String, CategoryType> primaryMap,
+        Map<String, CategoryType> secondaryMap
+    ) {
+        if (course.getMajorScope() == MajorScope.SECONDARY) {
+            return secondaryMap;
+        }
+        return primaryMap;
+    }
+
+    private Map<String, CategoryType> buildSecondaryCategoryMap(User user) {
+        if (!user.hasDoubleMajor()) {
+            return Map.of();
+        }
+        return requiredCourseResolver.buildCategoryByCuriNo(user.getAdmissionYear(), user.getDoubleDeptCd());
     }
 
     private boolean hasDifferentCategory(CompletedCourse course, CategoryType sheetCategory) {
