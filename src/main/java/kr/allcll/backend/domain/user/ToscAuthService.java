@@ -21,9 +21,10 @@ import org.springframework.stereotype.Service;
 public class ToscAuthService {
 
     private final LoginProperties properties;
+    private final OkHttpClient loginHttpClient;
 
     public void loginTosc(LoginRequest loginRequest) {
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = loginHttpClient.newBuilder().build();
 
         RequestBody body = new FormBody.Builder()
             .add("email", loginRequest.studentId())
