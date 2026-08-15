@@ -19,6 +19,7 @@ class QueryMetricsIntegrationTest {
 
     private static final String NOTICES_URI = "/api/notices";
     private static final String NEVER_CALLED_URI = "/api/baskets";
+    private static final String GET_AND_POST_URI = "/api/graduation/check";
 
     @LocalServerPort
     private int port;
@@ -38,8 +39,8 @@ class QueryMetricsIntegrationTest {
         RestAssured.given().when().get(NOTICES_URI).then().statusCode(200);
 
         // when
-        DistributionSummary queryCount = meterRegistry.find("db.query.count").tag("uri", NOTICES_URI).summary();
-        Timer queryTime = meterRegistry.find("db.query.time").tag("uri", NOTICES_URI).timer();
+        DistributionSummary queryCount = findQueryCount("GET", NOTICES_URI);
+        Timer queryTime = findQueryTime("GET", NOTICES_URI);
 
         // then
         assertThat(queryCount).isNotNull();
@@ -56,13 +57,37 @@ class QueryMetricsIntegrationTest {
         // 이 테스트는 NEVER_CALLED_URI 로 요청을 보내지 않는다
 
         // when
-        DistributionSummary queryCount = meterRegistry.find("db.query.count").tag("uri", NEVER_CALLED_URI).summary();
-        Timer queryTime = meterRegistry.find("db.query.time").tag("uri", NEVER_CALLED_URI).timer();
+        DistributionSummary queryCount = findQueryCount("GET", NEVER_CALLED_URI);
+        Timer queryTime = findQueryTime("GET", NEVER_CALLED_URI);
 
         // then
         assertThat(queryCount).isNotNull();
         assertThat(queryCount.count()).isZero();
         assertThat(queryTime).isNotNull();
         assertThat(queryTime.count()).isZero();
+    }
+
+    @Test
+    @DisplayName("한 경로에 여러 method 가 매핑돼 있으면 method 별로 미터가 등록된다.")
+    void registerEndpointPerHttpMethod() {
+        // given
+        // 이 테스트는 GET_AND_POST_URI 로 요청을 보내지 않는다
+
+        // when
+        DistributionSummary getQueryCount = findQueryCount("GET", GET_AND_POST_URI);
+        DistributionSummary postQueryCount = findQueryCount("POST", GET_AND_POST_URI);
+
+        // then
+        assertThat(getQueryCount).isNotNull();
+        assertThat(postQueryCount).isNotNull();
+        assertThat(getQueryCount).isNotSameAs(postQueryCount);
+    }
+
+    private DistributionSummary findQueryCount(String httpMethod, String uri) {
+        return meterRegistry.find("db.query.count").tag("method", httpMethod).tag("uri", uri).summary();
+    }
+
+    private Timer findQueryTime(String httpMethod, String uri) {
+        return meterRegistry.find("db.query.time").tag("method", httpMethod).tag("uri", uri).timer();
     }
 }

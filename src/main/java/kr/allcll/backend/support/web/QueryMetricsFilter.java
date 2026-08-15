@@ -39,6 +39,6 @@ public class QueryMetricsFilter extends OncePerRequestFilter {
         if (uriTemplate == null) {
             return;
         }
-        queryMetrics.record(uriTemplate.toString(), queryStats);
+        queryMetrics.record(request.getMethod(), uriTemplate.toString(), queryStats);
     }
 }

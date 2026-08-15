@@ -22,6 +22,7 @@ public class QueryMetrics {
 
     private static final String QUERY_COUNT_METER_NAME = "db.query.count";
     private static final String QUERY_TIME_METER_NAME = "db.query.time";
+    private static final String METHOD_TAG = "method";
     private static final String URI_TAG = "uri";
 
     private static final double[] QUERY_COUNT_BUCKETS = {1, 2, 3, 5, 10, 20, 50, 100, 500, 1_000, 5_000};
@@ -33,44 +34,46 @@ public class QueryMetrics {
     };
 
     private final MeterRegistry meterRegistry;
-    private final Map<String, DistributionSummary> queryCountSummaries = new ConcurrentHashMap<>();
-    private final Map<String, Timer> queryTimeTimers = new ConcurrentHashMap<>();
+    private final Map<Endpoint, DistributionSummary> queryCountSummaries = new ConcurrentHashMap<>();
+    private final Map<Endpoint, Timer> queryTimeTimers = new ConcurrentHashMap<>();
 
     public QueryMetrics(MeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;
     }
 
-    /**
-     * @param uriTemplate 실제 경로가 아니라 핸들러 매핑 패턴(/api/baskets/{subjectId}). 경로를 넘기면 시계열이 무한히 늘어난다.
-     */
-    public void registerEndpoint(String uriTemplate) {
-        queryCountSummaries.computeIfAbsent(uriTemplate, this::registerQueryCountSummary);
-        queryTimeTimers.computeIfAbsent(uriTemplate, this::registerQueryTimeTimer);
+    public void registerEndpoint(String httpMethod, String uriTemplate) {
+        Endpoint endpoint = new Endpoint(httpMethod, uriTemplate);
+        queryCountSummaries.computeIfAbsent(endpoint, this::registerQueryCountSummary);
+        queryTimeTimers.computeIfAbsent(endpoint, this::registerQueryTimeTimer);
     }
 
-    /**
-     * @param uriTemplate 실제 경로가 아니라 핸들러 매핑 패턴(/api/baskets/{subjectId}). 경로를 넘기면 시계열이 무한히 늘어난다.
-     */
-    public void record(String uriTemplate, RequestQueryStats queryStats) {
-        queryCountSummaries.computeIfAbsent(uriTemplate, this::registerQueryCountSummary)
+    public void record(String httpMethod, String uriTemplate, RequestQueryStats queryStats) {
+        Endpoint endpoint = new Endpoint(httpMethod, uriTemplate);
+        queryCountSummaries.computeIfAbsent(endpoint, this::registerQueryCountSummary)
             .record(queryStats.statementCount());
-        queryTimeTimers.computeIfAbsent(uriTemplate, this::registerQueryTimeTimer)
+        queryTimeTimers.computeIfAbsent(endpoint, this::registerQueryTimeTimer)
             .record(queryStats.executionNanos(), TimeUnit.NANOSECONDS);
     }
 
-    private DistributionSummary registerQueryCountSummary(String uriTemplate) {
+    private DistributionSummary registerQueryCountSummary(Endpoint endpoint) {
         return DistributionSummary.builder(QUERY_COUNT_METER_NAME)
             .description("요청 1건이 발행한 SQL 문 수")
-            .tag(URI_TAG, uriTemplate)
+            .tag(METHOD_TAG, endpoint.httpMethod())
+            .tag(URI_TAG, endpoint.uriTemplate())
             .serviceLevelObjectives(QUERY_COUNT_BUCKETS)
             .register(meterRegistry);
     }
 
-    private Timer registerQueryTimeTimer(String uriTemplate) {
+    private Timer registerQueryTimeTimer(Endpoint endpoint) {
         return Timer.builder(QUERY_TIME_METER_NAME)
             .description("요청 1건이 SQL 실행에 쓴 시간")
-            .tag(URI_TAG, uriTemplate)
+            .tag(METHOD_TAG, endpoint.httpMethod())
+            .tag(URI_TAG, endpoint.uriTemplate())
             .serviceLevelObjectives(QUERY_TIME_BUCKETS)
             .register(meterRegistry);
+    }
+
+    private record Endpoint(String httpMethod, String uriTemplate) {
+
     }
 }

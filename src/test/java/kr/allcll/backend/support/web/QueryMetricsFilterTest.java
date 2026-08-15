@@ -31,7 +31,7 @@ class QueryMetricsFilterTest {
     @DisplayName("요청이 실행한 SQL 수와 시간을 핸들러 매핑 패턴 태그로 기록한다.")
     void recordQueryStatsWithUriTemplateTag() throws Exception {
         // given
-        MockHttpServletRequest request = requestWithUriTemplate("/api/baskets/{subjectId}");
+        MockHttpServletRequest request = requestWithUriTemplate("GET", "/api/baskets/{subjectId}");
 
         // when
         queryMetricsFilter.doFilter(request, new MockHttpServletResponse(), (req, res) -> {
@@ -40,14 +40,34 @@ class QueryMetricsFilterTest {
         });
 
         // then
-        DistributionSummary queryCount = findQueryCount("/api/baskets/{subjectId}");
+        DistributionSummary queryCount = findQueryCount("GET", "/api/baskets/{subjectId}");
         assertThat(queryCount).isNotNull();
         assertThat(queryCount.count()).isEqualTo(1);
         assertThat(queryCount.totalAmount()).isEqualTo(2.0);
 
-        Timer queryTime = findQueryTime("/api/baskets/{subjectId}");
+        Timer queryTime = findQueryTime("GET", "/api/baskets/{subjectId}");
         assertThat(queryTime).isNotNull();
         assertThat(queryTime.count()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("경로가 같아도 HTTP method 가 다르면 따로 기록한다.")
+    void recordSameUriPerHttpMethod() throws Exception {
+        // given
+        MockHttpServletRequest getRequest = requestWithUriTemplate("GET", "/api/timetables");
+        MockHttpServletRequest postRequest = requestWithUriTemplate("POST", "/api/timetables");
+
+        // when
+        queryMetricsFilter.doFilter(getRequest, new MockHttpServletResponse(), (req, res) -> executeStatement());
+        queryMetricsFilter.doFilter(postRequest, new MockHttpServletResponse(), (req, res) -> {
+            executeStatement();
+            executeStatement();
+            executeStatement();
+        });
+
+        // then
+        assertThat(findQueryCount("GET", "/api/timetables").totalAmount()).isEqualTo(1.0);
+        assertThat(findQueryCount("POST", "/api/timetables").totalAmount()).isEqualTo(3.0);
     }
 
     @Test
@@ -69,7 +89,7 @@ class QueryMetricsFilterTest {
     @DisplayName("요청 처리 중 예외가 나도 집계를 정리해 다음 요청에 값이 새지 않는다.")
     void clearStatsWhenRequestFails() {
         // given
-        MockHttpServletRequest request = requestWithUriTemplate("/api/subjects");
+        MockHttpServletRequest request = requestWithUriTemplate("GET", "/api/subjects");
 
         // when
         try {
@@ -81,7 +101,7 @@ class QueryMetricsFilterTest {
         }
 
         // then
-        assertThat(findQueryCount("/api/subjects").totalAmount()).isEqualTo(1.0);
+        assertThat(findQueryCount("GET", "/api/subjects").totalAmount()).isEqualTo(1.0);
         assertThat(RequestQueryStats.stop().statementCount()).isZero();
     }
 
@@ -91,17 +111,17 @@ class QueryMetricsFilterTest {
         listener.jdbcExecuteStatementEnd();
     }
 
-    private MockHttpServletRequest requestWithUriTemplate(String uriTemplate) {
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", uriTemplate);
+    private MockHttpServletRequest requestWithUriTemplate(String httpMethod, String uriTemplate) {
+        MockHttpServletRequest request = new MockHttpServletRequest(httpMethod, uriTemplate);
         request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, uriTemplate);
         return request;
     }
 
-    private DistributionSummary findQueryCount(String uri) {
-        return meterRegistry.find("db.query.count").tag("uri", uri).summary();
+    private DistributionSummary findQueryCount(String httpMethod, String uri) {
+        return meterRegistry.find("db.query.count").tag("method", httpMethod).tag("uri", uri).summary();
     }
 
-    private Timer findQueryTime(String uri) {
-        return meterRegistry.find("db.query.time").tag("uri", uri).timer();
+    private Timer findQueryTime(String httpMethod, String uri) {
+        return meterRegistry.find("db.query.time").tag("method", httpMethod).tag("uri", uri).timer();
     }
 }

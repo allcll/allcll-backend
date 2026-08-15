@@ -15,6 +15,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.condition.PathPatternsRequestCondition;
 import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
@@ -49,9 +50,16 @@ public class QueryMetricsConfig {
     ) {
         return event -> handlerMappings.stream()
             .flatMap(handlerMapping -> handlerMapping.getHandlerMethods().keySet().stream())
-            .flatMap(mappingInfo -> uriPatterns(mappingInfo).stream())
-            .distinct()
-            .forEach(queryMetrics::registerEndpoint);
+            .forEach(mappingInfo -> registerEndpoints(queryMetrics, mappingInfo));
+    }
+
+    private void registerEndpoints(QueryMetrics queryMetrics, RequestMappingInfo mappingInfo) {
+        Set<String> uriPatterns = uriPatterns(mappingInfo);
+        for (RequestMethod httpMethod : mappingInfo.getMethodsCondition().getMethods()) {
+            for (String uriPattern : uriPatterns) {
+                queryMetrics.registerEndpoint(httpMethod.name(), uriPattern);
+            }
+        }
     }
 
     private Set<String> uriPatterns(RequestMappingInfo mappingInfo) {
@@ -66,9 +74,6 @@ public class QueryMetricsConfig {
         return Set.of();
     }
 
-    /*
-    Hibernate 가 세션마다 인스턴스를 직접 만들기 때문에 인스턴스가 아니라 클래스 이름으로 지정한다.
-     */
     private void registerSessionListener(Map<String, Object> hibernateProperties) {
         hibernateProperties.put(
             AvailableSettings.AUTO_SESSION_EVENTS_LISTENER,
