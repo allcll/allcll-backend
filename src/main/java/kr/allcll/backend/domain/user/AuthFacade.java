@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -24,7 +23,6 @@ public class AuthFacade {
     private final GraduationCertService graduationCertService;
     private final GraduationCertResolver graduationCertResolver;
 
-    @Transactional
     public LoginResult login(LoginRequest loginRequest) {
         OkHttpClient client = authService.login(loginRequest);
 
