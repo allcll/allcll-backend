@@ -42,3 +42,6 @@ qa-snapshots/
 
 # QA 운영 DB 접속 정보 (크레덴셜 — 커밋 금지)
 .env.qa
+
+# 운영 Grafana 관리자 비밀번호 (배포 시 서버에만 생성)
+observability/.env
