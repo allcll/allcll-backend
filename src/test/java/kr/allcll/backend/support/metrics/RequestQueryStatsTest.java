@@ -23,7 +23,7 @@ class RequestQueryStatsTest {
         // then
         RequestQueryStats queryStats = RequestQueryStats.stop();
         assertThat(queryStats.statementCount()).isEqualTo(2);
-        assertThat(queryStats.executionMillis()).isEqualTo(3.0);
+        assertThat(queryStats.executionNanos()).isEqualTo(3 * ONE_MILLI_NANOS);
     }
 
     @Test
@@ -37,7 +37,7 @@ class RequestQueryStatsTest {
 
         // then
         assertThat(queryStats.statementCount()).isZero();
-        assertThat(queryStats.executionMillis()).isZero();
+        assertThat(queryStats.executionNanos()).isZero();
     }
 
     @Test

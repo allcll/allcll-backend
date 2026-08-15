@@ -55,7 +55,7 @@ public class QueryMetrics {
         queryCountSummaries.computeIfAbsent(uriTemplate, this::registerQueryCountSummary)
             .record(queryStats.statementCount());
         queryTimeTimers.computeIfAbsent(uriTemplate, this::registerQueryTimeTimer)
-            .record((long) (queryStats.executionMillis() * 1_000), TimeUnit.MICROSECONDS);
+            .record(queryStats.executionNanos(), TimeUnit.NANOSECONDS);
     }
 
     private DistributionSummary registerQueryCountSummary(String uriTemplate) {

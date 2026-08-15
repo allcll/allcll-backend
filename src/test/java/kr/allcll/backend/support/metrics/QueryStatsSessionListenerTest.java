@@ -21,7 +21,7 @@ class QueryStatsSessionListenerTest {
         // then
         RequestQueryStats queryStats = RequestQueryStats.stop();
         assertThat(queryStats.statementCount()).isEqualTo(1);
-        assertThat(queryStats.executionMillis()).isNotNegative();
+        assertThat(queryStats.executionNanos()).isNotNegative();
     }
 
     @Test

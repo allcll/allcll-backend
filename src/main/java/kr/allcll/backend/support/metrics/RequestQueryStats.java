@@ -6,7 +6,6 @@ package kr.allcll.backend.support.metrics;
 public class RequestQueryStats {
 
     private static final RequestQueryStats EMPTY = new RequestQueryStats();
-    private static final double NANOS_PER_MILLI = 1_000_000.0;
     private static final ThreadLocal<RequestQueryStats> CURRENT = new ThreadLocal<>();
 
     private int statementCount;
@@ -38,7 +37,7 @@ public class RequestQueryStats {
         return statementCount;
     }
 
-    public double executionMillis() {
-        return executionNanos / NANOS_PER_MILLI;
+    public long executionNanos() {
+        return executionNanos;
     }
 }
