@@ -21,12 +21,17 @@ services:
     container_name: allcll-grafana
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD is required}
       GF_USERS_ALLOW_SIGN_UP: "false"
       GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_SECURITY_COOKIE_SECURE: "true"
+      GF_SERVER_PROTOCOL: http
+      GF_SERVER_DOMAIN: grafana.allcll.kr
+      GF_SERVER_ROOT_URL: https://grafana.allcll.kr/
+      GF_SERVER_ENFORCE_DOMAIN: "true"
     volumes:
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
       - grafana-data:/var/lib/grafana
