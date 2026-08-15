@@ -1,8 +1,8 @@
 # 적재 규칙 (수강편람 → 시트 적재 컨벤션)
 
-졸업요건 기준 데이터는 원래 **사람이 수강편람을 보고 손으로 구글시트에 적재**하며 정한 *암묵적 규칙*들이다. 2026-08부터 시트는 wiki 정본(cohort/·mappings/)에서 **자동 생성·반영되는 파생물**이고, 이 규칙들은 생성기·검증기에 코드화되어 있다. 코드가 이 규칙을 알고 있어야 조회/검사가 맞는다 — 신규 피쳐·버그 수정·시트 검증 시 필독. **시트 변경은 사람이 직접 하지 않는다** — 유일한 경로는 graduation-wiki `grad-sheet-change` 파이프라인(정본 수정 → matrix 재생성 → PR 리뷰 → CI apply).
+졸업요건 기준 데이터는 원래 **사람이 수강편람을 보고 손으로 구글시트에 적재**하며 정한 *암묵적 규칙*들이다. 2026-08부터 시트는 wiki 정본(cohort/·mappings/)에서 **자동 생성·반영되는 파생물**이고, 이 규칙들은 생성기·검증기에 코드화되어 있다. 코드가 이 규칙을 알고 있어야 조회/검사가 맞는다 — 신규 피쳐·버그 수정·시트 검증 시 필독. **시트 변경은 사람이 직접 하지 않는다** — 유일한 경로는 graduation-wiki `grad-sheet-change` 파이프라인(정본 수정 → matrix 재생성 → PR 리뷰 → CI apply). **적용 범위 = `tools/export_sheets.py` 의 `TABS` 에 등록된 12탭**(live 탭 전부 — dead 인 `course_replacements` 만 제외, §7). TABS 미등록 탭은 PR·CI 를 통과해도 시트에 반영되지 않으므로, 시트에 탭을 신설하면 `TABS` 와 `apply_sheets.GUARDS` 등록이 선행돼야 한다.
 
-마지막 갱신: 2026-08-13 (시트 자동화 파이프라인 전환 반영 · 규칙 본문은 2026-08-05 13탭 전수 역추출 기준)
+마지막 갱신: 2026-08-15 (탭 원천 분류 정정 + apply 커버리지 명시 · 규칙 본문은 2026-08-05 13탭 전수 역추출 기준)
 값의 정본: graduation-llm-wiki(cohort/) · 코드 분기: ../edge-cases.md
 **전수 감사·발견 오류 목록**: graduation-wiki `reports/audits/2026-08-05-sheet-loading-rules-profile.md`
 **기계 검증**: graduation-wiki `tools/loading_rules_check.py` — 아래 규칙 26종을 스냅샷에 자동 assert (신규 위반 시 exit 1). 시트 수정·새 스냅샷 후 재실행. `--matrix` 모드는 생성 정답지를 예외 목록 없이 검증(위반 0 필수).
@@ -57,17 +57,22 @@
 
 - **전공필수/전공선택 과목 목록은 시트가 아니다** → Subject(크롤러). `required_courses`는 교양 지정과목·학문기초·전공기초용.
 - required_courses 인코딩: 지정 범위 **과반 → `dept_cd="0"` ALL행 + required=FALSE override / 소수 → 학과별 TRUE 열거**.
-- **course_equivalences의 원천은 학사정보시스템 CSV** (편람·cohort 아님, EC-011). group_code 2대역: 일반(0~2xxx) = 같은 과목의 코드 변천 통합, **9000번대 = 다른 과목 간 대체 인정 (수동 발급)**. 한 과목의 이중 소속 37건은 의도 — 코드 조회는 List 합집합이라 양쪽 그룹 전부 인정(과잉 인정 방향, 예외 없음).
+- **course_equivalences의 원천은 학사정보시스템 CSV** (편람·cohort 아님, EC-011). 그룹코드 컬럼명은 **시트·엔티티 기준 `same_course_code`** (07-29 rename 이후. wiki `mappings/course_equivalences.csv` 만 구명 `group_code` 유지 — 생성기가 헤더를 변환). 2대역: 일반(0~2xxx) = 같은 과목의 코드 변천 통합, **9000번대 = 다른 과목 간 대체 인정 (수동 발급)**. 한 과목의 이중 소속 37건은 의도 — 코드 조회는 List 합집합이라 양쪽 그룹 전부 인정(과잉 인정 방향, 예외 없음).
 - **택N 규칙 (미구현 버그)**: required_courses의 `note='1'/'2'` = same_course_code 그룹에서 "N과목 택해 이수" (편람 원문 확정, note≠빈값 ⟺ 그룹 존재 — 검증 R1). **코드는 note를 읽지 않고 그룹 전체 이수를 요구** → false negative. same_course_code 체계: `<첫등장학번>-<계열약어(CH/NA/LI)>-<번호>`, 24/25학번 코드 교차(swap) 있음 — (year, dept_cd) AND 조건 필수.
 - course_replacements 탭은 **dead** (validator·엔티티·sync 전부 제거, 설정 키만 잔존) — 입력해도 미반영.
 
 ## 7. 탭 원천 3분류 (시트 자동화 설계 기준)
 
-| 분류 | 탭 | matrix 생성 원천 |
-|---|---|---|
-| cohort/편람 파생 | credit, double, balance 3탭, 인증 4탭, department_info | cohort md + 편람 PDF 표 직접 추출 (지정과목 학과×과목 매트릭스는 md에 없음) + 학수번호는 학사시스템 조인 |
-| 외부 CSV 파생 | course_equivalences | 학사정보시스템 동일과목 CSV |
-| dead | course_replacements | 없음 (sync 미대상) |
+전체 13탭 = 편람 파생 9 + 상주본 파생 3 + dead 1. **앞의 12탭이 `export_sheets.TABS` = CI apply 대상**이다.
+
+| 분류 | 탭 (13) | matrix 생성 원천 | CI apply |
+|---|---|---|---|
+| cohort/편람 파생 (9) | credit, double, balance 3탭, 인증 4탭 | cohort md + 편람 PDF 표 직접 추출 (지정과목 학과×과목 매트릭스는 md에 없음) + 학수번호는 학사시스템 조인 | O |
+| **mappings 상주본 파생 (3)** | **required_courses**, course_equivalences, department_info | 편람에서 재생성하지 않고 `mappings/*.csv` 자체가 선언 상태(passthrough). required=감사 §5 가 편람과 전수 대조한 행 구조(학수번호·그룹코드·DEPRECATED는 비편람 데이터) / equivalences=학사정보시스템 동일과목 CSV(EC-011) / department_info=행 우주는 `mappings/dept_codes.csv`, target_type 값만 편람 규칙 엔진 | O |
+| dead (1) | course_replacements | 없음 (생성·apply·sync 전부 미대상) | X |
+
+- 상주본 3탭의 유지 = `mappings/` 파일 직접 편집. 편람 지정표(pdfplumber) 완전 재생성은 wiki v2 과제.
+- 그래서 **입력이 `matrix/` 가 아니라 `mappings/`** 다 — wiki `apply.yml` 의 apply 트리거 경로에 `mappings/**` 가 없으면 이 3탭은 계획서만 뜨고 머지해도 반영되지 않는다 (2026-08-15 수정 이전의 실제 상태).
 
 ## 8. 기타 컬럼 규칙
 
@@ -85,6 +90,7 @@
 
 - [x] 2026-08-05 **13탭 전수 역추출 + 편람 원문 대조 + 기계 검증 통과** (당시 24규칙, 신규 위반 0, 알려진 오류 12건은 wiki 감사 리포트 §10 수정 목록과 1:1 일치)
 - [x] 2026-08-13 **시트 자동화 파이프라인 전환** — 검증 26종으로 확장(`--matrix` 모드), 시트 반영 경로는 wiki `grad-sheet-change`(matrix → PR → CI apply)로 일원화
+- [x] 2026-08-15 **apply 커버리지 정합화** (리뷰 지적 후속) — §7 표에서 누락됐던 `required_courses` 복원·분류 정정, `course_equivalences` 를 wiki `TABS`/`GUARDS` 에 편입(기대 diff 0, 7,535행 무변경 편입), apply 워크플로 push 트리거에 `mappings/**` 추가(plan↔apply 경로 비대칭 해소). → live 12탭 전부 CI apply 대상
 - [x] ALL_DEPT·sentinel 쌍·페어 fallback·계약학과 보정·rename·세대 차이: 코드+데이터+편람 3자 일치
 - [ ] 택N(note) 판정 로직 구현 — 미구현 확정 (§6), 백엔드 이슈화 필요
 - [ ] enabled=FALSE 필터 (EC-007) — 운영 의도 확인 후 적재·조회 필터 여부 결정

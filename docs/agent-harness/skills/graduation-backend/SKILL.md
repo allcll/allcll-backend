@@ -14,7 +14,7 @@
 | 무엇 | 어디 | 왜 |
 |---|---|---|
 | **resolver 계층 규칙** | `docs/agent-harness/knowledge/graduation/conventions/resolver-layering.md` | service 에서 repository 직접 호출 금지. 조회는 resolver 경유 |
-| **적재 규칙** | `docs/agent-harness/knowledge/graduation/conventions/loading-rules.md` | ALL_DEPT·계약학과 보정·rename·세대 차이 등 사람 적재 규칙 |
+| **적재 규칙** | `docs/agent-harness/knowledge/graduation/conventions/loading-rules.md` | ALL_DEPT·계약학과 보정·rename·세대 차이 등 적재 규칙 (+§7 = 시트 반영 경로·apply 대상 탭) |
 | **데이터 의존 지도** | `docs/agent-harness/knowledge/graduation/map/data-dependency-map.md` | 전공 과목=크롤러, 교양=시트 등 출처 구분 |
 
 추가 참조: `docs/agent-harness/knowledge/graduation/map/architecture.md`(파이프라인 + 시트 13개 인벤토리), `docs/agent-harness/knowledge/graduation/contracts/data-loading-policy.md`(시트↔엔티티↔validator 매핑 + 적재 메커니즘), `docs/agent-harness/knowledge/graduation/contracts/data-usage-policy.md`(검사 계약), `docs/agent-harness/knowledge/graduation/edge-cases.md`(코드 분기 24), `docs/agent-harness/knowledge/graduation/glossary.md`(enum), `docs/agent-harness/knowledge/graduation/contracts/certification-policy.md`(인증 3종), `docs/agent-harness/knowledge/graduation/decisions/`(정책 결정).

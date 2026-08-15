@@ -19,10 +19,12 @@
 ```
 [수강편람 PDF]
        │
-       │  (사람이 옮김, 학기 시작 시 1회)
+       │  (graduation-wiki 정본 cohort/·mappings/ → export_sheets → matrix/)
+       │  (PR 리뷰 → apply CI 가 탭 전면 교체. 2026-08 부터 자동 — 사람이 시트를 직접 고치지 않는다)
        ▼
 [Google Sheets: 졸업요건검사 기준 데이터]
        │  ─ 13개 탭 (시트1 스크래치 제외, course_replacements 미적재 1개 포함)
+       │    apply 대상 = live 12탭 (dead 인 course_replacements 제외 — ../conventions/loading-rules.md §7)
        │
        │  (어드민 sync 호출, POST /api/admin/graduation/sync)
        │   → AdminGraduationSyncService.syncGraduationRules  @Transactional
@@ -70,7 +72,7 @@
 | 10 | `coding_cert_criteria` | CodingCertCriteriaSheetValidator | CodingCertCriterion | syncCodingCertCriteria | 코딩 인증 + alt1/alt2 (EC-016) |
 | 11 | `classic_cert_criteria` | ClassicCertCriteriaSheetValidator | ClassicCertCriterion | syncClassicCertCriteria | 고전 인증 영역별 필수 권수 (EC-022) |
 | 12 | `graduation_department_info` | GraduationDepartmentInfoSheetValidator | GraduationDepartmentInfo | syncGraduationDepartmentInfo | 학과 메타 (인증 대상 분류 포함) |
-| — | `course_replacements` | (확인 필요) | (CourseReplacement 가 있지만 sync 메서드 없음) | **없음** | **EC-011** — 다른 적재 경로 추정 |
+| — | `course_replacements` | 없음 | 없음 (`CourseReplacement` 클래스 부재 — `application*.yml` 탭 키와 `V1__initial_schema.sql` DDL 만 잔존) | **없음** | **dead 탭** (EC-011 로 `course_equivalences` 에 흡수). 시트에 입력해도 DB 에 안 들어가고, wiki apply 대상도 아니다 — 2026-08-15 코드 확인 |
 | — | `시트1` | — | — | — | 빈 스크래치 탭, 안전하게 무시됨 |
 
 ---
@@ -305,6 +307,7 @@ CLAUDE.md 의 5단계 여석 파이프라인은 graduation 도메인과 **무관
 | 토픽 | 주 파일 | 보조 파일 |
 |---|---|---|
 | 시트 13개 인벤토리 | architecture.md (본 파일) | ../contracts/data-loading-policy.md §8, graduation-wiki `sheets/<날짜>/` 스냅샷 |
+| 시트 값을 바꾸는 방법 (apply 파이프라인) | ../conventions/loading-rules.md §7 | graduation-wiki `matrix/README.md`, `grad-sheet-change` 스킬 |
 | 정책 **값** (학점·영역·인증 기준) | **graduation-wiki `cohort/`** (별도 private 레포 — 태그 포인터로 인용) | ../glossary.md, ../contracts/certification-policy.md |
 | 적재 트리거·트랜잭션·검증 | ../contracts/data-loading-policy.md | architecture.md §단계1 |
 | 검사 호출·신뢰 가정·재계산 | ../contracts/data-usage-policy.md | architecture.md §단계3·4·5 |
@@ -336,5 +339,5 @@ CLAUDE.md 의 5단계 여석 파이프라인은 graduation 도메인과 **무관
 - [x] 균형교양 두 경로 차이: 코드 일치 (EC-019, EC-020 보강)
 - [x] 인증제 정책 구조: ../contracts/certification-policy.md 와 일치
 - [x] 응답 보정 패턴: 코드 + PR #254, #269, #277 일치
-- [ ] **`course_replacements` 탭의 sync 경로**: 다른 적재 경로 추정 — 확인 필요
+- [x] **`course_replacements` 탭의 sync 경로**: 2026-08-15 확인 — 적재 경로 자체가 없다 (`CourseReplacement` 클래스·validator·sync 전부 부재, `application*.yml` 탭 키와 V1 DDL 만 잔존). dead 탭 확정, EC-011 로 `course_equivalences` 에 흡수
 - [ ] **`CompletedCoursePersistenceService`, `GraduationCheckPersistenceService` 트랜잭션**: 코드 미열람 (`@Transactional` 추정)
