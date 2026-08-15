@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import kr.allcll.backend.domain.graduation.credit.dto.RequiredCourseResponse;
 import kr.allcll.backend.support.graduation.KeyUtils;
@@ -42,12 +44,41 @@ public class RequiredCourseResolver {
             selectedByCourseKey.put(courseKey, course);
         }
 
-        return selectedByCourseKey.values().stream()
+        List<RequiredCourse> requiredCourses = selectedByCourseKey.values().stream()
             .filter(RequiredCourse::getRequired)
+            .toList();
+        Map<String, RequiredCourse> currentCoursesBySameCourseCode = findCurrentCourses(requiredCourses);
+
+        return requiredCourses.stream()
             .collect(Collectors.groupingBy(
                 RequiredCourse::getCategoryType,
-                Collectors.collectingAndThen(Collectors.toList(), this::resolveDeprecatedCourses)
+                Collectors.collectingAndThen(
+                    Collectors.toList(),
+                    categoryCourses -> resolveDeprecatedCourses(categoryCourses, currentCoursesBySameCourseCode)
+                )
             ));
+    }
+
+    /**
+     * DEPRECATED 지정과목의 현행 과목을 동일과목 그룹 단위로 한 번에 조회한다.
+     */
+    private Map<String, RequiredCourse> findCurrentCourses(List<RequiredCourse> requiredCourses) {
+        Set<String> deprecatedSameCourseCodes = requiredCourses.stream()
+            .filter(requiredCourse -> isDeprecated(requiredCourse.getCuriNo()))
+            .map(RequiredCourse::getSameCourseCode)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+
+        if (deprecatedSameCourseCodes.isEmpty()) {
+            return Map.of();
+        }
+
+        Map<String, RequiredCourse> currentCoursesBySameCourseCode = new HashMap<>();
+        requiredCourseRepository.findCurrentCoursesBySameCourseCodes(deprecatedSameCourseCodes, DEPRECATED)
+            .forEach(currentCourse ->
+                currentCoursesBySameCourseCode.putIfAbsent(currentCourse.getSameCourseCode(), currentCourse)
+            );
+        return currentCoursesBySameCourseCode;
     }
 
     public boolean findRequiredCourseInGroup(
@@ -112,9 +143,12 @@ public class RequiredCourseResolver {
         return requiredCourseCandidates.values().stream().toList();
     }
 
-    public List<RequiredCourseResponse> resolveDeprecatedCourses(List<RequiredCourse> requiredCourses) {
+    private List<RequiredCourseResponse> resolveDeprecatedCourses(
+        List<RequiredCourse> requiredCourses,
+        Map<String, RequiredCourse> currentCoursesBySameCourseCode
+    ) {
         return requiredCourses.stream()
-            .map(this::mapToCurrentCourse)
+            .map(requiredCourse -> mapToCurrentCourse(requiredCourse, currentCoursesBySameCourseCode))
             .toList();
     }
 
@@ -126,18 +160,21 @@ public class RequiredCourseResolver {
         return requiredCourse.getDeptNm().equals(departmentName);
     }
 
-    private RequiredCourseResponse mapToCurrentCourse(RequiredCourse requiredCourse) {
+    private RequiredCourseResponse mapToCurrentCourse(
+        RequiredCourse requiredCourse,
+        Map<String, RequiredCourse> currentCoursesBySameCourseCode
+    ) {
         if (isNotDeprecated(requiredCourse.getCuriNo())) {
             return RequiredCourseResponse.of(requiredCourse.getCuriNo(), requiredCourse.getCuriNm());
         }
-        return requiredCourseRepository.findCurrentCourseBySameCourseCode(requiredCourse.getSameCourseCode(), DEPRECATED)
-            .map(currentCourse -> RequiredCourseResponse.of(currentCourse.getCuriNo(), currentCourse.getCuriNm()))
-            .orElseGet(() -> {
-                log.error(
-                    "[졸업요건] DEPRECATED된 과목의 현재 과목 조회에 실패했습니다. sameCourseCode={}", requiredCourse.getSameCourseCode()
-                );
-                return RequiredCourseResponse.of(requiredCourse.getCuriNo(), requiredCourse.getCuriNm());
-            });
+        RequiredCourse currentCourse = currentCoursesBySameCourseCode.get(requiredCourse.getSameCourseCode());
+        if (currentCourse == null) {
+            log.error(
+                "[졸업요건] DEPRECATED된 과목의 현재 과목 조회에 실패했습니다. sameCourseCode={}", requiredCourse.getSameCourseCode()
+            );
+            return RequiredCourseResponse.of(requiredCourse.getCuriNo(), requiredCourse.getCuriNm());
+        }
+        return RequiredCourseResponse.of(currentCourse.getCuriNo(), currentCourse.getCuriNm());
     }
 
     private boolean isNotDeprecated(String curiNo) {
