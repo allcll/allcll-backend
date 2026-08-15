@@ -59,6 +59,32 @@ public class RequiredCourseResolver {
             ));
     }
 
+    public Set<String> findRequiredCourseInGroups(
+        String departmentName,
+        Integer admissionYear,
+        CategoryType categoryType,
+        Set<String> sameCourseCodes
+    ) {
+        if (sameCourseCodes.isEmpty()) {
+            return Set.of();
+        }
+
+        Map<String, List<RequiredCourse>> candidatesBySameCourseCode =
+            requiredCourseRepository.findRequiredCoursesBySameCourseCodes(
+                    List.of(WILD_CARD_DEPT_NM, departmentName),
+                    admissionYear,
+                    categoryType,
+                    sameCourseCodes
+                )
+                .stream()
+                .collect(Collectors.groupingBy(RequiredCourse::getSameCourseCode));
+
+        return candidatesBySameCourseCode.entrySet().stream()
+            .filter(candidates -> hasRequiredCourse(candidates.getValue(), departmentName))
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toSet());
+    }
+
     /**
      * DEPRECATED 지정과목의 현행 과목을 동일과목 그룹 단위로 한 번에 조회한다.
      */
@@ -81,24 +107,17 @@ public class RequiredCourseResolver {
         return currentCoursesBySameCourseCode;
     }
 
-    public boolean findRequiredCourseInGroup(
-        String departmentName,
-        Integer admissionYear,
-        CategoryType categoryType,
-        String sameCourseCode
+    private List<RequiredCourseResponse> resolveDeprecatedCourses(
+        List<RequiredCourse> requiredCourses,
+        Map<String, RequiredCourse> currentCoursesBySameCourseCode
     ) {
-        List<RequiredCourse> requiredCourseCandidatesWithWildCard =
-            requiredCourseRepository.findRequiredCoursesBySameCourseCode(
-                List.of(WILD_CARD_DEPT_NM, departmentName),
-                admissionYear,
-                categoryType,
-                sameCourseCode
-            );
+        return requiredCourses.stream()
+            .map(requiredCourse -> mapToCurrentCourse(requiredCourse, currentCoursesBySameCourseCode))
+            .toList();
+    }
 
-        List<RequiredCourse> requiredCoursesWithStatus
-            = getDepartmentRequiredCourses(requiredCourseCandidatesWithWildCard, departmentName);
-
-        return requiredCoursesWithStatus.stream()
+    private boolean hasRequiredCourse(List<RequiredCourse> candidateRequiredCourses, String departmentName) {
+        return getDepartmentRequiredCourses(candidateRequiredCourses, departmentName).stream()
             .anyMatch(RequiredCourse::getRequired);
     }
 
@@ -141,15 +160,6 @@ public class RequiredCourseResolver {
         }
 
         return requiredCourseCandidates.values().stream().toList();
-    }
-
-    private List<RequiredCourseResponse> resolveDeprecatedCourses(
-        List<RequiredCourse> requiredCourses,
-        Map<String, RequiredCourse> currentCoursesBySameCourseCode
-    ) {
-        return requiredCourses.stream()
-            .map(requiredCourse -> mapToCurrentCourse(requiredCourse, currentCoursesBySameCourseCode))
-            .toList();
     }
 
     private boolean isWildCardRule(RequiredCourse requiredCourse, String departmentName) {

@@ -27,13 +27,14 @@ public interface RequiredCourseRepository extends JpaRepository<RequiredCourse, 
             where r.deptNm in :deptNms
             and r.admissionYear = :admissionYear
             and r.categoryType = :categoryType
-            and r.sameCourseCode = :sameCourseCode
+            and r.sameCourseCode in :sameCourseCodes
+            order by r.id asc
         """)
-    List<RequiredCourse> findRequiredCoursesBySameCourseCode(
+    List<RequiredCourse> findRequiredCoursesBySameCourseCodes(
         List<String> deptNms,
         Integer admissionYear,
         CategoryType categoryType,
-        String sameCourseCode
+        Set<String> sameCourseCodes
     );
 
     @Query("""
