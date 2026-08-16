@@ -44,6 +44,40 @@ class QueryStatsSessionListenerTest {
     }
 
     @Test
+    @DisplayName("JDBC 배치로 나간 실행도 집계에 더한다.")
+    void recordBatchExecution() {
+        // given
+        RequestQueryStats.start();
+        QueryStatsSessionListener listener = new QueryStatsSessionListener();
+
+        // when
+        listener.jdbcExecuteBatchStart();
+        listener.jdbcExecuteBatchEnd();
+
+        // then
+        RequestQueryStats queryStats = RequestQueryStats.stop();
+        assertThat(queryStats.statementCount()).isEqualTo(1);
+        assertThat(queryStats.executionNanos()).isNotNegative();
+    }
+
+    @Test
+    @DisplayName("한 세션에서 단건 실행과 배치 실행이 섞이면 둘 다 집계된다.")
+    void recordStatementAndBatchInSession() {
+        // given
+        RequestQueryStats.start();
+        QueryStatsSessionListener listener = new QueryStatsSessionListener();
+
+        // when
+        listener.jdbcExecuteStatementStart();
+        listener.jdbcExecuteStatementEnd();
+        listener.jdbcExecuteBatchStart();
+        listener.jdbcExecuteBatchEnd();
+
+        // then
+        assertThat(RequestQueryStats.stop().statementCount()).isEqualTo(2);
+    }
+
+    @Test
     @DisplayName("집계를 시작하지 않은 스레드의 실행은 무시한다.")
     void ignoreExecutionWithoutStart() {
         // given
