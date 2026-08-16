@@ -8,6 +8,7 @@ import org.hibernate.SessionEventListener;
 public class QueryStatsSessionListener implements SessionEventListener {
 
     private long statementStartNanos;
+    private long batchStartNanos;
 
     @Override
     public void jdbcExecuteStatementStart() {
@@ -17,5 +18,15 @@ public class QueryStatsSessionListener implements SessionEventListener {
     @Override
     public void jdbcExecuteStatementEnd() {
         RequestQueryStats.recordStatement(System.nanoTime() - statementStartNanos);
+    }
+
+    @Override
+    public void jdbcExecuteBatchStart() {
+        batchStartNanos = System.nanoTime();
+    }
+
+    @Override
+    public void jdbcExecuteBatchEnd() {
+        RequestQueryStats.recordStatement(System.nanoTime() - batchStartNanos);
     }
 }
