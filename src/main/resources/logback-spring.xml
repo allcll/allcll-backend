@@ -107,8 +107,9 @@
   </springProfile>
 
   <springProfile name="prod">
-    <root level="ERROR">
+    <root level="INFO">
       <appender-ref ref="ERROR-ROLLING"/>
+      <appender-ref ref="INFO-ROLLING"/>
     </root>
   </springProfile>
 </configuration>
