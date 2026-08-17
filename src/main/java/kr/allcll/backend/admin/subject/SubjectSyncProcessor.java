@@ -68,7 +68,7 @@ public class SubjectSyncProcessor {
         return new SubjectSyncResult(subjectsToAdd, subjectsToDelete, subjectsToUpdate, updateDiffs);
     }
 
-    static String generateSubjectKey(CrawlerSubject crawlerSubject) {
+    private static String generateSubjectKey(CrawlerSubject crawlerSubject) {
         return crawlerSubject.getCuriNo() + "|" +
             crawlerSubject.getDeptCd() + "|" +
             crawlerSubject.getClassName() + "|" +

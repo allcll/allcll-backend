@@ -1,9 +1,6 @@
 package kr.allcll.backend.domain.graduation.credit;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -15,115 +12,46 @@ public class AcademicBasicPolicy {
     private final RequiredCourseResolver requiredCourseResolver;
     private final CourseEquivalenceRepository courseEquivalenceRepository;
 
-    public List<CompletedCourse> filterRecentMajorAcademicBasic(
-        List<CompletedCourse> courses,
-        CreditCriterion criterion
-    ) {
-        List<CompletedCourse> academicBasicCourses = courses.stream()
-            .filter(this::isAcademicBasic)
-            .toList();
-        if (academicBasicCourses.isEmpty()) {
-            return courses;
+    public boolean isRecentMajorAcademicBasic(CompletedCourse course, CreditCriterion criterion) {
+        if (isNotAcademicBasic(course)) {
+            return true;
         }
-
-        List<String> requiredCourseNames = requiredCourseResolver.findRequiredCourseNames(
-            criterion.getDeptNm(),
-            criterion.getAdmissionYear(),
+        String curiNm = course.getCuriNm();
+        String curiNo = course.getCuriNo();
+        Integer admissionYear = criterion.getAdmissionYear();
+        String departmentName = criterion.getDeptNm();
+        List<String> academicBasicRequiredCourseNames = requiredCourseResolver.findRequiredCourseNames(
+            departmentName,
+            admissionYear,
             CategoryType.ACADEMIC_BASIC
         );
 
-        List<CompletedCourse> unmatchedAcademicBasicCourses = academicBasicCourses.stream()
-            .filter(course -> !requiredCourseNames.contains(course.getCuriNm()))
-            .toList();
-
-        Set<String> equivalenceCuriNos = findEquivalenceCuriNos(
-            unmatchedAcademicBasicCourses,
-            criterion
-        );
-
-        return courses.stream()
-            .filter(course -> isRecentMajorAcademicBasic(
-                course,
-                requiredCourseNames,
-                equivalenceCuriNos
-            ))
-            .toList();
-    }
-
-    private boolean isRecentMajorAcademicBasic(
-        CompletedCourse course,
-        List<String> requiredCourseNames,
-        Set<String> equivalenceCuriNos
-    ) {
-        if (!isAcademicBasic(course)) {
+        if (isExistAcademicBasicCourse(academicBasicRequiredCourseNames, curiNm)) {
             return true;
         }
 
-        return requiredCourseNames.contains(course.getCuriNm())
-            || equivalenceCuriNos.contains(course.getCuriNo());
+        return isHaveReplaceOrEquivalenceCourse(admissionYear, departmentName, curiNo);
     }
 
-    private Set<String> findEquivalenceCuriNos(
-        List<CompletedCourse> unmatchedAcademicBasicCourses,
-        CreditCriterion criterion
+    private boolean isExistAcademicBasicCourse(List<String> academicBasicRequiredCourseNames, String courseName) {
+        return academicBasicRequiredCourseNames.contains(courseName);
+    }
+
+    private boolean isNotAcademicBasic(CompletedCourse course) {
+        return !CategoryType.ACADEMIC_BASIC.equals(course.getCategoryType());
+    }
+
+    private boolean isHaveReplaceOrEquivalenceCourse(
+        Integer admissionYear,
+        String departmentName,
+        String curiNo
     ) {
-        Set<String> curiNos = unmatchedAcademicBasicCourses.stream()
-            .map(CompletedCourse::getCuriNo)
-            .collect(Collectors.toSet());
-
-        Map<String, Set<String>> sameCourseCodesByCuriNo = findSameCourseCodesByCuriNo(curiNos);
-        if (sameCourseCodesByCuriNo.isEmpty()) {
-            return Set.of();
-        }
-
-        Set<String> requiredSameCourseCodes = findRequiredSameCourseCodes(
-            sameCourseCodesByCuriNo,
-            criterion
-        );
-
-        return sameCourseCodesByCuriNo.entrySet().stream()
-            .filter(entry -> hasRequiredSameCourseCode(entry.getValue(), requiredSameCourseCodes))
-            .map(Map.Entry::getKey)
-            .collect(Collectors.toSet());
-    }
-
-    private Map<String, Set<String>> findSameCourseCodesByCuriNo(Set<String> curiNos) {
-        if (curiNos.isEmpty()) {
-            return Map.of();
-        }
-
-        return courseEquivalenceRepository.findAllByCuriNoIn(curiNos).stream()
-            .collect(Collectors.groupingBy(
-                CourseEquivalence::getCuriNo,
-                Collectors.mapping(CourseEquivalence::getSameCourseCode, Collectors.toSet())
+        return courseEquivalenceRepository.findSameCourseCodesByCuriNo(curiNo).stream()
+            .anyMatch(sameCourseCode -> requiredCourseResolver.findRequiredCourseInGroup(
+                departmentName,
+                admissionYear,
+                CategoryType.ACADEMIC_BASIC,
+                sameCourseCode
             ));
-    }
-
-    private Set<String> findRequiredSameCourseCodes(
-        Map<String, Set<String>> sameCourseCodesByCuriNo,
-        CreditCriterion criterion
-    ) {
-        Set<String> sameCourseCodes = sameCourseCodesByCuriNo.values().stream()
-            .flatMap(Set::stream)
-            .collect(Collectors.toSet());
-
-        return requiredCourseResolver.findRequiredCourseInGroups(
-            criterion.getDeptNm(),
-            criterion.getAdmissionYear(),
-            CategoryType.ACADEMIC_BASIC,
-            sameCourseCodes
-        );
-    }
-
-    private boolean hasRequiredSameCourseCode(
-        Set<String> sameCourseCodes,
-        Set<String> requiredSameCourseCodes
-    ) {
-        return sameCourseCodes.stream()
-            .anyMatch(requiredSameCourseCodes::contains);
-    }
-
-    private boolean isAcademicBasic(CompletedCourse course) {
-        return CategoryType.ACADEMIC_BASIC.equals(course.getCategoryType());
     }
 }
