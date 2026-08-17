@@ -1,18 +1,11 @@
 package kr.allcll.backend.domain.graduation.credit;
 
 import static kr.allcll.backend.fixture.CompletedCourseFixture.createCompletedCourse;
-import static kr.allcll.backend.fixture.CourseEquivalenceFixture.createCourseEquivalence;
 import static kr.allcll.backend.fixture.CreditCriterionFixture.createAcademicBasicCriterion;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.times;
 
 import java.util.List;
-import java.util.Set;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,21 +27,21 @@ class AcademicBasicPolicyTest {
 
     @Test
     @DisplayName("ACADEMIC_BASIC이 아닌 과목은 검사 없이 통과한다")
-    void passThroughCourseWhenNotAcademicBasic() {
+    void returnTrueWhenNotAcademicBasic() {
         // given
         CompletedCourse course = createCompletedCourse("123456", "알고리즘및실습", CategoryType.MAJOR_BASIC);
         CreditCriterion criterion = createAcademicBasicCriterion("컴퓨터공학과", 2021);
 
         // when
-        List<CompletedCourse> result = academicBasicPolicy.filterRecentMajorAcademicBasic(List.of(course), criterion);
+        boolean result = academicBasicPolicy.isRecentMajorAcademicBasic(course, criterion);
 
         // then
-        assertThat(result).containsExactly(course);
+        assertThat(result).isTrue();
     }
 
     @Test
-    @DisplayName("학과 지정과목명에 있는 과목은 학문기초로 인정한다")
-    void acceptCourseWhenNameMatchesRequiredCourse() {
+    @DisplayName("필수 과목 리스트에 존재하는 과목이면 true를 반환한다")
+    void returnTrueWhenDirectMatch() {
         // given
         String courseName = "공학설계기초";
         String departmentName = "컴퓨터공학과";
@@ -64,15 +57,15 @@ class AcademicBasicPolicyTest {
         ).willReturn(List.of("공학설계기초", "기초미적분학"));
 
         // when
-        List<CompletedCourse> result = academicBasicPolicy.filterRecentMajorAcademicBasic(List.of(course), criterion);
+        boolean result = academicBasicPolicy.isRecentMajorAcademicBasic(course, criterion);
 
         // then
-        assertThat(result).containsExactly(course);
+        assertThat(result).isTrue();
     }
 
     @Test
-    @DisplayName("지정과목명에 없어도 동일과목 그룹으로 인정되면 학문기초로 인정한다")
-    void acceptCourseWhenGroupCodeMatchesRequiredCourse() {
+    @DisplayName("필수 과목에 없지만 동일과목 그룹에 속하면 true를 반환한다")
+    void returnTrueWhenGroupCodeMatchesRequiredCourse() {
         // given
         String curiNo = "123456";
         String sameCourseCode = "1";
@@ -88,27 +81,27 @@ class AcademicBasicPolicyTest {
                 CategoryType.ACADEMIC_BASIC
             )
         ).willReturn(List.of());
-        given(courseEquivalenceRepository.findAllByCuriNoIn(Set.of(curiNo)))
-            .willReturn(List.of(createCourseEquivalence(curiNo, sameCourseCode)));
+        given(courseEquivalenceRepository.findSameCourseCodesByCuriNo(curiNo))
+            .willReturn(List.of(sameCourseCode));
         given(
-            requiredCourseResolver.findRequiredCourseInGroups(
+            requiredCourseResolver.findRequiredCourseInGroup(
                 departmentName,
                 admissionYear,
                 CategoryType.ACADEMIC_BASIC,
-                Set.of(sameCourseCode)
+                sameCourseCode
             )
-        ).willReturn(Set.of(sameCourseCode));
+        ).willReturn(true);
 
         // when
-        List<CompletedCourse> result = academicBasicPolicy.filterRecentMajorAcademicBasic(List.of(course), criterion);
+        boolean result = academicBasicPolicy.isRecentMajorAcademicBasic(course, criterion);
 
         // then
-        assertThat(result).containsExactly(course);
+        assertThat(result).isTrue();
     }
 
     @Test
-    @DisplayName("여러 동일과목 그룹에 속하면 그중 하나만 인정되어도 학문기초로 인정한다")
-    void acceptCourseWhenAnyOfMultipleGroupsMatchesRequiredCourse() {
+    @DisplayName("여러 동일과목 그룹에 속한 과목은 그중 하나라도 필수과목을 포함하면 true를 반환한다")
+    void returnTrueWhenAnyOfMultipleGroupsMatchesRequiredCourse() {
         // given
         String curiNo = "009960";
         String firstGroupCode = "1";
@@ -126,31 +119,35 @@ class AcademicBasicPolicyTest {
                 CategoryType.ACADEMIC_BASIC
             )
         ).willReturn(List.of());
-        given(courseEquivalenceRepository.findAllByCuriNoIn(Set.of(curiNo)))
-            .willReturn(List.of(
-                createCourseEquivalence(curiNo, firstGroupCode),
-                createCourseEquivalence(curiNo, secondGroupCode)
-            ));
+        given(courseEquivalenceRepository.findSameCourseCodesByCuriNo(curiNo))
+            .willReturn(List.of(firstGroupCode, secondGroupCode));
         given(
-            requiredCourseResolver.findRequiredCourseInGroups(
+            requiredCourseResolver.findRequiredCourseInGroup(
                 departmentName,
                 admissionYear,
                 CategoryType.ACADEMIC_BASIC,
-                Set.of(firstGroupCode, secondGroupCode)
+                firstGroupCode
             )
-        ).willReturn(Set.of(secondGroupCode));
+        ).willReturn(false);
+        given(
+            requiredCourseResolver.findRequiredCourseInGroup(
+                departmentName,
+                admissionYear,
+                CategoryType.ACADEMIC_BASIC,
+                secondGroupCode
+            )
+        ).willReturn(true);
 
         // when
-        List<CompletedCourse> result = academicBasicPolicy.filterRecentMajorAcademicBasic(List.of(course), criterion);
+        boolean result = academicBasicPolicy.isRecentMajorAcademicBasic(course, criterion);
 
         // then
-        assertThat(result).containsExactly(course);
+        assertThat(result).isTrue();
     }
 
     @Test
-    @DisplayName("동일과목 그룹에 속해도 해당 학과의 지정과목이 아니면 학문기초로 인정하지 않는다")
-    void rejectCourseWhenGroupCodeNotMatchesRequiredCourse() {
-        // given
+    @DisplayName("과목명이 필수과목에 없고 동일과목 그룹에 속하지만, 해당 과의 이수 요건에 해당하지 않으면 false를 반환한다")
+    void returnFalseWhenGroupCodeNotMatchesRequiredCourse() {
         String curiNo = "123456";
         String sameCourseCode = "1";
         String departmentName = "컴퓨터공학과";
@@ -165,27 +162,26 @@ class AcademicBasicPolicyTest {
                 CategoryType.ACADEMIC_BASIC
             )
         ).willReturn(List.of());
-        given(courseEquivalenceRepository.findAllByCuriNoIn(Set.of(curiNo)))
-            .willReturn(List.of(createCourseEquivalence(curiNo, sameCourseCode)));
+        given(courseEquivalenceRepository.findSameCourseCodesByCuriNo(curiNo))
+            .willReturn(List.of(sameCourseCode));
         given(
-            requiredCourseResolver.findRequiredCourseInGroups(
+            requiredCourseResolver.findRequiredCourseInGroup(
                 departmentName,
                 admissionYear,
                 CategoryType.ACADEMIC_BASIC,
-                Set.of(sameCourseCode)
-            )
-        ).willReturn(Set.of()); //해당 학과의 지정 과목이 required=false인 경우
+                sameCourseCode)
+        ).willReturn(false); //해당 학과의 지정 과목이 required=false인 경우
 
         // when
-        List<CompletedCourse> result = academicBasicPolicy.filterRecentMajorAcademicBasic(List.of(course), criterion);
+        boolean result = academicBasicPolicy.isRecentMajorAcademicBasic(course, criterion);
 
         // then
-        assertThat(result).isEmpty();
+        assertThat(result).isFalse();
     }
 
     @Test
-    @DisplayName("지정과목명에도 없고 동일과목 그룹에도 속하지 않으면 학문기초로 인정하지 않는다")
-    void rejectCourseWhenCuriNoNotInEquivalence() {
+    @DisplayName("과목명이 필수과목에도 없고 동일과목 그룹에도 속하지 않으면 false를 반환한다")
+    void returnFalseWhenCuriNoNotInEquivalence() {
         // given
         String curiNo = "123456";
         String departmentName = "컴퓨터공학과";
@@ -195,49 +191,13 @@ class AcademicBasicPolicyTest {
 
         given(requiredCourseResolver.findRequiredCourseNames(departmentName, admissionYear, CategoryType.ACADEMIC_BASIC))
             .willReturn(List.of());
-        given(courseEquivalenceRepository.findAllByCuriNoIn(Set.of(curiNo)))
+        given(courseEquivalenceRepository.findSameCourseCodesByCuriNo(curiNo))
             .willReturn(List.of());
 
         // when
-        List<CompletedCourse> result = academicBasicPolicy.filterRecentMajorAcademicBasic(List.of(course), criterion);
+        boolean result = academicBasicPolicy.isRecentMajorAcademicBasic(course, criterion);
 
         // then
-        assertThat(result).isEmpty();
-    }
-
-    @Test
-    @DisplayName("학문기초 과목이 여러 개여도 지정과목·동일과목 조회는 각각 한 번만 수행한다")
-    void queryOncePerCourseList() {
-        // given
-        String departmentName = "컴퓨터공학과";
-        Integer admissionYear = 2021;
-        List<CompletedCourse> courses = List.of(
-            createCompletedCourse("100001", "공학설계기초", CategoryType.ACADEMIC_BASIC),
-            createCompletedCourse("100002", "옛날공학설계기초", CategoryType.ACADEMIC_BASIC),
-            createCompletedCourse("100003", "존재하지않는과목", CategoryType.ACADEMIC_BASIC)
-        );
-        CreditCriterion criterion = createAcademicBasicCriterion(departmentName, admissionYear);
-
-        given(requiredCourseResolver.findRequiredCourseNames(departmentName, admissionYear, CategoryType.ACADEMIC_BASIC))
-            .willReturn(List.of("공학설계기초"));
-        given(courseEquivalenceRepository.findAllByCuriNoIn(Set.of("100002", "100003")))
-            .willReturn(List.of(createCourseEquivalence("100002", "1")));
-        given(
-            requiredCourseResolver.findRequiredCourseInGroups(
-                departmentName,
-                admissionYear,
-                CategoryType.ACADEMIC_BASIC,
-                Set.of("1")
-            )
-        ).willReturn(Set.of("1"));
-
-        // when
-        List<CompletedCourse> result = academicBasicPolicy.filterRecentMajorAcademicBasic(courses, criterion);
-
-        // then
-        assertThat(result).containsExactly(courses.get(0), courses.get(1));
-        then(requiredCourseResolver).should(times(1))
-            .findRequiredCourseNames(anyString(), anyInt(), any(CategoryType.class));
-        then(courseEquivalenceRepository).should(times(1)).findAllByCuriNoIn(any());
+        assertThat(result).isFalse();
     }
 }

@@ -98,7 +98,13 @@ public class CategoryCreditCalculator {
         List<CompletedCourse> earnedCourses,
         CreditCriterion criterion
     ) {
-        double earnedCredits = calculateEarnedCredits(earnedCourses, criterion);
+        double earnedCredits = earnedCourses.stream()
+            .filter(course -> course.getCategoryType() == criterion.getCategoryType())
+            .filter(course -> matchesMajorScope(course, criterion.getMajorScope()))
+            .filter(course -> academicBasicPolicy.isRecentMajorAcademicBasic(course, criterion))
+            .mapToDouble(CompletedCourse::getCredits)
+            .sum();
+
         int requiredCredits = criterion.getRequiredCredits();
         double remainingCredits = calculateRemainingCredits(requiredCredits, earnedCredits);
         boolean isSatisfied = remainingCredits <= 0;
@@ -114,22 +120,6 @@ public class CategoryCreditCalculator {
             null,
             isSatisfied
         );
-    }
-
-    private double calculateEarnedCredits(
-        List<CompletedCourse> earnedCourses,
-        CreditCriterion criterion
-    ) {
-        List<CompletedCourse> matchedCourses = earnedCourses.stream()
-            .filter(course -> course.getCategoryType() == criterion.getCategoryType())
-            .filter(course -> matchesMajorScope(course, criterion.getMajorScope()))
-            .toList();
-        List<CompletedCourse> recognizedCourses =
-            academicBasicPolicy.filterRecentMajorAcademicBasic(matchedCourses, criterion);
-
-        return recognizedCourses.stream()
-            .mapToDouble(CompletedCourse::getCredits)
-            .sum();
     }
 
     private boolean matchesMajorScope(CompletedCourse course, MajorScope criterionScope) {

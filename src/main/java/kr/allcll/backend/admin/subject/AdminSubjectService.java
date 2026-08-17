@@ -1,9 +1,6 @@
 package kr.allcll.backend.admin.subject;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import kr.allcll.backend.support.semester.Semester;
 import kr.allcll.crawler.common.exception.CrawlerAllcllException;
 import kr.allcll.crawler.subject.CrawlerSubject;
@@ -30,7 +27,7 @@ public class AdminSubjectService {
         log.info("[SubjectService] 기존 과목 수: {}", existingCrawlerSubjects.size());
         SubjectSyncResult syncResult = SubjectSyncProcessor.process(allCrawlerSubjects, existingCrawlerSubjects);
         saveAddedSubjects(syncResult);
-        updateChangedSubjects(syncResult, existingCrawlerSubjects);
+        updateChangedSubjects(syncResult);
         deleteRemovedSubjects(syncResult);
 
         return syncResult;
@@ -52,19 +49,18 @@ public class AdminSubjectService {
         }
     }
 
-    private void updateChangedSubjects(SubjectSyncResult syncResult, List<CrawlerSubject> existingCrawlerSubjects) {
+    private void updateChangedSubjects(SubjectSyncResult syncResult) {
         if (syncResult.subjectsToUpdateIsExist()) {
             List<CrawlerSubject> subjectsToUpdate = syncResult.subjectsCanUpdate();
             log.info("[SubjectService] 변경된 과목 수: {}", subjectsToUpdate.size());
-            Map<String, CrawlerSubject> existingSubjectsByKey = existingCrawlerSubjects.stream()
-                .collect(Collectors.toMap(SubjectSyncProcessor::generateSubjectKey, subject -> subject));
             for (CrawlerSubject updatedSubject : subjectsToUpdate) {
-                String subjectKey = SubjectSyncProcessor.generateSubjectKey(updatedSubject);
-                CrawlerSubject existingSubject = Optional.ofNullable(
-                    existingSubjectsByKey.get(subjectKey)
-                ).orElseThrow(() ->
-                    new CrawlerAllcllException("SUBJECT_NOT_FOUND", "과목이 존재하지 않습니다.")
-                );
+                CrawlerSubject existingSubject = crawlerSubjectRepository.findByLogicalKeyIncludingDeleted(
+                    updatedSubject.getCuriNo(),
+                    updatedSubject.getDeptCd(),
+                    updatedSubject.getClassName(),
+                    updatedSubject.getSmtCd(),
+                    Semester.getCurrentSemester()
+                ).orElseThrow(() -> new CrawlerAllcllException("SUBJECT_NOT_FOUND", "과목이 존재하지 않습니다."));
                 existingSubject.updateFrom(updatedSubject);
             }
         }

@@ -1,8 +1,7 @@
 package kr.allcll.backend.domain.basket;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import kr.allcll.backend.domain.basket.dto.BasketsEachSubject;
 import kr.allcll.backend.domain.basket.dto.BasketsResponse;
 import kr.allcll.backend.domain.basket.dto.SubjectBasketsResponse;
@@ -15,14 +14,10 @@ import kr.allcll.backend.support.semester.Semester;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class BasketService {
-
-    private static final int NO_BASKET_TOTAL_COUNT = 0;
 
     private final BasketRepository basketRepository;
     private final SubjectRepository subjectRepository;
@@ -39,30 +34,15 @@ public class BasketService {
     }
 
     private List<BasketsEachSubject> getBasketsEachSubject(List<Subject> subjects) {
-        if (subjects.isEmpty()) {
-            return List.of();
-        }
-
-        List<Long> subjectIds = subjects.stream()
-            .map(Subject::getId)
-            .toList();
-        Map<Long, Integer> totalCountsBySubjectId = findTotalCountsBySubjectIds(subjectIds);
-
-        return subjectIds.stream()
-            .map(subjectId -> BasketsEachSubject.of(
-                subjectId,
-                totalCountsBySubjectId.getOrDefault(subjectId, NO_BASKET_TOTAL_COUNT)
-            ))
-            .toList();
-    }
-
-    private Map<Long, Integer> findTotalCountsBySubjectIds(List<Long> subjectIds) {
-        Map<Long, Integer> totalCountsBySubjectId = new HashMap<>();
-        basketRepository.findTotalCountsBySubjectIds(subjectIds, Semester.getCurrentSemester())
-            .forEach(totalCount ->
-                totalCountsBySubjectId.put(totalCount.subjectId(), totalCount.totalCount())
+        List<BasketsEachSubject> result = new ArrayList<>();
+        for (Subject subject : subjects) {
+            List<Basket> baskets = basketRepository.findBySubjectId(
+                subject.getId(),
+                Semester.getCurrentSemester()
             );
-        return totalCountsBySubjectId;
+            result.add(BasketsEachSubject.from(subject, baskets));
+        }
+        return result;
     }
 
     private Specification<Subject> getCondition(
