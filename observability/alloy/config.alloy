@@ -13,6 +13,12 @@ loki.source.file "allcll" {
       "env"         = "prod",
       "level"       = "info",
     },
+    {
+      "__path__"    = "/var/log/allcll/spring-boot-application-warn.log",
+      "application" = "backend",
+      "env"         = "prod",
+      "level"       = "warn",
+    },
   ]
   forward_to = [loki.write.local.receiver]
 }

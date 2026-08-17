@@ -109,6 +109,7 @@
   <springProfile name="prod">
     <root level="INFO">
       <appender-ref ref="ERROR-ROLLING"/>
+      <appender-ref ref="WARN-ROLLING"/>
       <appender-ref ref="INFO-ROLLING"/>
     </root>
   </springProfile>
