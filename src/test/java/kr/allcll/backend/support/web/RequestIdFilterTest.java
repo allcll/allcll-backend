@@ -1,7 +1,6 @@
 package kr.allcll.backend.support.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import ch.qos.logback.classic.Level;
@@ -10,7 +9,6 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.PatternLayout;
 import ch.qos.logback.classic.spi.LoggingEvent;
 import jakarta.servlet.ServletException;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +28,7 @@ class RequestIdFilterTest {
     }
 
     @Test
-    void 요청_처리_중에는_서버가_생성한_UUID_requestId가_MDC에_있고_응답은_그대로_전달된다() throws Exception {
+    void 요청_처리_중에는_서버가_생성한_12자리_requestId가_MDC에_있고_응답은_그대로_전달된다() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("X-Request-Id", "client-supplied-request-id");
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -43,7 +41,7 @@ class RequestIdFilterTest {
         });
 
         assertThat(requestIdDuringRequest.get()).isNotNull().isNotEqualTo("client-supplied-request-id");
-        assertThatCode(() -> UUID.fromString(requestIdDuringRequest.get())).doesNotThrowAnyException();
+        assertThat(requestIdDuringRequest.get()).matches("[A-Za-z0-9_-]{12}");
         assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.getContentAsString()).isEqualTo("unchanged-response");
         assertThat(MDC.get(RequestIdFilter.REQUEST_ID_MDC_KEY)).isNull();
@@ -64,8 +62,8 @@ class RequestIdFilterTest {
     }
 
     @Test
-    void UUID_requestId는_로그_패턴에_출력될_수_있다() {
-        String requestId = UUID.randomUUID().toString();
+    void 짧은_requestId는_로그_패턴에_출력될_수_있다() {
+        String requestId = "Cx8rP2mKq9Vd";
         MDC.put(RequestIdFilter.REQUEST_ID_MDC_KEY, requestId);
 
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
