@@ -15,8 +15,8 @@ public interface CourseEquivalenceRepository extends JpaRepository<CourseEquival
     List<String> findSameGroupCuriNos(Set<String> curiNos);
 
     @Query("""
-        select distinct e.sameCourseCode from CourseEquivalence e
-        where e.curiNo = :curiNo
+        select e from CourseEquivalence e
+        where e.curiNo in :curiNos
     """)
-    List<String> findSameCourseCodesByCuriNo(String curiNo);
+    List<CourseEquivalence> findAllByCuriNoIn(Set<String> curiNos);
 }
