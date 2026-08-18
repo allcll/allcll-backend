@@ -72,6 +72,10 @@ public class User extends BaseEntity {
         this.doubleDeptCd = null;
     }
 
+    public boolean hasDoubleMajor() {
+        return doubleDeptCd != null;
+    }
+
     public void updateDoubleMajorUser(
         UpdateUserRequest updateUserRequest,
         GraduationDepartmentInfo primaryDept,

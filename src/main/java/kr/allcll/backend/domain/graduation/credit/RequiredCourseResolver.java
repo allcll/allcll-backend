@@ -1,9 +1,9 @@
 package kr.allcll.backend.domain.graduation.credit;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import kr.allcll.backend.domain.graduation.credit.dto.RequiredCourseResponse;
 import kr.allcll.backend.support.graduation.KeyUtils;
@@ -32,7 +32,7 @@ public class RequiredCourseResolver {
     }
 
     private Map<CategoryType, List<RequiredCourseResponse>> resolveRequiredCourses(List<RequiredCourse> courses) {
-        Map<String, RequiredCourse> selectedByCourseKey = new LinkedHashMap<>();
+        Map<String, RequiredCourse> selectedByCourseKey = new HashMap<>();
         for (RequiredCourse course : courses) {
             String courseKey = KeyUtils.generate(course.getCategoryType(), course.getCuriNm());
             if (WILD_CARD_DEPT_CD.equals(course.getDeptCd())) {
@@ -48,6 +48,17 @@ public class RequiredCourseResolver {
                 RequiredCourse::getCategoryType,
                 Collectors.collectingAndThen(Collectors.toList(), this::resolveDeprecatedCourses)
             ));
+    }
+
+    public Map<String, CategoryType> buildCategoryByCuriNo(Integer admissionYear, String deptCd) {
+        Map<CategoryType, List<RequiredCourseResponse>> resolved = resolveRequiredCourses(admissionYear, deptCd);
+        Map<String, CategoryType> categoryByCuriNo = new HashMap<>();
+        for (Entry<CategoryType, List<RequiredCourseResponse>> entry : resolved.entrySet()) {
+            for (RequiredCourseResponse course : entry.getValue()) {
+                categoryByCuriNo.put(course.curiNo(), entry.getKey());
+            }
+        }
+        return categoryByCuriNo;
     }
 
     public boolean findRequiredCourseInGroup(
@@ -130,7 +141,8 @@ public class RequiredCourseResolver {
         if (isNotDeprecated(requiredCourse.getCuriNo())) {
             return RequiredCourseResponse.of(requiredCourse.getCuriNo(), requiredCourse.getCuriNm());
         }
-        return requiredCourseRepository.findCurrentCourseBySameCourseCode(requiredCourse.getSameCourseCode(), DEPRECATED)
+        return requiredCourseRepository.findCurrentCourseBySameCourseCode(requiredCourse.getSameCourseCode(),
+                DEPRECATED)
             .map(currentCourse -> RequiredCourseResponse.of(currentCourse.getCuriNo(), currentCourse.getCuriNm()))
             .orElseGet(() -> {
                 log.error(

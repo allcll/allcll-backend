@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import kr.allcll.backend.domain.graduation.MajorScope;
 import kr.allcll.backend.domain.graduation.MajorType;
 import kr.allcll.backend.domain.graduation.check.excel.CompletedCourse;
 import kr.allcll.backend.domain.graduation.check.result.dto.CertResult;
@@ -17,6 +18,7 @@ import kr.allcll.backend.domain.graduation.credit.CreditCriterionRepository;
 import kr.allcll.backend.domain.graduation.credit.DoubleCreditCriterion;
 import kr.allcll.backend.domain.graduation.credit.DoubleCreditCriterionRepository;
 import kr.allcll.backend.domain.graduation.credit.GeneralElectivePolicy;
+import kr.allcll.backend.domain.graduation.credit.RequiredCourseResolver;
 import kr.allcll.backend.domain.user.User;
 import kr.allcll.backend.domain.user.UserRepository;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
@@ -31,6 +33,7 @@ public class GraduationChecker {
     private final CategoryCreditCalculator categoryCalculator;
     private final CertificationChecker certificationChecker;
     private final GeneralElectivePolicy generalElectivePolicy;
+    private final RequiredCourseResolver requiredCourseResolver;
 
     private final UserRepository userRepository;
     private final CreditCriterionRepository creditCriterionRepository;
@@ -45,6 +48,9 @@ public class GraduationChecker {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new AllcllException(AllcllErrorCode.USER_NOT_FOUND));
         List<CreditCriterion> creditCriteria = resolveCreditCriteria(user);
+
+        // required_courses 시트 기준으로 이수구분 재분류
+        reclassifyByRequiredCourses(earnedCourses, user);
 
         // 이수구분별 학점 계산
         List<GraduationCategory> categoryResults = categoryCalculator.calculateCategoryResults(
@@ -214,6 +220,43 @@ public class GraduationChecker {
         return completedCourses.stream()
             .mapToDouble(CompletedCourse::getCredits)
             .sum();
+    }
+
+    private void reclassifyByRequiredCourses(List<CompletedCourse> earnedCourses, User user) {
+        Map<String, CategoryType> primaryMap = requiredCourseResolver.buildCategoryByCuriNo(
+            user.getAdmissionYear(), user.getDeptCd()
+        );
+        Map<String, CategoryType> secondaryMap = buildSecondaryCategoryMap(user);
+
+        for (CompletedCourse course : earnedCourses) {
+            Map<String, CategoryType> targetMap = selectCategoryMap(course, primaryMap, secondaryMap);
+            CategoryType sheetCategory = targetMap.get(course.getCuriNo());
+            if (hasDifferentCategory(course, sheetCategory)) {
+                course.reclassifyCategory(sheetCategory);
+            }
+        }
+    }
+
+    private Map<String, CategoryType> selectCategoryMap(
+        CompletedCourse course,
+        Map<String, CategoryType> primaryMap,
+        Map<String, CategoryType> secondaryMap
+    ) {
+        if (course.getMajorScope() == MajorScope.SECONDARY) {
+            return secondaryMap;
+        }
+        return primaryMap;
+    }
+
+    private Map<String, CategoryType> buildSecondaryCategoryMap(User user) {
+        if (!user.hasDoubleMajor()) {
+            return Map.of();
+        }
+        return requiredCourseResolver.buildCategoryByCuriNo(user.getAdmissionYear(), user.getDoubleDeptCd());
+    }
+
+    private boolean hasDifferentCategory(CompletedCourse course, CategoryType sheetCategory) {
+        return sheetCategory != null && sheetCategory != course.getCategoryType();
     }
 
     private boolean canGraduate(
