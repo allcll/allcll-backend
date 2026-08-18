@@ -35,6 +35,8 @@ import org.springframework.stereotype.Service;
 public class AdminSeatService {
 
     private static final long RECENT_CRAWLING_SUCCESS_THRESHOLD_MS = 3_000;
+    private static final boolean PIN_SUBJECT = true;
+    private static final boolean GENERAL_SUBJECT = false;
     private final SeatClient seatClient;
     private final Credentials credentials;
     private final TargetSubjectStorage targetSubjectStorage;
@@ -117,7 +119,7 @@ public class AdminSeatService {
 
     private void crawlPinSeatAndBuffer(CrawlerSubject pinSubject, Credential credential, SeatUtilsType seatUtilsType) {
         try {
-            CrawlerSeat crawlerSeat = sendExternalSeatRequest(pinSubject, credential, seatUtilsType, true);
+            CrawlerSeat crawlerSeat = sendExternalSeatRequest(pinSubject, credential, seatUtilsType, PIN_SUBJECT);
             recordCrawlingSuccess();
 
             batchService.savePinSeatBatch(crawlerSeat);
@@ -132,7 +134,7 @@ public class AdminSeatService {
     private void crawlGeneralSeatAndBuffer(CrawlerSubject generalSubject, Credential credential,
         SeatUtilsType seatUtilsType) {
         try {
-            CrawlerSeat crawlerSeat = sendExternalSeatRequest(generalSubject, credential, seatUtilsType, false);
+            CrawlerSeat crawlerSeat = sendExternalSeatRequest(generalSubject, credential, seatUtilsType, GENERAL_SUBJECT);
             recordCrawlingSuccess();
 
             batchService.saveGeneralSeatBatch(crawlerSeat);
