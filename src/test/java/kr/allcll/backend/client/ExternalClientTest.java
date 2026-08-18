@@ -8,15 +8,19 @@ import kr.allcll.backend.admin.seat.TargetSubjectStorage;
 import kr.allcll.backend.admin.seat.dto.PinSubjectUpdateRequest;
 import kr.allcll.backend.admin.seat.dto.PinSubjectUpdateRequest.PinSubject;
 import kr.allcll.backend.domain.seat.SeatStorage;
+import kr.allcll.backend.domain.seat.pin.Pin;
+import kr.allcll.backend.domain.seat.pin.PinRepository;
 import kr.allcll.backend.domain.subject.Subject;
 import kr.allcll.backend.domain.subject.SubjectRepository;
 import kr.allcll.backend.fixture.SubjectFixture;
+import kr.allcll.backend.support.sse.SseEmitterStorage;
 import kr.allcll.crawler.subject.CrawlerSubject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @SpringBootTest(classes = AllcllBackendApplication.class)
 class ExternalClientTest {
@@ -25,7 +29,13 @@ class ExternalClientTest {
     private ExternalClient externalClient;
 
     @Autowired
+    private ExternalService externalService;
+
+    @Autowired
     private SubjectRepository subjectRepository;
+
+    @Autowired
+    private PinRepository pinRepository;
 
     @Autowired
     private SeatStorage seatStorage;
@@ -33,9 +43,13 @@ class ExternalClientTest {
     @Autowired
     private TargetSubjectStorage targetSubjectStorage;
 
+    @Autowired
+    private SseEmitterStorage sseEmitterStorage;
+
     @AfterEach
     void tearDown() {
         seatStorage.clear();
+        pinRepository.deleteAllInBatch();
         subjectRepository.deleteAllInBatch();
     }
 
@@ -63,5 +77,47 @@ class ExternalClientTest {
                 subjectA.getId(),
                 subjectB.getId()
             );
+        assertThat(targetSubjectStorage.getPinSubject(subjectA.getId()).getId()).isEqualTo(subjectA.getId());
+
+        // 대상 과목이 변경되면 snapshot도 새 대상 기준으로 교체된다.
+        externalClient.sendPinSubjects(new PinSubjectUpdateRequest(List.of(new PinSubject(subjectB.getId(), 1))));
+
+        assertThat(targetSubjectStorage.getTargetSubjects())
+            .extracting(CrawlerSubject::getId)
+            .containsExactly(subjectB.getId());
+        assertThat(targetSubjectStorage.getPinSubject(subjectB.getId()).getId()).isEqualTo(subjectB.getId());
+    }
+
+    @Test
+    @DisplayName("활성 SSE token의 핀 과목만 크롤러 대상에 전달한다.")
+    void sendWantPinSubjectsToCrawler() {
+        // given
+        Subject activeSubject = subjectRepository.save(
+            SubjectFixture.createMajorSubject(null, "활성 과목", "000001", "001", "김주환")
+        );
+        Subject inactiveSubject = subjectRepository.save(
+            SubjectFixture.createMajorSubject(null, "비활성 과목", "000002", "001", "김주환")
+        );
+        String activeToken = "active-token";
+        SseEmitter emitter = new SseEmitter();
+        sseEmitterStorage.add(activeToken, emitter);
+        pinRepository.saveAll(List.of(
+            new Pin(activeToken, activeSubject),
+            new Pin("inactive-token", inactiveSubject)
+        ));
+
+        try {
+            // when
+            externalService.sendWantPinSubjectIdsToCrawler();
+
+            // then
+            assertThat(targetSubjectStorage.getTargetSubjects())
+                .extracting(CrawlerSubject::getId)
+                .containsExactly(activeSubject.getId());
+            assertThat(targetSubjectStorage.getPinSubject(activeSubject.getId()).getId())
+                .isEqualTo(activeSubject.getId());
+        } finally {
+            emitter.complete();
+        }
     }
 }
