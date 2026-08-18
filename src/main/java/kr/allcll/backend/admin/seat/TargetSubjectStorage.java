@@ -47,8 +47,7 @@ public class TargetSubjectStorage {
 
     public void addPinSubjects(Map<CrawlerSubject, Integer> subjects) {
         String currentSemester = Semester.getCurrentSemester();
-        Map<Long, Subject> updatedPinSubjects = loadMissingPinSubjects(subjects, currentSemester);
-        pinSubjectsById = updatedPinSubjects;
+        pinSubjectsById = loadMissingPinSubjects(subjects, currentSemester);
         pinSnapshotSemester = currentSemester;
 
         firstPriorityQueue.clear();
