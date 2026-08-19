@@ -74,7 +74,7 @@
   <property name="LOG_PATTERN"
     value="[%d{yyyy-MM-dd HH:mm:ss}:%-3relative]  %clr(%-5level) %clr(${PID:-}){magenta} %clr(---){faint} %clr([%15.15thread]){faint} %clr([requestId=%X{requestId:-}]){faint} %clr(%-40.40logger{36}){cyan} %clr(:){faint} %msg%n"/>
   <property name="LOG_FILE_PATTERN"
-    value="[%d{yyyy-MM-dd HH:mm:ss}:%-3relative]  %-5level ${PID:-} --- [%15.15thread] [requestId=%X{requestId:-}] %-40.40logger{36} : %msg%n"/>
+    value="[%d{yyyy-MM-dd HH:mm:ss}:%-3relative]  %-5level ${PID:-} --- [%15.15thread] [requestId=%X{requestId:-}] %-40.40logger{36} : %msg%n%nopex"/>
 
   <!--  ec2와 local 에서의 로그 경로 분리  -->
   <property name="LOG_PATH" value="${LOG_PATH:-/home/ubuntu/app/logs}"/>
@@ -107,8 +107,10 @@
   </springProfile>
 
   <springProfile name="prod">
-    <root level="ERROR">
+    <root level="INFO">
       <appender-ref ref="ERROR-ROLLING"/>
+      <appender-ref ref="WARN-ROLLING"/>
+      <appender-ref ref="INFO-ROLLING"/>
     </root>
   </springProfile>
 </configuration>
