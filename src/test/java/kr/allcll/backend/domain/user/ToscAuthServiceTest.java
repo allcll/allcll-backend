@@ -39,7 +39,7 @@ class ToscAuthServiceTest {
             "https://portal.sejong.ac.kr/englishInfo",
             "https://portal.sejong.ac.kr/codingInfo"
         );
-        toscAuthService = new ToscAuthService(properties, new okhttp3.OkHttpClient());
+        toscAuthService = new ToscAuthService(properties);
         portalCookieManager = new CookieManager();
         portalCookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
     }
