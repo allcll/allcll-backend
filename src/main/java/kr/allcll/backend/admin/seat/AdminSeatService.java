@@ -9,10 +9,12 @@ import kr.allcll.backend.admin.seat.dto.SeatStatusResponse;
 import kr.allcll.backend.domain.seat.SeatStorage;
 import kr.allcll.backend.domain.seat.dto.SeatDto;
 import kr.allcll.backend.domain.subject.Subject;
+import kr.allcll.backend.domain.subject.SubjectRepository;
 import kr.allcll.backend.support.batch.BatchService;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import kr.allcll.backend.support.metrics.SeatPipelineMetrics;
+import kr.allcll.backend.support.semester.Semester;
 import kr.allcll.backend.support.web.PrefixParser;
 import kr.allcll.backend.support.web.TokenProvider;
 import kr.allcll.crawler.client.SeatClient;
@@ -35,8 +37,6 @@ import org.springframework.stereotype.Service;
 public class AdminSeatService {
 
     private static final long RECENT_CRAWLING_SUCCESS_THRESHOLD_MS = 3_000;
-    private static final boolean PIN_SUBJECT = true;
-    private static final boolean GENERAL_SUBJECT = false;
     private final SeatClient seatClient;
     private final Credentials credentials;
     private final TargetSubjectStorage targetSubjectStorage;
@@ -45,6 +45,7 @@ public class AdminSeatService {
     private final SeatStorage seatStorage;
     private final AtomicLong lastSuccessCrawlingTime = new AtomicLong(0);
     private final BatchService batchService;
+    private final SubjectRepository subjectRepository;
     private final SeatPipelineMetrics seatPipelineMetrics;
 
     public void getAllSeatPeriodically(String userId, SeatUtilsType seatUtilsType) {
@@ -119,7 +120,7 @@ public class AdminSeatService {
 
     private void crawlPinSeatAndBuffer(CrawlerSubject pinSubject, Credential credential, SeatUtilsType seatUtilsType) {
         try {
-            CrawlerSeat crawlerSeat = sendExternalSeatRequest(pinSubject, credential, seatUtilsType, PIN_SUBJECT);
+            CrawlerSeat crawlerSeat = sendExternalSeatRequest(pinSubject, credential, seatUtilsType);
             recordCrawlingSuccess();
 
             batchService.savePinSeatBatch(crawlerSeat);
@@ -134,7 +135,7 @@ public class AdminSeatService {
     private void crawlGeneralSeatAndBuffer(CrawlerSubject generalSubject, Credential credential,
         SeatUtilsType seatUtilsType) {
         try {
-            CrawlerSeat crawlerSeat = sendExternalSeatRequest(generalSubject, credential, seatUtilsType, GENERAL_SUBJECT);
+            CrawlerSeat crawlerSeat = sendExternalSeatRequest(generalSubject, credential, seatUtilsType);
             recordCrawlingSuccess();
 
             batchService.saveGeneralSeatBatch(crawlerSeat);
@@ -149,20 +150,15 @@ public class AdminSeatService {
     private CrawlerSeat sendExternalSeatRequest(
         CrawlerSubject crawlerSubject,
         Credential credential,
-        SeatUtilsType seatUtilsType,
-        boolean pinSubject
+        SeatUtilsType seatUtilsType
     ) {
         log.info("[AdminSeatService] [학교 서버] 요청 시도 과목: {}", crawlerSubject);
         SeatPayload requestPayload = SeatPayload.from(crawlerSubject);
         SeatResponse response = seatClient.execute(credential, requestPayload);
         CrawlerSeat renewedCrawlerSeat = createSeat(response, crawlerSubject);
 
-        Subject subject;
-        if (pinSubject) {
-            subject = targetSubjectStorage.getPinSubject(crawlerSubject.getId());
-        } else {
-            subject = targetSubjectStorage.getGeneralSubject(crawlerSubject.getId());
-        }
+        Subject subject = subjectRepository.findById(crawlerSubject.getId(), Semester.getCurrentSemester())
+            .orElseThrow(() -> new AllcllException(AllcllErrorCode.SUBJECT_NOT_FOUND, crawlerSubject.getId()));
 
         seatStorage.add(
             new SeatDto(

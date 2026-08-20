@@ -32,16 +32,11 @@ public class ExternalService {
 
     private PinSubjectUpdateRequest getPinSubjects() {
         Set<String> activeSseTokens = Set.copyOf(sseEmitterStorage.getUserTokens());
+        List<Pin> currentSemesterPins = pinRepository.findAllBySemesterAt(Semester.getCurrentSemester());
 
-        if (activeSseTokens.isEmpty()) {
-            return new PinSubjectUpdateRequest(List.of());
-        }
-
-        List<Pin> activePins = pinRepository.findAllByTokenInAndSemesterAt(
-            activeSseTokens,
-            Semester.getCurrentSemester()
-        );
-
+        List<Pin> activePins = currentSemesterPins.stream()
+            .filter(pin -> activeSseTokens.contains(pin.getToken()))
+            .toList();
         Map<Subject, Integer> pinCountBySubject = activePins.stream()
             .collect(Collectors.groupingBy(
                 Pin::getSubject,
