@@ -1,19 +1,11 @@
 package kr.allcll.backend.admin.seat;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import kr.allcll.backend.domain.subject.Subject;
-import kr.allcll.backend.domain.subject.SubjectRepository;
-import kr.allcll.backend.support.exception.AllcllErrorCode;
-import kr.allcll.backend.support.exception.AllcllException;
-import kr.allcll.backend.support.semester.Semester;
 import kr.allcll.crawler.subject.CrawlerSubject;
 import org.springframework.stereotype.Component;
 
@@ -24,32 +16,20 @@ public class TargetSubjectStorage {
     private final Queue<CrawlerSubject> firstPriorityQueue;
     private final Queue<CrawlerSubject> secondPriorityQueue;
     private final Queue<CrawlerSubject> thirdPriorityQueue;
-    private final SubjectRepository subjectRepository;
-    private volatile Map<Long, Subject> generalSubjectsById = Map.of();
-    private volatile Map<Long, Subject> pinSubjectsById = Map.of();
-    private volatile String generalSnapshotSemester;
-    private volatile String pinSnapshotSemester;
 
-    public TargetSubjectStorage(SubjectRepository subjectRepository) {
+    public TargetSubjectStorage() {
         this.generalSubjectsQueue = new ConcurrentLinkedQueue<>();
         this.firstPriorityQueue = new ConcurrentLinkedQueue<>();
         this.secondPriorityQueue = new ConcurrentLinkedQueue<>();
         this.thirdPriorityQueue = new ConcurrentLinkedQueue<>();
-        this.subjectRepository = subjectRepository;
     }
 
     public void addGeneralSubjects(List<CrawlerSubject> crawlerSubjects) {
         generalSubjectsQueue.clear();
         generalSubjectsQueue.addAll(crawlerSubjects);
-        generalSubjectsById = loadSubjects(crawlerSubjects);
-        generalSnapshotSemester = Semester.getCurrentSemester();
     }
 
     public void addPinSubjects(Map<CrawlerSubject, Integer> subjects) {
-        String currentSemester = Semester.getCurrentSemester();
-        pinSubjectsById = loadMissingPinSubjects(subjects, currentSemester);
-        pinSnapshotSemester = currentSemester;
-
         firstPriorityQueue.clear();
         secondPriorityQueue.clear();
         thirdPriorityQueue.clear();
@@ -70,14 +50,6 @@ public class TargetSubjectStorage {
                     throw new IllegalArgumentException("Invalid priority: " + priority);
             }
         }
-    }
-
-    public Subject getGeneralSubject(Long subjectId) {
-        return getSubject(generalSubjectsById, generalSnapshotSemester, subjectId);
-    }
-
-    public Subject getPinSubject(Long subjectId) {
-        return getSubject(pinSubjectsById, pinSnapshotSemester, subjectId);
     }
 
     public CrawlerSubject getNextGeneralTarget() {
@@ -133,58 +105,6 @@ public class TargetSubjectStorage {
 
     public List<CrawlerSubject> getTargetGeneralSubjects() {
         return new LinkedList<>(generalSubjectsQueue);
-    }
-
-    private Map<Long, Subject> loadSubjects(List<CrawlerSubject> crawlerSubjects) {
-        String currentSemester = Semester.getCurrentSemester();
-        return loadSubjects(crawlerSubjects, currentSemester);
-    }
-
-    private Map<Long, Subject> loadMissingPinSubjects(
-        Map<CrawlerSubject, Integer> subjects,
-        String currentSemester
-    ) {
-        Map<Long, Subject> cachedSubjects = getCurrentPinSubjects(currentSemester);
-        List<CrawlerSubject> missingSubjects = subjects.keySet().stream()
-            .filter(crawlerSubject -> !cachedSubjects.containsKey(crawlerSubject.getId()))
-            .toList();
-
-        if (missingSubjects.isEmpty()) {
-            return cachedSubjects;
-        }
-
-        Map<Long, Subject> loadedSubjects = loadSubjects(missingSubjects, currentSemester);
-        Map<Long, Subject> mergedSubjects = new HashMap<>(cachedSubjects);
-        mergedSubjects.putAll(loadedSubjects);
-        return Map.copyOf(mergedSubjects);
-    }
-
-    private Map<Long, Subject> getCurrentPinSubjects(String currentSemester) {
-        if (!currentSemester.equals(pinSnapshotSemester)) {
-            return Map.of();
-        }
-        return pinSubjectsById;
-    }
-
-    private Map<Long, Subject> loadSubjects(List<CrawlerSubject> crawlerSubjects, String currentSemester) {
-        List<Long> subjectIds = crawlerSubjects.stream()
-            .map(CrawlerSubject::getId)
-            .toList();
-        return subjectRepository.findAllById(subjectIds).stream()
-            .filter(subject -> !subject.isDeleted())
-            .filter(subject -> currentSemester.equals(subject.getSemesterAt()))
-            .collect(Collectors.toUnmodifiableMap(Subject::getId, Function.identity()));
-    }
-
-    private Subject getSubject(Map<Long, Subject> subjectsById, String snapshotSemester, Long subjectId) {
-        if (!Semester.getCurrentSemester().equals(snapshotSemester)) {
-            throw new AllcllException(AllcllErrorCode.SUBJECT_NOT_FOUND, subjectId);
-        }
-        Subject subject = subjectsById.get(subjectId);
-        if (subject == null) {
-            throw new AllcllException(AllcllErrorCode.SUBJECT_NOT_FOUND, subjectId);
-        }
-        return subject;
     }
 
     private enum Priority {
