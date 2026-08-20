@@ -26,9 +26,12 @@ public class AuthFacade {
 
     @Transactional
     public LoginResult login(LoginRequest loginRequest) {
+        long loginStart = System.currentTimeMillis();
         OkHttpClient client = authService.login(loginRequest);
+        long portalElapsed = System.currentTimeMillis() - loginStart;
 
         boolean toscLoginFailed = false;
+        long toscStart = System.currentTimeMillis();
         try {
             toscAuthService.loginTosc(loginRequest);
         } catch (Exception exception) {
@@ -36,6 +39,10 @@ public class AuthFacade {
             log.error("[TOSC] 로그인 실패로 TOSC 정보 업데이트를 건너뜁니다. exceptionType={}",
                 exception.getClass().getSimpleName());
         }
+        long toscElapsed = System.currentTimeMillis() - toscStart;
+        long totalElapsed = System.currentTimeMillis() - loginStart;
+        log.info("[PERF] 로그인 소요시간: portal={}ms, tosc={}ms, total={}ms",
+            portalElapsed, toscElapsed, totalElapsed);
 
         UserInfo userInfo = userFetcher.fetch(client);
         User user = userService.findOrCreate(userInfo);
