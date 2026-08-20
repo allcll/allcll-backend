@@ -1,4 +1,4 @@
-loki.source.file "allcll_error" {
+loki.source.file "allcll" {
   tail_from_end           = true
   targets = [
     {
@@ -6,6 +6,18 @@ loki.source.file "allcll_error" {
       "application" = "backend",
       "env"         = "prod",
       "level"       = "error",
+    },
+    {
+      "__path__"    = "/var/log/allcll/spring-boot-application-info.log",
+      "application" = "backend",
+      "env"         = "prod",
+      "level"       = "info",
+    },
+    {
+      "__path__"    = "/var/log/allcll/spring-boot-application-warn.log",
+      "application" = "backend",
+      "env"         = "prod",
+      "level"       = "warn",
     },
   ]
   forward_to = [loki.write.local.receiver]

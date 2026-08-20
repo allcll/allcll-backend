@@ -3,6 +3,8 @@ package kr.allcll.backend.domain.user;
 import java.io.IOException;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
+import kr.allcll.backend.client.ConnectionEventListener;
+import kr.allcll.backend.client.ConnectionHeaderInterceptor;
 import kr.allcll.backend.client.LoginProperties;
 import kr.allcll.backend.domain.user.dto.LoginRequest;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
@@ -22,7 +24,6 @@ public class AuthService {
 
     public static final String RESULT_OK = "var result = 'OK'";
     private final LoginProperties properties;
-    private final OkHttpClient loginHttpClient;
 
     public OkHttpClient login(LoginRequest loginRequest) {
         try {
@@ -32,8 +33,10 @@ public class AuthService {
             CookieManager cookieManager = new CookieManager();
             cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
 
-            OkHttpClient client = loginHttpClient.newBuilder()
+            OkHttpClient client = new OkHttpClient().newBuilder()
                 .cookieJar(new JavaNetCookieJar(cookieManager))
+                .eventListener(new ConnectionEventListener())
+                .addNetworkInterceptor(new ConnectionHeaderInterceptor())
                 .build();
 
             RequestBody body = new FormBody.Builder()

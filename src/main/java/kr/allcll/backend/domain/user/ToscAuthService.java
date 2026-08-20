@@ -2,6 +2,8 @@ package kr.allcll.backend.domain.user;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import kr.allcll.backend.client.ConnectionEventListener;
+import kr.allcll.backend.client.ConnectionHeaderInterceptor;
 import kr.allcll.backend.client.LoginProperties;
 import kr.allcll.backend.domain.user.dto.LoginRequest;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
@@ -21,10 +23,12 @@ import org.springframework.stereotype.Service;
 public class ToscAuthService {
 
     private final LoginProperties properties;
-    private final OkHttpClient loginHttpClient;
 
     public void loginTosc(LoginRequest loginRequest) {
-        OkHttpClient client = loginHttpClient.newBuilder().build();
+        OkHttpClient client = new OkHttpClient.Builder()
+            .eventListener(new ConnectionEventListener())
+            .addNetworkInterceptor(new ConnectionHeaderInterceptor())
+            .build();
 
         RequestBody body = new FormBody.Builder()
             .add("email", loginRequest.studentId())
