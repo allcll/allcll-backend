@@ -26,6 +26,7 @@ public class AuthService {
 
     public static final String RESULT_OK = "var result = 'OK'";
     private final LoginProperties properties;
+    private final OkHttpClient loginHttpClient;
 
     public OkHttpClient login(LoginRequest loginRequest) {
         String studentId = loginRequest.studentId();
@@ -35,7 +36,7 @@ public class AuthService {
             CookieManager cookieManager = new CookieManager();
             cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
 
-            OkHttpClient client = new OkHttpClient().newBuilder()
+            OkHttpClient client = loginHttpClient.newBuilder()
                 .cookieJar(new JavaNetCookieJar(cookieManager))
                 .eventListener(new ConnectionEventListener())
                 .addNetworkInterceptor(new ConnectionHeaderInterceptor())
