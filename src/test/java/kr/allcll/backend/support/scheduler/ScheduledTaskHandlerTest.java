@@ -33,6 +33,18 @@ class ScheduledTaskHandlerTest {
             .tag("task", "pin-seat")
             .gauge()
             .value()).isZero();
+        assertThat(meterRegistry.get("scheduler.pool.max.active")
+            .tag("pool", "general-seat-sender")
+            .gauge()
+            .value()).isZero();
+        assertThat(meterRegistry.get("scheduler.pool.max.active")
+            .tag("pool", "pin-seat-sender")
+            .gauge()
+            .value()).isZero();
+        assertThat(meterRegistry.get("scheduler.task.duration")
+            .tag("task", "pin-seat")
+            .timer()
+            .count()).isZero();
     }
 
     @Test
@@ -241,6 +253,14 @@ class ScheduledTaskHandlerTest {
 
                 assertThat(counter.get()).isGreaterThanOrEqualTo(1);
                 assertThat(lastSuccessTimestamp).isPositive();
+                assertThat(meterRegistry.get("scheduler.pool.max.active")
+                    .tag("pool", "general-seat-sender")
+                    .gauge()
+                    .value()).isEqualTo(1.0);
+                assertThat(meterRegistry.get("scheduler.task.duration")
+                    .tag("task", "general-seat")
+                    .timer()
+                    .count()).isGreaterThanOrEqualTo(1);
             });
 
         scheduledTaskHandler.cancelAll();

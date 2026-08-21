@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,7 @@ public class SeatPipelineMetrics {
 
     private static final String TYPE_TAG = "type";
     private static final String TASK_TAG = "task";
+    private static final String POOL_TAG = "pool";
     private static final String EVENT_TAG = "event";
     private static final List<String> SSE_EVENT_NAMES = List.of(
         "connection",
@@ -33,6 +35,8 @@ public class SeatPipelineMetrics {
     private final Map<String, Timer> batchFlushDurationTimers = new ConcurrentHashMap<>();
     private final Map<String, Counter> sseEventCoalescedCounters = new ConcurrentHashMap<>();
     private final Map<String, AtomicLong> schedulerLastSuccessEpochSeconds = new ConcurrentHashMap<>();
+    private final Map<String, AtomicInteger> schedulerPoolMaxActiveThreads = new ConcurrentHashMap<>();
+    private final Map<String, Timer> schedulerTaskDurationTimers = new ConcurrentHashMap<>();
     private final Counter sseSendFailureCounter;
     private final Timer sseSendDurationTimer;
 
@@ -132,6 +136,29 @@ public class SeatPipelineMetrics {
 
     public void registerSchedulerTask(String task) {
         schedulerLastSuccessEpochSeconds.computeIfAbsent(task, this::registerSchedulerGauge);
+        registerSchedulerDurationMetrics(task);
+    }
+
+    public void recordSchedulerTask(String task, Runnable runnable) {
+        registerSchedulerDurationMetrics(task);
+        Timer durationTimer = schedulerTaskDurationTimers.get(task);
+
+        Timer.Sample sample = Timer.start(meterRegistry);
+        try {
+            runnable.run();
+        } finally {
+            sample.stop(durationTimer);
+        }
+    }
+
+    public void registerSchedulerPool(String pool) {
+        schedulerPoolMaxActiveThreads.computeIfAbsent(pool, this::registerSchedulerPoolMaxActiveGauge);
+    }
+
+    public void recordSchedulerPoolActiveThreads(String pool, int activeThreads) {
+        schedulerPoolMaxActiveThreads
+            .computeIfAbsent(pool, this::registerSchedulerPoolMaxActiveGauge)
+            .accumulateAndGet(activeThreads, Math::max);
     }
 
     public void recordSchedulerTaskSuccess(String task) {
@@ -145,6 +172,25 @@ public class SeatPipelineMetrics {
             .tags(Tags.of(TASK_TAG, task))
             .register(meterRegistry);
         return lastSuccess;
+    }
+
+    private void registerSchedulerDurationMetrics(String task) {
+        schedulerTaskDurationTimers.computeIfAbsent(task, this::registerSchedulerTaskDurationTimer);
+    }
+
+    private AtomicInteger registerSchedulerPoolMaxActiveGauge(String pool) {
+        AtomicInteger maxActiveThreads = new AtomicInteger(0);
+        Gauge.builder("scheduler.pool.max.active", maxActiveThreads, AtomicInteger::get)
+            .tags(Tags.of(POOL_TAG, pool))
+            .register(meterRegistry);
+        return maxActiveThreads;
+    }
+
+    private Timer registerSchedulerTaskDurationTimer(String task) {
+        return Timer.builder("scheduler.task.duration")
+            .tags(Tags.of(TASK_TAG, task))
+            .publishPercentileHistogram()
+            .register(meterRegistry);
     }
 
     private Counter registerBatchFlushFailureCounter(String type) {
