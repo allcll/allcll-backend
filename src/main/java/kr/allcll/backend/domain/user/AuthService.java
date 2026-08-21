@@ -10,6 +10,7 @@ import kr.allcll.backend.domain.user.dto.LoginRequest;
 import kr.allcll.backend.support.exception.AllcllErrorCode;
 import kr.allcll.backend.support.exception.AllcllException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.FormBody;
 import okhttp3.JavaNetCookieJar;
 import okhttp3.OkHttpClient;
@@ -18,22 +19,24 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     public static final String RESULT_OK = "var result = 'OK'";
     private final LoginProperties properties;
+    private final OkHttpClient loginHttpClient;
 
     public OkHttpClient login(LoginRequest loginRequest) {
+        String studentId = loginRequest.studentId();
         try {
-            String studentId = loginRequest.studentId();
             String password = loginRequest.password();
 
             CookieManager cookieManager = new CookieManager();
             cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
 
-            OkHttpClient client = new OkHttpClient().newBuilder()
+            OkHttpClient client = loginHttpClient.newBuilder()
                 .cookieJar(new JavaNetCookieJar(cookieManager))
                 .eventListener(new ConnectionEventListener())
                 .addNetworkInterceptor(new ConnectionHeaderInterceptor())
@@ -52,22 +55,29 @@ public class AuthService {
                 .build();
 
             try (Response response = client.newCall(request).execute()) {
-                if (!isSuccessful(response)) {
+                if (!isSuccessful(studentId, response)) {
                     throw new AllcllException(AllcllErrorCode.SEJONG_LOGIN_FAIL);
                 }
+                log.info("[Login] 로그인 성공 (학번: {})", studentId);
                 return client;
             }
         } catch (IOException exception) {
+            log.error("[Login] 세종포털 통신 오류 (학번: {})", studentId, exception);
             throw new AllcllException(AllcllErrorCode.SEJONG_LOGIN_IO_ERROR, exception);
         }
     }
 
-    private boolean isSuccessful(Response response) throws IOException {
+    private boolean isSuccessful(String studentId, Response response) throws IOException {
         if (!response.isSuccessful()) {
+            log.warn("[Login] 로그인 실패 (학번: {}, 응답코드: {})", studentId, response.code());
             return false;
         }
         // 세종대 포털은 로그인 실패에도 200을 반환하므로 응답 본문의 result 값으로 판단
         String responseBody = response.body() != null ? response.body().string() : "";
-        return responseBody.contains(RESULT_OK);
+        if (!responseBody.contains(RESULT_OK)) {
+            log.warn("[Login] 로그인 실패 (학번: {}, body: {})", studentId, responseBody);
+            return false;
+        }
+        return true;
     }
 }

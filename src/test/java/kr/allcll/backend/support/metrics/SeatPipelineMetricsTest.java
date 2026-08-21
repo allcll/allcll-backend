@@ -107,4 +107,32 @@ class SeatPipelineMetricsTest {
             .value();
         assertThat(timestamp).isPositive();
     }
+
+    @Test
+    @DisplayName("스케줄러 풀의 최대 활성 스레드 수와 작업 실행 시간을 기록한다.")
+    void schedulerTaskExecutionMetrics() {
+        // given
+        SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
+        SeatPipelineMetrics seatPipelineMetrics = new SeatPipelineMetrics(meterRegistry);
+        seatPipelineMetrics.registerSchedulerTask("pin-seat");
+        seatPipelineMetrics.registerSchedulerPool("pin-seat-sender");
+
+        // when
+        seatPipelineMetrics.recordSchedulerPoolActiveThreads("pin-seat-sender", 3);
+        seatPipelineMetrics.recordSchedulerPoolActiveThreads("pin-seat-sender", 2);
+        seatPipelineMetrics.recordSchedulerTask("pin-seat", () -> {
+        });
+        seatPipelineMetrics.recordSchedulerTask("pin-seat", () -> {
+        });
+
+        // then
+        assertThat(meterRegistry.get("scheduler.pool.max.active")
+            .tag("pool", "pin-seat-sender")
+            .gauge()
+            .value()).isEqualTo(3.0);
+        assertThat(meterRegistry.get("scheduler.task.duration")
+            .tag("task", "pin-seat")
+            .timer()
+            .count()).isEqualTo(2);
+    }
 }

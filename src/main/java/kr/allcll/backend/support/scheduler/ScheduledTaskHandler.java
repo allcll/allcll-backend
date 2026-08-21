@@ -17,6 +17,7 @@ public class ScheduledTaskHandler {
     private final ThreadPoolTaskScheduler scheduler;
     private final Map<String, ScheduledFuture<?>> tasks = new ConcurrentHashMap<>();
     private final SeatPipelineMetrics seatPipelineMetrics;
+    private final String poolName;
     private final String taskName;
 
     public ScheduledTaskHandler(int poolSize, String namePrefix, MeterRegistry meterRegistry) {
@@ -35,9 +36,11 @@ public class ScheduledTaskHandler {
         scheduler.setRemoveOnCancelPolicy(true);
         scheduler.initialize();
         this.seatPipelineMetrics = seatPipelineMetrics;
+        this.poolName = namePrefix;
         this.taskName = resolveTaskName(namePrefix);
         if (seatPipelineMetrics != null) {
             seatPipelineMetrics.registerSchedulerTask(taskName);
+            seatPipelineMetrics.registerSchedulerPool(poolName);
         }
 
         ExecutorServiceMetrics.monitor(meterRegistry, scheduler.getScheduledExecutor(), namePrefix);
@@ -94,10 +97,16 @@ public class ScheduledTaskHandler {
     }
 
     private void runWithMetrics(Runnable task) {
-        task.run();
-        if (seatPipelineMetrics != null) {
-            seatPipelineMetrics.recordSchedulerTaskSuccess(taskName);
+        if (seatPipelineMetrics == null) {
+            task.run();
+            return;
         }
+
+        seatPipelineMetrics.recordSchedulerPoolActiveThreads(poolName, scheduler.getActiveCount());
+        seatPipelineMetrics.recordSchedulerTask(taskName, () -> {
+            task.run();
+            seatPipelineMetrics.recordSchedulerTaskSuccess(taskName);
+        });
     }
 
     private String resolveTaskName(String namePrefix) {
