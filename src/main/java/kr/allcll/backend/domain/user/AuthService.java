@@ -55,9 +55,7 @@ public class AuthService {
                 .build();
 
             try (Response response = client.newCall(request).execute()) {
-                if (!isSuccessful(studentId, response)) {
-                    throw new AllcllException(AllcllErrorCode.SEJONG_LOGIN_FAIL);
-                }
+                validateLoginResponse(studentId, response);
                 log.info("[Login] 로그인 성공 (학번: {})", studentId);
                 return client;
             }
@@ -67,17 +65,30 @@ public class AuthService {
         }
     }
 
-    private boolean isSuccessful(String studentId, Response response) throws IOException {
+    private void validateLoginResponse(String studentId, Response response) throws IOException {
         if (!response.isSuccessful()) {
             log.warn("[Login] 로그인 실패 (학번: {}, 응답코드: {})", studentId, response.code());
-            return false;
+            throw new AllcllException(AllcllErrorCode.SEJONG_LOGIN_FAIL);
         }
         // 세종대 포털은 로그인 실패에도 200을 반환하므로 응답 본문의 result 값으로 판단
         String responseBody = response.body() != null ? response.body().string() : "";
-        if (!responseBody.contains(RESULT_OK)) {
-            log.warn("[Login] 로그인 실패 (학번: {}, body: {})", studentId, responseBody);
-            return false;
+        if (responseBody.contains(RESULT_OK)) {
+            return;
         }
-        return true;
+        log.warn("[Login] 로그인 실패 (학번: {}, body: {})", studentId, responseBody);
+        throw classifyLoginFailure(responseBody);
+    }
+
+    private AllcllException classifyLoginFailure(String responseBody) {
+        if (responseBody.contains("개인정보 수집동의")) {
+            return new AllcllException(AllcllErrorCode.SEJONG_PRIVACY_CONSENT_REQUIRED);
+        }
+        if (responseBody.contains("계정관리자의 요청으로 현재 로그인이 불가")) {
+            return new AllcllException(AllcllErrorCode.SEJONG_ACCOUNT_LOCKED);
+        }
+        if (responseBody.contains("pwdNeedChg")) {
+            return new AllcllException(AllcllErrorCode.SEJONG_PASSWORD_CHANGE_REQUIRED);
+        }
+        return new AllcllException(AllcllErrorCode.SEJONG_LOGIN_FAIL);
     }
 }
