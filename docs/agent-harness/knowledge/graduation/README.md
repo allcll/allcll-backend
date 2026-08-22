@@ -11,7 +11,8 @@
 | 이 도메인이 처음이다 / 전체 구조 | [map/architecture.md](map/architecture.md) — 파이프라인 5단계 + 컴포넌트 매트릭스 + Cross-Reference Index |
 | "이 값 어디서 오지?" (시트 vs 크롤러 vs 업로드) | [map/data-dependency-map.md](map/data-dependency-map.md) — **전공과목은 시트 아님(크롤러)** |
 | 조회/검사 쿼리 추가·수정 | [conventions/resolver-layering.md](conventions/resolver-layering.md) — resolver 경유 의무 |
-| 시트 값·적재 규칙이 이상하다 | [conventions/loading-rules.md](conventions/loading-rules.md) — 사람이 적재한 임의 규칙 (계약학과 보정·rename 등) |
+| 시트 값·적재 규칙이 이상하다 | [conventions/loading-rules.md](conventions/loading-rules.md) — 적재 규칙 (계약학과 보정·rename 등). 원래 사람이 정한 암묵 규칙이었고 지금은 wiki 생성기·검증기에 코드화됨 |
+| 시트 값을 고쳐야 한다 | [conventions/loading-rules.md](conventions/loading-rules.md) §7 — **시트를 직접 수정 금지**. graduation-wiki `grad-sheet-change`(정본 → PR → apply CI) 경로와 apply 대상 탭 목록 |
 | sync/적재 코드 | [contracts/data-loading-policy.md](contracts/data-loading-policy.md) — delete-all+save-all·검증 2단계 |
 | 검사 파이프라인·트랜잭션·재계산 | [contracts/data-usage-policy.md](contracts/data-usage-policy.md) |
 | 인증제 (영어·코딩·고전) | [contracts/certification-policy.md](contracts/certification-policy.md) — 값 정본은 wiki |

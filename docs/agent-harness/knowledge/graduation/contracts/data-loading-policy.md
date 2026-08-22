@@ -20,6 +20,9 @@
 ### 1.2 정책적 의미
 
 - "시트 수정 = 즉시 운영 반영" 이 *아님*. 항상 사람 결정의 sync 호출이 끼어있음
+- 반대편(시트로 값이 들어가는 경로)도 사람이 손으로 하지 않는다 — graduation-wiki 정본 → PR 리뷰 →
+  apply CI 가 시트를 전면 교체한다. 즉 전체 경로는 **wiki 정본 → (apply CI) → 시트 → (어드민 sync) → DB**
+  이고, 사람 게이트는 PR 머지와 sync 호출 둘이다 (`../conventions/loading-rules.md` §7)
 - 동기화 누락 시 운영 데이터가 stale — sync 호출 누락이 무음 장애 원인이 될 수 있음
 - 학기 시작 시 sync 호출은 **운영 절차의 일부**로 박제 필요 (../decisions/ ADR 후보)
 
@@ -217,15 +220,18 @@ private void syncXxx() {
 | `coding_cert_criteria` | `CodingCertCriteriaSheetValidator` | `CodingCertCriterion` | `CodingCertCriterionRepository` | `syncCodingCertCriteria` |
 | `classic_cert_criteria` | `ClassicCertCriteriaSheetValidator` | `ClassicCertCriterion` | `ClassicCertCriterionRepository` | `syncClassicCertCriteria` |
 | `graduation_department_info` | `GraduationDepartmentInfoSheetValidator` | `GraduationDepartmentInfo` | `GraduationDepartmentInfoRepository` | `syncGraduationDepartmentInfo` |
-| `course_replacements` | (확인 필요 — sync 메서드에서 사용 안 함) | (확인 필요) | (확인 필요) | **없음** |
+| `course_replacements` | 없음 | 없음 (`CourseReplacement` 클래스 부재) | 없음 | **없음** — dead 탭 |
 
-### 8.1 미해결: `course_replacements`
+### 8.1 해소: `course_replacements` = dead 탭 (2026-08-15 확정)
 
-- 시트에는 탭이 존재 (`course_replacements`)
-- `AdminGraduationSyncService` 에 sync 메서드 없음
-- worktrees 에는 `CourseReplacementsSheetValidator` 가 보였으나 main 에는 없음
-- **가설**: 미적용 신규 탭이거나, 다른 sync 서비스가 따로 있을 수 있음
-- **검수 필요**: 사용자가 운영 현황 확인 (분류 B 의 갭일 가능성)
+- 시트에는 탭이 남아 있지만 **적재 경로가 존재하지 않는다**: validator·엔티티·repository·sync 메서드 전부 부재.
+  잔존물은 `application.yml`/`application-local.yml` 의 탭 키 (`course-replacements: "course_replacements"`) 와
+  `V1__initial_schema.sql` 의 DDL 뿐이다.
+- 원인은 누락이 아니라 **의도된 폐기** — EC-011(TSK-71, PR #310)에서 `course_equivalences` +
+  `same_course_code` 체계로 대체됐다.
+- 시트 자동화 파이프라인에서도 유일한 non-live 탭 — graduation-wiki `export_sheets.TABS` 미등록 =
+  apply 대상 아님 (`conventions/loading-rules.md` §7). **입력해도 시트에도 DB 에도 반영되지 않는다.**
+- 남은 정리 후보(선택): yml 탭 키 제거. 지금은 무해 — 어떤 코드도 이 키를 읽지 않는다.
 
 ---
 
@@ -238,7 +244,7 @@ private void syncXxx() {
 
 ### 분류 B (스키마·구조 변경 후보)
 
-- ST-001: `course_replacements` 탭이 시트에 있는데 sync 메서드 없음 — 의도된 미적용인지 누락인지 확인 필요
+- ~~ST-001~~ **해소 (2026-08-15)**: `course_replacements` 는 의도된 dead 탭 (EC-011 폐기분, §8.1). 잔여 작업은 yml 탭 키 제거뿐 — 기능 갭 아님
 - ST-002: 검증이 형식만 — 키 유일성·합계 정합성 보강 (validator 강화 또는 별도 의미 validator 신설)
 - ST-003: admission_year vs admission_year_short 정합 validator 없음 (EC-008)
 
@@ -262,7 +268,7 @@ private void syncXxx() {
 - [x] Delete-All + Save-All 패턴: 12 sync 메서드 모두 동일 확인
 - [x] 12개 탭 sync 순서: 코드 일치
 - [x] 시트 ↔ 엔티티 매핑 표: 코드 일치
-- [ ] **`course_replacements` 탭의 의도** (시트 존재, sync 없음): 운영 확인 필요
+- [x] **`course_replacements` 탭의 의도**: 2026-08-15 확인 — EC-011 로 폐기된 dead 탭. 적재 경로 전무(§8.1)
 - [ ] **순서 의존성의 정책 의도**: PR 히스토리·구두 합의 확인 필요
 - [ ] **동시 sync 호출 처리 정책**: 미정 → ADR 필요
 - [ ] **rate limit 보호 필요성**: Google API 사용량 실측 필요

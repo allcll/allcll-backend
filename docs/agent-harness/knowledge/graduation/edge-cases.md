@@ -92,8 +92,8 @@ EC 번호는 한 번 부여되면 폐기되어도 재사용 금지. 폐기된 �
 ## EC-008: admission_year vs admission_year_short 정합
 
 - **조건**: 모든 시트의 두 컬럼
-- **함정**: validator 정합 검증 안 함. 사람 적재 시 한쪽만 수정하면 어긋남
-- **검수 상태**: 코드 일치, validator 보강 후보
+- **함정**: 백엔드 validator 는 두 컬럼의 정합을 검증하지 않는다. 다만 2026-08 이후 시트는 생성물이고 wiki 생성기가 `short = year%100` 로 계산하므로(검증 A1) 실질 위험은 시트를 손으로 건드린 경우뿐 — 그리고 그 수정은 apply 의 lease 가드가 잡는다
+- **검수 상태**: 코드 일치, validator 보강 후보 (우선순위는 낮아짐 — 생성기 A1 이 상류에서 보장)
 
 ## EC-009: dept_nm 변경 시 마이그레이션 — 시트 운영 = 새 dept_cd 분리 발급
 
@@ -155,8 +155,9 @@ EC 번호는 한 번 부여되면 폐기되어도 재사용 금지. 폐기된 �
     - `RequiredCourse.curiNo = "DEPRECATED"` 행
     - `RequiredCourseResolver` 가 `CourseReplacement` 로 치환
     - 학번별 대체과목 관리 — 커버리지 낮음, 운영 리소스 큼
+- **컬럼명 주의 (2026-07-29 rename)**: 아래 서술의 `group_code` 는 **현재 `same_course_code`** 다 (시트 컬럼·엔티티 `CourseEquivalence.sameCourseCode`·`RequiredCourse.sameCourseCode` 전부). 구명은 PR #310 당시 표기로만 남는다. `required_courses` 의 **`alt_group`(구 same_course_code)은 택N 그룹**으로 의미가 다르니 혼동 주의 — graduation-wiki `mappings/course_equivalences.csv` 만 아직 `group_code` 헤더를 쓰고 생성기가 변환한다.
 - **현행**:
-    - `course_equivalences` 시트 + `group_code` 컬럼 도입
+    - `course_equivalences` 시트 + `group_code`(현 `same_course_code`) 컬럼 도입
     - `required_courses` 에도 `group_code` 컬럼 추가
     - 모든 학번/학과 공통, 과목 자체 기준 통합 관리
     - 동일과목 ⊃ 대체과목 (동일과목이 상위 개념)
@@ -167,8 +168,8 @@ EC 번호는 한 번 부여되면 폐기되어도 재사용 금지. 폐기된 �
     - 학사정보시스템 동일과목 CSV 기반 적재 → 운영 리소스 감소
     - 동일과목/대체과목 통합 — 동일과목 카테고리가 대체과목 카테고리 포함 (실제 동일과목이 더 넓음)
 - **시트 영향**:
-    - `course_replacements` 시트 폐기 (또는 미적재 유지)
-    - `course_equivalences` 시트가 모든 동일/대체과목 관리
+    - `course_replacements` 시트 **dead 확정** (2026-08-15 코드 확인 — 클래스·validator·sync 전부 부재, yml 탭 키와 V1 DDL 만 잔존. wiki apply 대상도 아님)
+    - `course_equivalences` 시트가 모든 동일/대체과목 관리 (7,535행, 원천=학사정보시스템 CSV)
 - **함정**:
     - 적재 순서 의존 없음 (PR #310 논의 참조 — 학사정보시스템 순서가 변경 이력대로 정렬 안 됨)
     - 일대다 대체는 같은 group_code 에 여러 행으로 자연스럽게 표현

@@ -58,7 +58,7 @@ service  →  resolver  →  repository
 | `NonMajorCategoryResolver` | 교양 카테고리 조회. 와일드카드(ALL_DEPT) + 학과 override 머지 | `loadRequiredCourses`(courseKey override) | EC-010 |
 | `BalanceRequiredResolver` | 균형교양 기준 조회 (학과별 룰 + 영역 제외) | — | EC-019, EC-020 |
 | `DoubleCreditCriterionResolver` | 복수전공 학과 페어 **3단계 fallback** | `resolve` (pair → primary+ALL → ALL+secondary) | EC-003, EC-004 |
-| `RequiredCourseResolver` | DEPRECATED 과목 → 현행 과목 치환, group_code 매칭 | `findRequiredCourseNames`, `findRequiredCourseInGroup` | EC-011 |
+| `RequiredCourseResolver` | DEPRECATED 과목 → 현행 과목 치환, `sameCourseCode` 그룹 매칭 (구 group_code) | `findRequiredCourseNames`, `findRequiredCourseInGroup` | EC-011 |
 | `AcademicBasicPolicy` (policy) | 기필(ACADEMIC_BASIC) 과목의 학과 인정 추가검증 | `isRecentMajorAcademicBasic` | EC-021 |
 | `GraduationCertResolver` (check/cert) | 로그인 시 인증 판정 (대체과목 우선) | — | EC-015 |
 
