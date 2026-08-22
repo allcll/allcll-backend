@@ -30,12 +30,12 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
         HttpSession session = request.getSession(false);
 
         if (session == null) {
-            throw new AllcllException(AllcllErrorCode.UNAUTHORIZED_ACCESS);
+            throw new AllcllException(AllcllErrorCode.SESSION_EXPIRED);
         }
 
         Long userId = (Long) session.getAttribute(LOGIN_SESSION);
         if (userId == null) {
-            throw new AllcllException(AllcllErrorCode.SEJONG_LOGIN_FAIL);
+            throw new AllcllException(AllcllErrorCode.SESSION_EXPIRED);
         }
 
         return userId;

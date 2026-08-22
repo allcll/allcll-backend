@@ -28,6 +28,7 @@ public enum AllcllErrorCode {
     SEJONG_ACCOUNT_LOCKED(HttpStatus.UNAUTHORIZED, "계정이 잠겨 있습니다. 세종대 포털에서 계정 잠금을 해제해주세요."),
     SEJONG_PASSWORD_CHANGE_REQUIRED(HttpStatus.UNAUTHORIZED, "비밀번호 변경이 필요합니다. 세종대 포털에서 비밀번호를 변경해주세요."),
     SESSION_NOT_FOUND(HttpStatus.UNAUTHORIZED, "로그인이 필요한 서비스입니다."),
+    SESSION_EXPIRED(HttpStatus.UNAUTHORIZED, "로그인이 만료되었습니다. 다시 로그인해주세요."),
     UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "접근 권한이 없습니다."),
     TOSC_LOGIN_FAIL(HttpStatus.UNAUTHORIZED, "TOSC 로그인에 실패했습니다."),
 
